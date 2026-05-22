@@ -36,8 +36,8 @@ Strava answers *what happened*. StrideIQ should answer **why it happened, what i
 
 | # | Vision | Today (honest) | Gap |
 |---|--------|----------------|-----|
-| **1** | Interactive endurance reasoning | `/coach` + MCP: 9 **fetch** tools, Anthropic loop | No **reasoning** tools: compare sessions, explain deltas, trace causality |
-| **2** | Training memory | `bestBlock`, 4-week blocks, volume/efficiency trends | No **AthleteMemory** object: “you perform best when…” |
+| **1** | Interactive endurance reasoning | `/coach` + MCP: reasoning + ecosystem **tools**, OpenAI/Anthropic loop; `/intelligence` belief UI | Deeper causality chains, memory-weighted planning |
+| **2** | Training memory | `bestBlock`, memory snippets, Intelligence tiles, workspace state | No formal **AthleteMemory** profile object persisted across seasons |
 | **3** | Causality engine | Efficiency MoM, intensity advice, block highlights | No **period attribution** or multi-factor causal scoring |
 | **4** | Workout quality | Run detail: quality 0–100, pacing stability, HR drift, fade | Missing: interval repeatability, decoupling index, threshold HR control |
 | **5** | Adaptive goals | Consensus predictions + spread; readiness score | No **scenario engine**: “1:45 requires +15% volume…” |

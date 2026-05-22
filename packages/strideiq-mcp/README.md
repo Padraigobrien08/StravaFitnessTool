@@ -2,7 +2,7 @@
 
 MCP server exposing StrideIQ **deterministic training intelligence** to Claude Desktop, Cursor, and other MCP clients.
 
-Requires a running StrideIQ app (`npm run dev`) with Strava connected and data synced.
+Requires a running StrideIQ app (`npm run dev`) with Strava connected and data synced. See [docs/ARCHITECTURE.md](../../docs/ARCHITECTURE.md) and [docs/COACH_AND_INTELLIGENCE.md](../../docs/COACH_AND_INTELLIGENCE.md) for how tools relate to the web Coach and Intelligence surfaces.
 
 ## Setup
 

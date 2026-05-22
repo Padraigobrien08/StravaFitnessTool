@@ -17,6 +17,10 @@
 | Am I ready for my goal? | Goals, Readiness, Race predictions |
 | What should I do next? | Home recommendations, Goals |
 | What changed recently? | Home, Reports |
+| What does the system believe about me? | **Intelligence** (`/intelligence`) |
+| Why / compare / investigate? | **Coach** (`/coach`) |
+
+See [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md).
 
 ## Architecture rules
 
@@ -51,8 +55,11 @@ type Insight = {
 - [x] Phase 3 — Import quality validation
 - [x] Phase 4 — Customer-facing IA (Home, Training, Performance, Goals, Reports, Settings)
 - [x] Phase 5 — Insight engine v1
+- [x] Phase 5b — Strava OAuth + Neon sync, webhooks, FIT streams
+- [x] Phase 5c — Coach chat + MCP + reasoning tools (`lib/reasoning/`)
+- [x] Phase 5d — Intelligence page + Coach workspace split
 - [ ] Phase 6 — Auth, billing, Sentry, PostHog, E2E (V2 hosted)
-- [ ] Phase 7 — **Differentiation:** reasoning primitives, athlete memory, causality (see [docs/DIFFERENTIATION_NORTH_STAR.md](docs/DIFFERENTIATION_NORTH_STAR.md))
+- [ ] Phase 7 — **Differentiation:** deeper athlete memory, causality, adaptive goals (see [docs/DIFFERENTIATION_NORTH_STAR.md](docs/DIFFERENTIATION_NORTH_STAR.md))
 
 ## Differentiation (north star)
 
