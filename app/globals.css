@@ -148,6 +148,19 @@ body::before {
   overscroll-behavior: contain;
 }
 
+/* Intelligence athlete model */
+.intelligence-model {
+  --intel-gap: 1.25rem;
+}
+
+.intelligence-hero {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.intelligence-block + .intelligence-block {
+  margin-top: 0;
+}
+
 .coach-split {
   min-height: 0;
 }
