@@ -1,26 +1,387 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --accent: #10b981;
+  --accent-muted: #064e3b;
+  --warning: #fbbf24;
+  --card: rgba(255, 255, 255, 0.04);
+  --border: rgba(255, 255, 255, 0.1);
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Syne", system-ui, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(16, 185, 129, 0.06), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Home dashboard micro-interactions */
+@keyframes dashboard-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-enter {
+  animation: dashboard-fade-in 0.35s ease-out both;
+}
+
+.dashboard-stagger-1 { animation: dashboard-fade-in 0.4s ease-out 0.02s both; }
+.dashboard-stagger-2 { animation: dashboard-fade-in 0.4s ease-out 0.06s both; }
+.dashboard-stagger-3 { animation: dashboard-fade-in 0.4s ease-out 0.1s both; }
+.dashboard-stagger-4 { animation: dashboard-fade-in 0.4s ease-out 0.14s both; }
+.dashboard-stagger-5 { animation: dashboard-fade-in 0.4s ease-out 0.18s both; }
+.dashboard-stagger-6 { animation: dashboard-fade-in 0.4s ease-out 0.22s both; }
+.dashboard-stagger-7 { animation: dashboard-fade-in 0.4s ease-out 0.26s both; }
+
+.sparkline-enter .sparkline-area {
+  animation: spark-fade 0.6s ease-out both;
+}
+
+@keyframes spark-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Coach intelligence terminal */
+.coach-terminal {
+  background:
+    radial-gradient(ellipse 140% 90% at 0% 0%, rgba(16, 185, 129, 0.07), transparent 52%),
+    radial-gradient(ellipse 70% 50% at 100% 0%, rgba(16, 185, 129, 0.03), transparent 40%),
+    linear-gradient(180deg, #0a0b0d 0%, #07080a 100%);
+}
+
+.coach-split {
+  min-height: 0;
+}
+
+.coach-intel-pane {
+  background:
+    radial-gradient(ellipse 80% 40% at 20% 0%, rgba(16, 185, 129, 0.04), transparent 55%),
+    #09090b;
+}
+
+.coach-thread-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0%, transparent 12%),
+    #07080a;
+}
+
+.coach-intel-scroll,
+.coach-thread-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+.coach-intel-obs-panel {
+  animation: coach-presence-in 0.55s ease-out 0.06s both;
+}
+
+.coach-memory-layer {
+  animation: coach-card-in 0.5s ease-out 0.1s both;
+}
+
+.coach-continuity {
+  animation: coach-card-in 0.5s ease-out 0.14s both;
+}
+
+.coach-investigation-prompt {
+  animation: coach-card-in 0.35s ease-out both;
+}
+
+.coach-reasoning-trace {
+  animation: coach-phase-enter 0.4s ease-out both;
+}
+
+.coach-card-enter {
+  animation: coach-card-in 0.45s ease-out both;
+}
+
+.coach-msg-enter {
+  animation: dashboard-fade-in 0.3s ease-out both;
+}
+
+.coach-empty-enter {
+  animation: dashboard-fade-in 0.5s ease-out both;
+}
+
+.coach-phase-enter {
+  animation: dashboard-fade-in 0.25s ease-out both;
+}
+
+@keyframes coach-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.coach-shimmer-bar {
+  animation: coach-shimmer-slide 1.8s ease-in-out infinite;
+}
+
+@keyframes coach-shimmer-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.coach-card-section + .coach-card-section {
+  padding-top: 0.25rem;
+}
+
+.coach-canvas {
+  animation: dashboard-fade-in 0.55s ease-out both;
+}
+
+.coach-presence {
+  animation: coach-presence-in 0.6s ease-out both;
+}
+
+.coach-domain-feature {
+  animation: coach-card-in 0.5s ease-out 0.08s both;
+}
+
+.coach-domain-card {
+  animation: coach-card-in 0.45s ease-out both;
+}
+
+.coach-domain-card:nth-child(2) { animation-delay: 0.05s; }
+.coach-domain-card:nth-child(3) { animation-delay: 0.1s; }
+.coach-domain-card:nth-child(4) { animation-delay: 0.14s; }
+
+.coach-main {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center top;
+}
+
+@keyframes coach-presence-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Route intelligence replay */
+.route-terminal {
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(16, 185, 129, 0.05), transparent 55%),
+    #09090b;
+  min-height: calc(100dvh - 8rem);
+}
+
+.route-scrubber {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  accent-color: #14b8a6;
+}
+
+.route-scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #5eead4;
+  box-shadow: 0 0 12px rgba(94, 234, 212, 0.5);
+}
+
+.maplibregl-ctrl-group {
+  background: rgba(12, 13, 16, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-enter,
+  .dashboard-stagger-1,
+  .dashboard-stagger-2,
+  .dashboard-stagger-3,
+  .dashboard-stagger-4,
+  .dashboard-stagger-5,
+  .dashboard-stagger-6,
+  .dashboard-stagger-7 {
+    animation: none;
+  }
+  .skeleton-shimmer {
+    animation: none;
+  }
+  .sparkline-line {
+    transition: none !important;
+  }
+}
+
+/* Athlete Intelligence Report — document identity (screen + print) */
+.report-page-shell .report-canvas {
+  color: #18181b;
+}
+
+.report-document {
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.report-section {
+  break-inside: auto;
+}
+
+.report-chart,
+.report-hero,
+.report-executive,
+.report-race-briefing {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+@media print {
+  @page {
+    margin: 18mm 16mm 20mm;
+    size: A4;
+  }
+
+  body::before {
+    display: none;
+  }
+
+  body {
+    background: white !important;
+    color: #18181b !important;
+  }
+
+  nav,
+  aside,
+  header button,
+  .no-print,
+  .report-page-shell > .no-print {
+    display: none !important;
+  }
+
+  .report-page-shell {
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .report-canvas {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  .report-document {
+    border: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .report-section.print\:break-before-page,
+  .print\:break-before-page {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .report-masthead {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .report-footer {
+    break-before: avoid;
+    page-break-before: avoid;
+  }
+
+  /* Grayscale-safe chart strokes */
+  .report-chart .recharts-line-curve,
+  .report-chart .recharts-area-curve {
+    stroke: #0f766e !important;
+  }
+
+  .report-chart .recharts-bar-rectangle {
+    fill: #3f3f46 !important;
+  }
+
+  /* Confidence badges readable on white */
+  .report-document span.rounded-full.border {
+    border-color: #a1a1aa !important;
+    background: #f4f4f5 !important;
+    color: #3f3f46 !important;
+  }
+
+  /* Readiness ring text */
+  .report-hero .font-display {
+    color: #18181b !important;
+  }
 }
