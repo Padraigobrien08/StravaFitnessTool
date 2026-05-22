@@ -3,7 +3,8 @@
 import Link from "next/link";
 import type { CoachWorkspaceState } from "@/lib/coach/types";
 import type { DashboardInsights } from "@/lib/analytics";
-import { coachUrl } from "@/lib/coach/domainLinks";
+import { buildCurrentBelief } from "@/lib/intelligence/presentation";
+import { coachUrl, topicCoachLink } from "@/lib/coach/domainLinks";
 import { cn } from "@/lib/utils";
 import { MessageCircle } from "lucide-react";
 
@@ -11,108 +12,115 @@ export function IntelligenceHero({
   state,
   analytics,
   primaryRecommendation,
+  metaLine,
 }: {
   state: CoachWorkspaceState;
   analytics: DashboardInsights;
   primaryRecommendation: string;
+  metaLine?: string;
 }) {
   const snap = state.snapshot;
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
-
-  const subline = [
-    snap.daysToRace != null
-      ? `${snap.daysToRace} days to race`
-      : snap.raceLabel
-        ? snap.raceLabel
-        : null,
-    snap.freshness != null ? `freshness ${snap.freshness}` : null,
-    snap.riskLevel !== "low" ? snap.riskLabel.toLowerCase() : null,
-  ]
-    .filter(Boolean)
-    .join(" — ");
+  const currentBelief = buildCurrentBelief(state, analytics);
+  const profileLine =
+    snap.archetypeLabel ??
+    analytics.trainingEcosystem.archetype.label ??
+    "Runner";
 
   return (
-    <section className="intelligence-hero relative overflow-hidden rounded-2xl border border-teal-500/12 bg-gradient-to-br from-teal-500/[0.08] via-[#0c0d10] to-[#09090b] p-5 sm:p-7">
-      <div
-        className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-teal-400/[0.06] blur-3xl"
-        aria-hidden
-      />
-      <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-teal-400/80">
-            Athlete intelligence
-          </p>
-          <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            {state.currentFocus}
-          </h1>
-          {subline ? (
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
-              {subline}
-              {snap.riskLevel === "moderate" || snap.riskLevel === "elevated"
-                ? ", but intensity stacking remains elevated."
-                : "."}
+    <section className="intelligence-hero relative overflow-hidden rounded-xl bg-gradient-to-br from-[#12141a] via-[#0d0e12] to-[#0a0b0e] px-5 py-5 sm:px-6 sm:py-6">
+      <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_200px] lg:items-start">
+        <div className="min-w-0 space-y-4">
+          <div>
+            <p className="text-[12px] text-zinc-500">
+              Athlete intelligence
+              {metaLine ? (
+                <span className="text-zinc-600"> · {metaLine}</span>
+              ) : null}
             </p>
-          ) : null}
-          <div className="mt-4 rounded-lg border border-white/[0.06] bg-black/25 px-4 py-3">
-            <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-              Primary recommendation
+            <h1 className="mt-1 font-display text-xl font-bold tracking-tight text-zinc-100 sm:text-2xl">
+              {state.currentFocus}
+            </h1>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-medium text-zinc-600">Current belief</p>
+            <p className="mt-1 max-w-2xl text-[15px] leading-relaxed text-zinc-300">
+              {currentBelief}
             </p>
-            <p className="mt-1.5 text-sm leading-relaxed text-teal-100/85">
+          </div>
+
+          <div className="rounded-lg bg-white/[0.04] px-3.5 py-3 ring-1 ring-white/[0.05]">
+            <p className="text-[11px] font-medium text-zinc-500">Primary action</p>
+            <p className="mt-1.5 text-[14px] leading-relaxed text-zinc-100">
               {primaryRecommendation}
             </p>
           </div>
+
+          <div className="flex flex-wrap gap-2 pt-0.5">
+            <Link
+              href={coachUrl({ investigate: true })}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-2 text-[13px] font-medium text-zinc-900 hover:bg-white"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              Ask Coach
+            </Link>
+            <Link
+              href={topicCoachLink(
+                "readiness-change",
+                "Why did my readiness change this week?"
+              )}
+              className="rounded-lg px-3 py-2 text-[13px] text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+            >
+              Investigate readiness
+            </Link>
+          </div>
         </div>
 
-        <div className="flex shrink-0 flex-wrap gap-4 lg:flex-col lg:items-end lg:gap-3">
-          <Metric label="Readiness" value={`${r.score}`} sub={r.label} />
-          <Metric
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+          <HeroMetric label="Readiness" value={String(r.score)} sub={r.label} />
+          <HeroMetric
             label="Freshness"
-            value={snap.freshness != null ? String(snap.freshness) : "—"}
+            value={
+              snap.freshness != null ? String(Math.round(snap.freshness)) : "—"
+            }
             sub={snap.fatigueLabel ?? undefined}
           />
-          <Metric
+          <HeroMetric
             label="Confidence"
             value={snap.recommendationConfidence}
-            sub={snap.archetypeLabel ?? "Runner"}
+            sub="Model belief"
           />
+          <HeroMetric label="Profile" value={profileLine} sub="Archetype" compact />
         </div>
-      </div>
-
-      <div className="relative mt-5 flex flex-wrap gap-2 border-t border-white/[0.05] pt-4">
-        <Link
-          href={coachUrl({ investigate: true })}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-teal-500/25 bg-teal-500/10 px-3 py-1.5 text-xs font-medium text-teal-100/90 hover:bg-teal-500/15"
-        >
-          <MessageCircle className="h-3.5 w-3.5" />
-          Ask Coach
-        </Link>
-        <Link
-          href={coachUrl({ q: "Why did my readiness change this week?", investigate: true })}
-          className="rounded-lg border border-white/[0.08] px-3 py-1.5 text-xs text-zinc-400 hover:border-white/[0.14] hover:text-zinc-200"
-        >
-          Investigate readiness
-        </Link>
       </div>
     </section>
   );
 }
 
-function Metric({
+function HeroMetric({
   label,
   value,
   sub,
+  compact,
 }: {
   label: string;
   value: string;
   sub?: string;
+  compact?: boolean;
 }) {
   return (
-    <div className="text-right">
-      <p className="text-[10px] uppercase tracking-wider text-zinc-600">{label}</p>
-      <p className="font-display text-xl font-bold tabular-nums text-white capitalize">
+    <div className="rounded-lg bg-white/[0.03] px-3 py-2">
+      <p className="text-[11px] text-zinc-600">{label}</p>
+      <p
+        className={cn(
+          "mt-0.5 font-medium tabular-nums text-zinc-100 capitalize",
+          compact ? "text-[13px] leading-snug" : "text-lg"
+        )}
+      >
         {value}
       </p>
-      {sub ? <p className="text-[11px] text-zinc-600">{sub}</p> : null}
+      {sub ? <p className="mt-0.5 text-[10px] text-zinc-600">{sub}</p> : null}
     </div>
   );
 }

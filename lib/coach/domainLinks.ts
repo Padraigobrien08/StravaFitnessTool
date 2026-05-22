@@ -28,3 +28,11 @@ export function domainCoachLink(domain: CoachingDomain, investigate = true): str
 export function signalCoachLink(question: string): string {
   return coachUrl({ q: question, investigate: true });
 }
+
+export function topicCoachLink(topic: string, query?: string): string {
+  const sp = new URLSearchParams();
+  sp.set("topic", topic);
+  if (query) sp.set("q", query);
+  sp.set("investigate", "1");
+  return `/coach?${sp.toString()}`;
+}

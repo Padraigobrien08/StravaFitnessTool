@@ -57,7 +57,7 @@ export function useAthleteIntelligence(
       raceGoal,
       quality,
       dataset,
-      signals: getActiveSignals(state),
+      signals: getActiveSignals(state, analytics),
       memory: getLongitudinalMemory(state),
       risksAndOpportunities: getRisksAndOpportunities(state),
       ecosystem: getTrainingEcosystem(analytics),

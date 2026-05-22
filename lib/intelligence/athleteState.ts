@@ -21,6 +21,7 @@ export interface IntelligenceSignal {
   type: string;
   severity: "positive" | "neutral" | "warning" | "opportunity";
   text: string;
+  headline: string;
   evidence: string;
   confidence: "low" | "medium" | "high";
 }
@@ -30,6 +31,34 @@ export interface TrajectorySeries {
   label: string;
   values: { label: string; value: number }[];
   trend: "up" | "down" | "flat";
+  interpretation: string;
+}
+
+function signalHeadline(text: string): string {
+  const first = text.split(/[.—]/)[0]?.trim();
+  return first && first.length < 72 ? first : text.slice(0, 68).trim() + "…";
+}
+
+function signalEvidence(
+  o: ActiveObservation,
+  analytics: DashboardInsights
+): string {
+  switch (o.id) {
+    case "eff-trend":
+      return "Recent HR-backed runs";
+    case "eff-down":
+      return "Efficiency trend (28d)";
+    case "intensity":
+      return `${analytics.intensityAdvice.hardRunsLast14d} hard sessions / 14d`;
+    case "fresh":
+      return `Freshness ${Math.round(analytics.fatigue.freshness)}`;
+    case "fatigue":
+      return `TSB ${Math.round(analytics.fatigue.tsb)}`;
+    case "readiness":
+      return `${analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score}/100 readiness`;
+    default:
+      return o.domain;
+  }
 }
 
 /** Full athlete intelligence model for Intelligence + Coach surfaces */
@@ -44,14 +73,16 @@ export function getAthleteIntelligenceState(
 }
 
 export function getActiveSignals(
-  state: CoachWorkspaceState
+  state: CoachWorkspaceState,
+  analytics: DashboardInsights
 ): IntelligenceSignal[] {
-  return state.observations.map((o) => ({
+  return state.observations.slice(0, 6).map((o) => ({
     id: o.id,
     type: o.domain,
     severity: o.tone,
     text: o.text,
-    evidence: o.text,
+    headline: signalHeadline(o.text),
+    evidence: signalEvidence(o, analytics),
     confidence: o.confidence,
   }));
 }
@@ -114,21 +145,36 @@ export function getTrajectorySeries(
   analytics: DashboardInsights
 ): TrajectorySeries[] {
   const weeks = analytics.weeklyVolume.slice(-8);
+  const volTrend =
+    weeks.length >= 2 &&
+    weeks[weeks.length - 1]!.distanceKm > weeks[weeks.length - 2]!.distanceKm
+      ? "up"
+      : weeks.length >= 2 &&
+          weeks[weeks.length - 1]!.distanceKm < weeks[weeks.length - 2]!.distanceKm
+        ? "down"
+        : "flat";
+
   const vol: TrajectorySeries = {
     id: "volume",
     label: "Weekly volume",
     values: weeks.map((w) => ({ label: w.label, value: w.distanceKm })),
-    trend:
-      weeks.length >= 2 &&
-      weeks[weeks.length - 1]!.distanceKm > weeks[weeks.length - 2]!.distanceKm
-        ? "up"
-        : weeks.length >= 2 &&
-            weeks[weeks.length - 1]!.distanceKm < weeks[weeks.length - 2]!.distanceKm
-          ? "down"
-          : "flat",
+    trend: volTrend,
+    interpretation:
+      volTrend === "down"
+        ? "Down this week · taper effect"
+        : volTrend === "up"
+          ? "Building · load rising"
+          : "Steady week to week",
   };
 
   const eff = analytics.efficiencyTrend.slice(-8);
+  const effTrend =
+    analytics.efficiencySummary.trend === "improving"
+      ? "up"
+      : analytics.efficiencySummary.trend === "declining"
+        ? "down"
+        : "flat";
+
   const efficiency: TrajectorySeries = {
     id: "efficiency",
     label: "Aerobic efficiency",
@@ -136,25 +182,35 @@ export function getTrajectorySeries(
       label: p.label,
       value: p.efficiency,
     })),
-    trend:
-      analytics.efficiencySummary.trend === "improving"
-        ? "up"
-        : analytics.efficiencySummary.trend === "declining"
-          ? "down"
-          : "flat",
+    trend: effTrend,
+    interpretation:
+      effTrend === "up"
+        ? analytics.efficiencyMoM.narrative
+          ? "Improving · MoM gain"
+          : "Improving"
+        : effTrend === "down"
+          ? "Softening · check fatigue"
+          : "Flat · hold pattern",
   };
+
+  const rScore =
+    analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score;
+  const rLabel =
+    analytics.raceReadiness?.label ?? analytics.halfMarathonReadiness.label;
 
   const readiness: TrajectorySeries = {
     id: "readiness",
     label: "Race readiness",
     values: weeks.map((w) => ({
       label: w.label,
-      value:
-        analytics.raceReadiness?.score ??
-        analytics.halfMarathonReadiness.score,
+      value: rScore,
     })),
     trend: "flat",
+    interpretation: `Stable · ${rLabel.toLowerCase()}`,
   };
+
+  const freshTrend =
+    analytics.fatigue.tsb > 0 ? "up" : analytics.fatigue.tsb < -8 ? "down" : "flat";
 
   const freshness: TrajectorySeries = {
     id: "freshness",
@@ -170,7 +226,13 @@ export function getTrajectorySeries(
         )
       ),
     })),
-    trend: analytics.fatigue.tsb > 0 ? "up" : analytics.fatigue.tsb < -8 ? "down" : "flat",
+    trend: freshTrend,
+    interpretation:
+      analytics.fatigue.freshness >= 65
+        ? "High · quality window"
+        : analytics.fatigue.freshness < 45
+          ? "Low · ease intensity"
+          : "Moderate · selective quality",
   };
 
   return [readiness, freshness, efficiency, vol];
