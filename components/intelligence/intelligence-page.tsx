@@ -1,17 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { RequireData } from "@/components/require-data";
 import { useStrava } from "@/lib/context/strava-context";
 import { useAthleteIntelligence } from "@/hooks/use-athlete-intelligence";
+import { getStateEvolutionStrip } from "@/lib/intelligence/presentation";
 import { IntelligenceWorkspace } from "./intelligence-workspace";
 import { IntelligenceHero } from "./intelligence-hero";
 import {
+  IntelligenceStateEvolution,
   IntelligenceSignalBoard,
-  IntelligenceSynthesis,
+  IntelligenceDecisionSupport,
   IntelligenceMemoryTiles,
   IntelligenceEcosystemCompact,
-  IntelligenceTrajectoryStrip,
   IntelligenceCoachEntries,
 } from "./intelligence-sections";
 import { coachUrl } from "@/lib/coach/domainLinks";
@@ -20,16 +22,22 @@ export function IntelligencePage() {
   const intel = useAthleteIntelligence();
   const { dataSourceLabel, importData } = useStrava();
 
+  const evolution = useMemo(
+    () =>
+      intel.analytics ? getStateEvolutionStrip(intel.analytics) : [],
+    [intel.analytics]
+  );
+
   if (intel.loading && !intel.state) {
     return (
       <RequireData>
         <IntelligenceWorkspace>
-          <div className="intelligence-model space-y-3">
-            <div className="skeleton-shimmer h-36 rounded-xl" />
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="skeleton-shimmer h-24 rounded-lg" />
-              <div className="skeleton-shimmer h-24 rounded-lg" />
-              <div className="skeleton-shimmer h-24 rounded-lg" />
+          <div className="intelligence-model mx-auto max-w-6xl space-y-3">
+            <div className="skeleton-shimmer h-32 rounded-xl" />
+            <div className="skeleton-shimmer h-16 rounded-lg" />
+            <div className="grid gap-3 lg:grid-cols-2">
+              <div className="skeleton-shimmer h-40 rounded-lg" />
+              <div className="skeleton-shimmer h-40 rounded-lg" />
             </div>
           </div>
         </IntelligenceWorkspace>
@@ -50,7 +58,7 @@ export function IntelligencePage() {
   const runCount = importData?.runs.length ?? intel.analytics.summary.runCount;
   const metaLine = [
     `${runCount} runs`,
-    dataSourceLabel ?? "imported data",
+    dataSourceLabel ?? "latest training data",
   ].join(" · ");
 
   const risks = intel.risksAndOpportunities.filter((r) => r.kind === "risk");
@@ -61,16 +69,16 @@ export function IntelligencePage() {
   return (
     <RequireData>
       <IntelligenceWorkspace>
-        <div className="intelligence-model mx-auto max-w-6xl space-y-5 pb-8">
+        <div className="intelligence-model mx-auto max-w-6xl space-y-4 pb-10">
           <div className="flex items-center justify-between gap-3">
             <p className="text-[12px] text-zinc-600">
-              Persistent athlete model · updated from your latest training data
+              Persistent athlete model · updated from latest training data
             </p>
             <Link
               href={coachUrl()}
               className="shrink-0 text-[12px] text-zinc-500 hover:text-zinc-300"
             >
-              Open Coach →
+              Coach →
             </Link>
           </div>
 
@@ -81,25 +89,32 @@ export function IntelligencePage() {
             metaLine={metaLine}
           />
 
-          <div className="grid gap-5 lg:grid-cols-12 lg:items-start">
-            <div className="space-y-5 lg:col-span-8">
+          <IntelligenceStateEvolution items={evolution} />
+
+          <div className="grid gap-4 lg:grid-cols-12 lg:items-start">
+            <div className="space-y-4 lg:col-span-7">
               <IntelligenceSignalBoard signals={intel.signals} />
-              <IntelligenceSynthesis
+            </div>
+            <div className="lg:col-span-5">
+              <IntelligenceDecisionSupport
                 risks={risks}
                 opportunities={opportunities}
                 recommendation={intel.primaryRecommendation}
               />
             </div>
-            <div className="lg:col-span-4">
-              <IntelligenceTrajectoryStrip series={intel.trajectories} />
-            </div>
           </div>
 
-          <IntelligenceMemoryTiles memory={intel.memory} />
-
-          {intel.ecosystem ? (
-            <IntelligenceEcosystemCompact ecosystem={intel.ecosystem} />
-          ) : null}
+          <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
+            <IntelligenceMemoryTiles memory={intel.memory} />
+            {intel.ecosystem ? (
+              <div className="rounded-xl bg-white/[0.015] px-4 py-4">
+                <IntelligenceEcosystemCompact
+                  ecosystem={intel.ecosystem}
+                  embedded
+                />
+              </div>
+            ) : null}
+          </div>
 
           <IntelligenceCoachEntries domains={intel.state.domains} />
         </div>
