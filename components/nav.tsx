@@ -13,6 +13,7 @@ import {
   Settings,
   Upload,
   MessageCircle,
+  Brain,
 } from "lucide-react";
 
 const links = [
@@ -21,6 +22,7 @@ const links = [
   { href: "/performance", label: "Performance", icon: TrendingUp },
   { href: "/runs", label: "Runs", icon: Footprints },
   { href: "/goals", label: "Goals", icon: Target },
+  { href: "/intelligence", label: "Intelligence", icon: Brain },
   { href: "/coach", label: "Coach", icon: MessageCircle },
   { href: "/report", label: "Reports", icon: FileText },
   { href: "/import", label: "Import", icon: Upload },

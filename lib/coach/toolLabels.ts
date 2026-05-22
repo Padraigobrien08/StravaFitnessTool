@@ -50,7 +50,7 @@ export function loadingMessageForTool(name: string): string {
 }
 
 export const DEFAULT_LOADING_PHASES = [
-  "Accessing your training intelligence…",
-  "Grounding analysis in deterministic engines…",
-  "Synthesizing coaching response…",
+  "Checking readiness data…",
+  "Comparing your recent training block…",
+  "Building recommendation…",
 ];

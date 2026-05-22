@@ -77,6 +77,7 @@ function BulletList({ items }: { items: string[] }) {
   );
 }
 
+/** Prefer CoachInvestigationNotebook in the reasoning panel */
 export function CoachIntelligenceCard({
   parsed,
   toolsUsed,
