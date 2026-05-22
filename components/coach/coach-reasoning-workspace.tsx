@@ -1,14 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
-import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useCoachThread } from "@/hooks/use-coach-thread";
-import { useGoalStore } from "@/stores/goal-store";
-import { buildCoachWorkspaceState } from "@/lib/coach/viewModel";
-import { CoachIntelligenceModel } from "./coach-intelligence-model";
-import { CoachReasoningThread } from "./coach-reasoning-thread";
+import { useAthleteIntelligence } from "@/hooks/use-athlete-intelligence";
+import { getCoachDomainContext } from "@/lib/intelligence/athleteState";
+import { CoachWorkspaceSidebar } from "./coach-workspace-sidebar";
+import { CoachReasoningPanel } from "./coach-reasoning-panel";
+import { CoachMiniContext } from "./coach-mini-context";
 import { cn } from "@/lib/utils";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Menu, X } from "lucide-react";
+import Link from "next/link";
+import { intelligenceUrl } from "@/lib/coach/domainLinks";
 
 export function CoachReasoningWorkspace({
   disabled,
@@ -17,133 +20,177 @@ export function CoachReasoningWorkspace({
   disabled?: boolean;
   disabledReason?: string;
 }) {
-  const { analytics, insights, loading: dataLoading } = useTrainingIntelligence();
-  const raceGoal = useGoalStore((s) => s.raceGoal);
-
+  const searchParams = useSearchParams();
   const thread = useCoachThread(disabled);
+  const intel = useAthleteIntelligence(thread.messages);
+  const [activeDomainId, setActiveDomainId] = useState<string | null>(null);
+  const [contextCollapsed, setContextCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const bootstrapped = useRef(false);
 
-  const workspace = useMemo(
-    () =>
-      analytics
-        ? buildCoachWorkspaceState(
-            analytics,
-            insights,
-            raceGoal,
-            thread.messages
-          )
-        : null,
-    [analytics, insights, raceGoal, thread.messages]
+  const domainParam = searchParams.get("domain");
+  const qParam = searchParams.get("q");
+  const investigate = searchParams.get("investigate") === "1";
+
+  useEffect(() => {
+    if (!intel.state || bootstrapped.current) return;
+    bootstrapped.current = true;
+
+    if (domainParam) {
+      setActiveDomainId(domainParam);
+      const domain = getCoachDomainContext(intel.state, domainParam);
+      if (domain && investigate) {
+        void thread.send(domain.suggestedQuery);
+        return;
+      }
+    }
+    if (qParam && investigate) {
+      void thread.send(qParam);
+    }
+  }, [intel.state, domainParam, qParam, investigate, thread]);
+
+  const handleDomainSelect = useCallback(
+    (domain: NonNullable<typeof intel.state>["domains"][0]) => {
+      setActiveDomainId(domain.id);
+      setSidebarOpen(false);
+      void thread.send(domain.suggestedQuery);
+    },
+    [thread]
   );
 
-  const composerPlaceholder = useMemo(() => {
-    if (!workspace) return "Connect data to activate coaching intelligence…";
-    return `Investigate ${workspace.currentFocus.toLowerCase()}…`;
-  }, [workspace]);
+  const showSidebar = intel.state && !intel.loading;
 
   return (
-    <div className="coach-terminal flex min-h-[calc(100dvh-6.5rem)] flex-col overflow-hidden rounded-xl border border-white/[0.06] shadow-[0_40px_120px_-56px_rgba(0,0,0,0.95)]">
-      <header className="coach-terminal-header relative flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-2.5 sm:px-5">
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-teal-500/[0.05] via-transparent to-transparent"
-          aria-hidden
-        />
-        <div className="relative min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-teal-400/80">
-            Endurance reasoning workspace
-          </p>
-          <h1 className="font-display text-base font-bold text-white sm:text-lg">
-            StrideIQ Coach
-          </h1>
-          {workspace ? (
-            <p className="truncate text-[11px] text-zinc-600">
-              {workspace.observations.length} live signals ·{" "}
-              {workspace.investigations.length} open investigations
-            </p>
+    <div className="coach-terminal flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-lg">
+      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.04] px-3 py-2.5 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2">
+          {showSidebar ? (
+            <button
+              type="button"
+              className="rounded-md p-1.5 text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300 lg:hidden"
+              onClick={() => setSidebarOpen((o) => !o)}
+              aria-label={sidebarOpen ? "Close threads" : "Open threads"}
+            >
+              {sidebarOpen ? (
+                <X className="h-4 w-4" />
+              ) : (
+                <Menu className="h-4 w-4" />
+              )}
+            </button>
           ) : null}
+          <div className="min-w-0">
+            <h1 className="font-display text-sm font-bold text-zinc-100 sm:text-base">
+              Coach
+            </h1>
+            <p className="truncate text-[12px] text-zinc-600">
+              Training investigations
+            </p>
+          </div>
         </div>
-        <div className="relative hidden items-center gap-2 sm:flex">
-          <span className="rounded-md border border-teal-500/20 bg-teal-500/[0.08] px-2 py-1 text-[10px] font-medium text-teal-300/90">
-            Continuously reasoning
-          </span>
+        <div className="hidden shrink-0 items-center gap-2 text-[10px] text-zinc-600 sm:flex">
+          <Link
+            href={intelligenceUrl()}
+            className="hover:text-teal-400/80 hover:underline"
+          >
+            Intelligence
+          </Link>
+          <span className="text-zinc-800">·</span>
+          <Link href="/import" className="hover:text-teal-400/80 hover:underline">
+            Data
+          </Link>
         </div>
       </header>
 
-      <div className="coach-split flex min-h-0 flex-1 flex-col lg:flex-row">
-        <section
-          className={cn(
-            "coach-intel-pane min-h-[320px] min-w-0 border-b border-white/[0.06] lg:border-b-0 lg:border-r",
-            "lg:w-[68%] lg:max-w-[68%] lg:flex-[0_0_68%]"
-          )}
-        >
-          {workspace && !dataLoading ? (
-            <CoachIntelligenceModel
-              state={workspace}
-              onExplore={(q) => void thread.send(q)}
-              disabled={disabled}
-            />
-          ) : dataLoading ? (
-            <IntelligenceSkeleton />
-          ) : (
-            <div className="flex h-full items-center justify-center p-8 text-sm text-zinc-600">
-              Load training data to activate the intelligence model.
-            </div>
-          )}
-        </section>
+      {disabled ? (
+        <div className="flex shrink-0 items-center gap-2 border-b border-amber-500/15 bg-amber-500/[0.06] px-4 py-2 text-[11px] text-amber-200/85">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+          <span>{disabledReason}</span>
+        </div>
+      ) : null}
 
-        <section
-          className={cn(
-            "coach-thread-pane min-h-[360px] min-w-0",
-            "lg:w-[32%] lg:max-w-[32%] lg:flex-[0_0_32%]"
-          )}
-        >
-          {workspace && !dataLoading ? (
-            <CoachReasoningThread
-              workspace={workspace}
-              threads={thread.threads}
-              activeId={thread.activeId}
+      <div className="coach-grid relative grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_280px]">
+        {sidebarOpen && showSidebar ? (
+          <button
+            type="button"
+            className="absolute inset-0 z-30 bg-black/50 lg:hidden"
+            aria-label="Close sidebar"
+            onClick={() => setSidebarOpen(false)}
+          />
+        ) : null}
+
+        {showSidebar ? (
+          <CoachWorkspaceSidebar
+            className={cn(
+              "z-40 lg:relative lg:z-auto",
+              sidebarOpen
+                ? "fixed inset-y-0 left-0 flex max-w-[85vw] shadow-2xl lg:static lg:max-w-none lg:shadow-none"
+                : "hidden lg:flex"
+            )}
+            threads={thread.threads}
+            activeId={thread.activeId}
+            state={intel.state!}
+            activeDomainId={activeDomainId}
+            onNewThread={() => {
+              thread.handleNewThread();
+              setSidebarOpen(false);
+            }}
+            onSelectThread={(id) => {
+              thread.loadThread(id);
+              setSidebarOpen(false);
+            }}
+            onDeleteThread={thread.handleDeleteThread}
+            onDomainSelect={handleDomainSelect}
+            disabled={disabled}
+          />
+        ) : null}
+
+        <section className="coach-reasoning-pane flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          {intel.state && intel.analytics && !intel.loading ? (
+            <CoachReasoningPanel
+              workspace={intel.state}
+              analytics={intel.analytics}
+              raceGoal={intel.raceGoal}
               messages={thread.messages}
               input={thread.input}
               setInput={thread.setInput}
               loading={thread.loading}
               error={thread.error}
               pendingTools={thread.pendingTools}
-              loadingPhase={thread.loadingPhase}
               scrollRef={thread.scrollRef}
               onSend={(t) => void thread.send(t)}
-              onNewThread={thread.handleNewThread}
-              onSelectThread={thread.loadThread}
-              onDeleteThread={thread.handleDeleteThread}
               disabled={disabled}
-              disabledReason={disabledReason}
-              composerPlaceholder={composerPlaceholder}
             />
+          ) : intel.loading ? (
+            <PanelSkeleton />
           ) : (
-            <div className="flex h-full items-center justify-center p-6 text-xs text-zinc-600">
-              Reasoning thread activates with synced data.
+            <div className="flex h-full min-h-0 items-center justify-center p-8 text-sm text-zinc-600">
+              Connect and sync Strava data to open Coach.
             </div>
           )}
         </section>
-      </div>
 
-      {disabled ? (
-        <div className="flex shrink-0 items-center gap-2 border-t border-amber-500/15 bg-amber-500/[0.06] px-4 py-2 text-[11px] text-amber-200/85 lg:hidden">
-          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-          <span>{disabledReason}</span>
-        </div>
-      ) : null}
+        {intel.state ? (
+          <CoachMiniContext
+            state={intel.state}
+            collapsed={contextCollapsed}
+            onToggle={() => setContextCollapsed((c) => !c)}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
 
-function IntelligenceSkeleton() {
+function PanelSkeleton() {
   return (
-    <div className="space-y-4 p-5">
-      <div className="skeleton-shimmer h-24 w-full rounded-2xl" />
-      <div className="grid gap-3 lg:grid-cols-2">
-        <div className="skeleton-shimmer h-32 rounded-xl" />
-        <div className="skeleton-shimmer h-32 rounded-xl" />
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-y-auto p-8">
+        <div className="coach-message-column mx-auto w-full space-y-4">
+          <div className="skeleton-shimmer h-6 w-32 rounded" />
+          <div className="skeleton-shimmer h-10 w-full rounded" />
+          <div className="skeleton-shimmer h-48 w-full rounded" />
+        </div>
       </div>
-      <div className="skeleton-shimmer h-40 rounded-xl" />
     </div>
   );
 }
