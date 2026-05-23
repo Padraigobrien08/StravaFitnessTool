@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
+import { useStrava } from "@/lib/context/strava-context";
 import { useGoalStore } from "@/stores/goal-store";
 import { buildGoalsPageView } from "@/lib/goals/viewModels";
 import {
@@ -22,6 +23,8 @@ import { GoalRisksPanel } from "@/components/goals/goal-risks-panel";
 import { GoalsExplainability } from "@/components/goals/goals-explainability";
 import { HistoricalReadinessPanel } from "@/components/goals/historical-readiness-panel";
 import { ForecastV2Panel } from "@/components/goals/forecast-v2-panel";
+import { GoalsRaceBrief } from "@/components/goals/goals-race-brief";
+import { GoalsEvidenceDrawer } from "@/components/goals/goals-evidence-drawer";
 import { dash } from "@/components/home/primitives/tokens";
 
 function GoalsBriefingBar() {
@@ -29,7 +32,7 @@ function GoalsBriefingBar() {
     <div className="border-b border-white/[0.04] pb-3">
       <p className={dash.labelAccent}>Race intelligence & goal planning</p>
       <p className="mt-0.5 text-xs text-zinc-600">
-        Readiness · prediction integrity · execution · risks
+        Forecast briefing · readiness · execution
       </p>
     </div>
   );
@@ -37,18 +40,25 @@ function GoalsBriefingBar() {
 
 export default function GoalsPage() {
   const { analytics, insights, loading } = useTrainingIntelligence();
+  const { importData, fitDetails } = useStrava();
   const raceGoal = useGoalStore((s) => s.raceGoal);
   const readyInsights = insights.filter((i) => i.question === "ready");
+  const [showLegacyV1, setShowLegacyV1] = useState(false);
 
   const view = useMemo(() => {
     if (!analytics) return null;
-    return buildGoalsPageView(analytics, raceGoal, readyInsights);
-  }, [analytics, raceGoal, readyInsights]);
+    return buildGoalsPageView(analytics, raceGoal, readyInsights, {
+      runs: importData?.runs,
+      fitDetails,
+    });
+  }, [analytics, raceGoal, readyInsights, importData?.runs, fitDetails]);
 
   const trajectoryNarrative = useMemo(() => {
     const item = view?.historical.find((h) => h.label === "Projection trajectory");
     return item?.value ?? null;
   }, [view?.historical]);
+
+  const useBriefLayout = Boolean(view?.raceBrief && view?.forecastV2);
 
   if (loading && !view) {
     return (
@@ -69,29 +79,52 @@ export default function GoalsPage() {
       {view && analytics && (
         <GoalsWorkspace>
           <GoalsBriefingBar />
-          <RaceMissionHero hero={view.hero} />
           <CompactRaceGoalForm />
+
+          {useBriefLayout && view.raceBrief && view.forecastV2 ? (
+            <>
+              <GoalsRaceBrief brief={view.raceBrief} />
+              <GoalsEvidenceDrawer
+                forecast={view.forecastV2}
+                showLegacy={showLegacyV1}
+                projection={view.projection}
+                consensus={view.consensus}
+                analysis={analytics.racePredictionAnalysis}
+              />
+              {!showLegacyV1 ? (
+                <button
+                  type="button"
+                  onClick={() => setShowLegacyV1(true)}
+                  className="text-left text-xs text-zinc-600 underline-offset-2 hover:text-zinc-500 hover:underline"
+                >
+                  Compare legacy V1 estimate
+                </button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <RaceMissionHero hero={view.hero} />
+              {view.forecastV2 ? (
+                <ForecastV2Panel forecast={view.forecastV2} />
+              ) : null}
+              <GoalsIntelRow>
+                <div className="lg:col-span-7">
+                  <PredictionIntegrityPanel projection={view.projection} />
+                </div>
+                <div className="lg:col-span-5">
+                  <PredictionConsensusPanel
+                    rows={view.consensus}
+                    analysis={analytics.racePredictionAnalysis}
+                  />
+                </div>
+              </GoalsIntelRow>
+            </>
+          )}
 
           <ReadinessIntelligencePanel
             dimensions={view.dimensions}
             readiness={view.readiness}
           />
-
-          {view.forecastV2 ? (
-            <ForecastV2Panel forecast={view.forecastV2} />
-          ) : null}
-
-          <GoalsIntelRow>
-            <div className="lg:col-span-7">
-              <PredictionIntegrityPanel projection={view.projection} />
-            </div>
-            <div className="lg:col-span-5">
-              <PredictionConsensusPanel
-                rows={view.consensus}
-                analysis={analytics.racePredictionAnalysis}
-              />
-            </div>
-          </GoalsIntelRow>
 
           {raceGoal ? (
             <ExecutionIntelligencePanel raceGoal={raceGoal} analytics={analytics} />
@@ -110,10 +143,12 @@ export default function GoalsPage() {
             goalDistance={raceGoal?.distance ?? null}
           />
 
-          <ProjectionCurvePanel
-            projection={view.projection}
-            targetDistanceLabel={view.targetDistanceLabel}
-          />
+          {!useBriefLayout ? (
+            <ProjectionCurvePanel
+              projection={view.projection}
+              targetDistanceLabel={view.targetDistanceLabel}
+            />
+          ) : null}
 
           <GoalsIntelRow>
             <div className="lg:col-span-7">
@@ -136,6 +171,10 @@ export default function GoalsPage() {
             {" · "}
             <Link href="/performance" className="text-teal-400/90 hover:underline">
               Performance intelligence →
+            </Link>
+            {" · "}
+            <Link href="/coach" className="text-teal-400/90 hover:underline">
+              Coach →
             </Link>
           </p>
         </GoalsWorkspace>

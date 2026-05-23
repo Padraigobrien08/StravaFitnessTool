@@ -58,6 +58,7 @@ interface StravaContextValue {
   refreshFromStravaApi: () => Promise<void>;
   getRunById: (id: string) => import("@/lib/strava/types").RunActivity | undefined;
   getFitDetailForRun: (id: string) => FitRunDetail | undefined;
+  fitDetails: FitRunDetail[];
 }
 
 const StravaContext = createContext<StravaContextValue | null>(null);
@@ -368,6 +369,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         refreshFromStravaApi: loadFromStravaApi,
         getRunById,
         getFitDetailForRun,
+        fitDetails,
       }}
     >
       {children}

@@ -10,6 +10,10 @@ import type { Insight } from "@/lib/insights/types";
 import type { RaceProjectionView } from "@/lib/performance/viewModels";
 import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
 import { buildForecastV2View } from "@/lib/goals/forecastV2ViewModel";
+import {
+  buildGoalsRaceBrief,
+  type GoalsRaceBriefView,
+} from "@/lib/goals/goalsRaceBrief";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { formatDuration, formatKm, formatPace } from "@/lib/utils";
@@ -64,6 +68,7 @@ export interface GoalsExplainView {
 
 export interface GoalsPageView {
   hero: RaceMissionHeroView;
+  raceBrief: GoalsRaceBriefView | null;
   readiness: RaceReadiness | null;
   dimensions: ReadinessDimensionView[];
   projection: RaceProjectionView;
@@ -478,6 +483,10 @@ export function buildGoalsPageView(
     fitDetails: opts?.fitDetails,
   });
   const hero = buildHero(goal, readiness, analytics, projection, insights, forecastV2);
+  const raceBrief =
+    forecastV2 != null
+      ? buildGoalsRaceBrief({ forecast: forecastV2, goal, readiness })
+      : null;
 
   const explain: GoalsExplainView = {
     summary: projection.explanation[0] ?? "Predictions combine recent efforts with endurance scaling models.",
@@ -531,6 +540,7 @@ export function buildGoalsPageView(
 
   return {
     hero,
+    raceBrief,
     readiness,
     dimensions: buildDimensions(analytics, readiness),
     projection,
