@@ -1,4 +1,10 @@
 import type { ParsedCoachResponse } from "./parseResponse";
+import type { GenerateWeeklyPlanResult, PlanToolObservability } from "@/lib/ai-planning";
+
+export interface CoachWeeklyPlanAttachment extends GenerateWeeklyPlanResult {
+  observability?: PlanToolObservability;
+  explanationOnly?: string;
+}
 
 export interface CoachMessage {
   id: string;
@@ -8,6 +14,8 @@ export interface CoachMessage {
   toolsUsed?: string[];
   parsed?: ParsedCoachResponse;
   status?: "complete" | "error";
+  /** Structured adaptive weekly plan (tool: generate_next_week_training_plan) */
+  weeklyPlan?: CoachWeeklyPlanAttachment;
 }
 
 export interface CoachContextSnapshot {

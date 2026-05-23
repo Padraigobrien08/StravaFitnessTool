@@ -6,8 +6,7 @@ import { getAllFitDetailsForUser } from "@/lib/db/activity-streams";
 import { getStravaConnection } from "@/lib/db/strava-connection";
 import { getUserPreferences } from "@/lib/db/user-preferences";
 import { buildIntelligenceBrief } from "./brief";
-import { formatPace } from "@/lib/utils";
-import { paceSecPerKm } from "@/lib/analytics/pace";
+import { buildRunCoachDetail } from "@/lib/coaching-context";
 import type {
   AthleteIntelligenceBundle,
   IntelligenceBrief,
@@ -72,22 +71,35 @@ export async function computeAthleteIntelligence(
   );
   const insights = generateInsights(analytics, quality);
 
-  const labelById = new Map(
-    analytics.workoutLabels.map((l) => [l.runId, l.classification.type])
-  );
+  const fitById = new Map(fitDetails.map((f) => [f.activityId, f]));
   const recentRuns: RecentRunSummary[] = [...importData.runs]
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 30)
     .map((r) => {
-      const type = labelById.get(r.id) ?? "unknown";
-      const pace = paceSecPerKm(r);
+      const detail = buildRunCoachDetail(
+        r,
+        fitById.get(r.id) ?? null,
+        analytics,
+        importData.runs
+      );
       return {
-        runId: r.id,
-        date: r.date,
-        name: r.name,
-        type,
-        distanceKm: Math.round((r.distanceM / 1000) * 10) / 10,
-        pace: pace ? formatPace(pace) : null,
+        runId: detail.runId,
+        date: detail.date,
+        name: detail.name,
+        type: detail.workoutType,
+        distanceKm: detail.distanceKm,
+        pace: detail.pace,
+        durationMin: detail.durationMin,
+        avgHr: detail.avgHr,
+        maxHr: detail.maxHr,
+        elevationGainM: detail.elevationGainM,
+        executionQuality: detail.executionQuality,
+        executionScore: detail.executionScore,
+        lateFadePct: detail.lateFadePct,
+        hrDriftPct: detail.hrDriftPct,
+        fatigueCost: detail.fatigueCost,
+        streams: detail.streams,
+        narrative: detail.narrative,
       };
     });
 

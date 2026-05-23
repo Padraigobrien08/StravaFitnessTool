@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
-import { trainingChart } from "@/components/training/charts/chart-theme";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import {
@@ -36,8 +36,6 @@ const fadeColor = {
   high: "text-red-400",
 };
 
-const tooltipStyle = trainingChart.tooltip;
-
 export function ExecutionIntelligencePanel({
   raceGoal,
   analytics,
@@ -46,6 +44,7 @@ export function ExecutionIntelligencePanel({
   analytics: DashboardInsights;
 }) {
   const [mode, setMode] = useState<StrategyMode>("even");
+  const chart = useTrainingChart();
 
   const strategy = useMemo(
     () =>
@@ -125,10 +124,10 @@ export function ExecutionIntelligencePanel({
         <p className={cn(dash.label, "px-1 pb-2")}>Pacing progression</p>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartData}>
-            <CartesianGrid stroke={trainingChart.grid} vertical={false} />
+            <CartesianGrid stroke={chart.grid} vertical={false} />
             <XAxis
               dataKey="km"
-              tick={trainingChart.tick}
+              tick={chart.tick}
               unit=" km"
               axisLine={false}
               tickLine={false}
@@ -136,29 +135,29 @@ export function ExecutionIntelligencePanel({
             <YAxis
               domain={paceDomain}
               allowDataOverflow
-              tick={trainingChart.tick}
+              tick={chart.tick}
               reversed
               tickFormatter={formatPaceTick}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip
-              contentStyle={tooltipStyle}
+              contentStyle={chart.tooltip}
               formatter={(v) =>
                 typeof v === "number" ? formatPace(v) : String(v)
               }
             />
             <ReferenceLine
               y={strategy.targetTimeSec / strategy.distanceKm}
-              stroke="rgba(255,255,255,0.12)"
+              stroke="var(--chart-ref-line)"
               strokeDasharray="4 4"
             />
             <Line
               type="monotone"
               dataKey="pace"
-              stroke={trainingChart.teal}
+              stroke={chart.teal}
               strokeWidth={2}
-              dot={{ r: 3, fill: trainingChart.teal }}
+              dot={{ r: 3, fill: chart.teal }}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -1,10 +1,8 @@
 "use client";
 
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import type { TrainingDistributionView } from "@/lib/runs/viewModels";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
-import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 
 const barColors: Record<WorkoutType, string> = {
@@ -23,55 +21,37 @@ export function TrainingDistributionSummary({
   data: TrainingDistributionView;
 }) {
   return (
-    <PanelChrome title="Training distribution" subdued>
-      <p className={cn(dash.muted, "mb-4")}>
-        What kind of training behavior is emerging in your recent block.
+    <section className="rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2.5">
+      <p className="text-[10px] font-medium text-zinc-600">
+        Training distribution · operational strip
       </p>
-
-      <div className="mb-4 flex h-3 overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-white/[0.06]">
         {data.mix.map((m) => (
           <div
             key={m.type}
-            className={cn(barColors[m.type], "transition-all")}
+            className={cn(barColors[m.type])}
             style={{ width: `${Math.max(m.pct, 2)}%` }}
-            title={`${m.label} ${m.pct}%`}
+            title={`${WORKOUT_TYPE_LABELS[m.type]} ${m.pct}%`}
           />
         ))}
       </div>
-      <div className="mb-5 flex flex-wrap gap-x-4 gap-y-1">
-        {data.mix.map((m) => (
-          <span key={m.type} className="text-[10px] text-zinc-500">
-            <span
-              className={cn(
-                "mr-1 inline-block h-2 w-2 rounded-sm",
-                barColors[m.type]
-              )}
-            />
-            {WORKOUT_TYPE_LABELS[m.type]} {m.pct}% ({m.runCount})
-          </span>
-        ))}
+      <p className="mt-1.5 text-[11px] text-zinc-500">{data.intensityLine}</p>
+      <div className="mt-2 grid gap-x-4 gap-y-1 text-[11px] sm:grid-cols-2 lg:grid-cols-3">
+        <StripItem label="Frequency" value={data.frequencyLine} />
+        <StripItem label="Long-run rhythm" value={data.longRunRhythm} />
+        <StripItem label="Hard-session density" value={data.intervalDensity} />
+        <StripItem label="Weekly consistency" value={data.consistencyLine} />
+        <StripItem label="Modality" value={data.modalityLine} />
       </div>
+    </section>
+  );
+}
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {data.widgets.map((w) => (
-          <div
-            key={w.label}
-            className="rounded-lg bg-white/[0.02] px-3 py-2.5 ring-1 ring-inset ring-white/[0.05]"
-          >
-            <p className={dash.label}>{w.label}</p>
-            <p className="mt-0.5 font-display text-lg font-semibold text-zinc-200">
-              {w.value}
-            </p>
-            {w.hint ? <p className="text-[10px] text-zinc-600">{w.hint}</p> : null}
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-white/[0.04] pt-3 text-xs text-zinc-500">
-        <span>{data.easyHardLabel}</span>
-        <span>{data.longRunFreq}</span>
-        <span>{data.intervalDensity}</span>
-      </div>
-    </PanelChrome>
+function StripItem({ label, value }: { label: string; value: string }) {
+  return (
+    <p className="text-zinc-600">
+      <span className="text-zinc-500">{label}: </span>
+      <span className="text-zinc-400">{value}</span>
+    </p>
   );
 }

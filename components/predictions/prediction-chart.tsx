@@ -13,13 +13,9 @@ import {
   ReferenceLine,
 } from "recharts";
 import type { RacePredictionAnalysis } from "@/lib/analytics/predictions";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
-const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 8,
-  color: "#fafafa",
-};
+const chartTick = { fontSize: 10, fill: "var(--chart-tick-fill)" };
 
 const MODEL_COLORS: Record<string, string> = {
   riegel: "#34d399",
@@ -33,6 +29,7 @@ export function PredictionChart({
 }: {
   analysis: RacePredictionAnalysis;
 }) {
+  const chart = useTrainingChart();
   const effortScatter = analysis.efforts.map((e) => ({
     distanceKm: e.distanceKm,
     timeMin: e.timeSec / 60,
@@ -67,32 +64,32 @@ export function PredictionChart({
   return (
     <ResponsiveContainer width="100%" height={320}>
       <ComposedChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
         <XAxis
           type="number"
           dataKey="distanceKm"
           domain={[2, 44]}
-          tick={{ fontSize: 11, fill: "#a1a1aa" }}
+          tick={chartTick}
           label={{
             value: "Distance (km)",
             position: "insideBottom",
             offset: -4,
-            fill: "#71717a",
+            fill: "var(--chart-tick-fill)",
             fontSize: 11,
           }}
         />
         <YAxis
-          tick={{ fontSize: 11, fill: "#a1a1aa" }}
+          tick={chartTick}
           label={{
             value: "Time (min)",
             angle: -90,
             position: "insideLeft",
-            fill: "#71717a",
+            fill: "var(--chart-tick-fill)",
             fontSize: 11,
           }}
         />
         <Tooltip
-          contentStyle={tooltipStyle}
+          contentStyle={chart.tooltip}
           formatter={(v) => {
             const n = typeof v === "number" ? v : Number(v);
             if (!Number.isFinite(n)) return ["—", ""];
@@ -147,7 +144,7 @@ export function PredictionChart({
           <ReferenceLine
             key={d}
             x={d}
-            stroke="rgba(255,255,255,0.08)"
+            stroke="var(--chart-grid)"
             strokeDasharray="2 4"
           />
         ))}

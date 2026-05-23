@@ -6,16 +6,18 @@ import { RequireData } from "@/components/require-data";
 import { useStrava } from "@/lib/context/strava-context";
 import { useAthleteIntelligence } from "@/hooks/use-athlete-intelligence";
 import { getStateEvolutionStrip } from "@/lib/intelligence/presentation";
+import { allBeliefs } from "@/lib/athlete-memory";
 import { IntelligenceWorkspace } from "./intelligence-workspace";
 import { IntelligenceHero } from "./intelligence-hero";
 import {
   IntelligenceStateEvolution,
   IntelligenceSignalBoard,
   IntelligenceDecisionSupport,
-  IntelligenceMemoryTiles,
+  IntelligenceMemoryGrouped,
   IntelligenceEcosystemCompact,
   IntelligenceCoachEntries,
 } from "./intelligence-sections";
+import { IntelligenceRecentlyLearned } from "./intelligence-recently-learned";
 import { coachUrl } from "@/lib/coach/domainLinks";
 
 export function IntelligencePage() {
@@ -28,17 +30,22 @@ export function IntelligencePage() {
     [intel.analytics]
   );
 
+  const beliefsById = useMemo(() => {
+    if (!intel.adaptive?.memory) return undefined;
+    const map = new Map<string, import("@/lib/athlete-memory/types").AthleteBelief>();
+    for (const b of allBeliefs(intel.adaptive.memory)) {
+      map.set(b.id, b);
+    }
+    return map;
+  }, [intel.adaptive]);
+
   if (intel.loading && !intel.state) {
     return (
       <RequireData>
         <IntelligenceWorkspace>
-          <div className="intelligence-model mx-auto max-w-6xl space-y-3">
+          <div className="intelligence-model mx-auto max-w-5xl space-y-3">
             <div className="skeleton-shimmer h-32 rounded-xl" />
             <div className="skeleton-shimmer h-16 rounded-lg" />
-            <div className="grid gap-3 lg:grid-cols-2">
-              <div className="skeleton-shimmer h-40 rounded-lg" />
-              <div className="skeleton-shimmer h-40 rounded-lg" />
-            </div>
           </div>
         </IntelligenceWorkspace>
       </RequireData>
@@ -56,9 +63,16 @@ export function IntelligencePage() {
   }
 
   const runCount = importData?.runs.length ?? intel.analytics.summary.runCount;
-  const metaLine = [
+  const confidenceLabel =
+    intel.analytics.dataConfidence === "high"
+      ? "high confidence"
+      : intel.analytics.dataConfidence === "medium"
+        ? "moderate confidence"
+        : "low confidence";
+  const trustLine = [
     `${runCount} runs`,
-    dataSourceLabel ?? "latest training data",
+    dataSourceLabel ?? "Strava API",
+    confidenceLabel,
   ].join(" · ");
 
   const risks = intel.risksAndOpportunities.filter((r) => r.kind === "risk");
@@ -69,52 +83,59 @@ export function IntelligencePage() {
   return (
     <RequireData>
       <IntelligenceWorkspace>
-        <div className="intelligence-model mx-auto max-w-6xl space-y-4 pb-10">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[12px] text-zinc-600">
-              Persistent athlete model · updated from latest training data
+        <div className="intelligence-model mx-auto max-w-5xl space-y-3 pb-8">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[11px] text-zinc-600">
+              What StrideIQ currently believes, what changed, and what to investigate
             </p>
-            <Link
-              href={coachUrl()}
-              className="shrink-0 text-[12px] text-zinc-500 hover:text-zinc-300"
-            >
-              Coach →
-            </Link>
+            <div className="flex gap-3 text-[11px]">
+              <Link
+                href="/plan"
+                className="text-teal-500/90 hover:text-teal-300"
+              >
+                Plan →
+              </Link>
+              <Link
+                href={coachUrl()}
+                className="text-zinc-500 hover:text-zinc-300"
+              >
+                Coach →
+              </Link>
+            </div>
           </div>
 
           <IntelligenceHero
             state={intel.state}
             analytics={intel.analytics}
             primaryRecommendation={intel.primaryRecommendation}
-            metaLine={metaLine}
+            trustLine={trustLine}
           />
 
-          <IntelligenceStateEvolution items={evolution} />
+          {evolution.length > 0 ? (
+            <IntelligenceStateEvolution items={evolution} />
+          ) : null}
 
-          <div className="grid gap-4 lg:grid-cols-12 lg:items-start">
-            <div className="space-y-4 lg:col-span-7">
-              <IntelligenceSignalBoard signals={intel.signals} />
-            </div>
-            <div className="lg:col-span-5">
-              <IntelligenceDecisionSupport
-                risks={risks}
-                opportunities={opportunities}
-                recommendation={intel.primaryRecommendation}
-              />
-            </div>
-          </div>
+          <IntelligenceDecisionSupport
+            risks={risks}
+            opportunities={opportunities}
+            recommendation={intel.primaryRecommendation}
+          />
 
-          <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-            <IntelligenceMemoryTiles memory={intel.memory} />
-            {intel.ecosystem ? (
-              <div className="rounded-xl bg-white/[0.015] px-4 py-4">
-                <IntelligenceEcosystemCompact
-                  ecosystem={intel.ecosystem}
-                  embedded
-                />
-              </div>
-            ) : null}
-          </div>
+          <IntelligenceRecentlyLearned
+            items={intel.recentlyLearned}
+            adaptationSignals={intel.adaptationSignals}
+          />
+
+          <IntelligenceMemoryGrouped
+            memory={intel.memory}
+            beliefsById={beliefsById}
+          />
+
+          <IntelligenceSignalBoard signals={intel.signals} compact />
+
+          {intel.ecosystem ? (
+            <IntelligenceEcosystemCompact ecosystem={intel.ecosystem} />
+          ) : null}
 
           <IntelligenceCoachEntries domains={intel.state.domains} />
         </div>

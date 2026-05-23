@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Nav } from "@/components/nav";
 import { useStrava } from "@/lib/context/strava-context";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { cn } from "@/lib/utils";
 
 /** Usable workspace width on large displays */
@@ -61,7 +62,7 @@ function WorkspaceMeta() {
 
 export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isHome = pathname === "/home";
+  const isHome = pathname === "/home" || pathname === "/plan";
   const isCoach = pathname === "/coach";
 
   useEffect(() => {
@@ -80,15 +81,16 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
         isCoach ? "h-dvh max-h-dvh overflow-hidden" : "min-h-dvh"
       )}
     >
-      <header className="sticky top-0 z-50 shrink-0 border-b border-white/[0.06] bg-[#09090b]/88 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 shrink-0 border-b border-[var(--border-subtle)] bg-[var(--header-bg)] backdrop-blur-xl">
         <WorkspaceFrame className="flex h-[var(--app-nav-height)] items-center gap-3 sm:gap-5">
           <Link
             href="/home"
-            className="shrink-0 font-display text-lg font-bold tracking-tight text-white"
+            className="shrink-0 font-display text-lg font-bold tracking-tight text-[var(--foreground)]"
           >
             Stride<span className="text-teal-400">IQ</span>
           </Link>
           <Nav variant="app" className="min-w-0 flex-1" />
+          <ThemeToggle className="shrink-0" />
           <WorkspaceMeta />
         </WorkspaceFrame>
       </header>

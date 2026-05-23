@@ -11,7 +11,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
-import { trainingChart } from "@/components/training/charts/chart-theme";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { StreamAnnotationView } from "@/lib/runs/workoutDetailViewModels";
 import { formatPace, cn } from "@/lib/utils";
@@ -28,6 +28,7 @@ export function StreamIntelligencePanel({
   loading?: boolean;
   error?: string | null;
 }) {
+  const chart = useTrainingChart();
   if (loading) {
     return (
       <PanelChrome title="Stream intelligence" subdued>
@@ -93,25 +94,25 @@ export function StreamIntelligencePanel({
             <p className={cn(dash.label, "px-1 pb-2")}>Heart rate</p>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={fit.hrStream}>
-                <CartesianGrid stroke={trainingChart.grid} vertical={false} />
+                <CartesianGrid stroke={chart.grid} vertical={false} />
                 <XAxis
                   dataKey="elapsedSec"
-                  tick={trainingChart.tick}
+                  tick={chart.tick}
                   tickFormatter={(s) => `${Math.round(s / 60)}m`}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={trainingChart.tick}
+                  tick={chart.tick}
                   domain={["auto", "auto"]}
                   axisLine={false}
                   tickLine={false}
                 />
-                <Tooltip contentStyle={trainingChart.tooltip} />
+                <Tooltip contentStyle={chart.tooltip} />
                 {midElapsed != null ? (
                   <ReferenceLine
                     x={midElapsed}
-                    stroke="rgba(255,255,255,0.12)"
+                    stroke="var(--chart-ref-line)"
                     strokeDasharray="4 4"
                   />
                 ) : null}
@@ -131,23 +132,23 @@ export function StreamIntelligencePanel({
             <p className={cn(dash.label, "px-1 pb-2")}>Pace</p>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={fit.paceStream}>
-                <CartesianGrid stroke={trainingChart.grid} vertical={false} />
+                <CartesianGrid stroke={chart.grid} vertical={false} />
                 <XAxis
                   dataKey="elapsedSec"
-                  tick={trainingChart.tick}
+                  tick={chart.tick}
                   tickFormatter={(s) => `${Math.round(s / 60)}m`}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={trainingChart.tick}
+                  tick={chart.tick}
                   reversed
                   tickFormatter={(v) => formatPace(v)}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={trainingChart.tooltip}
+                  contentStyle={chart.tooltip}
                   formatter={(v) => [
                     typeof v === "number" ? formatPace(v) : "—",
                     "Pace",
@@ -156,7 +157,7 @@ export function StreamIntelligencePanel({
                 <Line
                   type="monotone"
                   dataKey="paceSecPerKm"
-                  stroke={trainingChart.teal}
+                  stroke={chart.teal}
                   strokeWidth={1.75}
                   dot={false}
                 />

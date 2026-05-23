@@ -4,7 +4,12 @@ import type { RaceGoal } from "@/lib/analytics/readiness";
 import { RACE_DISTANCE_LABELS } from "@/lib/analytics/readiness";
 import { archetypeDisplayLabel } from "@/lib/ecosystem";
 import { ecosystemHeadline } from "@/lib/ecosystem/insights";
-import { buildMemorySnippets } from "./memorySnippets";
+import {
+  beliefsToMemoryDisplay,
+  buildAthleteMemoryProfile,
+  selectRelevantBeliefs,
+} from "@/lib/athlete-memory";
+import type { MemorySnippet } from "./memorySnippets";
 import { buildCoachContextSnapshot } from "./viewModel";
 import {
   buildActiveInvestigations,
@@ -182,8 +187,10 @@ export function deriveCurrentFocus(
 export function buildCoachingDomains(
   analytics: DashboardInsights,
   insights: Insight[],
-  memory: ReturnType<typeof buildMemorySnippets>
+  memory: MemorySnippet[]
 ): CoachingDomain[] {
+  const mem = (cat: string) =>
+    memory.find((m) => m.label.toLowerCase() === cat)?.text ?? null;
   const eco = analytics.trainingEcosystem;
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
 
@@ -199,7 +206,7 @@ export function buildCoachingDomains(
           : analytics.fatigue.tsb < -10
             ? { label: "Loaded", tone: "alert" }
             : { label: "Neutral", tone: "flat" },
-      memoryRef: memory.find((m) => m.id === "recent-block")?.text ?? null,
+      memoryRef: mem("taper") ?? mem("fatigue"),
       suggestedQuery: "Why did my readiness change this week?",
       priority: 10,
     },
@@ -219,7 +226,7 @@ export function buildCoachingDomains(
           : analytics.efficiencySummary.trend === "declining"
             ? { label: "↓ efficiency", tone: "down" }
             : null,
-      memoryRef: memory.find((m) => m.id === "efficiency")?.text ?? null,
+      memoryRef: mem("adaptation"),
       suggestedQuery: "What likely caused my recent improvement?",
       priority: 9,
     },
@@ -232,7 +239,7 @@ export function buildCoachingDomains(
         analytics.intensityAdvice.status === "too_hard"
           ? { label: "High intensity", tone: "alert" }
           : null,
-      memoryRef: memory.find((m) => m.id === "intensity")?.text ?? null,
+      memoryRef: mem("fatigue"),
       suggestedQuery: "Am I stacking too much intensity?",
       priority: 8,
     },
@@ -268,7 +275,7 @@ export function buildCoachingDomains(
           : eco.scores.strengthSupport >= 60
             ? { label: "Strength OK", tone: "up" }
             : null,
-      memoryRef: memory.find((m) => m.id === "ecosystem")?.text ?? null,
+      memoryRef: mem("modality"),
       suggestedQuery: "Is my gym work helping or hurting my running?",
       priority: eco.totalContext.last28Days.nonRunSessions > 0 ? 7 : 3,
     },
@@ -280,7 +287,7 @@ export function buildCoachingDomains(
         ? `Best block: ${analytics.bestBlock.label}`
         : `${analytics.summary.runCount} runs in dataset`,
       trendBadge: null,
-      memoryRef: memory.find((m) => m.id === "best-block")?.text ?? null,
+      memoryRef: mem("durability") ?? mem("adaptation"),
       suggestedQuery: "When was my strongest aerobic training block?",
       priority: 6,
     },
@@ -319,7 +326,7 @@ export function buildCoachingDomains(
         tone:
           analytics.weeklyNarrative.severity === "positive" ? "up" : "alert",
       },
-      memoryRef: memory.find((m) => m.id === "fade")?.text ?? null,
+      memoryRef: mem("pacing"),
       suggestedQuery: "What type of training helps me improve pace most?",
       priority: 6,
     },
@@ -477,7 +484,12 @@ export function buildCoachWorkspaceState(
 ): CoachWorkspaceState | null {
   if (!analytics) return null;
 
-  const memory = buildMemorySnippets(analytics);
+  const memoryProfile = buildAthleteMemoryProfile(analytics);
+  const { beliefs } = selectRelevantBeliefs(memoryProfile, {
+    goal: raceGoal,
+    maxBeliefs: 6,
+  });
+  const memory = beliefsToMemoryDisplay(beliefs);
   const observations = buildActiveObservations(analytics, insights);
   const { focus, rationale } = deriveCurrentFocus(analytics, observations);
   const domains = buildCoachingDomains(analytics, insights, memory);

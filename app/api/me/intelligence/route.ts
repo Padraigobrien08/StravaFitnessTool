@@ -46,6 +46,8 @@ export async function GET(req: NextRequest) {
       readiness: "get_readiness",
       predictions: "get_predictions",
       plan: "get_week_plan",
+      weekly_plan: "generate_next_week_training_plan",
+      ai_weekly_plan: "generate_next_week_training_plan",
       strategy: "get_race_strategy",
       fatigue: "get_fatigue_load",
       quality: "get_data_quality",

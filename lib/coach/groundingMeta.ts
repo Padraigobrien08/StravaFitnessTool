@@ -12,6 +12,7 @@ const TOOL_GROUNDING: Record<string, string> = {
   get_training_ecosystem: "training ecosystem",
   get_coach_brief: "training brief",
   list_recent_runs: "activity history",
+  get_run_detail: "run execution detail",
   get_data_quality: "data quality",
 };
 

@@ -8,6 +8,7 @@ import {
   CoachConversationTurn,
   CoachUserTurn,
 } from "./coach-conversation-turn";
+import { WeeklyPlanResponse } from "./weekly-plan-response";
 import { CoachComposer } from "./coach-composer";
 import { CoachAnalysisLoader } from "./coach-analysis-loader";
 import { CoachThreadStarter } from "./coach-thread-starter";
@@ -108,7 +109,7 @@ export function CoachReasoningPanel({
                     >
                       <CoachUserTurn content={pair.user.content} />
                       {pair.assistant ? (
-                        <div className="mt-5">
+                        <div className="mt-5 space-y-4">
                           <CoachConversationTurn
                             parsed={
                               pair.assistant.parsed ??
@@ -117,10 +118,16 @@ export function CoachReasoningPanel({
                             toolsUsed={pair.assistant.toolsUsed}
                             onFollowUp={onSend}
                             showFollowUps={
-                              i === pairs.length - 1 && !loading
+                              i === pairs.length - 1 && !loading &&
+                              !pair.assistant.weeklyPlan
                             }
                             animate={i === pairs.length - 1}
                           />
+                          {pair.assistant.weeklyPlan ? (
+                            <WeeklyPlanResponse
+                              result={pair.assistant.weeklyPlan}
+                            />
+                          ) : null}
                         </div>
                       ) : null}
                     </div>

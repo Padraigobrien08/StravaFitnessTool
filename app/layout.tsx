@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { ThemeScript } from "@/components/theme/theme-script";
 
 export const metadata: Metadata = {
   title: "StrideIQ — Strava Running Insights",
@@ -14,7 +15,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

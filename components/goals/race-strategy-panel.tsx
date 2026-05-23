@@ -20,13 +20,9 @@ import {
   type StrategyMode,
 } from "@/lib/analytics/raceStrategy";
 import { formatDuration, formatPace } from "@/lib/utils";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
-const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 8,
-  color: "#fafafa",
-};
+const chartTick = { fontSize: 10, fill: "var(--chart-tick-fill)" };
 
 const MODES: { id: StrategyMode; label: string }[] = [
   { id: "even", label: "Even" },
@@ -48,6 +44,7 @@ export function RaceStrategyPanel({
   analytics: DashboardInsights;
 }) {
   const [mode, setMode] = useState<StrategyMode>("even");
+  const chart = useTrainingChart();
 
   const strategy = useMemo(
     () =>
@@ -157,27 +154,27 @@ export function RaceStrategyPanel({
             <LineChart data={chartData}>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="rgba(255,255,255,0.06)"
+                stroke="var(--chart-grid)"
               />
               <XAxis
                 dataKey="km"
-                tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                tick={chartTick}
                 unit=" km"
               />
               <YAxis
-                tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                tick={chartTick}
                 reversed
                 tickFormatter={formatPaceTick}
               />
               <Tooltip
-                contentStyle={tooltipStyle}
+                contentStyle={chart.tooltip}
                 formatter={(v) =>
                   typeof v === "number" ? formatPace(v) : String(v)
                 }
               />
               <ReferenceLine
                 y={strategy.targetTimeSec / strategy.distanceKm}
-                stroke="rgba(255,255,255,0.15)"
+                stroke="var(--chart-ref-line)"
                 strokeDasharray="4 4"
               />
               <Line

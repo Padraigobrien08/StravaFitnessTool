@@ -11,23 +11,37 @@ import type { ImportQualityReport } from "@/lib/quality/assessImport";
 import { formatWorkoutTitle, type FormattedWorkoutTitle } from "./formatWorkoutName";
 import { formatDistanceKm, formatKm, formatPace } from "@/lib/utils";
 import { paceSecPerKm } from "@/lib/analytics/pace";
-import { parseISO, subDays } from "date-fns";
+import { format, parseISO, subDays } from "date-fns";
+import { monthKeyFromDate, monthLabelFromKey } from "./explorerUtils";
+
+export type SignificanceLevel = "critical" | "meaningful" | "supporting";
+
+export interface ActivityStateSummaryView {
+  headline: string;
+  bullets: string[];
+}
+
+export interface TrainingStateCardView {
+  readiness: string;
+  consistency: string;
+  easyShare: string;
+  frequency: string;
+  volumeTrend: string;
+  phase: string;
+}
 
 export type RunMarker = "pr" | "long" | "key" | "high_load" | "efficient";
 
 export interface RunsHeroView {
   title: string;
-  blockEmphasis: string;
-  commonSession: string;
-  currentTrend: string;
+  trainingIdentity: string;
+  signals: string[];
+  recentBehavior: string;
+  trainingEmphasis: string;
+  stateCard: TrainingStateCardView;
   runCount: number;
   totalKm: string;
-  typeCount: number;
   confidence: "low" | "medium" | "high";
-  mixSparkline: number[];
-  loadSparkline: number[];
-  easyPct: number;
-  inlineMetrics: { label: string; value: string; hint?: string }[];
 }
 
 export interface DistributionWidget {
@@ -45,10 +59,12 @@ export interface WorkoutMixBar {
 
 export interface TrainingDistributionView {
   mix: WorkoutMixBar[];
-  widgets: DistributionWidget[];
-  easyHardLabel: string;
-  longRunFreq: string;
+  modalityLine: string;
+  intensityLine: string;
+  frequencyLine: string;
+  longRunRhythm: string;
   intervalDensity: string;
+  consistencyLine: string;
 }
 
 export interface NotableSessionView {
@@ -57,7 +73,10 @@ export interface NotableSessionView {
   title: string;
   meta: string;
   why: string;
-  signal: string;
+  adaptation: string;
+  goalRelation: string;
+  significance: SignificanceLevel;
+  rank: number;
   href: string;
 }
 
@@ -72,21 +91,32 @@ export interface RunExplorerRow {
   impact: string;
   markers: RunMarker[];
   distanceDisplay: string;
+  distanceKm: number;
   paceDisplay: string;
+  paceSec: number;
   hrDisplay: string;
   loadDisplay: string | null;
+  loadValue: number | null;
   hasFit: boolean;
-  isKeyRow: boolean;
+  significanceScore: number;
+  significanceTier: SignificanceLevel | "routine";
+  executionLabel: string;
+  executionRank: number;
+  adaptationTags: string[];
+  groupKey: string;
+  groupLabel: string;
 }
 
 export interface PatternInsightView {
+  id: string;
   title: string;
   body: string;
   tone: "positive" | "neutral" | "warning";
+  coachQuery: string;
 }
 
 export interface HistoricalContextView {
-  items: { label: string; value: string }[];
+  items: { label: string; value: string; detail?: string }[];
 }
 
 export interface RunsDataQualityView {
@@ -98,6 +128,7 @@ export interface RunsDataQualityView {
 }
 
 export interface RunsPageView {
+  activityState: ActivityStateSummaryView;
   hero: RunsHeroView;
   distribution: TrainingDistributionView;
   notableSessions: NotableSessionView[];
@@ -105,6 +136,7 @@ export interface RunsPageView {
   historical: HistoricalContextView;
   quality: RunsDataQualityView;
   explorerRows: RunExplorerRow[];
+  intelligenceSessions: NotableSessionView[];
 }
 
 const SESSION_PURPOSE: Record<WorkoutType, string> = {
@@ -134,6 +166,67 @@ function prBuckets(prs: PersonalRecord[]): Map<string, PersonalRecord> {
 function recentRuns(runs: RunActivity[], days = 56): RunActivity[] {
   const cutoff = subDays(new Date(), days);
   return runs.filter((r) => parseISO(r.date) >= cutoff);
+}
+
+function roundPct(n: number): number {
+  return Math.round(n);
+}
+
+function significanceScoreFromMarkers(
+  markers: RunMarker[],
+  workout: WorkoutClassification
+): number {
+  let score = 10;
+  if (markers.includes("pr")) score = 100;
+  else if (markers.includes("efficient") && markers.includes("key")) score = 85;
+  else if (markers.includes("long")) score = 75;
+  else if (markers.includes("key")) score = 65;
+  else if (markers.includes("high_load")) score = 55;
+  else if (workout.type === "tempo" || workout.type === "interval") score = 45;
+  else if (workout.type === "race") score = 70;
+  return score;
+}
+
+function tierFromScore(score: number): SignificanceLevel | "routine" {
+  if (score >= 80) return "critical";
+  if (score >= 55) return "meaningful";
+  if (score >= 35) return "supporting";
+  return "routine";
+}
+
+function executionFromMarkers(
+  markers: RunMarker[],
+  workout: WorkoutClassification
+): { label: string; rank: number } {
+  if (markers.includes("pr") || markers.includes("efficient")) {
+    return { label: "Excellent", rank: 4 };
+  }
+  if (workout.type === "easy" && !markers.includes("high_load")) {
+    return { label: "Strong", rank: 3 };
+  }
+  if (markers.includes("high_load")) {
+    return { label: "Elevated cost", rank: 2 };
+  }
+  if (workout.type === "tempo" || workout.type === "interval") {
+    return { label: "Strong", rank: 3 };
+  }
+  return { label: "Moderate", rank: 2 };
+}
+
+function adaptationTagsFor(
+  workout: WorkoutClassification,
+  markers: RunMarker[]
+): string[] {
+  const tags: string[] = [];
+  if (markers.includes("pr")) tags.push("Speed");
+  if (markers.includes("efficient")) tags.push("Aerobic efficiency");
+  if (markers.includes("long")) tags.push("Durability");
+  if (workout.type === "tempo") tags.push("Threshold");
+  if (workout.type === "interval") tags.push("VO₂");
+  if (workout.type === "race") tags.push("Race execution");
+  if (markers.includes("high_load")) tags.push("Fatigue load");
+  if (tags.length === 0) tags.push("Base volume");
+  return tags;
 }
 
 function buildMarkers(
@@ -172,6 +265,9 @@ function buildNotableSessions(
   const sorted = [...runs].sort(
     (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
   );
+  const goalHint = analytics.raceReadiness
+    ? `${analytics.raceReadiness.distanceLabel} prep`
+    : "current fitness block";
 
   for (const pr of analytics.personalRecords.filter((p) =>
     ["5k", "10k", "hm"].includes(p.bucket)
@@ -181,42 +277,12 @@ function buildNotableSessions(
       runId: pr.runId,
       title: `New ${pr.label} PR`,
       meta: formatPace(pr.paceSecPerKm),
-      why: "Validates speed progression in your current block.",
-      signal: "Performance breakthrough",
+      why: "Top-end speed proof in recent training.",
+      adaptation: "Supports top-end speed progression.",
+      goalRelation: `Relevant to ${goalHint}.`,
+      significance: "critical",
+      rank: 100,
       href: `/runs/${pr.runId}`,
-    });
-  }
-
-  const longest = [...sorted].sort((a, b) => b.distanceM - a.distanceM)[0];
-  if (longest && longest.distanceM / 1000 >= 12) {
-    sessions.push({
-      id: "longest",
-      runId: longest.id,
-      title: "Longest recent run",
-      meta: formatDistanceKm(longest.distanceM),
-      why: "Anchors endurance capacity for race readiness.",
-      signal: "Endurance anchor",
-      href: `/runs/${longest.id}`,
-    });
-  }
-
-  const byLoad = [...sorted]
-    .map((r) => ({
-      r,
-      load: r.trainingLoad ?? (r.distanceM / 1000) * 10,
-    }))
-    .sort((a, b) => b.load - a.load)[0];
-  if (byLoad && !sessions.some((s) => s.runId === byLoad.r.id)) {
-    sessions.push({
-      id: "load",
-      runId: byLoad.r.id,
-      title: "Highest load session",
-      meta: workoutMap.get(byLoad.r.id)
-        ? WORKOUT_TYPE_LABELS[workoutMap.get(byLoad.r.id)!.type]
-        : "—",
-      why: "Largest training stress in recent history — recovery timing matters.",
-      signal: "Load peak",
-      href: `/runs/${byLoad.r.id}`,
     });
   }
 
@@ -231,9 +297,28 @@ function buildNotableSessions(
       runId: effRun?.id ?? "",
       title: "Strongest aerobic efficiency",
       meta: best.label,
-      why: "Fastest pace relative to heart rate in recent sample.",
-      signal: "Adaptation signal",
+      why: "Fastest pace relative to HR in the recent block.",
+      adaptation: "Aerobic efficiency signal — durable fitness.",
+      goalRelation: "Protect with easy volume between quality days.",
+      significance: "critical",
+      rank: 90,
       href: effRun ? `/runs/${effRun.id}` : "/performance",
+    });
+  }
+
+  const longest = [...sorted].sort((a, b) => b.distanceM - a.distanceM)[0];
+  if (longest && longest.distanceM / 1000 >= 12) {
+    sessions.push({
+      id: "longest",
+      runId: longest.id,
+      title: "Longest recent run",
+      meta: formatDistanceKm(longest.distanceM),
+      why: "Primary endurance anchor in the current window.",
+      adaptation: "Supports HM durability and long-race confidence.",
+      goalRelation: `Key for ${goalHint}.`,
+      significance: "meaningful",
+      rank: 75,
+      href: `/runs/${longest.id}`,
     });
   }
 
@@ -245,15 +330,43 @@ function buildNotableSessions(
     sessions.push({
       id: "threshold",
       runId: hardRecent.id,
-      title: "Key quality session",
+      title: "Key threshold session",
       meta: WORKOUT_TYPE_LABELS[workoutMap.get(hardRecent.id)!.type],
-      why: "Structured intensity supporting threshold/fitness.",
-      signal: "Quality stimulus",
+      why: "High-quality lactate-support stimulus.",
+      adaptation: "Threshold tolerance and race-pace support.",
+      goalRelation: "Monitor freshness before the next quality day.",
+      significance: "meaningful",
+      rank: 65,
       href: `/runs/${hardRecent.id}`,
     });
   }
 
-  return sessions.slice(0, 6);
+  const byLoad = [...sorted]
+    .map((r) => ({
+      r,
+      load: r.trainingLoad ?? (r.distanceM / 1000) * 10,
+    }))
+    .sort((a, b) => b.load - a.load)[0];
+  if (byLoad && !sessions.some((s) => s.runId === byLoad.r.id)) {
+    sessions.push({
+      id: "load",
+      runId: byLoad.r.id,
+      title: "Highest fatigue-cost session",
+      meta: workoutMap.get(byLoad.r.id)
+        ? WORKOUT_TYPE_LABELS[workoutMap.get(byLoad.r.id)!.type]
+        : "—",
+      why: "Largest training stress recently — recovery timing matters.",
+      adaptation: "Fatigue accumulation — space easy days after.",
+      goalRelation: "Watch stacking into the next hard session.",
+      significance: "supporting",
+      rank: 50,
+      href: `/runs/${byLoad.r.id}`,
+    });
+  }
+
+  return [...sessions]
+    .sort((a, b) => b.rank - a.rank)
+    .slice(0, 6);
 }
 
 function buildPatterns(
@@ -272,63 +385,71 @@ function buildPatterns(
 
   if (top && top.pct >= 35) {
     patterns.push({
-      title: `${top.label}-leaning block`,
-      body: `${Math.round(top.pct)}% of recent sessions classified as ${top.label.toLowerCase()} — shapes your current training identity.`,
+      id: "mix-lean",
+      title: `${top.label}-heavy block`,
+      body: `${roundPct(top.pct)}% of recent sessions are ${top.label.toLowerCase()} — this defines your current training identity.`,
       tone: top.type === "easy" || top.type === "recovery" ? "positive" : "neutral",
+      coachQuery: `Why is my training ${top.label.toLowerCase()}-heavy right now?`,
     });
   }
 
   if (hardPct >= 30) {
     patterns.push({
-      title: "Threshold-heavy training block",
-      body: `${Math.round(hardPct)}% tempo/interval/race share — monitor freshness between quality days.`,
+      id: "threshold-density",
+      title: "Threshold density elevated",
+      body: `${roundPct(hardPct)}% quality share — monitor freshness between hard sessions.`,
       tone: "warning",
+      coachQuery: "Is my threshold density too high for my current freshness?",
     });
   } else if (analytics.intensityAdvice.currentEasyPct >= 75) {
     patterns.push({
-      title: "Polarized easy-volume base",
-      body: `${analytics.intensityAdvice.currentEasyPct}% easy runs — supports aerobic development when consistency holds.`,
+      id: "polarized",
+      title: "Aerobic-base rhythm",
+      body: `${roundPct(analytics.intensityAdvice.currentEasyPct)}% easy running — supports durable aerobic development.`,
       tone: "positive",
+      coachQuery: "Is my easy-volume base appropriate for my goal?",
     });
   }
 
   if (analytics.efficiencySummary.trend === "improving") {
     patterns.push({
+      id: "pace-stability",
       title: "Pace stability improving",
-      body: "Aerobic efficiency trend is positive — you're tending to run faster at similar heart rates.",
+      body: "Execution consistency is improving — faster paces at similar heart rates.",
       tone: "positive",
+      coachQuery: "What drove my improving aerobic efficiency?",
     });
   }
 
   const longCount = mix.find((m) => m.type === "long")?.runCount ?? 0;
-  if (longCount >= 2) {
+  if (longCount === 0 && analytics.summary.runCount >= 15) {
     patterns.push({
-      title: "Long-run consistency building",
-      body: `${longCount} long runs in the recent window — endurance structure is taking shape.`,
-      tone: "positive",
-    });
-  } else if (longCount === 0 && analytics.summary.runCount >= 15) {
-    patterns.push({
-      title: "Long-run gap in recent block",
-      body: "No 18 km+ classified long runs recently — consider scheduling an aerobic anchor.",
+      id: "long-gap",
+      title: "Long-run gap emerging",
+      body: "No 18+ km long run recently — durability may need an aerobic anchor.",
       tone: "warning",
+      coachQuery: "Should I schedule a long run this week?",
     });
   }
 
   const intervalCount = mix.find((m) => m.type === "interval")?.runCount ?? 0;
-  if (intervalCount === 0 && hardPct < 15) {
+  if (intervalCount >= 2) {
     patterns.push({
-      title: "Limited speed stimulus",
-      body: "Few intervals detected — top-end sharpness may need a touch of VO₂ work.",
+      id: "interval-regular",
+      title: "Regular interval stimulus",
+      body: `${intervalCount} interval sessions in the window — top-end speed is being trained.`,
       tone: "neutral",
+      coachQuery: "Are my intervals spaced correctly for recovery?",
     });
   }
 
   if (patterns.length === 0) {
     patterns.push({
+      id: "establishing",
       title: "Establishing training rhythm",
-      body: `${labels.length} classified sessions — patterns will sharpen as HR and FIT coverage grow.`,
+      body: `${labels.length} classified sessions — patterns sharpen as HR and stream coverage grow.`,
       tone: "neutral",
+      coachQuery: "What patterns are emerging in my training?",
     });
   }
 
@@ -336,12 +457,13 @@ function buildPatterns(
 }
 
 function buildHistorical(analytics: DashboardInsights): HistoricalContextView {
-  const items: { label: string; value: string }[] = [];
+  const items: HistoricalContextView["items"] = [];
 
   if (analytics.bestBlock) {
     items.push({
-      label: "Best 4-week block",
+      label: "Strongest block",
       value: `${analytics.bestBlock.label} · ${formatKm(analytics.bestBlock.distanceKm)}`,
+      detail: "Highest sustained volume phase in your history sample.",
     });
   }
 
@@ -351,27 +473,33 @@ function buildHistorical(analytics: DashboardInsights): HistoricalContextView {
     items.push({
       label: "Highest volume month",
       value: `${best.label} · ${formatKm(best.distanceKm)}`,
-    });
-  }
-
-  const weeks = analytics.weeklyVolume;
-  if (weeks.length > 0) {
-    const peak = [...weeks].sort((a, b) => b.distanceKm - a.distanceKm)[0];
-    items.push({
-      label: "Peak week",
-      value: `${peak.label} · ${formatKm(peak.distanceKm)} (${peak.runCount} runs)`,
+      detail: "Peak monthly load for comparison to current week.",
     });
   }
 
   items.push({
-    label: "Active streak",
+    label: "Longest consistency streak",
     value: `${analytics.consistencyScore.streakWeeks} week${analytics.consistencyScore.streakWeeks === 1 ? "" : "s"}`,
+    detail:
+      analytics.consistencyScore.streakWeeks >= 4
+        ? "Rhythm has been durable across phases."
+        : "Building weekly habit strength.",
   });
 
-  if (analytics.efficiencyMoM.narrative) {
+  if (analytics.efficiencySummary.trend === "improving") {
     items.push({
-      label: "Strongest progression signal",
-      value: analytics.efficiencyMoM.narrative.slice(0, 80) + (analytics.efficiencyMoM.narrative.length > 80 ? "…" : ""),
+      label: "Best adaptation phase",
+      value: "Efficiency strongest during stable threshold exposure",
+      detail: analytics.efficiencyMoM.narrative?.slice(0, 100),
+    });
+  }
+
+  const r = analytics.raceReadiness;
+  if (r && r.daysUntilRace <= 21) {
+    items.push({
+      label: "Taper context",
+      value: `Race in ${r.daysUntilRace}d · ${r.label}`,
+      detail: "Compare current sessions to prior successful tapers.",
     });
   }
 
@@ -442,104 +570,120 @@ export function buildRunsPageView(
     .filter((m) => ["tempo", "interval", "race"].includes(m.type))
     .reduce((s, m) => s + m.pct, 0);
 
-  let blockEmphasis = "Balanced mixed training";
-  if (hardPct >= 30) blockEmphasis = "Elevated threshold / quality density";
-  else if (analytics.intensityAdvice.currentEasyPct >= 78)
-    blockEmphasis = "Aerobic-base emphasis with controlled quality";
-
-  if (analytics.efficiencySummary.trend === "improving") {
-    blockEmphasis += " · efficiency improving";
+  let trainingIdentity = "Balanced mixed training identity";
+  if (hardPct >= 30 && topMix?.type === "tempo") {
+    trainingIdentity = "Threshold-heavy aerobic build with improving efficiency";
+  } else if (hardPct >= 30) {
+    trainingIdentity = "Quality-dense block with elevated threshold share";
+  } else if (analytics.intensityAdvice.currentEasyPct >= 78) {
+    trainingIdentity = "Aerobic-base rhythm with selective quality";
   }
 
-  const weekRuns = analytics.weeklyVolume.slice(-8).map((w) => w.runCount);
-  const loadSpark = analytics.weeklyVolume.slice(-10).map((w) => w.distanceKm);
-
+  const signals: string[] = [];
+  if (topMix && topMix.pct >= 40) {
+    signals.push(`${topMix.label} dominant`);
+  }
+  if (analytics.consistencyScore.streakWeeks >= 3) {
+    signals.push("Consistent weekly rhythm");
+  }
   const longRuns4w = recent.filter((r) => r.distanceM / 1000 >= 18).length;
+  if (longRuns4w >= 1) signals.push("Strong long-run anchor");
+  if (analytics.efficiencySummary.trend === "improving") {
+    signals.push("Efficiency trend improving");
+  }
+  if (signals.length === 0) signals.push("Building session history");
+
   const interval4w = recentLabels.filter(
     (l) => l.classification.type === "interval"
   ).length;
 
+  const recentBehavior = topMix
+    ? `${roundPct(topMix.pct)}% ${topMix.label.toLowerCase()} share · ${analytics.intensityAdvice.hardRunsLast14d} hard sessions in 14d`
+    : `${recent.length} sessions in 56d`;
+
+  let trainingEmphasis = "Aerobic consistency + controlled quality";
+  if (analytics.raceReadiness) {
+    trainingEmphasis = `${analytics.raceReadiness.distanceLabel} durability + threshold support`;
+  } else if (hardPct >= 30) {
+    trainingEmphasis = "Threshold support + recovery spacing";
+  }
+
+  const readinessScore =
+    analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score;
+  const volTrend =
+    analytics.weeklyVolume.length >= 2 &&
+    (analytics.weeklyVolume.at(-1)?.distanceKm ?? 0) >=
+      (analytics.weeklyVolume.at(-2)?.distanceKm ?? 0)
+      ? "Building"
+      : "Easing";
+
   const hero: RunsHeroView = {
     title: "Training history overview",
-    blockEmphasis,
-    commonSession: topMix
-      ? `${topMix.label} (${Math.round(topMix.pct)}% of recent runs)`
-      : "Mixed sessions",
-    currentTrend:
-      analytics.consistencyScore.streakWeeks >= 3
-        ? "Weekly consistency improving"
-        : analytics.efficiencySummary.trend === "improving"
-          ? "Aerobic response improving"
-          : "Building activity history",
+    trainingIdentity,
+    signals,
+    recentBehavior,
+    trainingEmphasis,
+    stateCard: {
+      readiness: `${readinessScore}/100 · ${(analytics.raceReadiness?.label ?? analytics.halfMarathonReadiness.label).toLowerCase()}`,
+      consistency: `${analytics.consistencyScore.overall}/100 · ${analytics.consistencyScore.label.toLowerCase()}`,
+      easyShare: `${roundPct(analytics.intensityAdvice.currentEasyPct)}% easy`,
+      frequency: `${Math.round(recent.length / 8) || recent.length} runs/wk (56d)`,
+      volumeTrend: volTrend,
+      phase: analytics.raceReadiness
+        ? analytics.raceReadiness.daysUntilRace <= 14
+          ? "Race week"
+          : analytics.raceReadiness.daysUntilRace <= 28
+            ? "Taper / sharpen"
+            : "Build"
+        : "General fitness",
+    },
     runCount: runs.length,
     totalKm: formatKm(totalKm),
-    typeCount: typeSet.size,
     confidence: analytics.dataConfidence,
-    mixSparkline: weekRuns.length >= 2 ? weekRuns : [1, 2, 2, 3],
-    loadSparkline: loadSpark,
-    easyPct: analytics.intensityAdvice.currentEasyPct,
-    inlineMetrics: [
-      {
-        label: "Recent",
-        value: String(recent.length),
-        hint: "56d window",
-      },
-      {
-        label: "Easy %",
-        value: `${analytics.intensityAdvice.currentEasyPct}%`,
-        hint: `target ~${analytics.intensityAdvice.easyTargetPct}%`,
-      },
-      {
-        label: "Consistency",
-        value: String(analytics.consistencyScore.overall),
-        hint: analytics.consistencyScore.label,
-      },
-    ],
   };
+
+  const mixParts = analytics.workoutTypeMix
+    .filter((m) => m.pct >= 4)
+    .map((m) => `${m.label} ${roundPct(m.pct)}%`)
+    .join(" · ");
 
   const distribution: TrainingDistributionView = {
     mix: analytics.workoutTypeMix.map((m) => ({
       type: m.type,
       label: m.label,
-      pct: Math.round(m.pct),
+      pct: roundPct(m.pct),
       runCount: m.runCount,
     })),
-    widgets: [
-      {
-        label: "Runs (56d)",
-        value: String(recent.length),
-      },
-      {
-        label: "Avg / week",
-        value: String(
-          Math.round((recent.length / 8) * 10) / 10 || recent.length
-        ),
-        hint: "frequency",
-      },
-      {
-        label: "Long runs",
-        value: String(longRuns4w),
-        hint: "18 km+",
-      },
-      {
-        label: "Intervals",
-        value: String(interval4w),
-        hint: "56d",
-      },
-    ],
-    easyHardLabel: `${analytics.intensityAdvice.currentEasyPct}% easy · ${analytics.intensityAdvice.hardRunsLast14d} hard sessions (14d)`,
-    longRunFreq:
+    modalityLine: "Running-led · see Training for cross-training",
+    intensityLine: mixParts || "Mixed intensity",
+    frequencyLine: `${Math.round(recent.length / 8) || recent.length} sessions/wk · ${recent.length} in 56d`,
+    longRunRhythm:
       longRuns4w >= 2
-        ? "Regular long-run rhythm"
+        ? "Stable"
         : longRuns4w === 1
-          ? "Single long run recently"
-          : "No recent 18 km+ long run",
+          ? "Single anchor"
+          : "Gap emerging",
     intervalDensity:
       interval4w >= 2
-        ? "Regular interval stimulus"
+        ? "Regular stimulus"
         : interval4w === 1
-          ? "Light interval density"
-          : "Low interval frequency",
+          ? "Light"
+          : "Low",
+    consistencyLine:
+      analytics.consistencyScore.streakWeeks >= 3
+        ? "Improving"
+        : analytics.consistencyScore.overall >= 70
+          ? "Stable"
+          : "Variable",
+  };
+
+  const activityState: ActivityStateSummaryView = {
+    headline: trainingIdentity,
+    bullets: [
+      ...signals.map((s) => s),
+      recentBehavior,
+      `Emphasis: ${trainingEmphasis}`,
+    ],
   };
 
   const recent56 = recentRuns(runs);
@@ -578,14 +722,14 @@ export function buildRunsPageView(
         efficientIds
       );
       const pace = paceSecPerKm(run);
+      const km = run.distanceM / 1000;
+      const score = significanceScoreFromMarkers(markers, workout);
+      const exec = executionFromMarkers(markers, workout);
+      const gKey = monthKeyFromDate(run.date);
       return {
         runId: run.id,
         date: run.date,
-        dateDisplay: new Date(run.date).toLocaleDateString(undefined, {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        }),
+        dateDisplay: format(parseISO(run.date), "MMM d, yyyy"),
         formattedTitle: formatWorkoutTitle(run.name),
         rawName: run.name,
         workout,
@@ -593,14 +737,23 @@ export function buildRunsPageView(
         impact: SESSION_IMPACT[workout.type],
         markers,
         distanceDisplay: formatDistanceKm(run.distanceM),
+        distanceKm: km,
         paceDisplay: pace ? formatPace(pace) : "—",
-        hrDisplay: run.avgHr != null ? `${run.avgHr} bpm` : "—",
+        paceSec: pace ?? 99999,
+        hrDisplay: run.avgHr != null ? `${Math.round(run.avgHr)} bpm` : "—",
         loadDisplay:
           run.trainingLoad != null
             ? String(Math.round(run.trainingLoad))
             : null,
+        loadValue: run.trainingLoad ?? null,
         hasFit: fitRunIds.includes(run.id),
-        isKeyRow: markers.includes("pr") || markers.includes("key"),
+        significanceScore: score,
+        significanceTier: tierFromScore(score),
+        executionLabel: exec.label,
+        executionRank: exec.rank,
+        adaptationTags: adaptationTagsFor(workout, markers),
+        groupKey: gKey,
+        groupLabel: monthLabelFromKey(gKey),
       };
     });
 
@@ -609,15 +762,19 @@ export function buildRunsPageView(
     f.label.toLowerCase().includes("heart")
   );
 
+  const notableSessions = buildNotableSessions(
+    runs,
+    analytics,
+    workoutMap,
+    prByRun
+  );
+
   return {
+    activityState,
     hero,
     distribution,
-    notableSessions: buildNotableSessions(
-      runs,
-      analytics,
-      workoutMap,
-      prByRun
-    ),
+    notableSessions,
+    intelligenceSessions: notableSessions,
     patterns: buildPatterns(analytics, analytics.workoutLabels),
     historical: buildHistorical(analytics),
     quality: {

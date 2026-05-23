@@ -56,7 +56,7 @@ export function ReadinessRing({
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="rgba(255,255,255,0.05)"
+          stroke="var(--chart-ring-track)"
           strokeWidth={8}
         />
         <circle

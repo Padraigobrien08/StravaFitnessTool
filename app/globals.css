@@ -1,18 +1,79 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
 
-:root {
+:root,
+html.dark {
+  color-scheme: dark;
   --background: #09090b;
   --foreground: #fafafa;
+  --muted: #a1a1aa;
+  --muted-subtle: #71717a;
   --accent: #10b981;
   --accent-muted: #064e3b;
   --warning: #fbbf24;
   --card: rgba(255, 255, 255, 0.04);
   --border: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+  --surface-elevated: #0c0d10;
+  --surface-subdued: #0a0b0e;
+  --surface-panel: #0e1015;
+  --header-bg: rgba(9, 9, 11, 0.88);
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --surface-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+    0 10px 40px -18px rgba(0, 0, 0, 0.55);
+  --surface-shadow-subtle: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset;
+  --chart-grid: rgba(255, 255, 255, 0.06);
+  --chart-tick-fill: #a1a1aa;
+  --chart-tooltip-bg: #18181b;
+  --chart-tooltip-border: rgba(255, 255, 255, 0.1);
+  --chart-tooltip-fg: #fafafa;
+  --chart-ref-line: rgba(255, 255, 255, 0.12);
+  --chart-sparkline: rgba(255, 255, 255, 0.12);
+  --chart-ring-track: rgba(255, 255, 255, 0.05);
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --app-nav-height: 3rem;
   --coach-page-pad: 0.75rem;
+  --body-glow-1: rgba(16, 185, 129, 0.15);
+  --body-glow-2: rgba(16, 185, 129, 0.06);
+}
+
+html.light {
+  color-scheme: light;
+  --background: #f4f4f5;
+  --foreground: #18181b;
+  --muted: #52525b;
+  --muted-subtle: #71717a;
+  --accent: #059669;
+  --accent-muted: #d1fae5;
+  --warning: #d97706;
+  --card: rgba(0, 0, 0, 0.03);
+  --border: rgba(0, 0, 0, 0.1);
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-default: rgba(0, 0, 0, 0.12);
+  --surface: rgba(0, 0, 0, 0.04);
+  --surface-hover: rgba(0, 0, 0, 0.06);
+  --surface-elevated: #ffffff;
+  --surface-subdued: #fafafa;
+  --surface-panel: #ffffff;
+  --header-bg: rgba(244, 244, 245, 0.92);
+  --input-bg: #ffffff;
+  --surface-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.04) inset,
+    0 8px 30px -12px rgba(0, 0, 0, 0.12);
+  --surface-shadow-subtle: 0 1px 0 0 rgba(0, 0, 0, 0.03) inset;
+  --chart-grid: rgba(0, 0, 0, 0.08);
+  --chart-tick-fill: #52525b;
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: rgba(0, 0, 0, 0.1);
+  --chart-tooltip-fg: #18181b;
+  --chart-ref-line: rgba(0, 0, 0, 0.12);
+  --chart-sparkline: rgba(0, 0, 0, 0.14);
+  --chart-ring-track: rgba(0, 0, 0, 0.08);
+  --body-glow-1: rgba(16, 185, 129, 0.08);
+  --body-glow-2: rgba(16, 185, 129, 0.04);
 }
 
 html.coach-route,
@@ -42,10 +103,82 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(16, 185, 129, 0.06), transparent);
+    radial-gradient(ellipse 80% 50% at 50% -20%, var(--body-glow-1), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 50%, var(--body-glow-2), transparent);
   pointer-events: none;
   z-index: 0;
+}
+
+/* Light mode: remap common dark-first Tailwind utilities */
+html.light .text-white {
+  color: var(--foreground);
+}
+
+html.light .text-zinc-100 {
+  color: #27272a;
+}
+
+html.light .text-zinc-200 {
+  color: #3f3f46;
+}
+
+html.light .text-zinc-300 {
+  color: #52525b;
+}
+
+html.light .text-zinc-400 {
+  color: #71717a;
+}
+
+html.light .text-zinc-500 {
+  color: #71717a;
+}
+
+html.light .text-zinc-600 {
+  color: #a1a1aa;
+}
+
+html.light .text-teal-400 {
+  color: #0d9488;
+}
+
+html.light .text-emerald-400 {
+  color: #059669;
+}
+
+html.light [class*="border-white"] {
+  border-color: var(--border-subtle) !important;
+}
+
+html.light [class*="bg-white/"] {
+  background-color: var(--surface) !important;
+}
+
+html.light [class*="bg-\\[\\#09"],
+html.light [class*="bg-\\[\\#0a"],
+html.light [class*="bg-\\[\\#0c"],
+html.light [class*="bg-\\[\\#0e"],
+html.light [class*="bg-\\[\\#10"],
+html.light [class*="bg-\\[\\#12"] {
+  background-color: var(--surface-elevated) !important;
+}
+
+html.light .hover\:bg-white\/5:hover,
+html.light .hover\:bg-white\/\[0\.05\]:hover {
+  background-color: var(--surface-hover) !important;
+}
+
+html.light select,
+html.light input[type="number"],
+html.light input[type="text"] {
+  color: var(--foreground);
+  background-color: var(--input-bg);
+  border-color: var(--border-default);
+}
+
+html.light option {
+  background: #ffffff;
+  color: #18181b;
 }
 
 .font-display {
@@ -83,6 +216,66 @@ body::before {
 @keyframes spark-fade {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+html.light .coach-terminal {
+  background: linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+html.light .coach-sidebar {
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.06);
+}
+
+html.light .coach-mini-context {
+  box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.06);
+}
+
+html.light .coach-state-pane {
+  background: #fafafa;
+}
+
+html.light .coach-reasoning-panel {
+  background: #ffffff;
+}
+
+html.light .coach-main {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+html.light .intelligence-hero {
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+html.light .intelligence-evolution {
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+html.light .route-terminal {
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(16, 185, 129, 0.06), transparent 55%),
+    #f4f4f5;
+}
+
+html.light .route-scrubber {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+html.light .maplibregl-ctrl-group {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+html.light .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.08) 50%,
+    rgba(0, 0, 0, 0.04) 100%
+  );
+  background-size: 200% 100%;
 }
 
 /* Coach intelligence terminal */
@@ -514,3 +707,4 @@ html.coach-route .coach-message-column {
     color: #18181b !important;
   }
 }
+

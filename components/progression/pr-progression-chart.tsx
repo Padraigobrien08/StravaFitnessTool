@@ -12,13 +12,9 @@ import {
 } from "recharts";
 import type { PrTimelinePoint } from "@/lib/analytics/progression";
 import { formatDuration } from "@/lib/utils";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
-const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 8,
-  color: "#fafafa",
-};
+const chartTick = { fontSize: 10, fill: "var(--chart-tick-fill)" };
 
 const BUCKET_COLORS: Record<string, string> = {
   "5k": "#34d399",
@@ -33,6 +29,7 @@ function formatTimeTick(sec: number): string {
 }
 
 export function PrProgressionChart({ timeline }: { timeline: PrTimelinePoint[] }) {
+  const chart = useTrainingChart();
   const buckets = ["5k", "10k", "hm"] as const;
   const dates = [...new Set(timeline.map((p) => p.date))].sort();
 
@@ -67,15 +64,11 @@ export function PrProgressionChart({ timeline }: { timeline: PrTimelinePoint[] }
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#a1a1aa" }} />
-        <YAxis
-          tick={{ fontSize: 10, fill: "#a1a1aa" }}
-          tickFormatter={formatTimeTick}
-          reversed
-        />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+        <XAxis dataKey="label" tick={chartTick} />
+        <YAxis tick={chartTick} tickFormatter={formatTimeTick} reversed />
         <Tooltip
-          contentStyle={tooltipStyle}
+          contentStyle={chart.tooltip}
           formatter={(v) =>
             typeof v === "number" ? formatDuration(v) : String(v)
           }

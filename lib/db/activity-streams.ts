@@ -54,10 +54,18 @@ export async function listRunIdsMissingStreams(
     FROM activities a
     WHERE a.user_id = ${userId}::uuid
       AND a.sport_type = 'Run'
-      AND NOT EXISTS (
-        SELECT 1 FROM activity_streams s
-        WHERE s.user_id = a.user_id
-          AND s.strava_activity_id = a.strava_activity_id
+      AND (
+        NOT EXISTS (
+          SELECT 1 FROM activity_streams s
+          WHERE s.user_id = a.user_id
+            AND s.strava_activity_id = a.strava_activity_id
+        )
+        OR EXISTS (
+          SELECT 1 FROM activity_streams s
+          WHERE s.user_id = a.user_id
+            AND s.strava_activity_id = a.strava_activity_id
+            AND COALESCE(jsonb_array_length(s.streams_json->'gpsStream'), 0) < 2
+        )
       )
     ORDER BY a.start_date DESC
     LIMIT ${limit}

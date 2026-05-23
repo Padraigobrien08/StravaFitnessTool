@@ -1,12 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { buildTrainingPageView } from "@/lib/training/viewModels";
-import { TrainingWorkspace, TrainingIntelRow } from "@/components/training/training-workspace";
+import { TrainingWorkspace } from "@/components/training/training-workspace";
 import { TrainingStateHero } from "@/components/training/training-state-hero";
-import { AdaptiveWeekPlan } from "@/components/training/adaptive-week-plan";
 import { LoadIntelligencePanel } from "@/components/training/load-intelligence-panel";
 import { CoachingExplainability } from "@/components/training/coaching-explainability";
 import { AdaptationSignalsPanel } from "@/components/training/adaptation-signals-panel";
@@ -15,16 +15,25 @@ import { TrainingEcosystemPanel } from "@/components/training/training-ecosystem
 import { ops } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 import { dash } from "@/components/home/primitives/tokens";
+import { ArrowRight, Sparkles } from "lucide-react";
 
-function TrainingBriefingBar() {
+function TrainingEvidenceBanner() {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.04] pb-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
       <div>
-        <p className={dash.labelAccent}>Coaching workspace</p>
+        <p className={dash.labelAccent}>Supporting evidence</p>
         <p className="mt-0.5 text-xs text-zinc-600">
-          Adaptation · load · next week · evidence
+          Audit load and adaptation behind your plan — not the primary workspace.
         </p>
       </div>
+      <Link
+        href="/plan"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-teal-500/10 px-3 py-2 text-[13px] font-medium text-teal-300 ring-1 ring-teal-500/20 hover:bg-teal-500/15"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+        Next week plan
+        <ArrowRight className="h-3.5 w-3.5" />
+      </Link>
     </div>
   );
 }
@@ -39,14 +48,9 @@ export default function TrainingPage() {
 
   if (loading && !view) {
     return (
-      <div className="dashboard-enter w-full space-y-4 pb-8">
+      <div className="dashboard-enter w-full max-w-5xl space-y-4 pb-8">
         <div className="skeleton-shimmer h-10 w-full rounded-lg" />
-        <div className="skeleton-shimmer h-44 w-full rounded-xl" />
-        <div className="skeleton-shimmer h-64 w-full rounded-xl" />
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="skeleton-shimmer h-56 rounded-xl" />
-          <div className="skeleton-shimmer h-56 rounded-xl" />
-        </div>
+        <div className="skeleton-shimmer h-32 w-full rounded-xl" />
       </div>
     );
   }
@@ -54,26 +58,19 @@ export default function TrainingPage() {
   return (
     <RequireData>
       {view && analytics && (
-        <TrainingWorkspace>
-          <TrainingBriefingBar />
+        <TrainingWorkspace className="max-w-5xl">
+          <TrainingEvidenceBanner />
           <TrainingStateHero hero={view.hero} />
-          <AdaptiveWeekPlan
-            plan={view.plan}
-            weekStart={analytics.nextWeekPlan.weekStart}
-          />
-          <TrainingIntelRow>
-            <LoadIntelligencePanel
-              data={view.load}
-              className={cn(ops.intelMain)}
-            />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <LoadIntelligencePanel data={view.load} className={cn(ops.intelMain)} />
             <CoachingExplainability
               data={view.explain}
               className={cn(ops.intelSide)}
             />
-          </TrainingIntelRow>
+          </div>
           <AdaptationSignalsPanel data={view.adaptation} />
           <TrainingEcosystemPanel data={view.ecosystem} />
-          <SupportingAnalytics data={view.supporting} />
+          <SupportingAnalytics data={view.supporting} defaultCollapsed />
         </TrainingWorkspace>
       )}
     </RequireData>

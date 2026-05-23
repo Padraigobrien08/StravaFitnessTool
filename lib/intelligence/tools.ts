@@ -33,6 +33,15 @@ import {
   findBestPhase,
   prContext,
 } from "@/lib/reasoning";
+import {
+  buildAthleteMemoryProfile,
+  serializeMemoryForCoachAnswer,
+} from "@/lib/athlete-memory";
+import {
+  executeGenerateNextWeekTrainingPlan,
+  planToolPayload,
+} from "@/lib/ai-planning/planTool";
+import { buildRunCoachDetail } from "@/lib/coaching-context";
 import { buildIntelligenceBrief } from "./brief";
 import { wrapIntelligence, wrapReasoning } from "./envelope";
 import { computeAthleteIntelligence, resolveIntelligenceContext } from "./service";
@@ -43,9 +52,11 @@ import type {
   CompareSessionsToolArgs,
   ExplainReadinessDeltaToolArgs,
   FindBestPhaseToolArgs,
+  GenerateNextWeekTrainingPlanArgs,
   GetRaceStrategyArgs,
   IntelligenceContext,
   IntelligenceToolName,
+  GetRunDetailArgs,
   ListRecentRunsArgs,
   PrContextToolArgs,
   ToolCallInput,
@@ -233,6 +244,37 @@ export async function executeIntelligenceTool(
       return wrapIntelligence({ runs }, quality);
     }
 
+    case "get_run_detail": {
+      const args = (call.arguments ?? {}) as GetRunDetailArgs;
+      const fitById = new Map(bundle.fitDetails.map((f) => [f.activityId, f]));
+      let run =
+        args.runId != null
+          ? bundle.runs.find((r) => r.id === args.runId)
+          : undefined;
+      if (!run && args.date) {
+        const day = args.date.slice(0, 10);
+        run = bundle.runs.find((r) => r.date.slice(0, 10) === day);
+      }
+      if (!run) {
+        return wrapIntelligence(
+          {
+            error:
+              "Run not found — pass runId from list_recent_runs or a YYYY-MM-DD date.",
+          },
+          quality,
+          [],
+          ["Use list_recent_runs to see available runId values."]
+        );
+      }
+      const detail = buildRunCoachDetail(
+        run,
+        fitById.get(run.id) ?? null,
+        analytics,
+        bundle.runs
+      );
+      return wrapIntelligence({ run: detail }, quality);
+    }
+
     case "get_data_quality": {
       return wrapIntelligence(
         {
@@ -378,6 +420,50 @@ export async function executeIntelligenceTool(
       );
     }
 
+    case "get_athlete_memory": {
+      const profile = buildAthleteMemoryProfile(analytics, ctx.userId);
+      const topic = (call.arguments as { topic?: string })?.topic;
+      const answer = serializeMemoryForCoachAnswer(
+        profile,
+        topic === "fatigue" ||
+          topic === "adaptation" ||
+          topic === "pacing" ||
+          topic === "taper" ||
+          topic === "modality"
+          ? topic
+          : "all"
+      );
+      return wrapIntelligence(
+        {
+          summary: answer,
+          beliefCount:
+            profile.adaptationPatterns.length +
+            profile.fatiguePatterns.length +
+            profile.pacingPatterns.length,
+          generatedAt: profile.generatedAt,
+        },
+        quality
+      );
+    }
+
+    case "generate_next_week_training_plan": {
+      const args = (call.arguments ?? {}) as GenerateNextWeekTrainingPlanArgs;
+      const result = await executeGenerateNextWeekTrainingPlan(ctx, {
+        goalId: args.goalId,
+        windowDays: args.windowDays,
+        planPreference: args.planPreference,
+        availableDays: args.availableDays,
+        constraints: args.constraints,
+        planningContext: args.planningContext,
+      });
+      return wrapIntelligence(
+        planToolPayload(result),
+        quality,
+        result.plan.rationale.evidenceUsed,
+        result.plan.limitations
+      );
+    }
+
     default:
       throw new Error(`Unknown tool: ${call.name}`);
   }
@@ -426,10 +512,24 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   },
   {
     name: "list_recent_runs",
-    description: "List recent runs with workout classification.",
+    description:
+      "List recent runs with workout type, pace, HR, execution quality, fade/drift, and a one-line narrative. Use before get_run_detail when browsing.",
     input_schema: {
       type: "object",
       properties: { limit: { type: "number" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_run_detail",
+    description:
+      "Deep dive on one run: laps, stream metrics, pacing/HR assessment, execution score, adaptations, and evidence. Requires runId or date (YYYY-MM-DD).",
+    input_schema: {
+      type: "object",
+      properties: {
+        runId: { type: "string" },
+        date: { type: "string", description: "YYYY-MM-DD" },
+      },
       additionalProperties: false,
     },
   },
@@ -603,6 +703,52 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     input_schema: {
       type: "object",
       properties: { window: { type: "number" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_athlete_memory",
+    description:
+      "Structured athlete memory: evidence-backed beliefs about adaptation, fatigue, pacing, taper, and modality. Use for 'what have you learned about me', fatigue patterns, uncertain patterns, and longitudinal coaching context.",
+    input_schema: {
+      type: "object",
+      properties: {
+        topic: {
+          type: "string",
+          enum: ["all", "adaptation", "fatigue", "pacing", "taper", "modality"],
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "generate_next_week_training_plan",
+    description:
+      "Generate an AI-native adaptive weekly training plan from coaching context, guardrails, and validation. REQUIRED for 'build my next week', race week plans, taper plans, and plan adjustments — never invent a plan without this tool. Returns structured WeeklyTrainingPlan with evidence, constraints, and limitations.",
+    input_schema: {
+      type: "object",
+      properties: {
+        goalId: { type: "string" },
+        windowDays: { type: "number", enum: [14, 21, 28] },
+        planPreference: {
+          type: "string",
+          enum: ["conservative", "balanced", "aggressive"],
+        },
+        availableDays: {
+          type: "array",
+          items: { type: "string" },
+          description: "e.g. Mon, Wed, Fri, Sun",
+        },
+        constraints: {
+          type: "array",
+          items: { type: "string" },
+        },
+        planningContext: {
+          type: "string",
+          description:
+            "Freeform athlete narrative for this week (e.g. post-race recovery, travel, no current goal)",
+        },
+      },
       additionalProperties: false,
     },
   },

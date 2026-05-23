@@ -11,5 +11,8 @@ describe("parseToolName", () => {
     expect(parseToolName("attribute_improvement")).toBe("attribute_improvement");
     expect(parseToolName("analyze_fade_pattern")).toBe("analyze_fade_pattern");
     expect(parseToolName("pr_context")).toBe("pr_context");
+    expect(parseToolName("generate_next_week_training_plan")).toBe(
+      "generate_next_week_training_plan"
+    );
   });
 });

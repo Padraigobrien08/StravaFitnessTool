@@ -1,7 +1,8 @@
 import { INTELLIGENCE_TOOL_DEFINITIONS } from "../tools";
 import { executeIntelligenceTool, parseToolName } from "../tools";
 import type { IntelligenceContext } from "../types";
-import { COACH_SYSTEM, type ChatMessage } from "./types";
+import { buildCoachSystemWithContext } from "./coachingContextPrompt";
+import type { ChatMessage } from "./types";
 
 const openaiTools = INTELLIGENCE_TOOL_DEFINITIONS.map((t) => ({
   type: "function" as const,
@@ -18,6 +19,7 @@ export async function runOpenAICoachChat(
   apiKey: string
 ): Promise<{ reply: string; toolsUsed: string[] }> {
   const toolsUsed: string[] = [];
+  const systemPrompt = await buildCoachSystemWithContext(ctx);
   const openaiMessages: Array<{
     role: "system" | "user" | "assistant" | "tool";
     content?: string;
@@ -27,7 +29,7 @@ export async function runOpenAICoachChat(
       function: { name: string; arguments: string };
     }>;
     tool_call_id?: string;
-  }> = [{ role: "system", content: COACH_SYSTEM }, ...messages];
+  }> = [{ role: "system", content: systemPrompt }, ...messages];
 
   const maxRounds = 6;
   for (let round = 0; round < maxRounds; round++) {

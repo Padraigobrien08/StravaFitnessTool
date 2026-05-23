@@ -11,13 +11,9 @@ import {
   YAxis,
 } from "recharts";
 import type { WorkoutTypeBucket } from "@/lib/analytics/workoutType";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
-const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 8,
-  color: "#fafafa",
-};
+const chartTick = { fontSize: 10, fill: "var(--chart-tick-fill)" };
 
 const TYPE_COLORS: Record<string, string> = {
   Easy: "#34d399",
@@ -30,6 +26,8 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export function WorkoutTypeChart({ data }: { data: WorkoutTypeBucket[] }) {
+  const chart = useTrainingChart();
+
   if (data.length === 0) {
     return (
       <p className="text-sm text-zinc-500">No runs in the last 8 weeks.</p>
@@ -46,16 +44,11 @@ export function WorkoutTypeChart({ data }: { data: WorkoutTypeBucket[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={chartData} layout="vertical">
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis type="number" tick={{ fontSize: 10, fill: "#a1a1aa" }} unit="%" />
-        <YAxis
-          type="category"
-          dataKey="label"
-          tick={{ fontSize: 10, fill: "#a1a1aa" }}
-          width={72}
-        />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+        <XAxis type="number" tick={chartTick} unit="%" />
+        <YAxis type="category" dataKey="label" tick={chartTick} width={72} />
         <Tooltip
-          contentStyle={tooltipStyle}
+          contentStyle={chart.tooltip}
           formatter={(value, _name, props) => {
             const payload = props.payload as { runCount: number };
             return [

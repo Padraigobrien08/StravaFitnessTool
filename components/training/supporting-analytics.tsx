@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
-import { trainingChart } from "./charts/chart-theme";
+import { useTrainingChart } from "./charts/chart-theme";
 import type { SupportingAnalyticsView } from "@/lib/training/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
@@ -56,9 +56,31 @@ function CollapsibleSection({
   );
 }
 
-export function SupportingAnalytics({ data }: { data: SupportingAnalyticsView }) {
+export function SupportingAnalytics({
+  data,
+  defaultCollapsed = false,
+}: {
+  data: SupportingAnalyticsView;
+  defaultCollapsed?: boolean;
+}) {
+  const [open, setOpen] = useState(!defaultCollapsed);
+  const chart = useTrainingChart();
+
   return (
     <PanelChrome title="Supporting analytics" subdued>
+      {defaultCollapsed ? (
+        <button
+          type="button"
+          className="mb-3 flex w-full items-center justify-between text-left text-xs text-zinc-500"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+        >
+          <span>Raw charts & block tables (advanced)</span>
+          <ChevronDown className={cn("h-4 w-4", open && "rotate-180")} />
+        </button>
+      ) : null}
+      {!defaultCollapsed || open ? (
+      <>
       <p className={cn(dash.muted, "mb-4")}>
         Elevation cost and block history — evidence behind the coaching view, not
         the primary decision layer.
@@ -77,26 +99,23 @@ export function SupportingAnalytics({ data }: { data: SupportingAnalyticsView })
             ) : null}
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={data.elevationChart}>
-                <CartesianGrid
-                  stroke={trainingChart.grid}
-                  vertical={false}
-                />
+                <CartesianGrid stroke={chart.grid} vertical={false} />
                 <XAxis
                   dataKey="label"
-                  tick={trainingChart.tick}
+                  tick={chart.tick}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={trainingChart.tick}
+                  tick={chart.tick}
                   width={28}
                   axisLine={false}
                   tickLine={false}
                 />
-                <Tooltip contentStyle={trainingChart.tooltip} />
+                <Tooltip contentStyle={chart.tooltip} />
                 <Bar
                   dataKey="gainPerKm"
-                  fill={trainingChart.amber}
+                  fill={chart.amber}
                   fillOpacity={0.65}
                   radius={[3, 3, 0, 0]}
                   name="m/km"
@@ -148,6 +167,8 @@ export function SupportingAnalytics({ data }: { data: SupportingAnalyticsView })
           </table>
         </div>
       </CollapsibleSection>
+      </>
+      ) : null}
     </PanelChrome>
   );
 }

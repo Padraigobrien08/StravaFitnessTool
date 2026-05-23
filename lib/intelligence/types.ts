@@ -32,6 +32,17 @@ export interface RecentRunSummary {
   type: string;
   distanceKm: number;
   pace: string | null;
+  durationMin?: number;
+  avgHr?: number | null;
+  maxHr?: number | null;
+  elevationGainM?: number | null;
+  executionQuality?: string;
+  executionScore?: number;
+  lateFadePct?: number | null;
+  hrDriftPct?: number | null;
+  fatigueCost?: string;
+  streams?: string;
+  narrative?: string;
 }
 
 export interface AthleteIntelligenceBundle {
@@ -92,6 +103,7 @@ export type IntelligenceToolName =
   | "get_race_strategy"
   | "get_fatigue_load"
   | "list_recent_runs"
+  | "get_run_detail"
   | "get_data_quality"
   | "get_connection_status"
   | "compare_sessions"
@@ -108,7 +120,9 @@ export type IntelligenceToolName =
   | "get_athlete_archetype"
   | "compare_modality_blocks"
   | "get_race_week_interference_check"
-  | "get_strength_mobility_support";
+  | "get_strength_mobility_support"
+  | "get_athlete_memory"
+  | "generate_next_week_training_plan";
 
 export interface EcosystemWindowArgs {
   window?: number;
@@ -153,8 +167,23 @@ export interface ListRecentRunsArgs {
   limit?: number;
 }
 
+export interface GetRunDetailArgs {
+  runId?: string;
+  /** YYYY-MM-DD — most recent run on that day if runId omitted */
+  date?: string;
+}
+
 export interface GetRaceStrategyArgs {
   mode?: StrategyMode;
+}
+
+export interface GenerateNextWeekTrainingPlanArgs {
+  goalId?: string;
+  windowDays?: 14 | 21 | 28;
+  planPreference?: "conservative" | "balanced" | "aggressive";
+  availableDays?: string[];
+  constraints?: string[];
+  planningContext?: string;
 }
 
 export interface ToolCallInput {

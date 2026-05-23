@@ -6,15 +6,19 @@ import type { CoachWorkspaceState } from "@/lib/coach/types";
 import type { IntelligenceSignal } from "@/lib/intelligence/athleteState";
 import type { StateEvolutionItem } from "@/lib/intelligence/presentation";
 import {
-  memoryKind,
   primaryActionBullets,
   prioritizeSignals,
 } from "@/lib/intelligence/presentation";
+import {
+  formatTrajectoryDisplay,
+  groupMemoryItems,
+  signalImplication,
+} from "@/lib/intelligence/intelligenceUiHelpers";
+import type { AthleteBelief } from "@/lib/athlete-memory/types";
 import type { MemorySnippet } from "@/lib/coach/memorySnippets";
 import type { RiskOpportunity } from "@/lib/coach/types";
 import type { TrainingEcosystemView } from "@/lib/training/ecosystemViewModel";
 import { domainCoachLink, signalCoachLink, topicCoachLink } from "@/lib/coach/domainLinks";
-import { ChartContainer } from "@/components/charts/chart-container";
 import { cn } from "@/lib/utils";
 import {
   AlertTriangle,
@@ -26,37 +30,47 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
-import { Area, AreaChart } from "recharts";
 
 const COACH_INVESTIGATIONS: {
   topic: string;
   label: string;
-  why: string;
+  hypothesis: string;
   query: string;
 }[] = [
   {
     topic: "readiness-change",
     label: "Why did readiness change?",
-    why: "Readiness shifts with taper, volume, and freshness balance.",
+    hypothesis:
+      "Freshness shifted with taper, volume, and load balance.",
     query: "Why did my readiness change this week?",
   },
   {
     topic: "cross-training-interference",
     label: "Is cross-training interfering?",
-    why: "Non-run timing can compress recovery before key sessions.",
+    hypothesis:
+      "Strength and hard non-run work may compress recovery before key sessions.",
     query: "Is my gym work helping or hurting my running?",
   },
   {
     topic: "strongest-block",
     label: "Compare to strongest block",
-    why: "Current load may mirror your best historical volume phase.",
+    hypothesis:
+      "Current load may mirror your best historical volume phase.",
     query: "Compare this training block to my strongest historical block.",
   },
   {
     topic: "pace-improvement",
     label: "What improves my pace historically?",
-    why: "Aerobic efficiency is often the strongest adaptation signal.",
+    hypothesis:
+      "Aerobic efficiency is often the strongest adaptation signal.",
     query: "What training patterns historically improve my pace?",
+  },
+  {
+    topic: "race-prep",
+    label: "Race prep execution",
+    hypothesis:
+      "Taper specificity and freshness alignment matter most now.",
+    query: "How should I execute race week given my current state?",
   },
 ];
 
@@ -68,42 +82,31 @@ export function IntelligenceStateEvolution({
   if (items.length === 0) return null;
 
   return (
-    <section className="intelligence-evolution rounded-xl bg-white/[0.02] px-3 py-3 sm:px-4">
-      <p className="mb-2.5 text-[11px] font-medium text-zinc-600">
+    <section className="intelligence-evolution rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2.5">
+      <p className="mb-2 text-[11px] font-medium text-zinc-500">
         How your state is moving
       </p>
-      <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="min-w-[148px] shrink-0 rounded-lg bg-white/[0.03] px-2.5 py-2 sm:min-w-[160px]"
-          >
-            <div className="flex items-center justify-between gap-1">
-              <p className="text-[11px] text-zinc-500">{item.label}</p>
-              <TrendGlyph trend={item.trend} />
+      <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+        {items.map((item) => {
+          const display = formatTrajectoryDisplay(item);
+          return (
+            <div
+              key={item.id}
+              className="min-w-[132px] shrink-0 rounded-md bg-white/[0.03] px-2 py-1.5 sm:min-w-[140px]"
+            >
+              <div className="flex items-center justify-between gap-1">
+                <p className="text-[10px] text-zinc-600">{item.label}</p>
+                <TrendGlyph trend={item.trend} />
+              </div>
+              <p className="mt-0.5 text-[12px] font-medium leading-tight text-zinc-200">
+                {display.headline}
+              </p>
+              {display.sub ? (
+                <p className="text-[10px] text-zinc-600">{display.sub}</p>
+              ) : null}
             </div>
-            <p className="mt-0.5 text-[13px] font-medium leading-snug text-zinc-200">
-              {item.direction}
-            </p>
-            <p className="text-[11px] text-zinc-500">{item.interpretation}</p>
-            {item.values.length >= 2 ? (
-              <ChartContainer height={28} className="mt-1.5 w-full">
-                {({ width, height }) => (
-                  <AreaChart width={width} height={height} data={item.values}>
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="rgba(113,113,122,0.55)"
-                      strokeWidth={1}
-                      fill="rgba(255,255,255,0.03)"
-                      dot={false}
-                    />
-                  </AreaChart>
-                )}
-              </ChartContainer>
-            ) : null}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
@@ -116,13 +119,116 @@ function TrendGlyph({ trend }: { trend: "up" | "down" | "flat" }) {
   return <span className="text-[10px] text-zinc-600">→</span>;
 }
 
-export function IntelligenceSignalBoard({
+function SignalStatusIcon({ severity }: { severity: IntelligenceSignal["severity"] }) {
+  if (severity === "positive")
+    return <span className="text-teal-400/80">↑</span>;
+  if (severity === "warning")
+    return <span className="text-amber-400/80">!</span>;
+  if (severity === "opportunity")
+    return <span className="text-teal-300/70">◇</span>;
+  return <span className="text-zinc-500">~</span>;
+}
+
+function IntelligenceSignalFeed({
   signals,
 }: {
   signals: IntelligenceSignal[];
 }) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  if (signals.length === 0) return null;
+
+  return (
+    <Section title="Signals shaping the current recommendation">
+      <div className="overflow-x-auto rounded-lg border border-white/[0.04]">
+        <table className="w-full min-w-[520px] border-collapse text-left">
+          <thead>
+            <tr className="border-b border-white/[0.04] text-[10px] text-zinc-600">
+              <th className="w-8 px-2 py-1.5 font-medium" />
+              <th className="px-2 py-1.5 font-medium">Signal</th>
+              <th className="hidden px-2 py-1.5 font-medium sm:table-cell">
+                Implication
+              </th>
+              <th className="w-20 px-2 py-1.5 font-medium">Confidence</th>
+              <th className="w-16 px-2 py-1.5 font-medium text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {signals.map((s) => {
+              const open = expandedId === s.id;
+              return (
+                <tr
+                  key={s.id}
+                  className="border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]"
+                >
+                  <td className="px-2 py-2 align-top text-center text-[12px]">
+                    <SignalStatusIcon severity={s.severity} />
+                  </td>
+                  <td className="px-2 py-2 align-top">
+                    <p className="text-[12px] text-zinc-300">{s.headline}</p>
+                    <p className="mt-0.5 text-[10px] text-zinc-600 sm:hidden">
+                      {signalImplication(s)}
+                    </p>
+                    {open ? (
+                      <p className="mt-1 text-[10px] leading-snug text-zinc-600">
+                        {s.evidence || s.text}
+                      </p>
+                    ) : null}
+                  </td>
+                  <td className="hidden px-2 py-2 align-top text-[11px] text-zinc-500 sm:table-cell">
+                    {signalImplication(s)}
+                  </td>
+                  <td className="px-2 py-2 align-top text-[10px] capitalize text-zinc-600">
+                    {s.confidence}
+                  </td>
+                  <td className="px-2 py-2 align-top text-right">
+                    {s.severity === "warning" ? (
+                      <Link
+                        href={signalCoachLink(s.text)}
+                        className="text-[10px] text-amber-200/60 hover:text-amber-100"
+                      >
+                        Investigate
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        className="text-[10px] text-zinc-600 hover:text-zinc-400"
+                        onClick={() =>
+                          setExpandedId(open ? null : s.id)
+                        }
+                      >
+                        Why
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </Section>
+  );
+}
+
+export function IntelligenceSignalBoard({
+  signals,
+  compact = false,
+}: {
+  signals: IntelligenceSignal[];
+  compact?: boolean;
+}) {
   const { primary, secondary, watchlist } = prioritizeSignals(signals);
   if (!primary && secondary.length === 0 && watchlist.length === 0) return null;
+
+  const all = [
+    ...(primary ? [primary] : []),
+    ...secondary,
+    ...watchlist,
+  ].slice(0, compact ? 5 : undefined);
+
+  if (compact) {
+    return <IntelligenceSignalFeed signals={all} />;
+  }
 
   return (
     <Section title="Prioritized signals">
@@ -235,8 +341,11 @@ export function IntelligenceDecisionSupport({
   const actionBullets = primaryActionBullets(recommendation);
 
   return (
-    <Section title="Decision support">
-      <div className="grid gap-3 lg:grid-cols-3">
+    <Section
+      title="Decision support"
+      subtitle="What should I do with this intelligence?"
+    >
+      <div className="grid gap-2.5 lg:grid-cols-3">
         <DecisionColumn
           title="Risks"
           items={risks.map((r) => r.text)}
@@ -333,40 +442,119 @@ function DecisionColumn({
 
 export function IntelligenceMemoryTiles({
   memory,
+  beliefsById,
 }: {
   memory: MemorySnippet[];
+  beliefsById?: Map<string, AthleteBelief>;
 }) {
+  return (
+    <IntelligenceMemoryGrouped memory={memory} beliefsById={beliefsById} />
+  );
+}
+
+export function IntelligenceMemoryGrouped({
+  memory,
+  beliefsById,
+}: {
+  memory: MemorySnippet[];
+  beliefsById?: Map<string, AthleteBelief>;
+}) {
+  const [showAll, setShowAll] = useState(false);
   if (memory.length === 0) return null;
 
+  const grouped = groupMemoryItems(memory);
+  const groups: {
+    key: keyof typeof grouped;
+    title: string;
+    tone: string;
+  }[] = [
+    { key: "stable", title: "Stable patterns", tone: "text-zinc-500" },
+    { key: "emerging", title: "Emerging patterns", tone: "text-teal-500/60" },
+    { key: "watchlist", title: "Watchlist", tone: "text-amber-400/55" },
+  ];
+
+  const limit = showAll ? 99 : 2;
+
   return (
-    <Section title="Athlete memory" className="h-full">
-      <div className="grid gap-2 sm:grid-cols-2">
-        {memory.slice(0, 6).map((m) => (
-          <div
-            key={m.id}
-            className="group rounded-lg bg-white/[0.025] px-3 py-2.5"
-          >
-            <p className="text-[11px] font-medium text-zinc-500">{m.label}</p>
-            <p className="mt-0.5 text-[10px] text-zinc-700">{memoryKind(m.label)}</p>
-            <p className="mt-1.5 text-[12px] leading-snug text-zinc-400 line-clamp-3">
-              {memoryOneLine(m.text, 100)}
-            </p>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <span className="text-[10px] capitalize text-zinc-700">
-                {m.confidence} confidence
-              </span>
-              <Link
-                href={signalCoachLink(`Explain my ${m.label.toLowerCase()}: ${m.text}`)}
-                className="text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100 hover:text-zinc-400"
-              >
-                Ask Coach
-              </Link>
+    <Section title="Athlete memory">
+      <div className="grid gap-3 md:grid-cols-3">
+        {groups.map(({ key, title, tone }) => {
+          const items = grouped[key].slice(0, limit);
+          if (items.length === 0) return null;
+          return (
+            <div key={key} className="min-w-0">
+              <p className={cn("text-[10px] font-medium uppercase tracking-wide", tone)}>
+                {title}
+              </p>
+              <ul className="mt-1.5 space-y-2">
+                {items.map((m) => (
+                  <MemoryBeliefRow
+                    key={m.id}
+                    belief={m}
+                    evidence={
+                      beliefsById?.get(m.id)?.evidence[0] ??
+                      memoryEvidenceFallback(m)
+                    }
+                  />
+                ))}
+              </ul>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      {memory.length > 6 ? (
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="mt-2 flex items-center gap-1 text-[10px] text-zinc-600 hover:text-zinc-400"
+        >
+          <ChevronDown className={cn("h-3 w-3", showAll && "rotate-180")} />
+          {showAll ? "Show fewer beliefs" : "Show full memory list"}
+        </button>
+      ) : null}
     </Section>
   );
+}
+
+function MemoryBeliefRow({
+  belief,
+  evidence,
+}: {
+  belief: MemorySnippet;
+  evidence: string;
+}) {
+  return (
+    <li className="group rounded-md bg-white/[0.02] px-2 py-2">
+      <p className="text-[12px] leading-snug text-zinc-400">{belief.text}</p>
+      <p className="mt-1 text-[10px] text-zinc-600">
+        Confidence:{" "}
+        <span className="capitalize text-zinc-500">{belief.confidence}</span>
+      </p>
+      {evidence ? (
+        <p className="mt-0.5 text-[10px] leading-snug text-zinc-700">
+          Evidence: {memoryOneLine(evidence, 90)}
+        </p>
+      ) : null}
+      <Link
+        href={signalCoachLink(
+          `Explain this belief about me: ${belief.text}`
+        )}
+        className="mt-1 inline-block text-[10px] text-zinc-700 hover:text-zinc-400"
+      >
+        Ask Coach
+      </Link>
+    </li>
+  );
+}
+
+function memoryEvidenceFallback(m: MemorySnippet): string {
+  if (m.stability === "stable") {
+    return "Repeated across recent blocks and session history.";
+  }
+  if (m.stability === "emerging") {
+    return "Limited observations — still forming.";
+  }
+  return "Mixed or inconsistent recent evidence.";
 }
 
 export function IntelligenceEcosystemCompact({
@@ -404,12 +592,7 @@ export function IntelligenceEcosystemCompact({
         Running drives race performance; non-run work shapes fatigue, durability, and
         recovery context.
       </p>
-      <p className="mt-2 text-[11px] leading-relaxed text-zinc-600">
-        Non-run work informs fatigue and support context; it does not directly improve
-        race predictions unless calibrated with key runs.
-      </p>
-
-      <div className="mt-3 grid grid-cols-3 gap-1.5">
+      <div className="mt-2.5 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
         <EcoMetric label="Run volume" value={load.runKm} />
         <EcoMetric label="Strength" value={`${load.strengthSessions}`} />
         <EcoMetric label="Mobility" value={`${load.mobilitySessions}`} />
@@ -488,7 +671,9 @@ export function IntelligenceEcosystemCompact({
   }
 
   return (
-    <Section title="Training ecosystem · fatigue & support">{body}</Section>
+    <Section title="Training ecosystem · how non-run work affects fatigue and support">
+      {body}
+    </Section>
   );
 }
 
@@ -521,58 +706,79 @@ export function IntelligenceCoachEntries({
 }: {
   domains: CoachWorkspaceState["domains"];
 }) {
+  const [showMore, setShowMore] = useState(false);
+  const domainCards = domains.slice(0, 2).map((d) => ({
+    key: d.id,
+    label: d.title,
+    hypothesis: d.liveInsight,
+    href: domainCoachLink(d),
+  }));
+  const all = [
+    ...COACH_INVESTIGATIONS.map((item) => ({
+      key: item.topic,
+      label: item.label,
+      hypothesis: item.hypothesis,
+      href: topicCoachLink(item.topic, item.query),
+    })),
+    ...domainCards,
+  ];
+  const visible = showMore ? all : all.slice(0, 4);
+  const hidden = all.length - visible.length;
+
   return (
     <Section title="Investigate with Coach">
       <div className="grid gap-2 sm:grid-cols-2">
-        {COACH_INVESTIGATIONS.map((item) => (
+        {visible.map((item) => (
           <Link
-            key={item.topic}
-            href={topicCoachLink(item.topic, item.query)}
-            className="group rounded-xl bg-white/[0.025] px-3.5 py-3 transition-colors hover:bg-white/[0.04]"
+            key={item.key}
+            href={item.href}
+            className="group rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.035]"
           >
-            <p className="text-[13px] font-medium text-zinc-300 group-hover:text-zinc-100">
+            <p className="text-[12px] font-medium text-zinc-300 group-hover:text-zinc-100">
               {item.label}
             </p>
-            <p className="mt-1 text-[12px] leading-snug text-zinc-600">{item.why}</p>
-            <span className="mt-2 inline-flex items-center gap-0.5 text-[11px] text-zinc-600 group-hover:text-zinc-400">
+            <p className="mt-0.5 text-[11px] leading-snug text-zinc-600">
+              {item.hypothesis}
+            </p>
+            <span className="mt-1.5 inline-flex items-center gap-0.5 text-[10px] text-zinc-600 group-hover:text-zinc-400">
               Open in Coach <ArrowRight className="h-3 w-3" />
             </span>
           </Link>
         ))}
-        {domains.slice(0, 2).map((d) => (
-          <Link
-            key={d.id}
-            href={domainCoachLink(d)}
-            className="group rounded-xl bg-white/[0.02] px-3.5 py-3 hover:bg-white/[0.035]"
-          >
-            <p className="text-[13px] font-medium text-zinc-400 group-hover:text-zinc-200">
-              {d.title}
-            </p>
-            <p className="mt-1 text-[12px] text-zinc-600 line-clamp-2">
-              {d.liveInsight}
-            </p>
-            <span className="mt-2 inline-flex items-center gap-0.5 text-[11px] text-zinc-700 group-hover:text-zinc-500">
-              Investigate <ArrowRight className="h-3 w-3" />
-            </span>
-          </Link>
-        ))}
       </div>
+      {hidden > 0 || all.length > 4 ? (
+        <button
+          type="button"
+          onClick={() => setShowMore((v) => !v)}
+          className="mt-2 flex items-center gap-1 text-[10px] text-zinc-600 hover:text-zinc-400"
+        >
+          <ChevronDown className={cn("h-3 w-3", showMore && "rotate-180")} />
+          {showMore ? "Show fewer investigations" : "Show more investigations"}
+        </button>
+      ) : null}
     </Section>
   );
 }
 
 function Section({
   title,
+  subtitle,
   children,
   className,
 }: {
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
     <section className={cn("intelligence-block", className)}>
-      <h2 className="mb-2.5 text-[12px] font-medium text-zinc-500">{title}</h2>
+      <div className="mb-2">
+        <h2 className="text-[12px] font-medium text-zinc-500">{title}</h2>
+        {subtitle ? (
+          <p className="mt-0.5 text-[10px] text-zinc-700">{subtitle}</p>
+        ) : null}
+      </div>
       {children}
     </section>
   );

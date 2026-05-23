@@ -1,105 +1,77 @@
 "use client";
 
 import { ConfidenceBadge } from "@/components/confidence-badge";
-import { DashboardPanel } from "@/components/home/primitives/dashboard-panel";
-import { ReadinessRing } from "@/components/home/primitives/readiness-ring";
-import { Sparkline } from "@/components/home/primitives/sparkline";
 import type { RunsHeroView } from "@/lib/runs/viewModels";
-import { dash } from "@/components/home/primitives/tokens";
-import { cn } from "@/lib/utils";
 
 export function RunHistoryHero({ hero }: { hero: RunsHeroView }) {
-  const mixScore = Math.min(
-    100,
-    Math.round(hero.easyPct * 0.6 + hero.typeCount * 8)
-  );
-
   return (
-    <DashboardPanel
-      variant="hero"
-      padding="hero"
-      elevated
-      hover={false}
-      className="border-l-[3px] border-l-teal-500/45 before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_50%_at_100%_0%,rgba(45,212,191,0.06),transparent_55%)]"
-    >
-      <div className="relative grid gap-5 lg:grid-cols-[1fr_minmax(220px,280px)] lg:gap-8">
+    <section className="rounded-xl border border-white/[0.06] bg-gradient-to-br from-[#0f1216] via-[#0c0e12] to-[#09090b] px-4 py-4 sm:px-5">
+      <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={dash.labelAccent}>Activity intelligence</span>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+              {hero.title}
+            </p>
             <ConfidenceBadge level={hero.confidence} />
+            <span className="text-[10px] text-zinc-700">
+              {hero.runCount} runs · {hero.totalKm}
+            </span>
           </div>
 
           <div>
-            <h1 className={dash.h1}>{hero.title}</h1>
-            <p className="mt-1 text-sm tabular-nums text-zinc-400">
-              {hero.runCount} runs · {hero.totalKm} · {hero.typeCount} workout
-              types
+            <p className="text-[10px] text-zinc-600">Current identity</p>
+            <p className="mt-0.5 text-[16px] font-medium leading-snug text-zinc-100 sm:text-[17px]">
+              {hero.trainingIdentity}
             </p>
           </div>
 
-          <div className="space-y-2 text-sm text-zinc-400">
-            <p>
-              <span className="font-medium text-zinc-300">Recent block · </span>
-              {hero.blockEmphasis}
-            </p>
-            <p>
-              <span className="font-medium text-zinc-300">Most common · </span>
-              {hero.commonSession}
-            </p>
-            <p>
-              <span className="font-medium text-zinc-300">Trend · </span>
-              {hero.currentTrend}
-            </p>
+          <div>
+            <p className="text-[10px] text-zinc-600">Current signals</p>
+            <ul className="mt-1 space-y-0.5">
+              {hero.signals.map((s) => (
+                <li
+                  key={s}
+                  className="flex gap-2 text-[13px] text-zinc-400 before:content-['–']"
+                >
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <dl className="flex flex-wrap gap-x-8 gap-y-2 border-t border-white/[0.05] pt-3">
-            {hero.inlineMetrics.map((m) => (
-              <div key={m.label} className="flex items-baseline gap-2">
-                <dt className={dash.label}>{m.label}</dt>
-                <dd className="flex items-baseline gap-2">
-                  <span className={dash.metricSm}>{m.value}</span>
-                  {m.hint ? <span className={dash.muted}>{m.hint}</span> : null}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <p className="text-[12px] text-zinc-500">
+            <span className="text-zinc-600">Recent behavior: </span>
+            {hero.recentBehavior}
+          </p>
+          <p className="text-[12px] text-zinc-500">
+            <span className="text-zinc-600">Training emphasis: </span>
+            {hero.trainingEmphasis}
+          </p>
         </div>
 
-        <aside
-          className="flex flex-col gap-4 rounded-xl bg-white/[0.03] p-4"
-          aria-label="Distribution and load"
-        >
-          <div className="flex items-center gap-4">
-            <ReadinessRing score={mixScore} size={80} showGlow />
-            <div className="min-w-0 flex-1 text-xs text-zinc-500">
-              <p className="font-medium text-zinc-300">Session mix</p>
-              <p className="mt-0.5">{hero.easyPct}% easy in lifetime split</p>
-            </div>
-          </div>
-          <div>
-            <p className={cn(dash.label, "mb-1")}>Weekly frequency</p>
-            <Sparkline
-              data={hero.mixSparkline}
-              fullWidth
-              height={28}
-              positive
-            />
-          </div>
-          <div>
-            <p className={cn(dash.label, "mb-1")}>Volume trend (km)</p>
-            <Sparkline
-              data={hero.loadSparkline}
-              fullWidth
-              height={28}
-              positive={
-                hero.loadSparkline.length >= 2 &&
-                (hero.loadSparkline.at(-1) ?? 0) >=
-                  (hero.loadSparkline.at(-2) ?? 0)
-              }
-            />
-          </div>
+        <aside className="rounded-lg border border-white/[0.05] bg-white/[0.03] p-3">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+            State
+          </p>
+          <dl className="mt-2 space-y-2 text-[11px]">
+            <StateRow label="Readiness" value={hero.stateCard.readiness} />
+            <StateRow label="Consistency" value={hero.stateCard.consistency} />
+            <StateRow label="Easy share" value={hero.stateCard.easyShare} />
+            <StateRow label="Frequency" value={hero.stateCard.frequency} />
+            <StateRow label="Volume" value={hero.stateCard.volumeTrend} />
+            <StateRow label="Phase" value={hero.stateCard.phase} />
+          </dl>
         </aside>
       </div>
-    </DashboardPanel>
+    </section>
+  );
+}
+
+function StateRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between gap-2">
+      <dt className="text-zinc-600">{label}</dt>
+      <dd className="text-right text-zinc-300">{value}</dd>
+    </div>
   );
 }

@@ -1,26 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
+import { useAthleteIntelligence } from "@/hooks/use-athlete-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
-import {
-  buildHeroView,
-  buildThisWeekOps,
-  buildNextWeekOps,
-  buildInsightRows,
-  buildProgressionView,
-  buildGoalMission,
-} from "@/lib/home/dashboardData";
-import { OperationalDashboard, OpsWeekRow, OpsIntelRow } from "@/components/home/primitives/operational-dashboard";
+import { buildHomeOperatingSystemView } from "@/lib/home/operatingSystemView";
+import { AthleteOperatingSystem } from "@/components/home/athlete-operating-system";
 import { DashboardSkeleton } from "@/components/home/primitives/dashboard-skeleton";
 import { HomeCommandBar } from "@/components/home/home-command-bar";
-import { HeroIntelligence } from "@/components/home/hero-intelligence";
-import { WeekOpsPanel } from "@/components/home/week-ops-panel";
-import { InsightsEnginePanel } from "@/components/home/insights-engine-panel";
-import { ProgressionMomentumPanel } from "@/components/home/progression-momentum-panel";
-import { GoalMissionControl } from "@/components/home/goal-mission-control";
-import { DataQualityFooter } from "@/components/home/data-quality-footer";
+import { useWeeklyPlan } from "@/hooks/use-weekly-plan";
+import { useTrainingCalendar } from "@/hooks/use-training-calendar";
 
 export default function HomePage() {
   const {
@@ -29,20 +20,37 @@ export default function HomePage() {
     refreshFromStravaApi,
     loading,
   } = useStrava();
-  const { insights, analytics, quality } = useTrainingIntelligence();
+  const { analytics, insights, loading: intelLoading } =
+    useTrainingIntelligence();
+  const intel = useAthleteIntelligence();
+  const { generate, loading: planLoading } = useWeeklyPlan();
+  const calendar = useTrainingCalendar();
   const [syncing, setSyncing] = useState(false);
 
   const vm = useMemo(() => {
     if (!analytics) return null;
-    return {
-      hero: buildHeroView(insights, analytics),
-      thisWeek: buildThisWeekOps(analytics),
-      nextWeek: buildNextWeekOps(analytics),
-      insightRows: buildInsightRows(analytics, insights),
-      progression: buildProgressionView(analytics, insights),
-      goal: buildGoalMission(analytics),
-    };
-  }, [analytics, insights]);
+    return buildHomeOperatingSystemView({
+      analytics,
+      insights,
+      state: intel.state,
+      risksAndOpportunities: intel.risksAndOpportunities,
+      savedWeek: calendar.savedWeek,
+      signals: intel.signals,
+      memory: intel.memory,
+      recentlyLearned: intel.recentlyLearned,
+      adaptationSignals: intel.adaptationSignals.map((s) => s.statement),
+    });
+  }, [
+    analytics,
+    intel.state,
+    intel.risksAndOpportunities,
+    intel.signals,
+    intel.memory,
+    intel.recentlyLearned,
+    intel.adaptationSignals,
+    insights,
+    calendar.savedWeek,
+  ]);
 
   const handleSync = async () => {
     setSyncing(true);
@@ -53,43 +61,57 @@ export default function HomePage() {
     }
   };
 
-  if (loading && !analytics) {
+  if ((loading || intelLoading) && !analytics) {
     return <DashboardSkeleton />;
   }
 
+  const readinessScore =
+    analytics?.raceReadiness?.score ??
+    analytics?.halfMarathonReadiness.score ??
+    0;
+
   return (
     <RequireData>
-      {analytics && quality && vm && (
-        <div className="dashboard-enter w-full">
-          <OperationalDashboard>
-            <HomeCommandBar
-              apiConnected={apiConnected}
-              confidence={analytics.dataConfidence}
-              syncing={syncing || loading}
-              onSync={() => void handleSync()}
-              mobileSummary={{
-                title: vm.hero.title,
-                readinessScore: vm.hero.readinessScore,
-                freshness: vm.hero.freshness,
-              }}
-            />
+      {analytics && vm && (
+        <div className="dashboard-enter mx-auto w-full max-w-6xl space-y-3 px-0 pb-6">
+          <HomeCommandBar
+            apiConnected={apiConnected}
+            confidence={analytics.dataConfidence}
+            syncing={syncing || loading}
+            onSync={() => void handleSync()}
+            mobileSummary={{
+              title: vm.hero.focusTitle,
+              readinessScore,
+              freshness: analytics.fatigue.freshness,
+            }}
+          />
 
-            <HeroIntelligence hero={vm.hero} />
+          <AthleteOperatingSystem
+            vm={vm}
+            savedWeek={calendar.savedWeek}
+            calendarHydrated={calendar.hydrated}
+            onPatchWorkout={calendar.patchWorkout}
+            onGeneratePlan={() => void generate()}
+            planLoading={planLoading}
+          />
 
-            <OpsIntelRow>
-              <InsightsEnginePanel rows={vm.insightRows} />
-              <ProgressionMomentumPanel data={vm.progression} />
-            </OpsIntelRow>
-
-            <OpsWeekRow>
-              <WeekOpsPanel title="This week" ops={vm.thisWeek} href="/report" />
-              <WeekOpsPanel title="Next week" ops={vm.nextWeek} href="/training" />
-            </OpsWeekRow>
-
-            <GoalMissionControl goal={vm.goal} />
-
-            <DataQualityFooter report={quality} />
-          </OperationalDashboard>
+          <p className="border-t border-[var(--border-subtle)] pt-3 text-[10px] text-zinc-600">
+            {dataSourceLabel ? `${dataSourceLabel} · ` : ""}
+            Deep analytics →{" "}
+            <Link
+              href="/intelligence"
+              className="text-zinc-500 hover:text-zinc-400"
+            >
+              Intelligence
+            </Link>
+            {" · "}
+            <Link
+              href="/performance"
+              className="text-zinc-500 hover:text-zinc-400"
+            >
+              Performance
+            </Link>
+          </p>
         </div>
       )}
     </RequireData>

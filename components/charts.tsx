@@ -14,29 +14,27 @@ import {
   YAxis,
 } from "recharts";
 
-const chartStyle = {
-  fontSize: 11,
-  fill: "#a1a1aa",
-};
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
-const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 8,
-  color: "#fafafa",
-};
+const chartTick = { fontSize: 11, fill: "var(--chart-tick-fill)" };
+const CHART_GRID = "var(--chart-grid)";
+
+function useChartTooltip() {
+  return useTrainingChart().tooltip;
+}
 
 export function VolumeChart({
   data,
 }: {
   data: { label: string; distanceKm: number; runCount: number }[];
 }) {
+  const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={chartStyle} interval="preserveStartEnd" />
-        <YAxis tick={chartStyle} unit=" km" />
+        <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+        <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
+        <YAxis tick={chartTick} unit=" km" />
         <Tooltip contentStyle={tooltipStyle} />
         <Bar dataKey="distanceKm" fill="#10b981" radius={[4, 4, 0, 0]} name="Distance (km)" />
       </BarChart>
@@ -61,6 +59,7 @@ export function PaceChart({
     (rolling ?? []).map((r) => [r.date, r.rollingPaceSecPerKm])
   );
 
+  const tooltipStyle = useChartTooltip();
   const chartData = data.map((d) => ({
     label: d.label,
     pace: d.paceSecPerKm,
@@ -70,10 +69,10 @@ export function PaceChart({
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={chartStyle} interval="preserveStartEnd" />
+        <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+        <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
         <YAxis
-          tick={chartStyle}
+          tick={chartTick}
           reversed
           domain={["auto", "auto"]}
           tickFormatter={formatPaceTick}
@@ -112,12 +111,13 @@ export function HrChart({
 }: {
   data: { label: string; avgHr: number }[];
 }) {
+  const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={240}>
       <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={chartStyle} interval="preserveStartEnd" />
-        <YAxis tick={chartStyle} domain={["auto", "auto"]} unit=" bpm" />
+        <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+        <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
+        <YAxis tick={chartTick} domain={["auto", "auto"]} unit=" bpm" />
         <Tooltip contentStyle={tooltipStyle} />
         <Line type="monotone" dataKey="avgHr" stroke="#f87171" dot={{ r: 2 }} name="Avg HR" />
       </LineChart>
@@ -130,13 +130,14 @@ export function LoadChart({
 }: {
   data: { label: string; trainingLoad: number | null }[];
 }) {
+  const tooltipStyle = useChartTooltip();
   const filtered = data.filter((d) => d.trainingLoad !== null);
   return (
     <ResponsiveContainer width="100%" height={240}>
       <AreaChart data={filtered}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={chartStyle} interval="preserveStartEnd" />
-        <YAxis tick={chartStyle} />
+        <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+        <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
+        <YAxis tick={chartTick} />
         <Tooltip contentStyle={tooltipStyle} />
         <Area
           type="monotone"
@@ -156,12 +157,13 @@ export function FitnessChart({
 }: {
   data: { label: string; ctl: number }[];
 }) {
+  const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={220}>
       <AreaChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={chartStyle} interval="preserveStartEnd" />
-        <YAxis tick={chartStyle} />
+        <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+        <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
+        <YAxis tick={chartTick} />
         <Tooltip contentStyle={tooltipStyle} />
         <Area
           type="monotone"
@@ -181,12 +183,13 @@ export function FatigueChart({
 }: {
   data: { label: string; ctl: number; atl: number }[];
 }) {
+  const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={220}>
       <AreaChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={chartStyle} interval="preserveStartEnd" />
-        <YAxis tick={chartStyle} />
+        <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+        <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
+        <YAxis tick={chartTick} />
         <Tooltip contentStyle={tooltipStyle} />
         <Area
           type="monotone"
@@ -214,12 +217,13 @@ export function ZoneBarChart({
 }: {
   data: { zone: string; label: string; pct: number; runCount: number }[];
 }) {
+  const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} layout="vertical">
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis type="number" tick={chartStyle} unit="%" />
-        <YAxis type="category" dataKey="zone" tick={chartStyle} width={32} />
+        <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
+        <XAxis type="number" tick={chartTick} unit="%" />
+        <YAxis type="category" dataKey="zone" tick={chartTick} width={32} />
         <Tooltip contentStyle={tooltipStyle} />
         <Bar dataKey="pct" fill="#10b981" radius={[0, 4, 4, 0]} name="% of runs" />
       </BarChart>
