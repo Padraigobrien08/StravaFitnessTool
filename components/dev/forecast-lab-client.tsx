@@ -68,7 +68,9 @@ export function ForecastLabClient() {
         </h1>
         <p className="max-w-2xl text-sm text-zinc-500">
           Audit harness for coherence, stability, and recommendation alignment.
-          Not shown to athletes.
+          Fixtures are synthetic profiles—not your Strava data. For your real
+          forecast, use Goals → Forecast V2. Try &quot;Near-race evidence
+          (20.5k + 10 mi)&quot; to mirror a 1:53 long run and 1:22 ten-miler.
         </p>
       </header>
 
