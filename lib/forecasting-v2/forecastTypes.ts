@@ -1,0 +1,216 @@
+import type { TrainingBlock } from "@/lib/analytics/block";
+import type { NormalizedActivity } from "@/lib/ecosystem/types";
+
+/** Race-quality effort used by capability models */
+export type RaceQualityEffort = {
+  distanceKm: number;
+  timeSec: number;
+  runId: string;
+  runName: string;
+  date: string;
+  source: string;
+  hasHr?: boolean;
+  isRaceLike?: boolean;
+};
+
+export type RaceForecastGoal = {
+  distanceMeters: number;
+  targetTimeSec?: number;
+  raceDate?: string;
+  distanceKey?: "5k" | "10k" | "hm" | "marathon";
+};
+
+export type RaceForecastInput = {
+  activities: NormalizedActivity[];
+  runs: NormalizedActivity[];
+  efforts: RaceQualityEffort[];
+  recentBlocks: TrainingBlock[];
+  trainingEcosystem?: unknown;
+  goal: RaceForecastGoal;
+  athleteContext?: {
+    maxHr?: number;
+    readinessScore?: number;
+    freshnessScore?: number;
+    tsb?: number;
+    ctl?: number;
+    atl?: number;
+    hardRunsLast14d?: number;
+    easyPct?: number;
+    efficiencyTrend?: "improving" | "declining" | "stable" | null;
+    archetypeLabel?: string;
+  };
+  /** Prior forecast for observability delta */
+  previousMostLikelyTimeSec?: number;
+};
+
+export type ForecastModelEstimate = {
+  modelName: string;
+  predictedTimeSec: number;
+  confidence: number;
+  weight: number;
+  anchorEfforts: string[];
+  assumptions: string[];
+  limitations: string[];
+};
+
+export type DurabilityAssessment = {
+  score: number;
+  label: "weak" | "moderate" | "strong";
+  evidence: string[];
+  penalties: string[];
+  explanation: string;
+  timeMultiplier: number;
+};
+
+export type FreshnessAssessment = {
+  score: number;
+  label: "fatigued" | "neutral" | "fresh";
+  timeAdjustmentSec: number;
+  evidence: string[];
+  risks: string[];
+};
+
+export type SpecificityAssessment = {
+  score: number;
+  label: "low" | "moderate" | "high";
+  evidence: string[];
+  gaps: string[];
+  timeMultiplier: number;
+};
+
+export type ExecutionAssessment = {
+  score: number;
+  fadeRisk: "low" | "medium" | "high";
+  pacingRisk: "low" | "medium" | "high";
+  evidence: string[];
+  recommendation: string;
+  conservativePaddingSec: number;
+};
+
+export type ForecastUncertaintyDriver = {
+  label: string;
+  impact: "low" | "medium" | "high";
+  explanation: string;
+};
+
+export type UncertaintyAssessment = {
+  score: number;
+  intervalWidthSec: number;
+  drivers: ForecastUncertaintyDriver[];
+  confidenceLabel: "low" | "medium" | "medium_high" | "high";
+};
+
+export type ForecastContributor = {
+  label: string;
+  direction: "positive" | "negative" | "neutral";
+  magnitude: "small" | "medium" | "large";
+  component:
+    | "capability"
+    | "durability"
+    | "freshness"
+    | "specificity"
+    | "execution"
+    | "uncertainty";
+  evidence: string;
+  confidence: "low" | "medium" | "high";
+};
+
+export type ForecastScenario = {
+  name: string;
+  predictedTimeSec: number;
+  description: string;
+};
+
+export type ForecastEvidence = {
+  label: string;
+  detail: string;
+};
+
+export type ForecastLimitation = {
+  label: string;
+  detail: string;
+};
+
+export type ForecastObservability = {
+  summary: string;
+  whyPredictionChanged?: {
+    previousPredictionSec?: number;
+    currentPredictionSec: number;
+    drivers: string[];
+  };
+  componentBreakdown: {
+    component: string;
+    score: number;
+    effect: "improves" | "weakens" | "neutral";
+    explanation: string;
+  }[];
+  modelWeights: {
+    modelName: string;
+    weight: number;
+    reason: string;
+  }[];
+  evidenceChain: string[];
+  warnings: string[];
+};
+
+export type RaceForecastV2 = {
+  distanceMeters: number;
+  distanceLabel: string;
+
+  /** Weighted capability models before durability/freshness adjustments */
+  capabilityBaseTimeSec: number;
+  mostLikelyTimeSec: number;
+  conservativeTimeSec: number;
+  optimisticTimeSec: number;
+  predictionIntervalSec: {
+    p10: number;
+    p25: number;
+    p50: number;
+    p75: number;
+    p90: number;
+  };
+
+  confidence: "low" | "medium" | "medium_high" | "high";
+  confidenceScore: number;
+
+  componentScores: {
+    capability: number;
+    durability: number;
+    freshness: number;
+    specificity: number;
+    execution: number;
+    uncertainty: number;
+  };
+
+  modelEstimates: ForecastModelEstimate[];
+  modelAgreement: {
+    score: number;
+    label: "low" | "medium" | "high";
+    spreadSec: number;
+    explanation: string;
+  };
+
+  contributors: {
+    positive: ForecastContributor[];
+    negative: ForecastContributor[];
+    neutral: ForecastContributor[];
+  };
+
+  uncertaintyDrivers: ForecastUncertaintyDriver[];
+
+  observability: ForecastObservability;
+  scenarios: ForecastScenario[];
+
+  evidence: ForecastEvidence[];
+  limitations: ForecastLimitation[];
+
+  recommendation: string;
+
+  /** Target gap when goal.targetTimeSec set */
+  targetAnalysis?: {
+    targetTimeSec: number;
+    gapSec: number;
+    realistic: boolean;
+    explanation: string;
+  };
+};

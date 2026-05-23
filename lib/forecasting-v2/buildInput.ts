@@ -1,0 +1,90 @@
+import type { DashboardInsights } from "@/lib/analytics";
+import type { RunActivity } from "@/lib/strava/types";
+import type { FitRunDetail } from "@/lib/strava/fitTypes";
+import {
+  RACE_READINESS_CONFIG,
+  type RaceGoal,
+} from "@/lib/analytics/readiness";
+import { effortsFromRuns } from "./capabilityModels";
+import { prepareCapabilityEfforts } from "./effortSelection";
+import type { RaceForecastInput, RaceQualityEffort } from "./forecastTypes";
+import type { NormalizedActivity } from "@/lib/ecosystem/types";
+
+function runsToNormalized(runs: RunActivity[]): NormalizedActivity[] {
+  return runs.map((r) => ({
+    id: r.id,
+    source: "strava_export" as const,
+    sportType: "Run",
+    modality: "run" as const,
+    name: r.name,
+    startDate: r.date,
+    movingTimeSec: r.movingSec ?? Math.round((r.distanceM / 1000) * 300),
+    elapsedTimeSec: r.elapsedSec ?? r.movingSec ?? 0,
+    distanceMeters: r.distanceM,
+    avgHr: r.avgHr ?? undefined,
+    hasStreams: false,
+    hasLaps: false,
+    perceivedIntensity: "unknown" as const,
+    intensity: { level: "unknown" as const, confidence: "low" as const, evidence: [] },
+    confidence: "low" as const,
+  }));
+}
+
+function effortsFromAnalysis(
+  analytics: DashboardInsights,
+  runs: RunActivity[]
+): RaceQualityEffort[] {
+  return analytics.racePredictionAnalysis.efforts.map((e) => ({
+    ...e,
+    hasHr: runs.some((r) => r.id === e.runId && r.avgHr != null),
+    isRaceLike:
+      e.distanceKm >= 4 &&
+      e.distanceKm <= 22 &&
+      (e.source.includes("Lap") || e.source.includes("Best")),
+  }));
+}
+
+export function buildRaceForecastInput(opts: {
+  runs?: RunActivity[];
+  fitDetails?: FitRunDetail[];
+  analytics: DashboardInsights;
+  goal: RaceGoal | null;
+  previousMostLikelyTimeSec?: number;
+}): RaceForecastInput | null {
+  const { analytics, goal } = opts;
+  if (!goal) return null;
+
+  const runs = opts.runs ?? [];
+  const fitDetails = opts.fitDetails ?? [];
+  const rawEfforts =
+    runs.length > 0
+      ? effortsFromRuns(runs, fitDetails)
+      : effortsFromAnalysis(analytics, runs);
+  const efforts = prepareCapabilityEfforts(rawEfforts);
+  const normalized = runsToNormalized(runs);
+  const cfg = RACE_READINESS_CONFIG[goal.distance];
+
+  return {
+    activities: normalized,
+    runs: normalized,
+    efforts,
+    recentBlocks: analytics.trainingBlocks ?? [],
+    goal: {
+      distanceMeters: Math.round(cfg.raceDistanceKm * 1000),
+      distanceKey: goal.distance,
+      targetTimeSec: goal.targetTimeSec,
+      raceDate: goal.date,
+    },
+    athleteContext: {
+      readinessScore: analytics.raceReadiness?.score,
+      freshnessScore: analytics.fatigue.freshness,
+      tsb: analytics.fatigue.tsb,
+      ctl: analytics.fatigue.ctl,
+      atl: analytics.fatigue.atl,
+      hardRunsLast14d: analytics.intensityAdvice.hardRunsLast14d,
+      easyPct: analytics.intensityAdvice.currentEasyPct,
+      efficiencyTrend: analytics.efficiencySummary.trend,
+    },
+    previousMostLikelyTimeSec: opts.previousMostLikelyTimeSec,
+  };
+}
