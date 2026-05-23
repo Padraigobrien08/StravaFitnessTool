@@ -153,6 +153,28 @@ export const inconsistentModelEstimatesInput: RaceForecastInput = {
   ],
 };
 
+/** Recent 20.5k + 10-mile efforts — HM should land clearly under 2:00. */
+export const nearRaceEvidenceRunnerInput: RaceForecastInput = {
+  activities: [],
+  runs: [],
+  efforts: [
+    eff(20.5, 6780, "20.5 km long run", "2026-04-12", true, true),
+    eff(16.09, 4920, "10 mile race", "2026-03-28", true, true),
+    eff(10, 2520, "10K", "2026-03-01"),
+  ],
+  recentBlocks: [
+    block("Prior", 120, 16, 4),
+    block("Current", 145, 20.5, 5),
+  ],
+  goal: { distanceMeters: 21097, distanceKey: "hm", targetTimeSec: 7200 },
+  athleteContext: {
+    freshnessScore: 68,
+    tsb: 4,
+    hardRunsLast14d: 2,
+    easyPct: 60,
+  },
+};
+
 export const raceWeekTaperAthleteInput: RaceForecastInput = {
   ...fatigueHeavyRunnerInput,
   goal: {
@@ -258,6 +280,19 @@ export const FORECAST_FIXTURES: ForecastFixtureProfile[] = [
     expectations: {
       modelAgreementNotHigh: true,
       minIntervalWidthSec: 180,
+    },
+  },
+  {
+    id: "near_race_evidence",
+    label: "Near-race evidence (20.5k + 10 mi)",
+    description:
+      "Recent 1:53 20.5k and 1:22 10-mile — HM forecast should be clearly under 2:00.",
+    input: nearRaceEvidenceRunnerInput,
+    expectations: {
+      minConfidence: "medium",
+      durabilityLabel: "strong",
+      specificityLabel: "high",
+      mustPassAllRules: true,
     },
   },
   {

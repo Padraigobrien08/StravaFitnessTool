@@ -1,3 +1,4 @@
+import { predictRaceTime } from "@/lib/analytics/records";
 import {
   buildCapabilityModelEstimates,
   computeWeightedCapability,
@@ -72,10 +73,45 @@ function capabilityScoreFromEfforts(effortCount: number, modelCount: number): nu
   return Math.max(0, Math.min(100, Math.round(s)));
 }
 
+/** When a recent effort is ≥90% of race distance, cap forecast to modest extrapolation. */
+function nearRaceEffortCeilingSec(
+  input: RaceForecastInput,
+  freshnessAdjustmentSec: number
+): number | null {
+  const targetKm = input.goal.distanceMeters / 1000;
+  const near = input.efforts
+    .filter((e) => e.distanceKm >= targetKm * 0.9)
+    .sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm);
+  if (near.length === 0) return null;
+
+  const best = near[0]!;
+  const extrapolated = predictRaceTime(
+    best.distanceKm * 1000,
+    best.timeSec,
+    input.goal.distanceMeters
+  );
+  const durabilityTax =
+    input.goal.distanceMeters >= 21000 ? 1.015 : 1.01;
+  return Math.round(
+    extrapolated * durabilityTax + Math.max(0, freshnessAdjustmentSec)
+  );
+}
+
+const CONFIDENCE_LABEL_DISPLAY: Record<
+  ReturnType<typeof buildUncertaintyAssessment>["confidenceLabel"],
+  string
+> = {
+  low: "low",
+  medium: "medium",
+  medium_high: "medium-high",
+  high: "high",
+};
+
 function buildRecommendation(
   freshness: ReturnType<typeof assessFreshness>,
   execution: ReturnType<typeof assessExecution>,
-  limitations: string[]
+  limitations: string[],
+  confidenceLabel: ReturnType<typeof buildUncertaintyAssessment>["confidenceLabel"]
 ): string {
   const parts: string[] = [];
   if (freshness.risks.length) {
@@ -88,7 +124,7 @@ function buildRecommendation(
     );
   }
   parts.push(`Execution: ${execution.recommendation}`);
-  parts.push("Confidence: medium-high.");
+  parts.push(`Confidence: ${CONFIDENCE_LABEL_DISPLAY[confidenceLabel]}.`);
   parts.push(
     `Limitation: ${limitations[0] ?? "No sleep or HRV data available."}`
   );
@@ -134,6 +170,14 @@ export function buildRaceForecastV2(input: RaceForecastInput): RaceForecastV2 {
     mostLikelyTimeSec = ceiling;
   } else if (mostLikelyTimeSec < floor) {
     mostLikelyTimeSec = Math.max(60, floor);
+  }
+
+  const nearRaceCap = nearRaceEffortCeilingSec(
+    input,
+    freshness.timeAdjustmentSec
+  );
+  if (nearRaceCap != null && mostLikelyTimeSec > nearRaceCap) {
+    mostLikelyTimeSec = nearRaceCap;
   }
   const conservativeTimeSec = Math.round(
     mostLikelyTimeSec + execution.conservativePaddingSec
@@ -252,7 +296,12 @@ export function buildRaceForecastV2(input: RaceForecastInput): RaceForecastV2 {
     scenarios,
     evidence,
     limitations: limitationObjs,
-    recommendation: buildRecommendation(freshness, execution, limitations),
+    recommendation: buildRecommendation(
+      freshness,
+      execution,
+      limitations,
+      uncertainty.confidenceLabel
+    ),
     targetAnalysis,
   };
 }

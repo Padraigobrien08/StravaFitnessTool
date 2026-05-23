@@ -154,12 +154,21 @@ describe("fixture athletes", () => {
     expect(report.fixtureExpectation?.met).toBe(true);
     expect(report.forecast.componentScores.durability).toBeLessThan(60);
   });
+
+  it("near-race 20.5k + 10-mile efforts predict HM under 2:00", () => {
+    const report = evaluateForecastFixture(
+      FORECAST_FIXTURES.find((f) => f.id === "near_race_evidence")!
+    );
+    expect(report.fixtureExpectation?.met).toBe(true);
+    expect(report.forecast.mostLikelyTimeSec).toBeLessThan(7200);
+    expect(report.forecast.mostLikelyTimeSec).toBeGreaterThan(6300);
+  });
 });
 
 describe("production readiness gate", () => {
   it("all fixtures pass behavioral expectations with zero validation errors", () => {
     const { reports, productionReady } = evaluateAllForecastFixtures();
-    expect(reports.length).toBe(9);
+    expect(reports.length).toBe(10);
     const failures = reports
       .filter((r) => !r.fixtureExpectation?.met || r.errorCount > 0)
       .map(

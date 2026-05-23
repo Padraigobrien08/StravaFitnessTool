@@ -7,8 +7,17 @@ export function assessDurability(input: RaceForecastInput): DurabilityAssessment
   const blocks = input.recentBlocks;
   const runs = input.runs;
 
-  const longestKm = runs.reduce(
+  const longestFromRuns = runs.reduce(
     (m, r) => Math.max(m, (r.distanceMeters ?? 0) / 1000),
+    0
+  );
+  const longestFromEfforts = input.efforts.reduce(
+    (m, e) => Math.max(m, e.distanceKm),
+    0
+  );
+  const longestKm = Math.max(
+    longestFromRuns,
+    longestFromEfforts,
     blocks[blocks.length - 1]?.longestRunKm ?? 0
   );
 

@@ -47,6 +47,14 @@ export function assessSpecificity(input: RaceForecastInput): SpecificityAssessme
     gaps.push("Long runs do not yet approach race distance.");
   }
 
+  const nearRaceEfforts = efforts.filter((e) => e.distanceKm >= targetKm * 0.9);
+  if (nearRaceEfforts.length > 0) {
+    score += 28;
+    evidence.push(
+      `${nearRaceEfforts.length} effort(s) at or near race distance (≥90% of ${targetKm.toFixed(1)} km).`
+    );
+  }
+
   const maxAnchor = efforts.reduce((m, e) => Math.max(m, e.distanceKm), 0);
   if (maxAnchor < targetKm * 0.35 && targetKm >= 15) {
     score -= 15;
