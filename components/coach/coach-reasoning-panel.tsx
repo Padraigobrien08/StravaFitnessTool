@@ -75,8 +75,8 @@ export function CoachReasoningPanel({
         ref={scrollRef}
         className="coach-reasoning-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
       >
-        <div className="px-4 py-6 sm:px-6 sm:py-7">
-          <div className="coach-message-column w-full">
+        <div className="px-3 py-5 sm:px-5 sm:py-6">
+          <div className="coach-message-column mx-auto w-full">
             {!hasConversation ? (
               <CoachThreadStarter
                 state={workspace}

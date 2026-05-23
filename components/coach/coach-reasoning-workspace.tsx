@@ -108,7 +108,7 @@ export function CoachReasoningWorkspace({
         </div>
       ) : null}
 
-      <div className="coach-grid relative grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_280px]">
+      <div className="coach-grid relative grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)_264px]">
         {sidebarOpen && showSidebar ? (
           <button
             type="button"
@@ -184,7 +184,7 @@ export function CoachReasoningWorkspace({
 function PanelSkeleton() {
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="min-h-0 flex-1 overflow-y-auto p-8">
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5 sm:px-5">
         <div className="coach-message-column mx-auto w-full space-y-4">
           <div className="skeleton-shimmer h-6 w-32 rounded" />
           <div className="skeleton-shimmer h-10 w-full rounded" />

@@ -12,7 +12,7 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --app-nav-height: 3rem;
-  --coach-page-pad: 1rem;
+  --coach-page-pad: 0.75rem;
 }
 
 html.coach-route,
@@ -106,7 +106,11 @@ body::before {
 }
 
 .coach-message-column {
-  max-width: 50rem; /* ~800px readable measure */
+  max-width: 50rem; /* ~800px readable measure — default pages */
+}
+
+html.coach-route .coach-message-column {
+  max-width: min(54rem, 100%); /* ~864px — wider than default, still readable */
 }
 
 .coach-sidebar {
@@ -146,6 +150,14 @@ body::before {
 
 .coach-reasoning-scroll {
   overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.coach-reasoning-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Intelligence athlete model */
@@ -175,11 +187,6 @@ body::before {
 
 .coach-reasoning-panel {
   background: #0a0b0e;
-}
-
-.coach-reasoning-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
 }
 
 .coach-thread {

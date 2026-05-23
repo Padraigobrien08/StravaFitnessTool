@@ -10,21 +10,26 @@ import { cn } from "@/lib/utils";
 
 /** Usable workspace width on large displays */
 export const WORKSPACE_MAX = "max-w-[1500px]";
-export const COACH_WORKSPACE_MAX = "max-w-[1550px]";
+/** Coach: wider than default pages, with modest side gutters on ultra-wide screens */
+export const COACH_WORKSPACE_MAX = "max-w-[1720px]";
 
 export function WorkspaceFrame({
   children,
   className,
+  variant = "default",
 }: {
   children: React.ReactNode;
   className?: string;
+  variant?: "default" | "coach";
 }) {
+  const isCoach = variant === "coach";
   return (
     <div
       className={cn(
         "mx-auto w-full",
-        WORKSPACE_MAX,
-        "px-4 sm:px-5 lg:px-6",
+        isCoach
+          ? cn(COACH_WORKSPACE_MAX, "px-3 sm:px-4 lg:px-5")
+          : cn(WORKSPACE_MAX, "px-4 sm:px-5 lg:px-6"),
         className
       )}
     >
@@ -94,9 +99,10 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
         )}
       >
         <WorkspaceFrame
+          variant={isCoach ? "coach" : "default"}
           className={cn(
             isCoach
-              ? "flex h-full min-h-0 max-w-[1550px] flex-1 flex-col overflow-hidden px-3 py-2 sm:px-4"
+              ? "flex h-full min-h-0 flex-1 flex-col overflow-hidden py-1 sm:py-1.5"
               : "py-4 sm:py-5",
             isHome && "pb-8"
           )}

@@ -35,8 +35,8 @@ export function CoachComposer({
   const canSend = !loading && !disabled && value.trim().length > 0;
 
   return (
-    <div className="coach-composer shrink-0 border-t border-white/[0.04] bg-[#0a0b0e]/95 px-4 pb-3 pt-3 sm:px-6">
-      <div className="coach-message-column w-full">
+    <div className="coach-composer shrink-0 border-t border-white/[0.04] bg-[#0a0b0e]/95 px-3 pb-3 pt-3 sm:px-5">
+      <div className="coach-message-column mx-auto w-full">
         {loading ? (
           <div
             className="coach-composer-progress mb-2 h-px w-full overflow-hidden rounded-full bg-white/[0.04]"

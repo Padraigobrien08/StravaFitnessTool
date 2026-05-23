@@ -53,7 +53,7 @@ export function CoachMiniContext({
   }
 
   return (
-    <aside className="coach-mini-context hidden h-full min-h-0 w-[280px] shrink-0 flex-col overflow-hidden bg-[#0a0b0e]/50 xl:flex">
+    <aside className="coach-mini-context hidden h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden bg-[#0a0b0e]/50 xl:flex">
       <div className="flex shrink-0 items-center justify-between px-3 py-2.5">
         <span className="text-[12px] font-medium text-zinc-500">
           Answer context
