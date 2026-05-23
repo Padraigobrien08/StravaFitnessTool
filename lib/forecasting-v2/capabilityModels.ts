@@ -44,8 +44,14 @@ export function distanceRelevanceWeight(
   return 0.4;
 }
 
-function pickBestAnchor(efforts: RaceQualityEffort[]): RaceQualityEffort | null {
-  const c = efforts.filter((e) => e.distanceKm >= 4 && e.distanceKm <= 15);
+function pickBestAnchor(
+  efforts: RaceQualityEffort[],
+  targetKm: number
+): RaceQualityEffort | null {
+  const maxKm = Math.min(30, Math.max(15, targetKm * 1.08));
+  const c = efforts.filter(
+    (e) => e.distanceKm >= 4 && e.distanceKm <= maxKm
+  );
   if (c.length === 0) return efforts[0] ?? null;
   return [...c].sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm)[0];
 }
@@ -79,8 +85,9 @@ function predictMultiEffort(
   targetM: number,
   targetKm: number
 ): number | null {
+  const maxKm = Math.min(30, Math.max(21, targetKm * 1.08));
   const anchors = [...efforts]
-    .filter((e) => e.distanceKm >= 4 && e.distanceKm <= 21)
+    .filter((e) => e.distanceKm >= 4 && e.distanceKm <= maxKm)
     .sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm)
     .slice(0, 3);
   if (anchors.length === 0) return null;
@@ -119,7 +126,7 @@ export function buildCapabilityModelEstimates(
 
   if (efforts.length === 0) return estimates;
 
-  const anchor = pickBestAnchor(efforts);
+  const anchor = pickBestAnchor(efforts, targetKm);
   if (anchor) {
     estimates.push({
       modelName: "Riegel (1981)",
@@ -188,7 +195,7 @@ export function computeWeightedCapability(
   spreadSec: number;
 } {
   const targetKm = input.goal.distanceMeters / 1000;
-  const anchor = pickBestAnchor(input.efforts);
+  const anchor = pickBestAnchor(input.efforts, targetKm);
 
   const modelTimes = estimates
     .map((e) => e.predictedTimeSec)
@@ -218,7 +225,8 @@ export function computeWeightedCapability(
   const totalW = positive.reduce((s, e) => s + e.weight, 0);
 
   if (totalW <= 0 || positive.length === 0) {
-    const fallback = pickBestAnchor(input.efforts) ?? input.efforts[0];
+    const fallback =
+      pickBestAnchor(input.efforts, targetKm) ?? input.efforts[0];
     const baseTimeSec = fallback
       ? Math.round(predictRiegel(fallback, input.goal.distanceMeters))
       : 0;

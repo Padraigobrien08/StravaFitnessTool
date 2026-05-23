@@ -5,7 +5,8 @@
 StrideIQ answers *why* things changed and *what to do next*, not only *what happened*. Analytics and reasoning run on deterministic engines; language layers (Coach, MCP) orchestrate tools and must not invent metrics.
 
 📄 **Product contract:** [PRODUCT.md](PRODUCT.md)  
-📚 **Full docs index:** [docs/README.md](docs/README.md)
+📚 **Full docs index:** [docs/README.md](docs/README.md)  
+📋 **Every feature:** [docs/FEATURES.md](docs/FEATURES.md)
 
 ---
 

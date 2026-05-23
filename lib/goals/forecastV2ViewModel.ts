@@ -5,8 +5,10 @@ import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import {
   buildRaceForecastInput,
   buildRaceForecastV2,
+  distanceRelevanceWeight,
   type RaceForecastV2,
 } from "@/lib/forecasting-v2";
+import { differenceInDays, parseISO } from "date-fns";
 import { formatDuration } from "@/lib/utils";
 
 export interface ForecastV2ComponentView {
@@ -17,9 +19,17 @@ export interface ForecastV2ComponentView {
   explanation: string;
 }
 
+export interface ForecastV2KeyEffort {
+  label: string;
+  time: string;
+  distanceKm: number;
+  date: string;
+}
+
 export interface ForecastV2View {
   enabled: boolean;
   distanceLabel: string;
+  keyEfforts: ForecastV2KeyEffort[];
   capabilityBase: string;
   mostLikely: string;
   rangeDisplay: string;
@@ -73,6 +83,29 @@ function confidenceLabel(c: RaceForecastV2["confidence"]): string {
   return map[c];
 }
 
+function buildKeyEfforts(
+  input: NonNullable<ReturnType<typeof buildRaceForecastInput>>
+): ForecastV2KeyEffort[] {
+  const targetKm = input.goal.distanceMeters / 1000;
+  const now = new Date();
+
+  return [...input.efforts]
+    .map((e) => {
+      const days = Math.max(0, differenceInDays(now, parseISO(e.date)));
+      const recency = Math.exp(-days / 90);
+      const relevance = distanceRelevanceWeight(e.distanceKm, targetKm);
+      return { e, score: recency * relevance * (e.isRaceLike ? 1.1 : 1) };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map(({ e }) => ({
+      label: e.runName,
+      time: formatDuration(e.timeSec),
+      distanceKm: e.distanceKm,
+      date: e.date,
+    }));
+}
+
 export function buildForecastV2View(opts: {
   analytics: DashboardInsights;
   goal: RaceGoal | null;
@@ -114,6 +147,7 @@ export function buildForecastV2View(opts: {
   return {
     enabled: true,
     distanceLabel: raw.distanceLabel,
+    keyEfforts: buildKeyEfforts(input),
     capabilityBase: formatDuration(raw.capabilityBaseTimeSec),
     mostLikely: formatDuration(raw.mostLikelyTimeSec),
     rangeDisplay: intervalRange(raw),

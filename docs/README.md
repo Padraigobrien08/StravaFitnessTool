@@ -3,6 +3,7 @@
 | Document | Audience | Contents |
 |----------|----------|----------|
 | [../README.md](../README.md) | Everyone | Setup, routes, env, quick reference |
+| [FEATURES.md](FEATURES.md) | Everyone | **Complete feature catalog** (every page, engine, tool) |
 | [../PRODUCT.md](../PRODUCT.md) | Product / eng | Positioning, IA rules, roadmap phases |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Engineers | Layers, data paths, API, folder map |
 | [COACH_AND_INTELLIGENCE.md](COACH_AND_INTELLIGENCE.md) | Product + eng | Athlete model vs conversational Coach |
