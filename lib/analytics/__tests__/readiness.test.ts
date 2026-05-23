@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { raceReadiness, halfMarathonReadiness } from "../readiness";
+import {
+  raceReadiness,
+  halfMarathonReadiness,
+  longRunPercentOfRace,
+  formatLongRunVsRace,
+  RACE_READINESS_CONFIG,
+} from "../readiness";
 import { buildRacePredictionAnalysis } from "../predictions";
 import type { RunActivity } from "@/lib/strava/types";
 
@@ -51,6 +57,14 @@ describe("raceReadiness", () => {
     expect(readiness.score).toBeGreaterThanOrEqual(80);
     expect(readiness.daysUntilRace).toBeGreaterThanOrEqual(20);
     expect(readiness.distanceLabel).toContain("Half");
+  });
+
+  it("long-run percent uses race distance not training benchmark", () => {
+    const raceKm = RACE_READINESS_CONFIG.hm.raceDistanceKm;
+    expect(longRunPercentOfRace(20.5, raceKm)).toBe(97);
+    expect(formatLongRunVsRace(20.5, raceKm)).toBe(
+      "20.5 km (97% of 21.1 km race)"
+    );
   });
 
   it("halfMarathonReadiness matches legacy shape", () => {

@@ -2,7 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfidenceBadge } from "@/components/confidence-badge";
-import type { RaceReadiness } from "@/lib/analytics/readiness";
+import {
+  RACE_READINESS_CONFIG,
+  formatLongRunVsRace,
+  type RaceReadiness,
+} from "@/lib/analytics/readiness";
 import { formatDuration } from "@/lib/utils";
 import type { InsightConfidence } from "@/lib/insights/types";
 
@@ -60,7 +64,10 @@ export function RaceReadinessCard({
           <div className="rounded-lg bg-white/[0.03] px-3 py-2">
             <p className="text-zinc-500">Longest run</p>
             <p className="text-zinc-200">
-              {readiness.longestRunKm} km ({readiness.longestRunPct}% of target)
+              {formatLongRunVsRace(
+                readiness.longestRunKm,
+                RACE_READINESS_CONFIG[readiness.distance].raceDistanceKm
+              )}
             </p>
           </div>
           <div className="rounded-lg bg-white/[0.03] px-3 py-2">

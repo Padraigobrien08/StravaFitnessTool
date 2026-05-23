@@ -22,6 +22,23 @@ import { differenceInDays, parseISO } from "date-fns";
 const HM_KM = 21.0975;
 const TYPICAL_4WK_HM_KM = 160;
 
+/** Longest run as % of official race distance (not the shorter training long-run benchmark). */
+export function longRunPercentOfRace(
+  longestKm: number,
+  raceDistanceKm: number
+): number {
+  if (raceDistanceKm <= 0) return 0;
+  return Math.round(Math.min(100, (longestKm / raceDistanceKm) * 100));
+}
+
+export function formatLongRunVsRace(
+  longestKm: number,
+  raceDistanceKm: number
+): string {
+  const pct = longRunPercentOfRace(longestKm, raceDistanceKm);
+  return `${longestKm.toFixed(1)} km (${pct}% of ${raceDistanceKm.toFixed(1)} km race)`;
+}
+
 export interface HalfMarathonReadiness {
   longestRunKm: number;
   longestRunPct: number;
@@ -151,10 +168,7 @@ export function raceReadiness(
   const longest = runs.reduce((m, r) => Math.max(m, r.distanceM), 0) / 1000;
   const fourWeek = lastNDaysVolume(runs, 28).distanceKm;
 
-  const longestPct = Math.min(
-    100,
-    (longest / config.longRunTargetKm) * 100
-  );
+  const longestPct = longRunPercentOfRace(longest, config.raceDistanceKm);
   const volumePct = Math.min(
     100,
     (fourWeek / config.fourWeekVolumeTargetKm) * 100
@@ -179,11 +193,11 @@ export function raceReadiness(
 
   const gaps: ReadinessGap[] = [];
 
-  if (longest < config.longRunTargetKm) {
+  if (longest < config.raceDistanceKm * 0.92) {
     gaps.push({
       metric: "Long run",
       current: `${longest.toFixed(1)} km`,
-      target: `${config.longRunTargetKm} km`,
+      target: `${config.raceDistanceKm.toFixed(1)} km (race distance)`,
     });
   }
 
