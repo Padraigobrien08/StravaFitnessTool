@@ -21,6 +21,7 @@ import { PredictionConsensusPanel } from "@/components/goals/prediction-consensu
 import { GoalRisksPanel } from "@/components/goals/goal-risks-panel";
 import { GoalsExplainability } from "@/components/goals/goals-explainability";
 import { HistoricalReadinessPanel } from "@/components/goals/historical-readiness-panel";
+import { ForecastV2Panel } from "@/components/goals/forecast-v2-panel";
 import { dash } from "@/components/home/primitives/tokens";
 
 function GoalsBriefingBar() {
@@ -76,6 +77,10 @@ export default function GoalsPage() {
             readiness={view.readiness}
           />
 
+          {view.forecastV2 ? (
+            <ForecastV2Panel forecast={view.forecastV2} />
+          ) : null}
+
           <GoalsIntelRow>
             <div className="lg:col-span-7">
               <PredictionIntegrityPanel projection={view.projection} />
@@ -102,6 +107,7 @@ export default function GoalsPage() {
           <TrajectoryForecastPanel
             timeline={analytics.predictionTimeline}
             narrative={trajectoryNarrative}
+            goalDistance={raceGoal?.distance ?? null}
           />
 
           <ProjectionCurvePanel

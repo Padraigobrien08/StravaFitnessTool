@@ -1,9 +1,17 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RaceGoal, RaceReadiness } from "@/lib/analytics/readiness";
-import { RACE_DISTANCE_LABELS } from "@/lib/analytics/readiness";
+import {
+  RACE_DISTANCE_LABELS,
+  RACE_READINESS_CONFIG,
+  formatLongRunVsRace,
+} from "@/lib/analytics/readiness";
 import type { RacePredictionAnalysis, ConsensusPrediction } from "@/lib/analytics/predictions";
 import type { Insight } from "@/lib/insights/types";
 import type { RaceProjectionView } from "@/lib/performance/viewModels";
+import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
+import { buildForecastV2View } from "@/lib/goals/forecastV2ViewModel";
+import type { RunActivity } from "@/lib/strava/types";
+import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { formatDuration, formatKm, formatPace } from "@/lib/utils";
 
 export interface ReadinessDimensionView {
@@ -59,6 +67,7 @@ export interface GoalsPageView {
   readiness: RaceReadiness | null;
   dimensions: ReadinessDimensionView[];
   projection: RaceProjectionView;
+  forecastV2: ForecastV2View | null;
   risks: GoalRiskView[];
   consensus: ModelConsensusRow[];
   explain: GoalsExplainView;
@@ -219,8 +228,14 @@ function buildDimensions(
       score: longRun,
       level: levelFromScore(longRun),
       note: r
-        ? `Longest ${r.longestRunKm} km (${r.longestRunPct}% of target)`
-        : `Longest ${analytics.halfMarathonReadiness.longestRunKm} km`,
+        ? formatLongRunVsRace(
+            r.longestRunKm,
+            RACE_READINESS_CONFIG[r.distance].raceDistanceKm
+          )
+        : formatLongRunVsRace(
+            analytics.halfMarathonReadiness.longestRunKm,
+            RACE_READINESS_CONFIG.hm.raceDistanceKm
+          ),
     },
     {
       id: "freshness",
@@ -366,7 +381,8 @@ function buildHero(
   readiness: RaceReadiness | null,
   analytics: DashboardInsights,
   projection: RaceProjectionView,
-  insights: Insight[]
+  insights: Insight[],
+  forecastV2: ForecastV2View | null
 ): RaceMissionHeroView {
   const r = readiness ?? {
     distance: "hm" as const,
@@ -419,7 +435,8 @@ function buildHero(
     targetTimeDisplay: targetDisplay,
     readinessScore: r.score,
     readinessLabel: r.label,
-    confidenceLabel: projection.primary?.confidenceLabel ?? "Medium",
+    confidenceLabel:
+      forecastV2?.confidence ?? projection.primary?.confidenceLabel ?? "Medium",
     confidence: analytics.dataConfidence,
     strongestSignal: strongest,
     biggestLimiter: limiter,
@@ -428,8 +445,10 @@ function buildHero(
       (r.score >= 70
         ? "Maintain rhythm; add short race-pace touches without increasing fatigue."
         : "Extend long run and volume before taper; keep easy days truly easy."),
-    projectedFinish: primary?.timeDisplay ?? null,
-    projectedSpread: primary?.spreadDisplay ?? null,
+    projectedFinish:
+      forecastV2?.mostLikely ?? primary?.timeDisplay ?? null,
+    projectedSpread:
+      forecastV2?.rangeDisplay ?? primary?.spreadDisplay ?? null,
     daysUntilRace: readiness?.daysUntilRace ?? null,
     raceDateDisplay: readiness
       ? new Date(readiness.raceDate).toLocaleDateString(undefined, {
@@ -447,11 +466,18 @@ function buildHero(
 export function buildGoalsPageView(
   analytics: DashboardInsights,
   goal: RaceGoal | null,
-  insights: Insight[] = []
+  insights: Insight[] = [],
+  opts?: { runs?: RunActivity[]; fitDetails?: FitRunDetail[] }
 ): GoalsPageView {
   const readiness = analytics.raceReadiness;
   const projection = buildProjection(analytics, goal, readiness);
-  const hero = buildHero(goal, readiness, analytics, projection, insights);
+  const forecastV2 = buildForecastV2View({
+    analytics,
+    goal,
+    runs: opts?.runs,
+    fitDetails: opts?.fitDetails,
+  });
+  const hero = buildHero(goal, readiness, analytics, projection, insights, forecastV2);
 
   const explain: GoalsExplainView = {
     summary: projection.explanation[0] ?? "Predictions combine recent efforts with endurance scaling models.",
@@ -508,6 +534,7 @@ export function buildGoalsPageView(
     readiness,
     dimensions: buildDimensions(analytics, readiness),
     projection,
+    forecastV2,
     risks: buildRisks(analytics, readiness, projection),
     consensus: buildConsensus(analytics.racePredictionAnalysis),
     explain,

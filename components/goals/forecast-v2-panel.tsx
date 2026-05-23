@@ -1,0 +1,249 @@
+"use client";
+
+import { PanelChrome } from "@/components/home/primitives/panel-chrome";
+import { dash } from "@/components/home/primitives/tokens";
+import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
+import { cn } from "@/lib/utils";
+
+const effectStyle = {
+  improves: "text-teal-400/90",
+  weakens: "text-amber-400/85",
+  neutral: "text-zinc-500",
+};
+
+const magnitudeDot = {
+  small: "w-1.5",
+  medium: "w-2",
+  large: "w-2.5",
+};
+
+export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
+  return (
+    <div className="space-y-4">
+      <PanelChrome title="Forecast summary (V2)" accent>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className={dash.label}>Most likely</p>
+            <p className="font-display text-2xl font-bold tabular-nums text-white">
+              {forecast.mostLikely}
+            </p>
+            <p className="mt-0.5 text-xs text-zinc-500">
+              {forecast.distanceLabel} · capability base {forecast.capabilityBase}
+            </p>
+          </div>
+          <div>
+            <p className={dash.label}>Realistic range (p25–p75)</p>
+            <p className="text-lg font-semibold tabular-nums text-zinc-200">
+              {forecast.rangeDisplay}
+            </p>
+            <p className="mt-0.5 text-xs text-zinc-600">
+              Conservative {forecast.conservative} · Optimistic {forecast.optimistic}
+            </p>
+          </div>
+          <div>
+            <p className={dash.label}>Confidence</p>
+            <p className="text-lg font-semibold text-zinc-200">
+              {forecast.confidence}
+            </p>
+            <p className="mt-0.5 text-xs text-zinc-600">
+              Score {forecast.confidenceScore}/100
+            </p>
+          </div>
+          {forecast.targetGapDisplay ? (
+            <div>
+              <p className={dash.label}>Target path</p>
+              <p
+                className={cn(
+                  "text-sm font-medium",
+                  forecast.targetRealistic ? "text-teal-400/90" : "text-amber-400/85"
+                )}
+              >
+                {forecast.targetGapDisplay}
+              </p>
+              {forecast.targetChance ? (
+                <p className="mt-1 text-xs text-zinc-600">{forecast.targetChance}</p>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </PanelChrome>
+
+      <PanelChrome title="Performance state breakdown" subdued>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {forecast.components.map((c) => (
+            <div
+              key={c.key}
+              className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-3.5 py-3"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-medium text-zinc-300">{c.label}</span>
+                <span className="font-display text-lg font-bold tabular-nums text-white">
+                  {c.score}
+                </span>
+              </div>
+              <p className={cn("mt-1 text-[11px]", effectStyle[c.effect])}>
+                {c.effect === "improves"
+                  ? "Supports forecast"
+                  : c.effect === "weakens"
+                    ? "Weakens confidence"
+                    : "Neutral"}
+              </p>
+              <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">
+                {c.explanation}
+              </p>
+            </div>
+          ))}
+        </div>
+      </PanelChrome>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <PanelChrome title="What helps the forecast" accent>
+          {forecast.positiveContributors.length === 0 ? (
+            <p className="text-sm text-zinc-500">No strong positive signals identified.</p>
+          ) : (
+            <ul className="space-y-3">
+              {forecast.positiveContributors.map((c) => (
+                <li key={c.label} className="flex gap-2">
+                  <span
+                    className={cn(
+                      "mt-1.5 h-1.5 shrink-0 rounded-full bg-teal-500/70",
+                      magnitudeDot[c.magnitude as keyof typeof magnitudeDot] ?? "w-1.5"
+                    )}
+                  />
+                  <div>
+                    <p className="text-sm text-zinc-300">{c.label}</p>
+                    <p className="text-xs text-zinc-600">{c.evidence}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </PanelChrome>
+
+        <PanelChrome title="What weakens the forecast" subdued>
+          {forecast.negativeContributors.length === 0 ? (
+            <p className="text-sm text-zinc-500">No major negative contributors.</p>
+          ) : (
+            <ul className="space-y-3">
+              {forecast.negativeContributors.map((c) => (
+                <li key={c.label} className="flex gap-2">
+                  <span
+                    className={cn(
+                      "mt-1.5 h-1.5 shrink-0 rounded-full bg-amber-500/60",
+                      magnitudeDot[c.magnitude as keyof typeof magnitudeDot] ?? "w-1.5"
+                    )}
+                  />
+                  <div>
+                    <p className="text-sm text-zinc-300">{c.label}</p>
+                    <p className="text-xs text-zinc-600">{c.evidence}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </PanelChrome>
+      </div>
+
+      <PanelChrome title="Model agreement" accent>
+        <p className={`${dash.muted} mb-3`}>
+          {forecast.modelAgreement.explanation} Spread:{" "}
+          {forecast.modelAgreement.spread} ({forecast.modelAgreement.label} agreement).
+        </p>
+        <div className="space-y-2.5">
+          {forecast.modelRows.map((row) => (
+            <div
+              key={row.name}
+              className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2.5"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-zinc-300">{row.name}</p>
+                <p className="text-[11px] text-zinc-600 truncate">{row.reason}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-display text-lg font-bold tabular-nums text-white">
+                  {row.time}
+                </p>
+                <p className="text-[11px] text-zinc-600">Weight {row.weightPct}%</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </PanelChrome>
+
+      <PanelChrome title="Scenario forecasts" subdued>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {forecast.scenarios.map((s) => (
+            <div
+              key={s.name}
+              className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-3"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-sm font-medium text-zinc-300">{s.name}</span>
+                <span className="font-display text-xl font-bold tabular-nums text-white">
+                  {s.time}
+                </span>
+              </div>
+              <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">
+                {s.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </PanelChrome>
+
+      <PanelChrome title="Why the system believes this" accent>
+        <p className="text-sm leading-relaxed text-zinc-400">{forecast.observability.summary}</p>
+        {forecast.observability.changeDrivers?.length ? (
+          <div className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5">
+            <p className={dash.label}>What changed</p>
+            <ul className="mt-1 space-y-1 text-xs text-zinc-500">
+              {forecast.observability.changeDrivers.map((d) => (
+                <li key={d}>· {d}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        <p className={`${dash.label} mt-4`}>Evidence chain</p>
+        <ul className="mt-1 space-y-1 text-xs text-zinc-600">
+          {forecast.observability.evidenceChain.map((e) => (
+            <li key={e}>· {e}</li>
+          ))}
+        </ul>
+        {forecast.observability.warnings.length > 0 ? (
+          <>
+            <p className={`${dash.label} mt-4`}>Warnings</p>
+            <ul className="mt-1 space-y-1 text-xs text-amber-400/80">
+              {forecast.observability.warnings.map((w) => (
+                <li key={w}>· {w}</li>
+              ))}
+            </ul>
+          </>
+        ) : null}
+        {forecast.uncertaintyDrivers.length > 0 ? (
+          <>
+            <p className={`${dash.label} mt-4`}>Uncertainty drivers</p>
+            <ul className="mt-2 space-y-2">
+              {forecast.uncertaintyDrivers.map((u) => (
+                <li key={u.label} className="text-xs text-zinc-600">
+                  <span className="text-zinc-400">{u.label}</span> ({u.impact}) —{" "}
+                  {u.explanation}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
+        {forecast.targetPath ? (
+          <p className="mt-4 text-sm text-teal-400/85">{forecast.targetPath}</p>
+        ) : null}
+        <p className="mt-4 text-xs leading-relaxed text-zinc-600">
+          {forecast.recommendation}
+        </p>
+        {forecast.limitations.length > 0 ? (
+          <p className="mt-3 text-[11px] text-zinc-600">
+            Limitations: {forecast.limitations.slice(0, 3).join(" · ")}
+          </p>
+        ) : null}
+      </PanelChrome>
+    </div>
+  );
+}
