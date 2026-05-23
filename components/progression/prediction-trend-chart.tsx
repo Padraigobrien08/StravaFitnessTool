@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   CartesianGrid,
   Line,
@@ -11,6 +12,7 @@ import {
   Legend,
 } from "recharts";
 import type { PredictionTimelinePoint } from "@/lib/analytics/progression";
+import { minMaxYDomain } from "@/lib/charts/yDomain";
 import { formatDuration } from "@/lib/utils";
 
 const tooltipStyle = {
@@ -20,17 +22,77 @@ const tooltipStyle = {
   color: "#fafafa",
 };
 
+export type PredictionTrendSeriesKey = "5K" | "10K" | "HM";
+
+const SERIES: {
+  key: PredictionTrendSeriesKey;
+  dataKey: "5K" | "10K" | "HM";
+  color: string;
+}[] = [
+  { key: "5K", dataKey: "5K", color: "#34d399" },
+  { key: "10K", dataKey: "10K", color: "#818cf8" },
+  { key: "HM", dataKey: "HM", color: "#fbbf24" },
+];
+
 function formatTimeTick(sec: number): string {
-  const m = Math.floor(sec / 60);
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
   const s = Math.round(sec % 60);
+  if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function valuesForSeries(
+  timeline: PredictionTimelinePoint[],
+  dataKey: "5K" | "10K" | "HM"
+): number[] {
+  const field =
+    dataKey === "5K"
+      ? "consensus5kSec"
+      : dataKey === "10K"
+        ? "consensus10kSec"
+        : "consensusHmSec";
+  return timeline
+    .map((p) => p[field])
+    .filter((v): v is number => v != null && v > 0);
 }
 
 export function PredictionTrendChart({
   timeline,
+  seriesKeys,
 }: {
   timeline: PredictionTimelinePoint[];
+  /** When set, only these distances are drawn (avoids 5K/10K flattening HM scale). */
+  seriesKeys?: PredictionTrendSeriesKey[];
 }) {
+  const activeSeries = useMemo(() => {
+    const keys = seriesKeys ?? (["5K", "10K", "HM"] as PredictionTrendSeriesKey[]);
+    return SERIES.filter((s) => keys.includes(s.key));
+  }, [seriesKeys]);
+
+  const chartData = useMemo(
+    () =>
+      timeline.map((p) => ({
+        label: p.label,
+        "5K": p.consensus5kSec ?? undefined,
+        "10K": p.consensus10kSec ?? undefined,
+        HM: p.consensusHmSec ?? undefined,
+      })),
+    [timeline]
+  );
+
+  const yDomain = useMemo(() => {
+    const vals: number[] = [];
+    for (const s of activeSeries) {
+      vals.push(...valuesForSeries(timeline, s.dataKey));
+    }
+    return minMaxYDomain(vals, {
+      paddingPct: 0.08,
+      paddingMin: 45,
+      filterOutliers: true,
+    });
+  }, [timeline, activeSeries]);
+
   if (timeline.length < 2) {
     return (
       <p className="text-sm text-zinc-500">
@@ -40,19 +102,14 @@ export function PredictionTrendChart({
     );
   }
 
-  const chartData = timeline.map((p) => ({
-    label: p.label,
-    "5K": p.consensus5kSec ?? undefined,
-    "10K": p.consensus10kSec ?? undefined,
-    HM: p.consensusHmSec ?? undefined,
-  }));
-
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
         <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#a1a1aa" }} />
         <YAxis
+          domain={yDomain}
+          allowDataOverflow
           tick={{ fontSize: 10, fill: "#a1a1aa" }}
           tickFormatter={formatTimeTick}
           reversed
@@ -64,27 +121,16 @@ export function PredictionTrendChart({
           }
         />
         <Legend wrapperStyle={{ fontSize: 11 }} />
-        <Line
-          type="monotone"
-          dataKey="5K"
-          stroke="#34d399"
-          dot={{ r: 2 }}
-          connectNulls
-        />
-        <Line
-          type="monotone"
-          dataKey="10K"
-          stroke="#818cf8"
-          dot={{ r: 2 }}
-          connectNulls
-        />
-        <Line
-          type="monotone"
-          dataKey="HM"
-          stroke="#fbbf24"
-          dot={{ r: 2 }}
-          connectNulls
-        />
+        {activeSeries.map((s) => (
+          <Line
+            key={s.dataKey}
+            type="monotone"
+            dataKey={s.dataKey}
+            stroke={s.color}
+            dot={{ r: 2 }}
+            connectNulls
+          />
+        ))}
       </LineChart>
     </ResponsiveContainer>
   );

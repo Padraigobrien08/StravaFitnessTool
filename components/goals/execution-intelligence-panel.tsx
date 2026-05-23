@@ -19,6 +19,7 @@ import {
   simulateRaceStrategy,
   type StrategyMode,
 } from "@/lib/analytics/raceStrategy";
+import { minMaxYDomainReversed } from "@/lib/charts/yDomain";
 import { formatDuration, formatPace, cn } from "@/lib/utils";
 import { dash } from "@/components/home/primitives/tokens";
 
@@ -72,6 +73,11 @@ export function ExecutionIntelligencePanel({
     km: s.km,
     pace: s.paceSecPerKm,
   }));
+
+  const paceDomain = minMaxYDomainReversed(
+    chartData.map((d) => d.pace),
+    { paddingPct: 0.12, paddingMin: 8, filterOutliers: false }
+  );
 
   const formatPaceTick = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -128,6 +134,8 @@ export function ExecutionIntelligencePanel({
               tickLine={false}
             />
             <YAxis
+              domain={paceDomain}
+              allowDataOverflow
               tick={trainingChart.tick}
               reversed
               tickFormatter={formatPaceTick}
