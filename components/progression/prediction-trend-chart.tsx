@@ -14,13 +14,9 @@ import {
 import type { PredictionTimelinePoint } from "@/lib/analytics/progression";
 import { minMaxYDomain } from "@/lib/charts/yDomain";
 import { formatDuration } from "@/lib/utils";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
-const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 8,
-  color: "#fafafa",
-};
+const chartTick = { fontSize: 10, fill: "var(--chart-tick-fill)" };
 
 export type PredictionTrendSeriesKey = "5K" | "10K" | "HM";
 
@@ -65,6 +61,7 @@ export function PredictionTrendChart({
   /** When set, only these distances are drawn (avoids 5K/10K flattening HM scale). */
   seriesKeys?: PredictionTrendSeriesKey[];
 }) {
+  const chart = useTrainingChart();
   const activeSeries = useMemo(() => {
     const keys = seriesKeys ?? (["5K", "10K", "HM"] as PredictionTrendSeriesKey[]);
     return SERIES.filter((s) => keys.includes(s.key));
@@ -105,17 +102,17 @@ export function PredictionTrendChart({
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-        <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#a1a1aa" }} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+        <XAxis dataKey="label" tick={chartTick} />
         <YAxis
           domain={yDomain}
           allowDataOverflow
-          tick={{ fontSize: 10, fill: "#a1a1aa" }}
+          tick={chartTick}
           tickFormatter={formatTimeTick}
           reversed
         />
         <Tooltip
-          contentStyle={tooltipStyle}
+          contentStyle={chart.tooltip}
           formatter={(v) =>
             typeof v === "number" ? formatDuration(v) : String(v)
           }

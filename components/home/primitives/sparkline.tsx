@@ -57,7 +57,7 @@ export function Sparkline({
           y1={VB_H / 2}
           x2={VB_W - 4}
           y2={VB_H / 2}
-          stroke="rgba(255,255,255,0.12)"
+          stroke="var(--chart-sparkline)"
           strokeWidth={1}
         />
       </svg>

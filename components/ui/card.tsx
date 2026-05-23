@@ -10,7 +10,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-sm",
+        "rounded-xl border border-[var(--border-default)] bg-[var(--surface)] backdrop-blur-sm",
         className
       )}
     >
@@ -37,7 +37,12 @@ export function CardTitle({
   children: React.ReactNode;
 }) {
   return (
-    <h3 className={cn("text-sm font-medium tracking-wide text-zinc-400 uppercase", className)}>
+    <h3
+      className={cn(
+        "text-sm font-medium tracking-wide text-[var(--muted)] uppercase",
+        className
+      )}
+    >
       {children}
     </h3>
   );

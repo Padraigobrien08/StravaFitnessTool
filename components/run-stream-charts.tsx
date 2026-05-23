@@ -11,15 +11,13 @@ import {
 } from "recharts";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { formatPace } from "@/lib/utils";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
-const tooltipStyle = {
-  backgroundColor: "#18181b",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: 8,
-  color: "#fafafa",
-};
+const chartTick = { fontSize: 10, fill: "var(--chart-tick-fill)" };
 
 export function RunStreamCharts({ fit }: { fit: FitRunDetail }) {
+  const chart = useTrainingChart();
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {fit.hrStream.length > 2 && (
@@ -27,14 +25,14 @@ export function RunStreamCharts({ fit }: { fit: FitRunDetail }) {
           <h4 className="mb-2 text-sm font-medium text-zinc-400">Heart rate</h4>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={fit.hrStream}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
               <XAxis
                 dataKey="elapsedSec"
-                tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                tick={chartTick}
                 tickFormatter={(s) => `${Math.round(s / 60)}m`}
               />
-              <YAxis tick={{ fontSize: 10, fill: "#a1a1aa" }} domain={["auto", "auto"]} />
-              <Tooltip contentStyle={tooltipStyle} />
+              <YAxis tick={chartTick} domain={["auto", "auto"]} />
+              <Tooltip contentStyle={chart.tooltip} />
               <Line type="monotone" dataKey="hr" stroke="#f87171" dot={false} />
             </LineChart>
           </ResponsiveContainer>
@@ -45,19 +43,19 @@ export function RunStreamCharts({ fit }: { fit: FitRunDetail }) {
           <h4 className="mb-2 text-sm font-medium text-zinc-400">Pace</h4>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={fit.paceStream}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
               <XAxis
                 dataKey="elapsedSec"
-                tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                tick={chartTick}
                 tickFormatter={(s) => `${Math.round(s / 60)}m`}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: "#a1a1aa" }}
+                tick={chartTick}
                 reversed
                 tickFormatter={(v) => formatPace(v)}
               />
               <Tooltip
-                contentStyle={tooltipStyle}
+                contentStyle={chart.tooltip}
                 formatter={(v) => [
                   typeof v === "number" ? formatPace(v) : "—",
                   "Pace",

@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { trainingChart } from "./chart-theme";
+import { useTrainingChart } from "./chart-theme";
 
 export function LoadIntelligenceChart({
   data,
@@ -19,6 +19,8 @@ export function LoadIntelligenceChart({
   data: { label: string; ctl: number; atl: number; tsb: number }[];
   currentIndex: number;
 }) {
+  const chart = useTrainingChart();
+
   if (data.length < 2) {
     return (
       <p className="py-8 text-center text-xs text-zinc-600">
@@ -34,33 +36,33 @@ export function LoadIntelligenceChart({
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="ctlGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={trainingChart.teal} stopOpacity={0.35} />
-            <stop offset="100%" stopColor={trainingChart.teal} stopOpacity={0} />
+            <stop offset="0%" stopColor={chart.teal} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={chart.teal} stopOpacity={0} />
           </linearGradient>
           <linearGradient id="atlGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={trainingChart.amber} stopOpacity={0.25} />
-            <stop offset="100%" stopColor={trainingChart.amber} stopOpacity={0} />
+            <stop offset="0%" stopColor={chart.amber} stopOpacity={0.25} />
+            <stop offset="100%" stopColor={chart.amber} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid stroke={trainingChart.grid} vertical={false} />
+        <CartesianGrid stroke={chart.grid} vertical={false} />
         <XAxis
           dataKey="label"
-          tick={trainingChart.tick}
+          tick={chart.tick}
           interval="preserveStartEnd"
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={trainingChart.tick}
+          tick={chart.tick}
           width={32}
           axisLine={false}
           tickLine={false}
         />
-        <Tooltip contentStyle={trainingChart.tooltip} />
+        <Tooltip contentStyle={chart.tooltip} />
         <Area
           type="monotone"
           dataKey="ctl"
-          stroke={trainingChart.teal}
+          stroke={chart.teal}
           fill="url(#ctlGrad)"
           strokeWidth={2}
           name="Fitness (CTL)"
@@ -69,7 +71,7 @@ export function LoadIntelligenceChart({
         <Area
           type="monotone"
           dataKey="atl"
-          stroke={trainingChart.amber}
+          stroke={chart.amber}
           fill="url(#atlGrad)"
           strokeWidth={1.5}
           name="Fatigue (ATL)"
@@ -79,16 +81,16 @@ export function LoadIntelligenceChart({
           x={current.label}
           y={current.atl}
           r={5}
-          fill={trainingChart.amber}
-          stroke="#09090b"
+          fill={chart.amber}
+          stroke="var(--background)"
           strokeWidth={2}
         />
         <ReferenceDot
           x={current.label}
           y={current.ctl}
           r={5}
-          fill={trainingChart.teal}
-          stroke="#09090b"
+          fill={chart.teal}
+          stroke="var(--background)"
           strokeWidth={2}
         />
       </AreaChart>

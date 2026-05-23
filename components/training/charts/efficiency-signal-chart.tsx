@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { trainingChart } from "./chart-theme";
+import { useTrainingChart } from "./chart-theme";
 
 export function EfficiencySignalChart({
   data,
@@ -20,6 +20,8 @@ export function EfficiencySignalChart({
   data: { label: string; efficiency: number }[];
   positive?: boolean;
 }) {
+  const chart = useTrainingChart();
+
   if (data.length < 3) {
     return (
       <p className="py-6 text-center text-xs text-zinc-600">
@@ -28,7 +30,7 @@ export function EfficiencySignalChart({
     );
   }
 
-  const stroke = positive === false ? trainingChart.amber : trainingChart.teal;
+  const stroke = positive === false ? chart.amber : chart.teal;
   const last = data.at(-1)!;
 
   return (
@@ -40,22 +42,22 @@ export function EfficiencySignalChart({
             <stop offset="100%" stopColor={stroke} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid stroke={trainingChart.grid} vertical={false} />
+        <CartesianGrid stroke={chart.grid} vertical={false} />
         <XAxis
           dataKey="label"
-          tick={trainingChart.tick}
+          tick={chart.tick}
           interval="preserveStartEnd"
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={trainingChart.tick}
+          tick={chart.tick}
           width={36}
           axisLine={false}
           tickLine={false}
           domain={["auto", "auto"]}
         />
-        <Tooltip contentStyle={trainingChart.tooltip} />
+        <Tooltip contentStyle={chart.tooltip} />
         <Area
           type="monotone"
           dataKey="efficiency"
@@ -75,7 +77,7 @@ export function EfficiencySignalChart({
           y={last.efficiency}
           r={4}
           fill={stroke}
-          stroke="#09090b"
+          stroke="var(--background)"
           strokeWidth={2}
         />
       </AreaChart>

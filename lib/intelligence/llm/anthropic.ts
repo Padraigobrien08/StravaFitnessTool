@@ -1,7 +1,8 @@
 import { INTELLIGENCE_TOOL_DEFINITIONS } from "../tools";
 import { executeIntelligenceTool, parseToolName } from "../tools";
 import type { IntelligenceContext } from "../types";
-import { COACH_SYSTEM, type ChatMessage } from "./types";
+import { buildCoachSystemWithContext } from "./coachingContextPrompt";
+import type { ChatMessage } from "./types";
 
 export async function runAnthropicCoachChat(
   ctx: IntelligenceContext,
@@ -9,6 +10,7 @@ export async function runAnthropicCoachChat(
   apiKey: string
 ): Promise<{ reply: string; toolsUsed: string[] }> {
   const toolsUsed: string[] = [];
+  const systemPrompt = await buildCoachSystemWithContext(ctx);
   const anthropicMessages: Array<{
     role: "user" | "assistant";
     content: unknown;
@@ -26,7 +28,7 @@ export async function runAnthropicCoachChat(
       body: JSON.stringify({
         model: process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-20250514",
         max_tokens: 2048,
-        system: COACH_SYSTEM,
+        system: systemPrompt,
         tools: INTELLIGENCE_TOOL_DEFINITIONS,
         messages: anthropicMessages,
       }),

@@ -14,6 +14,7 @@ export const TOOL_LABELS: Record<string, string> = {
   get_race_strategy: "Pacing strategy",
   get_fatigue_load: "Fatigue & load model",
   list_recent_runs: "Activity index",
+  get_run_detail: "Run deep dive",
   get_data_quality: "Data quality audit",
   get_connection_status: "Connection status",
   get_training_ecosystem: "Training ecosystem",

@@ -9,9 +9,12 @@ import type {
   TimelinePoint,
 } from "@/lib/route-intelligence/types";
 import { positionAtTime } from "@/lib/route-intelligence/geometry";
+import { useThemeStore } from "@/stores/theme-store";
 
-const DARK_STYLE =
-  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+const MAP_STYLES = {
+  dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+  light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+} as const;
 
 const OVERLAY_COLORS: Record<string, string> = {
   interval: "#2dd4bf",
@@ -36,18 +39,20 @@ export function RouteMap({
   overlays: OverlaySegment[];
   className?: string;
 }) {
+  const theme = useThemeStore((s) => s.theme);
+  const mapStyle = MAP_STYLES[theme];
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markerRef = useRef<maplibregl.Marker | null>(null);
   const loadedRef = useRef(false);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    if (!containerRef.current) return;
     loadedRef.current = false;
 
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: DARK_STYLE,
+      style: mapStyle,
       center: [
         (geometry.bounds.minLon + geometry.bounds.maxLon) / 2,
         (geometry.bounds.minLat + geometry.bounds.maxLat) / 2,
@@ -112,8 +117,9 @@ export function RouteMap({
       markerRef.current?.remove();
       map.remove();
       mapRef.current = null;
+      loadedRef.current = false;
     };
-  }, [geometry]);
+  }, [geometry, mapStyle]);
 
   useEffect(() => {
     const map = mapRef.current;

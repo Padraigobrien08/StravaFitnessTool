@@ -6,6 +6,7 @@ export interface MemorySnippet {
   text: string;
   confidence: "low" | "medium" | "high";
   era?: string;
+  stability?: "emerging" | "stable" | "weakening";
 }
 
 export function buildMemorySnippets(

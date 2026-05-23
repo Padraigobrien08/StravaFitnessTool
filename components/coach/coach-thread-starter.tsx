@@ -4,10 +4,10 @@ import type { CoachWorkspaceState } from "@/lib/coach/types";
 import { cn } from "@/lib/utils";
 
 const FALLBACK_PROMPTS = [
-  "Why did readiness change this week?",
-  "Compare my last 3 threshold runs.",
-  "Is cross-training helping or interfering?",
-  "What should I prioritize before race day?",
+  "Build my next week of training.",
+  "Plan my race week.",
+  "What should I train next week given my goal?",
+  "Give me a conservative plan.",
 ];
 
 export function CoachThreadStarter({

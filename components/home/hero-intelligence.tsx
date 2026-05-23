@@ -52,9 +52,9 @@ export function HeroIntelligence({ hero }: { hero: HeroViewModel }) {
           </dl>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Link href="/training">
+            <Link href="/plan">
               <Button size="sm" className="h-9">
-                Open training plan
+                Open next week plan
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>

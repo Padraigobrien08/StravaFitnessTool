@@ -1,14 +1,16 @@
 "use client";
 
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
+import Link from "next/link";
+import { useState } from "react";
 import type { PatternInsightView } from "@/lib/runs/viewModels";
-import { dash } from "@/components/home/primitives/tokens";
+import { coachUrl } from "@/lib/coach/domainLinks";
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 
-const toneStyles = {
-  positive: "border-l-teal-500/40",
-  neutral: "border-l-zinc-500/30",
-  warning: "border-l-amber-500/45",
+const toneBorder = {
+  positive: "border-teal-500/15",
+  neutral: "border-white/[0.05]",
+  warning: "border-amber-500/20",
 };
 
 export function WorkoutPatternAnalysis({
@@ -16,26 +18,56 @@ export function WorkoutPatternAnalysis({
 }: {
   patterns: PatternInsightView[];
 }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
   return (
-    <PanelChrome title="Workout pattern analysis">
-      <p className={`${dash.muted} mb-4 max-w-2xl`}>
-        Training structure narrative from session mix, intensity, and progression
-        signals.
+    <section>
+      <p className="mb-2 text-[11px] font-medium text-zinc-500">
+        Evolving observations
       </p>
-      <div className="grid gap-2.5 sm:grid-cols-2">
-        {patterns.map((p, i) => (
-          <div
-            key={i}
-            className={cn(
-              "rounded-lg border border-white/[0.04] border-l-[3px] bg-white/[0.02] px-4 py-3",
-              toneStyles[p.tone]
-            )}
-          >
-            <h4 className="text-sm font-semibold text-zinc-200">{p.title}</h4>
-            <p className="mt-1 text-xs leading-relaxed text-zinc-500">{p.body}</p>
-          </div>
-        ))}
-      </div>
-    </PanelChrome>
+      <ul className="space-y-1.5">
+        {patterns.map((p) => {
+          const open = expanded === p.id;
+          return (
+            <li
+              key={p.id}
+              className={cn(
+                "rounded-lg border bg-white/[0.015] px-3 py-2",
+                toneBorder[p.tone]
+              )}
+            >
+              <button
+                type="button"
+                className="flex w-full items-start justify-between gap-2 text-left"
+                onClick={() => setExpanded(open ? null : p.id)}
+              >
+                <div>
+                  <p className="text-[12px] font-medium text-zinc-300">
+                    {p.title}
+                  </p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">
+                    {p.body}
+                  </p>
+                </div>
+                <ChevronDown
+                  className={cn(
+                    "mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-600",
+                    open && "rotate-180"
+                  )}
+                />
+              </button>
+              {open ? (
+                <Link
+                  href={coachUrl({ q: p.coachQuery })}
+                  className="mt-1.5 inline-block text-[10px] text-zinc-600 hover:text-teal-400/80"
+                >
+                  Investigate with Coach →
+                </Link>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

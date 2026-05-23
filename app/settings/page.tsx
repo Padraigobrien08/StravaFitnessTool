@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useStrava } from "@/lib/context/strava-context";
 import { useSettingsStore } from "@/stores/settings-store";
+import { ThemeSegmentedControl } from "@/components/theme/theme-toggle";
 import { RaceGoalPicker } from "@/components/goals/race-goal-picker";
 import { DataQualityPanel } from "@/components/layout/data-quality-panel";
 import { StravaWebhookCard } from "@/components/settings/strava-webhook-card";
@@ -27,7 +28,22 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <h1 className="font-display text-2xl font-bold text-white">Settings</h1>
+      <h1 className="font-display text-2xl font-bold text-[var(--foreground)]">
+        Settings
+      </h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Appearance</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-zinc-500">
+            Choose light or dark mode. Charts, maps, and panels adapt to your
+            selection.
+          </p>
+          <ThemeSegmentedControl />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

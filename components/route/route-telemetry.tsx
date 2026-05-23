@@ -16,6 +16,9 @@ import type { OverlaySegment, TimelinePoint } from "@/lib/route-intelligence/typ
 import { formatPace } from "@/lib/utils";
 import { formatReplayClock } from "@/lib/route-intelligence/replay";
 import { dash } from "@/components/home/primitives/tokens";
+import { useTrainingChart } from "@/components/training/charts/chart-theme";
+
+const chartTick = { fontSize: 9, fill: "var(--chart-tick-fill)" };
 
 const OVERLAY_FILL: Record<string, string> = {
   interval: "rgba(45,212,191,0.12)",
@@ -51,6 +54,8 @@ function SyncChart({
   yDomain?: [number | string, number | string];
   height?: number;
 }) {
+  const chart = useTrainingChart();
+
   return (
     <div style={{ height }} className="w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -68,26 +73,18 @@ function SyncChart({
             }
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
           <XAxis
             dataKey="t"
             type="number"
             domain={["dataMin", "dataMax"]}
-            tick={{ fontSize: 9, fill: "#71717a" }}
+            tick={chartTick}
             tickFormatter={(v) => formatReplayClock(v)}
             hide
           />
-          <YAxis
-            domain={yDomain}
-            tick={{ fontSize: 9, fill: "#71717a" }}
-            width={36}
-          />
+          <YAxis domain={yDomain} tick={chartTick} width={36} />
           <Tooltip
-            contentStyle={{
-              background: "#18181b",
-              border: "1px solid rgba(255,255,255,0.08)",
-              fontSize: 11,
-            }}
+            contentStyle={chart.tooltip}
             labelFormatter={(v) => formatReplayClock(Number(v))}
           />
           {overlays.map((o) => (

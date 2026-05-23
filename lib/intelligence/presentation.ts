@@ -24,30 +24,33 @@ export function buildCurrentBelief(
 ): string {
   const snap = state.snapshot;
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
-  const clauses: string[] = [];
+  const ready =
+    r.label.toLowerCase().includes("ready") || r.score >= 85;
+  const freshHigh = snap.freshness != null && snap.freshness >= 60;
+  const intensityHigh = analytics.intensityAdvice.status === "too_hard";
 
-  clauses.push(`${state.currentFocus} is the priority`);
+  if (ready && freshHigh && intensityHigh) {
+    return "Race readiness is strong and freshness is high, but intensity stacking remains elevated.";
+  }
 
-  const readinessPart =
-    r.label.toLowerCase().includes("ready") || r.score >= 85
-      ? "you are race ready"
-      : `readiness is ${r.label.toLowerCase()} (${r.score}/100)`;
-  clauses.push(readinessPart);
-
+  const parts: string[] = [];
+  parts.push(
+    ready
+      ? "Race readiness is strong"
+      : `Race readiness is ${r.label.toLowerCase()}`
+  );
   if (snap.freshness != null && snap.freshness >= 60) {
-    clauses.push("freshness is high");
+    parts.push("freshness is high");
   } else if (snap.freshness != null && snap.freshness < 45) {
-    clauses.push("freshness is constrained");
+    parts.push("freshness is constrained");
   }
-
-  if (analytics.intensityAdvice.status === "too_hard") {
-    clauses.push("intensity stacking remains elevated");
+  if (intensityHigh) {
+    parts.push("intensity stacking remains elevated");
   } else if (analytics.efficiencySummary.trend === "improving") {
-    clauses.push("aerobic efficiency is improving");
+    parts.push("aerobic efficiency is improving");
   }
 
-  const sentence = clauses.join(", ");
-  return sentence.charAt(0).toUpperCase() + sentence.slice(1) + ".";
+  return parts.join(", ") + ".";
 }
 
 export function prioritizeSignals(
@@ -100,6 +103,7 @@ export function getStateEvolutionStrip(
 
 function shortLabel(s: TrajectorySeries): string {
   if (s.id === "readiness") return "Race readiness";
+  if (s.id === "freshness") return "Freshness";
   if (s.id === "efficiency") return "Aerobic efficiency";
   if (s.id === "volume") return "Weekly volume";
   return s.label;

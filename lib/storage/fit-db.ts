@@ -74,7 +74,8 @@ export function isStaleFitDetail(detail: FitRunDetail): boolean {
   return (
     detail.paceStream.length === 0 &&
     detail.laps.length === 0 &&
-    (detail.bestEfforts?.length ?? 0) === 0
+    (detail.bestEfforts?.length ?? 0) === 0 &&
+    (detail.gpsStream?.length ?? 0) === 0
   );
 }
 

@@ -7,21 +7,23 @@ export const dash = {
   sectionGap: "gap-3 sm:gap-4",
   gridGap: "gap-3 sm:gap-4 lg:gap-5",
   surface:
-    "relative overflow-visible rounded-xl bg-[#0c0d10]/95 shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_10px_40px_-18px_rgba(0,0,0,0.55)]",
+    "relative overflow-visible rounded-xl bg-[var(--surface-elevated)] shadow-[var(--surface-shadow)]",
   surfaceSubdued:
-    "relative overflow-visible rounded-xl bg-[#0a0b0e]/80 shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]",
+    "relative overflow-visible rounded-xl bg-[var(--surface-subdued)] shadow-[var(--surface-shadow-subtle)]",
   surfaceElevated:
-    "relative overflow-visible rounded-xl bg-[#0e1015]/98 shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_12px_44px_-16px_rgba(0,0,0,0.5)]",
+    "relative overflow-visible rounded-xl bg-[var(--surface-panel)] shadow-[var(--surface-shadow)]",
   surfaceHover:
-    "transition-[box-shadow,background] duration-250 ease-out hover:bg-[#101218]/90",
+    "transition-[box-shadow,background] duration-250 ease-out hover:bg-[var(--surface-hover)]",
   label:
     "text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500",
   labelAccent:
     "text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-500/90",
-  h1: "font-display text-xl font-bold leading-snug tracking-tight text-white sm:text-2xl lg:text-[1.75rem]",
+  h1: "font-display text-xl font-bold leading-snug tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-[1.75rem]",
   lead: "text-[13px] leading-relaxed text-zinc-400 lg:text-sm",
-  metric: "font-display text-xl font-bold tabular-nums tracking-tight text-white sm:text-2xl",
-  metricSm: "font-display text-lg font-semibold tabular-nums text-white",
+  metric:
+    "font-display text-xl font-bold tabular-nums tracking-tight text-[var(--foreground)] sm:text-2xl",
+  metricSm:
+    "font-display text-lg font-semibold tabular-nums text-[var(--foreground)]",
   muted: "text-xs leading-snug text-zinc-500",
 } as const;
 

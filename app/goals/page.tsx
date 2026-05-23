@@ -25,6 +25,7 @@ import { HistoricalReadinessPanel } from "@/components/goals/historical-readines
 import { ForecastV2Panel } from "@/components/goals/forecast-v2-panel";
 import { GoalsRaceBrief } from "@/components/goals/goals-race-brief";
 import { GoalsEvidenceDrawer } from "@/components/goals/goals-evidence-drawer";
+import { GenerateWeekPlanButton } from "@/components/planning/generate-week-plan-button";
 import { dash } from "@/components/home/primitives/tokens";
 
 function GoalsBriefingBar() {
@@ -80,6 +81,10 @@ export default function GoalsPage() {
         <GoalsWorkspace>
           <GoalsBriefingBar />
           <CompactRaceGoalForm />
+
+          {raceGoal ? (
+            <GenerateWeekPlanButton label="Generate next week" />
+          ) : null}
 
           {useBriefLayout && view.raceBrief && view.forecastV2 ? (
             <>

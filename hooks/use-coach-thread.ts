@@ -13,6 +13,16 @@ import {
   titleFromFirstMessage,
 } from "@/lib/coach/threadStorage";
 import type { CoachMessage } from "@/lib/coach/types";
+import { classifyPlanningMessage } from "@/lib/ai-planning/planningIntent";
+import { classifyMemoryQuestion } from "@/lib/athlete-memory/memoryIntent";
+import { classifyAdaptiveCoachQuestion } from "@/lib/adaptive-intelligence";
+import type { CoachPlanApiResponse } from "./use-coach-plan";
+import {
+  buildCalendarCoachPayload,
+  calendarWeekToWeeklyPlan,
+  getCalendarWeek,
+  targetPlanWeekStart,
+} from "@/lib/training-calendar";
 
 export function useCoachThread(disabled?: boolean) {
   const [threads, setThreads] = useState(() => listThreads());
@@ -95,6 +105,99 @@ export function useCoachThread(disabled?: boolean) {
       );
 
       try {
+        const lastPlan = [...messages]
+          .reverse()
+          .find((m) => m.role === "assistant" && m.weeklyPlan)?.weeklyPlan;
+        const savedCalendar = getCalendarWeek(targetPlanWeekStart());
+        const previousPlan = savedCalendar
+          ? calendarWeekToWeeklyPlan(savedCalendar)
+          : lastPlan?.plan;
+        const calendarPayload = buildCalendarCoachPayload(savedCalendar, null);
+
+        const memoryQuestion =
+          classifyMemoryQuestion(trimmed) ?? classifyAdaptiveCoachQuestion(trimmed);
+        if (memoryQuestion) {
+          setPendingTools(["get_athlete_memory"]);
+          const memRes = await fetch("/api/me/coach/memory", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ message: trimmed }),
+          });
+          const memData = await memRes.json();
+          if (!memRes.ok) {
+            throw new Error(memData.error ?? "Memory request failed");
+          }
+          const replyText = memData.answer as string;
+          const parsed = parseCoachResponse(replyText);
+          const assistantMsg: CoachMessage = {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: replyText,
+            createdAt: new Date().toISOString(),
+            toolsUsed: ["get_athlete_memory"],
+            parsed,
+            status: "complete",
+          };
+          const final = [...nextMessages, assistantMsg];
+          setMessages(final);
+          persist(final, threadId);
+          return;
+        }
+
+        const planningRoute = classifyPlanningMessage(
+          trimmed,
+          Boolean(previousPlan)
+        );
+
+        if (planningRoute) {
+          setPendingTools(["generate_next_week_training_plan"]);
+          const planRes = await fetch("/api/me/coach/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              message: trimmed,
+              previousPlan,
+              calendarContext: calendarPayload.summaryText,
+            }),
+          });
+          const planData = (await planRes.json()) as CoachPlanApiResponse & {
+            error?: string;
+          };
+          if (!planRes.ok) {
+            throw new Error(planData.error ?? "Weekly plan failed");
+          }
+
+          const replyText =
+            planData.replySummary ??
+            planData.explanationOnly ??
+            planData.plan.summary;
+
+          const parsed = parseCoachResponse(replyText);
+          const assistantMsg: CoachMessage = {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: replyText,
+            createdAt: new Date().toISOString(),
+            toolsUsed: ["generate_next_week_training_plan"],
+            parsed,
+            weeklyPlan: {
+              plan: planData.plan,
+              guardrails: planData.guardrails,
+              source: planData.source,
+              validation: planData.validation,
+              observability: planData.observability,
+              explanationOnly: planData.explanationOnly,
+            },
+            status: "complete",
+          };
+          const final = [...nextMessages, assistantMsg];
+          setMessages(final);
+          persist(final, threadId);
+          return;
+        }
+
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
