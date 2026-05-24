@@ -2,8 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
   CalendarRange,
@@ -51,97 +59,81 @@ function isActive(pathname: string, href: string) {
 }
 
 function AdvancedMenu({ pathname }: { pathname: string }) {
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
   const advancedActive = advancedLinks.some((l) => isActive(pathname, l.href));
   const legacyActive = legacyLinks.some((l) => pathname === l.href);
 
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open]);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
   return (
-    <div className="relative shrink-0" ref={menuRef}>
-      <button
-        type="button"
-        className={cn(
-          "inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
-          advancedActive
-            ? "bg-teal-500/12 text-teal-300"
-            : legacyActive
-              ? "bg-white/[0.06] text-zinc-300"
-              : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200"
-        )}
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-haspopup="menu"
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "h-auto shrink-0 gap-1.5 px-2.5 py-1.5 text-xs font-medium",
+              advancedActive
+                ? "bg-teal-500/12 text-teal-300 hover:bg-teal-500/12 hover:text-teal-300"
+                : legacyActive
+                  ? "bg-white/[0.06] text-zinc-300 hover:bg-white/[0.06] hover:text-zinc-300"
+                  : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200"
+            )}
+          />
+        }
       >
         <span className="hidden md:inline">Advanced</span>
         <span className="md:hidden">More</span>
-        <ChevronDown
-          className={cn("h-3 w-3 transition-transform", open && "rotate-180")}
-        />
-      </button>
-      {open ? (
-        <div
-          role="menu"
-          className="absolute right-0 top-full z-[100] mt-1.5 max-h-[min(70vh,420px)] min-w-[200px] overflow-y-auto rounded-lg border border-white/[0.1] bg-[#0c0d10] py-1.5 shadow-2xl ring-1 ring-black/40"
-        >
-          <p className="px-3 pb-1 pt-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Analytics
-          </p>
-          {advancedLinks.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              role="menuitem"
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 text-xs transition-colors",
-                isActive(pathname, href)
-                  ? "bg-teal-500/10 text-teal-300"
-                  : "text-zinc-300 hover:bg-white/[0.06] hover:text-zinc-100"
-              )}
-              onClick={() => setOpen(false)}
-            >
-              <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
-              {label}
-            </Link>
-          ))}
-          <div className="my-1.5 border-t border-white/[0.08]" />
-          <p className="px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Legacy pages
-          </p>
-          {legacyLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              role="menuitem"
-              className={cn(
-                "block px-3 py-2 text-xs transition-colors",
-                pathname === href
-                  ? "bg-white/[0.06] text-zinc-200"
-                  : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-              )}
-              onClick={() => setOpen(false)}
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
-      ) : null}
-    </div>
+        <ChevronDown className="h-3 w-3" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className="max-h-[min(70vh,420px)] min-w-[200px] overflow-y-auto border-white/[0.1] bg-[#0c0d10] ring-black/40"
+      >
+        <DropdownMenuLabel className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+          Analytics
+        </DropdownMenuLabel>
+        {advancedLinks.map(({ href, label, icon: Icon }) => (
+          <DropdownMenuItem
+            key={href}
+            render={
+              <Link
+                href={href}
+                className={cn(
+                  "flex w-full items-center gap-2",
+                  isActive(pathname, href)
+                    ? "text-teal-300"
+                    : "text-zinc-300"
+                )}
+              />
+            }
+            nativeButton={false}
+          >
+            <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+            {label}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator className="bg-white/[0.08]" />
+        <DropdownMenuLabel className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+          Legacy pages
+        </DropdownMenuLabel>
+        {legacyLinks.map(({ href, label }) => (
+          <DropdownMenuItem
+            key={href}
+            render={
+              <Link
+                href={href}
+                className={cn(
+                  "block w-full",
+                  pathname === href ? "text-zinc-200" : "text-zinc-400"
+                )}
+              />
+            }
+            nativeButton={false}
+          >
+            {label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -159,7 +151,7 @@ export function Nav({
 
   const linkClass = (href: string, prominent?: boolean) =>
     cn(
-      "inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors",
+      "type-nav inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 transition-colors",
       isActive(pathname, href)
         ? prominent
           ? "bg-teal-500/15 text-teal-300"

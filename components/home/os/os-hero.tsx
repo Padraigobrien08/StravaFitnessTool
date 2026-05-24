@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { HomeHeroView } from "@/lib/home/operatingSystemView";
 import { coachUrl } from "@/lib/coach/domainLinks";
+import {
+  TypographyEyebrow,
+  TypographyMuted,
+  TypographyPageTitle,
+} from "@/components/ui/typography";
+import { type } from "@/lib/typography";
 import { cn } from "@/lib/utils";
 
 export function OsHero({
@@ -22,26 +28,26 @@ export function OsHero({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent)]" />
       <div className="relative grid gap-4 lg:grid-cols-[1fr_200px] lg:items-start">
         <div className="min-w-0 space-y-2.5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-500/85">
-            {hero.focusTitle}
-          </p>
-          <h1 className="font-display text-lg font-bold leading-snug tracking-tight text-[var(--foreground)] sm:text-xl">
+          <TypographyEyebrow>{hero.focusTitle}</TypographyEyebrow>
+          <TypographyPageTitle className="text-lg sm:text-xl">
             {hero.primaryAction}
-          </h1>
+          </TypographyPageTitle>
           <div>
-            <p className="text-[11px] font-medium text-zinc-500">Current belief</p>
-            <p className="mt-0.5 text-[13px] leading-relaxed text-zinc-400">
-              {hero.currentBelief}
+            <p className={cn(type.sectionLabel, "normal-case tracking-normal text-zinc-500")}>
+              Current belief
             </p>
+            <TypographyMuted className="mt-1">{hero.currentBelief}</TypographyMuted>
           </div>
           {hero.whyBullets.length > 0 ? (
             <div>
-              <p className="text-[11px] font-medium text-zinc-600">Why</p>
-              <ul className="mt-1 space-y-0.5">
+              <p className={cn(type.sectionLabel, "normal-case tracking-normal text-zinc-600")}>
+                Why
+              </p>
+              <ul className="mt-1.5 space-y-1">
                 {hero.whyBullets.map((b) => (
                   <li
                     key={b}
-                    className="flex gap-1.5 text-[12px] leading-snug text-zinc-500"
+                    className="flex gap-1.5 text-[0.875rem] leading-snug text-muted-foreground"
                   >
                     <span className="text-zinc-700">–</span>
                     <span>{b}</span>

@@ -85,7 +85,7 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
         <WorkspaceFrame className="flex h-[var(--app-nav-height)] items-center gap-3 sm:gap-5">
           <Link
             href="/home"
-            className="shrink-0 font-display text-lg font-bold tracking-tight text-[var(--foreground)]"
+            className="type-title shrink-0 text-[1.0625rem] tracking-[-0.03em]"
           >
             Stride<span className="text-teal-400">IQ</span>
           </Link>

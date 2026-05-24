@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WhatThisMeans } from "@/components/layout/what-this-means";
 import { WorkoutTypeBadge } from "@/components/workout/workout-type-badge";
 import type { WeekPlan } from "@/lib/training/planEngine";
@@ -89,11 +90,10 @@ export function NextWeekPlanPanel({
                   : "border-white/10 bg-white/[0.02]"
               }`}
             >
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={checked[i] ?? false}
-                onChange={() => toggle(i)}
-                className="mt-1 h-4 w-4 rounded border-white/20 accent-emerald-500"
+                onCheckedChange={() => toggle(i)}
+                className="mt-1"
                 aria-label={`Mark session ${i + 1} complete`}
               />
               <div className="min-w-0 flex-1">

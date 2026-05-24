@@ -66,10 +66,8 @@ export function PlanHeader({
   return (
     <header className="flex flex-col gap-3 border-b border-[var(--border-subtle)] pb-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0 space-y-1.5">
-        <h1 className="font-display text-xl font-bold tracking-tight text-[var(--foreground)] sm:text-2xl">
-          {title}
-        </h1>
-        <p className="text-[13px] text-zinc-500">{weekRange}</p>
+        <h1 className="type-page-title">{title}</h1>
+        <p className="type-body-muted">{weekRange}</p>
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={status} label={statusLabel} />
           <span className="text-[11px] text-zinc-600">{phaseLabel}</span>

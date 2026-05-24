@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   PLAN_CONTEXT_COMPACT_ROWS,
@@ -70,9 +72,11 @@ export function PlanPlanningContext({
             no goal, returning from break, etc.
           </p>
         </div>
-        <button
+        <Button
           type="button"
-          className="inline-flex items-center gap-0.5 text-[10px] text-zinc-500 hover:text-zinc-300"
+          variant="ghost"
+          size="sm"
+          className="h-auto gap-0.5 px-1 py-0 text-[10px] text-zinc-500 hover:text-zinc-300"
           onClick={() => setExpanded((e) => !e)}
         >
           {expanded ? (
@@ -84,11 +88,11 @@ export function PlanPlanningContext({
               <ChevronDown className="h-3 w-3" /> Longer field
             </>
           )}
-        </button>
+        </Button>
       </div>
 
-      <textarea
-        className="mt-2 w-full resize-y rounded-md border border-[var(--border-subtle)] bg-[var(--surface)]/80 px-2.5 py-2 text-[12px] leading-relaxed text-zinc-200 placeholder:text-zinc-600 focus:border-teal-500/40 focus:outline-none focus:ring-1 focus:ring-teal-500/25"
+      <Textarea
+        className="mt-2 resize-y border-[var(--border-subtle)] bg-[var(--surface)]/80 text-[12px] leading-relaxed text-zinc-200 placeholder:text-zinc-600 focus-visible:border-teal-500/40 focus-visible:ring-teal-500/25"
         rows={expanded ? PLAN_CONTEXT_EXPANDED_ROWS : PLAN_CONTEXT_COMPACT_ROWS}
         placeholder="e.g. I just ran a half marathon — plan my recovery for this week. No race goal for now."
         value={value}
@@ -111,15 +115,17 @@ export function PlanPlanningContext({
 
       <div className="mt-2 flex flex-wrap gap-1">
         {PLAN_CONTEXT_SUGGESTIONS.map((s) => (
-          <button
+          <Button
             key={s}
             type="button"
+            variant="outline"
+            size="sm"
             disabled={disabled}
-            className="rounded-md border border-[var(--border-subtle)] bg-[var(--surface)]/60 px-2 py-0.5 text-left text-[10px] text-zinc-500 transition-colors hover:border-teal-500/25 hover:text-zinc-300 disabled:opacity-40"
+            className="h-auto rounded-md border-[var(--border-subtle)] bg-[var(--surface)]/60 px-2 py-0.5 text-left text-[10px] font-normal text-zinc-500 hover:border-teal-500/25 hover:text-zinc-300"
             onClick={() => appendSuggestion(s)}
           >
             {s}
-          </button>
+          </Button>
         ))}
       </div>
     </section>

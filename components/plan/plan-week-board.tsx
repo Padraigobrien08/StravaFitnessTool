@@ -3,6 +3,8 @@
 import { useCallback, useState } from "react";
 import type { CalendarWorkout, TrainingCalendarWeek } from "@/lib/training-calendar";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Check, ChevronDown, GripVertical, MoreHorizontal, X } from "lucide-react";
 import { PlanMobileWeekSwiper } from "./plan-mobile-week-swiper";
 
@@ -479,43 +481,49 @@ function EditPanel({
 
   return (
     <div className="mt-2 space-y-2 border-t border-[var(--border-subtle)] pt-2">
-      <input
-        className="w-full rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
+      <Input
+        className="h-7 rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <input
-        className="w-full rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
+      <Input
+        className="h-7 rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
         placeholder="km"
         value={distanceKm}
         onChange={(e) => setDistanceKm(e.target.value)}
       />
       <div className="flex flex-wrap gap-1">
-        <button
+        <Button
           type="button"
-          className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] bg-teal-500/15 text-teal-300"
+          variant="ghost"
+          size="sm"
+          className="h-auto gap-0.5 rounded px-1.5 py-0.5 text-[10px] bg-teal-500/15 text-teal-300 hover:bg-teal-500/20 hover:text-teal-300"
           onClick={() => {
             onPatch?.(w.id, { status: "completed" });
             onClose();
           }}
         >
           <Check className="h-3 w-3" /> Done
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] bg-zinc-500/15 text-zinc-400"
+          variant="ghost"
+          size="sm"
+          className="h-auto gap-0.5 rounded px-1.5 py-0.5 text-[10px] bg-zinc-500/15 text-zinc-400 hover:bg-zinc-500/20 hover:text-zinc-400"
           onClick={() => {
             onPatch?.(w.id, { status: "skipped" });
             onClose();
           }}
         >
           <X className="h-3 w-3" /> Skip
-        </button>
+        </Button>
       </div>
       <div className="flex gap-2">
-        <button
+        <Button
           type="button"
-          className="text-[10px] text-teal-400"
+          variant="ghost"
+          size="sm"
+          className="h-auto p-0 text-[10px] text-teal-400 hover:text-teal-300"
           onClick={() => {
             onPatch?.(w.id, {
               title,
@@ -526,18 +534,20 @@ function EditPanel({
           }}
         >
           Save
-        </button>
+        </Button>
         {onDelete ? (
-          <button
+          <Button
             type="button"
-            className="text-[10px] text-red-400/80"
+            variant="ghost"
+            size="sm"
+            className="h-auto p-0 text-[10px] text-red-400/80 hover:text-red-400"
             onClick={() => {
               onDelete(w.id);
               onClose();
             }}
           >
             Remove
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>

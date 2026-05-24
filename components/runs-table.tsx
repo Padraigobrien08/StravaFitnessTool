@@ -6,6 +6,23 @@ import type { RunActivity } from "@/lib/strava/types";
 import type { WorkoutClassification, WorkoutType } from "@/lib/analytics/workoutType";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import { WorkoutTypeBadge } from "@/components/workout/workout-type-badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { formatDistanceKm, formatPace } from "@/lib/utils";
 import { paceSecPerKm } from "@/lib/analytics/pace";
 import { Search } from "lucide-react";
@@ -83,23 +100,25 @@ export function RunsTable({
     }
   }
 
-  const Th = ({
+  const SortHead = ({
     label,
     col,
   }: {
     label: string;
     col: SortKey;
   }) => (
-    <th className="pb-3 pr-4">
-      <button
+    <TableHead className="pr-4">
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
+        className="h-auto px-0 text-zinc-500 hover:text-zinc-300"
         onClick={() => toggleSort(col)}
-        className="text-left text-zinc-500 hover:text-zinc-300"
       >
         {label}
         {sortKey === col ? (sortAsc ? " ↑" : " ↓") : ""}
-      </button>
-    </th>
+      </Button>
+    </TableHead>
   );
 
   const typeOptions: (WorkoutType | typeof ALL_TYPES)[] = [
@@ -116,70 +135,73 @@ export function RunsTable({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-3">
-        <div className="relative max-w-sm flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-          <input
+        <div className="relative max-w-sm min-w-[200px] flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+          <Input
             type="search"
             placeholder="Search runs…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-2 pl-9 pr-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-emerald-500/50 focus:outline-none"
+            className="pl-9"
             aria-label="Search runs"
           />
         </div>
-        <select
+        <Select
           value={typeFilter}
-          onChange={(e) =>
-            setTypeFilter(e.target.value as WorkoutType | typeof ALL_TYPES)
+          onValueChange={(value) =>
+            setTypeFilter(value as WorkoutType | typeof ALL_TYPES)
           }
-          className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-zinc-200"
-          aria-label="Filter by workout type"
         >
-          {typeOptions.map((t) => (
-            <option key={t} value={t}>
-              {t === ALL_TYPES ? "All types" : WORKOUT_TYPE_LABELS[t]}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-[180px]" aria-label="Filter by workout type">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {typeOptions.map((t) => (
+              <SelectItem key={t} value={t}>
+                {t === ALL_TYPES ? "All types" : WORKOUT_TYPE_LABELS[t]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <p className="text-xs text-zinc-600">
         {filtered.length} of {runs.length} runs
       </p>
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-white/10">
-              <Th label="Date" col="date" />
-              <th className="pb-3 pr-4 text-zinc-500">Run</th>
-              <Th label="Type" col="type" />
-              <Th label="Distance" col="distance" />
-              <Th label="Pace" col="pace" />
-              <Th label="HR" col="hr" />
-              <th className="pb-3 text-zinc-500">FIT</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow className="border-white/10 hover:bg-transparent">
+              <SortHead label="Date" col="date" />
+              <TableHead className="pr-4 text-zinc-500">Run</TableHead>
+              <SortHead label="Type" col="type" />
+              <SortHead label="Distance" col="distance" />
+              <SortHead label="Pace" col="pace" />
+              <SortHead label="HR" col="hr" />
+              <TableHead className="text-zinc-500">FIT</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filtered.map((run) => {
               const pace = paceSecPerKm(run);
               const hasFit = fitRunIds.includes(run.id);
               const workout = workoutByRunId.get(run.id);
               return (
-                <tr
+                <TableRow
                   key={run.id}
-                  className="border-b border-white/5 text-zinc-300 hover:bg-white/[0.03]"
+                  className="border-white/5 text-zinc-300 hover:bg-white/[0.03]"
                 >
-                  <td className="py-3 pr-4 whitespace-nowrap">
+                  <TableCell className="whitespace-nowrap pr-4">
                     {new Date(run.date).toLocaleDateString()}
-                  </td>
-                  <td className="py-3 pr-4">
+                  </TableCell>
+                  <TableCell className="pr-4">
                     <Link
                       href={`/runs/${run.id}`}
                       className="font-medium text-emerald-400 hover:text-emerald-300"
                     >
                       {run.name}
                     </Link>
-                  </td>
-                  <td className="py-3 pr-4">
+                  </TableCell>
+                  <TableCell className="pr-4">
                     {workout ? (
                       <WorkoutTypeBadge
                         type={workout.type}
@@ -188,17 +210,17 @@ export function RunsTable({
                     ) : (
                       "—"
                     )}
-                  </td>
-                  <td className="py-3 pr-4 tabular-nums">
+                  </TableCell>
+                  <TableCell className="tabular-nums pr-4">
                     {formatDistanceKm(run.distanceM)}
-                  </td>
-                  <td className="py-3 pr-4 tabular-nums">
+                  </TableCell>
+                  <TableCell className="tabular-nums pr-4">
                     {pace ? formatPace(pace) : "—"}
-                  </td>
-                  <td className="py-3 pr-4 tabular-nums">
+                  </TableCell>
+                  <TableCell className="tabular-nums pr-4">
                     {run.avgHr ?? "—"}
-                  </td>
-                  <td className="py-3">
+                  </TableCell>
+                  <TableCell>
                     {hasFit ? (
                       <span className="text-emerald-500" title="FIT data loaded">
                         ●
@@ -206,12 +228,12 @@ export function RunsTable({
                     ) : (
                       <span className="text-zinc-600">—</span>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

@@ -19,6 +19,15 @@ import { semanticSearchTokens } from "@/lib/runs/formatWorkoutName";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
 import { coachUrl } from "@/lib/coach/domainLinks";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import {
   ChevronDown,
@@ -156,14 +165,16 @@ export function RunExplorer({
 
   const Th = ({ label, col }: { label: string; col: ExplorerSortKey }) => (
     <th className="pb-1 pr-2">
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         onClick={() => toggleSort(col)}
-        className="text-[9px] font-semibold uppercase tracking-wider text-zinc-600 hover:text-zinc-400"
+        className="h-auto p-0 text-[9px] font-semibold uppercase tracking-wider text-zinc-600 hover:bg-transparent hover:text-zinc-400"
       >
         {label}
         {sortKey === col ? (sortAsc ? " ↑" : " ↓") : ""}
-      </button>
+      </Button>
     </th>
   );
 
@@ -182,7 +193,7 @@ export function RunExplorer({
         <div className="mt-2 flex flex-wrap gap-1.5">
           <div className="relative min-w-[180px] flex-1">
             <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-600" />
-            <input
+            <Input
               type="search"
               placeholder="Search sessions…"
               value={search}
@@ -190,7 +201,8 @@ export function RunExplorer({
                 setSearch(e.target.value);
                 setPage(0);
               }}
-              className="w-full rounded-md border border-white/[0.06] bg-white/[0.03] py-1.5 pl-7 pr-2 text-[12px] text-zinc-200 placeholder:text-zinc-600 focus:border-teal-500/30 focus:outline-none"
+              className="border-white/[0.06] bg-white/[0.03] py-1.5 pl-7 pr-2 text-[12px] text-zinc-200 placeholder:text-zinc-600 focus-visible:border-teal-500/30"
+              aria-label="Search sessions"
             />
           </div>
           <FilterSelect
@@ -230,18 +242,20 @@ export function RunExplorer({
             }}
             options={PAGE_SIZES.map((n) => [String(n), `${n} / page`])}
           />
-          <button
+          <Button
             type="button"
+            variant={groupByMonth ? "secondary" : "outline"}
+            size="sm"
             className={cn(
-              "rounded-md px-2 py-1.5 text-[10px]",
+              "h-auto px-2 py-1.5 text-[10px]",
               groupByMonth
-                ? "bg-teal-500/15 text-teal-300"
-                : "bg-white/[0.03] text-zinc-500"
+                ? "bg-teal-500/15 text-teal-300 hover:bg-teal-500/20"
+                : "border-white/[0.06] bg-white/[0.03] text-zinc-500"
             )}
             onClick={() => setGroupByMonth((v) => !v)}
           >
             Group by month
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -273,9 +287,11 @@ export function RunExplorer({
                 {groupByMonth && group.key !== "page" ? (
                   <tr className="bg-white/[0.02]">
                     <td colSpan={10} className="px-3 py-1.5">
-                      <button
+                      <Button
                         type="button"
-                        className="flex items-center gap-1 text-[11px] font-medium text-zinc-400"
+                        variant="ghost"
+                        size="sm"
+                        className="flex h-auto items-center gap-1 p-0 text-[11px] font-medium text-zinc-400 hover:bg-transparent hover:text-zinc-300"
                         onClick={() => {
                           setCollapsedGroups((prev) => {
                             const next = new Set(prev);
@@ -295,7 +311,7 @@ export function RunExplorer({
                         <span className="text-zinc-600">
                           ({group.rows.length})
                         </span>
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ) : null}
@@ -329,26 +345,30 @@ export function RunExplorer({
       ) : null}
 
       <div className="flex items-center justify-between gap-2 border-t border-white/[0.04] px-3 py-2">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           disabled={page <= 0}
-          className="flex items-center gap-0.5 rounded px-2 py-1 text-[11px] text-zinc-500 disabled:opacity-40 hover:bg-white/[0.04]"
+          className="h-auto gap-0.5 px-2 py-1 text-[11px] text-zinc-500 hover:bg-white/[0.04]"
           onClick={() => goPage(page - 1)}
         >
           <ChevronLeft className="h-3.5 w-3.5" /> Prev
-        </button>
+        </Button>
         <span className="text-[10px] text-zinc-600">
           Showing {page * pageSize + 1}–
           {Math.min((page + 1) * pageSize, total)} of {total}
         </span>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           disabled={page >= totalPages - 1}
-          className="flex items-center gap-0.5 rounded px-2 py-1 text-[11px] text-zinc-500 disabled:opacity-40 hover:bg-white/[0.04]"
+          className="h-auto gap-0.5 px-2 py-1 text-[11px] text-zinc-500 hover:bg-white/[0.04]"
           onClick={() => goPage(page + 1)}
         >
           Next <ChevronRight className="h-3.5 w-3.5" />
-        </button>
+        </Button>
       </div>
     </section>
   );
@@ -364,17 +384,21 @@ function FilterSelect({
   options: ReadonlyArray<readonly [string, string]>;
 }) {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 text-[10px] text-zinc-400"
-    >
-      {options.map(([v, label]) => (
-        <option key={v} value={v}>
-          {label}
-        </option>
-      ))}
-    </select>
+    <Select value={value} onValueChange={(v) => v != null && onChange(v)}>
+      <SelectTrigger
+        size="sm"
+        className="h-auto border-white/[0.06] bg-white/[0.03] px-2 py-1.5 text-[10px] text-zinc-400"
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map(([v, label]) => (
+          <SelectItem key={v} value={v}>
+            {label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 

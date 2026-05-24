@@ -2,6 +2,20 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useGoalStore } from "@/stores/goal-store";
 import {
   RACE_DISTANCE_LABELS,
@@ -31,32 +45,36 @@ function parseTargetTime(value: string): number | undefined {
 export function CompactRaceGoalForm() {
   const { raceGoal, setRaceGoal, clearRaceGoal } = useGoalStore();
   const [open, setOpen] = useState(!raceGoal);
+  const [distance, setDistance] = useState<RaceDistance>(raceGoal?.distance ?? "hm");
+  const [date, setDate] = useState(
+    raceGoal?.date ??
+      new Date(Date.now() + 56 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+  );
+  const [targetTime, setTargetTime] = useState("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const distance = fd.get("distance") as RaceDistance;
-    const date = String(fd.get("date") ?? "");
-    const targetRaw = String(fd.get("targetTime") ?? "");
     if (!date) return;
     const goal: RaceGoal = { distance, date };
-    const targetTimeSec = parseTargetTime(targetRaw);
+    const targetTimeSec = parseTargetTime(targetTime);
     if (targetTimeSec) goal.targetTimeSec = targetTimeSec;
     setRaceGoal(goal);
     setOpen(false);
   };
 
-  const defaultDate =
-    raceGoal?.date ??
-    new Date(Date.now() + 56 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-
   return (
-    <div className="rounded-xl border border-white/[0.05] bg-white/[0.02]">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="rounded-xl border border-white/[0.05] bg-white/[0.02]"
+    >
+      <CollapsibleTrigger
+        render={
+          <Button
+            variant="ghost"
+            className="flex h-auto w-full items-center justify-between gap-2 rounded-xl px-4 py-3 text-left font-normal hover:bg-white/[0.02]"
+          />
+        }
       >
         <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
           Race mission setup
@@ -70,45 +88,54 @@ export function CompactRaceGoalForm() {
         <ChevronDown
           className={cn("h-4 w-4 text-zinc-600 transition-transform", open && "rotate-180")}
         />
-      </button>
-      {open ? (
+      </CollapsibleTrigger>
+      <CollapsibleContent>
         <form
           onSubmit={handleSubmit}
           className="grid gap-3 border-t border-white/[0.04] px-4 py-4 sm:grid-cols-4"
         >
-          <label className="block text-xs text-zinc-500">
-            Distance
-            <select
-              name="distance"
-              defaultValue={raceGoal?.distance ?? "hm"}
-              className="mt-1 w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 text-sm text-zinc-200"
+          <div className="space-y-2">
+            <Label className="text-xs text-zinc-500">Distance</Label>
+            <Select
+              value={distance}
+              onValueChange={(v) => setDistance(v as RaceDistance)}
             >
-              {DISTANCES.map((d) => (
-                <option key={d} value={d}>
-                  {RACE_DISTANCE_LABELS[d]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-xs text-zinc-500">
-            Race date
-            <input
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {DISTANCES.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {RACE_DISTANCE_LABELS[d]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="compact-race-date" className="text-xs text-zinc-500">
+              Race date
+            </Label>
+            <Input
+              id="compact-race-date"
               type="date"
-              name="date"
-              defaultValue={defaultDate}
+              value={date}
               required
-              className="mt-1 w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 text-sm text-zinc-200"
+              onChange={(e) => setDate(e.target.value)}
             />
-          </label>
-          <label className="block text-xs text-zinc-500 sm:col-span-2">
-            Target time (optional)
-            <input
+          </div>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="compact-race-target" className="text-xs text-zinc-500">
+              Target time (optional)
+            </Label>
+            <Input
+              id="compact-race-target"
               type="text"
-              name="targetTime"
+              value={targetTime}
               placeholder="1:49:00"
-              className="mt-1 w-full rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-1.5 text-sm text-zinc-200"
+              onChange={(e) => setTargetTime(e.target.value)}
             />
-          </label>
+          </div>
           <div className="flex gap-2 sm:col-span-4">
             <Button type="submit" size="sm">
               Update mission
@@ -120,7 +147,7 @@ export function CompactRaceGoalForm() {
             ) : null}
           </div>
         </form>
-      ) : null}
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
