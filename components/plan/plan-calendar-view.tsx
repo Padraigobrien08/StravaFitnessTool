@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { CalendarWorkout, TrainingCalendarWeek } from "@/lib/training-calendar";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Check, MoreHorizontal, X } from "lucide-react";
 
 const intensityStyles: Record<string, string> = {
@@ -243,13 +245,13 @@ function EditPopover({
 
   return (
     <div className="mt-2 space-y-2 border-t border-white/[0.06] pt-2">
-      <input
-        className="w-full rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
+      <Input
+        className="h-7 rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
-      <input
-        className="w-full rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
+      <Input
+        className="h-7 rounded bg-black/30 px-2 py-1 text-[11px] text-zinc-200"
         placeholder="Distance km"
         value={distanceKm}
         onChange={(e) => setDistanceKm(e.target.value)}

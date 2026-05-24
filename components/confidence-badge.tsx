@@ -1,3 +1,6 @@
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
 export function ConfidenceBadge({
   level,
 }: {
@@ -9,16 +12,14 @@ export function ConfidenceBadge({
     high: "Solid sample — trends are reliable",
   };
   const colors = {
-    low: "text-amber-400/90 border-amber-500/30 bg-amber-500/10",
-    medium: "text-sky-400/90 border-sky-500/30 bg-sky-500/10",
-    high: "text-emerald-400/90 border-emerald-500/30 bg-emerald-500/10",
+    low: "border-amber-500/30 bg-amber-500/10 text-amber-400/90",
+    medium: "border-sky-500/30 bg-sky-500/10 text-sky-400/90",
+    high: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400/90",
   };
 
   return (
-    <span
-      className={`inline-block rounded-full border px-3 py-1 text-xs ${colors[level]}`}
-    >
+    <Badge variant="outline" className={cn("rounded-full px-3 py-1", colors[level])}>
       {labels[level]}
-    </span>
+    </Badge>
   );
 }

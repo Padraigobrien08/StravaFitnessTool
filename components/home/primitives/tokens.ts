@@ -14,17 +14,13 @@ export const dash = {
     "relative overflow-visible rounded-xl bg-[var(--surface-panel)] shadow-[var(--surface-shadow)]",
   surfaceHover:
     "transition-[box-shadow,background] duration-250 ease-out hover:bg-[var(--surface-hover)]",
-  label:
-    "text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500",
-  labelAccent:
-    "text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-500/90",
-  h1: "font-display text-xl font-bold leading-snug tracking-tight text-[var(--foreground)] sm:text-2xl lg:text-[1.75rem]",
-  lead: "text-[13px] leading-relaxed text-zinc-400 lg:text-sm",
-  metric:
-    "font-display text-xl font-bold tabular-nums tracking-tight text-[var(--foreground)] sm:text-2xl",
-  metricSm:
-    "font-display text-lg font-semibold tabular-nums text-[var(--foreground)]",
-  muted: "text-xs leading-snug text-zinc-500",
+  label: "type-section-label",
+  labelAccent: "type-eyebrow",
+  h1: "type-page-title",
+  lead: "type-body-muted max-w-2xl",
+  metric: "type-metric",
+  metricSm: "font-display text-lg font-semibold tabular-nums tracking-[-0.02em] text-foreground",
+  muted: "type-caption",
 } as const;
 
 export const ops = {

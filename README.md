@@ -6,7 +6,8 @@ StrideIQ answers *why* things changed and *what to do next*, not only *what happ
 
 📄 **Product contract:** [PRODUCT.md](PRODUCT.md)  
 📚 **Full docs index:** [docs/README.md](docs/README.md)  
-📋 **Every feature:** [docs/FEATURES.md](docs/FEATURES.md)
+📋 **Every feature:** [docs/FEATURES.md](docs/FEATURES.md)  
+🚀 **Deploy:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) · **Smoke test:** [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) · **MVP release:** [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md)
 
 ---
 
@@ -28,44 +29,71 @@ StrideIQ answers *why* things changed and *what to do next*, not only *what happ
 
 ```bash
 npm install
-cp .env.example .env.local   # optional for Strava sync + Coach
+cp .env.example .env.local   # optional — see paths below
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-### 2. Load data (choose one or both)
+### 2. Choose a data path
 
-| Method | Best for | Coach / server tools |
-|--------|----------|----------------------|
-| **Strava export folder** | Offline, privacy-first | Limited (local analytics only) |
-| **Connect Strava (OAuth)** | Live sync, Coach, MCP | Full |
+| Path | `.env.local` | What works |
+|------|----------------|------------|
+| **A — Export only** | Empty or omit file | Home, Training, Goals, Plan (local), Runs, Report, Intelligence (client) |
+| **B — Full stack** | Strava + Neon + LLM keys | Everything including OAuth sync, Coach, webhooks |
 
-**Export import:** Strava → Settings → Download account data → unzip → upload in **Import** (`activities.csv` required).
+Details: [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md) (what needs the API).
 
-**API sync:** Set `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `DATABASE_URL` (Neon) in `.env.local` → **Import → Connect Strava** → sync activities.
+#### Path A — Export only (clean machine, ~5 min)
 
-### 3. Optional — Coach chat
+1. Strava → **Settings → My Account → Download or Delete Your Account** → request export → unzip.
+2. App → **Import** → upload export folder (must include `activities.csv`).
+3. Optional: second step — upload the `activities/` folder for FIT streams.
+4. **Home** → confirm runs load.
+5. **Goals** → set a race date.
+6. **Plan** → optional context → **Generate** → **Save week**.
+7. **Settings** → toggle theme; optional **Clear data** (confirmation dialog).
+
+No `DATABASE_URL` or Strava API app required.
+
+#### Path B — OAuth + Coach (~20 min first time)
+
+1. Create [Neon](https://neon.tech) database; run migrations:
+
+   ```bash
+   psql "$DATABASE_URL" -f db/migrations/001_initial.sql
+   psql "$DATABASE_URL" -f db/migrations/002_coach.sql
+   psql "$DATABASE_URL" -f db/migrations/003_route_geometry.sql
+   ```
+
+2. Create [Strava API application](https://www.strava.com/settings/api); set callback domain to `localhost` for dev.
+
+3. Fill `.env.local` from [`.env.example`](.env.example):
+
+   ```bash
+   DATABASE_URL=postgresql://...
+   SESSION_SECRET=$(openssl rand -hex 32)
+   STRAVA_CLIENT_ID=...
+   STRAVA_CLIENT_SECRET=...
+   STRAVA_REDIRECT_URI=http://localhost:3000/api/auth/strava/callback
+   OPENAI_API_KEY=sk-...
+   ```
+
+4. Restart `npm run dev` → **Import → Connect Strava** → sync.
+5. **Goals** → race goal → **Plan** → generate + save → **Coach** → ask a training question.
+
+### 3. Verify (CI gate)
 
 ```bash
-# .env.local
-OPENAI_API_KEY=sk-...          # preferred
-# or ANTHROPIC_API_KEY=...
-
-DATABASE_URL=postgresql://...  # Neon
-SESSION_SECRET=$(openssl rand -hex 32)
+npm test && npm run build
+# or: ./scripts/verify.sh
 ```
 
-Apply DB migrations (`db/migrations/001_initial.sql`, `002_coach.sql`, `003_route_geometry.sql`). Set a race goal on **Goals**, sync runs, then open **Coach**.
+For manual QA, use [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
 
-### 4. Verify
+### 4. Production deploy
 
-```bash
-npm test
-npm run build
-```
-
-Run as **separate** commands (do not paste shell comments on the same line as `npm`).
+[Vercel + Neon + Strava URLs](docs/DEPLOYMENT.md) — set production `STRAVA_REDIRECT_URI` and optional webhook callback, then run smoke Path C in [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
 
 ---
 
@@ -189,16 +217,19 @@ FIT data is matched via the `Filename` column and stored in IndexedDB for stream
 
 ## Environment variables
 
-Copy [`.env.example`](.env.example) → `.env.local`.
+Copy [`.env.example`](.env.example) → `.env.local` (never commit `.env.local`).
 
 | Variable | Required for |
 |----------|----------------|
 | `DATABASE_URL` | Strava sync, Coach, MCP |
-| `SESSION_SECRET` | Signed session cookies |
+| `SESSION_SECRET` | Signed session cookies (when using DB) |
 | `STRAVA_CLIENT_ID` / `SECRET` / `REDIRECT_URI` | OAuth |
-| `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` | Coach chat |
-| `STRAVA_WEBHOOK_*` | Push auto-sync |
-| `STRIDEIQ_API_KEY` | MCP / automation (optional) |
+| `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` | Coach chat + AI plan |
+| `STRAVA_WEBHOOK_VERIFY_TOKEN` / `STRAVA_WEBHOOK_CALLBACK_URL` | Push auto-sync |
+| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` | MCP / automation (optional) |
+| `NEXT_PUBLIC_FORECAST_LAB=1` | Forecast lab in production (optional) |
+
+Full comments and production examples: [`.env.example`](.env.example), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ---
 

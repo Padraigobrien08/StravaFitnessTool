@@ -1,8 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useStrava } from "@/lib/context/strava-context";
 import { useSettingsStore } from "@/stores/settings-store";
 import { ThemeSegmentedControl } from "@/components/theme/theme-toggle";
@@ -12,6 +30,7 @@ import { StravaWebhookCard } from "@/components/settings/strava-webhook-card";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 
 export default function SettingsPage() {
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const { clearData, importData, dataSources, dataSourceLabel, apiConnected } =
     useStrava();
   const { quality } = useTrainingIntelligence();
@@ -28,16 +47,14 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <h1 className="font-display text-2xl font-bold text-[var(--foreground)]">
-        Settings
-      </h1>
+      <h1 className="type-page-title">Settings</h1>
 
       <Card>
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm text-zinc-500">
+          <p className="type-body-muted">
             Choose light or dark mode. Charts, maps, and panels adapt to your
             selection.
           </p>
@@ -76,9 +93,45 @@ export default function SettingsPage() {
               </Button>
             </Link>
             {importData && (
-              <Button variant="ghost" size="sm" onClick={() => void clearData()}>
-                Clear all data & disconnect
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setClearDialogOpen(true)}
+                >
+                  Clear all data & disconnect
+                </Button>
+                <Dialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+                  <DialogContent showCloseButton={false} className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Clear all data?</DialogTitle>
+                      <DialogDescription>
+                        This removes your local runs, plans, and disconnects
+                        Strava from this browser. You can import again later.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setClearDialogOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          setClearDialogOpen(false);
+                          void clearData();
+                        }}
+                      >
+                        Clear all data
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
             )}
           </div>
         </CardContent>
@@ -93,9 +146,12 @@ export default function SettingsPage() {
           <CardTitle>Training plan limits</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <label className="block text-sm text-zinc-500">
-            Default runs per week (when Strava has no goal)
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="default-weekly-runs" className="text-zinc-500">
+              Default runs per week (when Strava has no goal)
+            </Label>
+            <Input
+              id="default-weekly-runs"
               type="number"
               min={1}
               max={7}
@@ -103,21 +159,22 @@ export default function SettingsPage() {
               onChange={(e) =>
                 setDefaultWeeklyRuns(Number(e.target.value) || 3)
               }
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-zinc-200"
             />
-          </label>
-          <label className="block text-sm text-zinc-500">
-            Max weekly km for adaptive plan (0 = auto from your history)
-            <input
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="max-weekly-km" className="text-zinc-500">
+              Max weekly km for adaptive plan (0 = auto from your history)
+            </Label>
+            <Input
+              id="max-weekly-km"
               type="number"
               min={0}
               max={200}
               step={5}
               value={maxWeeklyKm}
               onChange={(e) => setMaxWeeklyKm(Number(e.target.value) || 0)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-zinc-200"
             />
-          </label>
+          </div>
         </CardContent>
       </Card>
 
@@ -126,32 +183,38 @@ export default function SettingsPage() {
           <CardTitle>Units</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <label className="block text-sm text-zinc-500">
-            Distance
-            <select
+          <div className="space-y-2">
+            <Label className="text-zinc-500">Distance</Label>
+            <Select
               value={distanceUnit}
-              onChange={(e) =>
-                setDistanceUnit(e.target.value as "km" | "mi")
-              }
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-zinc-200"
+              onValueChange={(v) => setDistanceUnit(v as "km" | "mi")}
             >
-              <option value="km">Kilometres</option>
-              <option value="mi">Miles</option>
-            </select>
-          </label>
-          <label className="block text-sm text-zinc-500">
-            Pace
-            <select
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="km">Kilometres</SelectItem>
+                <SelectItem value="mi">Miles</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-zinc-500">Pace</Label>
+            <Select
               value={paceUnit}
-              onChange={(e) =>
-                setPaceUnit(e.target.value as "min/km" | "min/mi")
+              onValueChange={(v) =>
+                setPaceUnit(v as "min/km" | "min/mi")
               }
-              className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-zinc-200"
             >
-              <option value="min/km">min/km</option>
-              <option value="min/mi">min/mile</option>
-            </select>
-          </label>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="min/km">min/km</SelectItem>
+                <SelectItem value="min/mi">min/mile</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <p className="text-xs text-zinc-600">
             Unit conversion on charts is coming in the next release; preference is
             saved now.

@@ -8,6 +8,14 @@ import {
   type ForecastFixtureProfile,
 } from "@/lib/forecasting-v2/evaluation";
 import { formatDuration } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 function formatSec(sec: number): string {
@@ -75,20 +83,24 @@ export function ForecastLabClient() {
       </header>
 
       <div className="flex flex-wrap items-end gap-4">
-        <label className="block min-w-[240px] flex-1">
-          <span className="mb-1.5 block text-[11px] text-zinc-500">Fixture athlete</span>
-          <select
+        <div className="min-w-[240px] flex-1 space-y-2">
+          <Label className="text-[11px] text-zinc-500">Fixture athlete</Label>
+          <Select
             value={fixtureId}
-            onChange={(e) => setFixtureId(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-zinc-200"
+            onValueChange={(v) => v && setFixtureId(v)}
           >
-            {FORECAST_FIXTURES.map((fx) => (
-              <option key={fx.id} value={fx.id}>
-                {fx.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {FORECAST_FIXTURES.map((fx) => (
+                <SelectItem key={fx.id} value={fx.id}>
+                  {fx.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <StatusBadge report={report} profile={profile} />
       </div>
 

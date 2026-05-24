@@ -15,6 +15,7 @@ import {
 import type { OverlaySegment, TimelinePoint } from "@/lib/route-intelligence/types";
 import { formatPace } from "@/lib/utils";
 import { formatReplayClock } from "@/lib/route-intelligence/replay";
+import { Input } from "@/components/ui/input";
 import { dash } from "@/components/home/primitives/tokens";
 import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
@@ -210,7 +211,7 @@ function Scrubber({
 }) {
   return (
     <div className="pt-1">
-      <input
+      <Input
         type="range"
         min={0}
         max={duration}
@@ -223,7 +224,7 @@ function Scrubber({
             })
           );
         }}
-        className="route-scrubber w-full"
+        className="route-scrubber h-2 w-full border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
       />
       <div className="mt-1 flex justify-between text-[10px] tabular-nums text-zinc-600">
         <span>{formatReplayClock(0)}</span>

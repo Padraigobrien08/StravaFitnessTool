@@ -41,7 +41,13 @@ import { PlanOperationalSidebar } from "./plan-operational-sidebar";
 import { PlanSavedStateCard } from "./plan-saved-state";
 import { PlanPlanningContext } from "./plan-planning-context";
 import { PlanWeekExecution } from "./plan-week-execution";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { CalendarPlus, RefreshCw } from "lucide-react";
 
 export function PlanWorkspace() {
@@ -329,20 +335,26 @@ export function PlanWorkspace() {
       ) : null}
 
       {showingPreview && preview ? (
-        <p className="rounded-md border border-amber-500/20 bg-amber-500/[0.05] px-3 py-1.5 text-[11px] text-amber-200/85">
-          Preview — save to make this your persistent training week
-        </p>
+        <Alert className="border-amber-500/20 bg-amber-500/[0.05] px-3 py-1.5 text-[11px] text-amber-200/85">
+          <AlertDescription className="text-[11px] text-amber-200/85">
+            Preview — save to make this your persistent training week
+          </AlertDescription>
+        </Alert>
       ) : null}
 
       {saveError ? (
-        <p className="rounded-md border border-amber-500/25 bg-amber-500/[0.06] px-3 py-2 text-[12px] text-amber-200/90">
-          {saveError}
-        </p>
+        <Alert className="border-amber-500/25 bg-amber-500/[0.06] px-3 py-2 text-[12px] text-amber-200/90">
+          <AlertDescription className="text-[12px] text-amber-200/90">
+            {saveError}
+          </AlertDescription>
+        </Alert>
       ) : null}
 
       {error ? (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2.5">
-          <p className="text-sm text-red-300/90">{error}</p>
+        <Alert className="border-red-500/20 bg-red-500/5 px-3 py-2.5">
+          <AlertDescription className="text-sm text-red-300/90">
+            {error}
+          </AlertDescription>
           <Button
             size="sm"
             variant="outline"
@@ -351,7 +363,7 @@ export function PlanWorkspace() {
           >
             Use safe fallback
           </Button>
-        </div>
+        </Alert>
       ) : null}
 
       {loading && !displayWeek ? (
@@ -451,16 +463,20 @@ export function PlanWorkspace() {
       ) : null}
 
       {debugMode && preview ? (
-        <details className="rounded border border-[var(--border-subtle)] px-2 py-1 text-[10px] text-zinc-700">
-          <summary>Advanced (dev)</summary>
-          <pre className="mt-1 max-h-32 overflow-auto">
-            {JSON.stringify(
-              { validation: preview.validation, integrity: preview.integrity },
-              null,
-              2
-            )}
-          </pre>
-        </details>
+        <Collapsible className="rounded border border-[var(--border-subtle)] px-2 py-1 text-[10px] text-zinc-700">
+          <CollapsibleTrigger className="cursor-pointer text-left">
+            Advanced (dev)
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <pre className="mt-1 max-h-32 overflow-auto">
+              {JSON.stringify(
+                { validation: preview.validation, integrity: preview.integrity },
+                null,
+                2
+              )}
+            </pre>
+          </CollapsibleContent>
+        </Collapsible>
       ) : null}
 
       {coachPlan ? (

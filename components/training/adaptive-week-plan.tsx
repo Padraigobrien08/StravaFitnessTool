@@ -14,6 +14,7 @@ import {
   Minus,
   AlertTriangle,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
 
@@ -142,11 +143,10 @@ export function AdaptiveWeekPlan({
               s.isKey && !checked[i] && "bg-white/[0.02]"
             )}
           >
-            <input
-              type="checkbox"
+            <Checkbox
               checked={checked[i] ?? false}
-              onChange={() => toggle(i)}
-              className="mt-1 h-4 w-4 shrink-0 rounded border-white/20 accent-teal-500"
+              onCheckedChange={() => toggle(i)}
+              className="mt-1"
               aria-label={`Mark ${s.day} ${s.typeLabel} complete`}
             />
             <div className="min-w-0 flex-1">

@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TypographyMetric, TypographyMuted } from "@/components/ui/typography";
 
 export function KpiCard({
   title,
@@ -21,12 +22,10 @@ export function KpiCard({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-3xl font-semibold tracking-tight text-white tabular-nums">
-          {value}
-        </p>
-        {subtitle && (
-          <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>
-        )}
+        <TypographyMetric className="text-foreground">{value}</TypographyMetric>
+        {subtitle ? (
+          <TypographyMuted className="mt-2">{subtitle}</TypographyMuted>
+        ) : null}
       </CardContent>
     </Card>
   );

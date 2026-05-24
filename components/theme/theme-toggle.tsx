@@ -1,6 +1,8 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/stores/theme-store";
 
@@ -15,13 +17,12 @@ export function ThemeToggle({
   const isLight = theme === "light";
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       onClick={toggleTheme}
-      className={cn(
-        "inline-flex items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--surface)] px-2.5 py-1.5 text-xs font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--surface-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40",
-        className
-      )}
+      className={cn("gap-2", className)}
       aria-pressed={isLight}
       aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
     >
@@ -35,7 +36,7 @@ export function ThemeToggle({
       ) : (
         <span className="sr-only">{isLight ? "Dark mode" : "Light mode"}</span>
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -43,30 +44,26 @@ export function ThemeSegmentedControl({ className }: { className?: string }) {
   const { theme, setTheme } = useThemeStore();
 
   return (
-    <div
-      className={cn(
-        "inline-flex rounded-lg border border-[var(--border-default)] bg-[var(--surface)] p-0.5",
-        className
-      )}
-      role="group"
+    <ToggleGroup
+      value={[theme]}
+      onValueChange={(values) => {
+        const next = values[0];
+        if (next === "dark" || next === "light") setTheme(next);
+      }}
+      variant="outline"
+      size="sm"
+      className={className}
       aria-label="Color theme"
     >
       {(["dark", "light"] as const).map((value) => (
-        <button
+        <ToggleGroupItem
           key={value}
-          type="button"
-          onClick={() => setTheme(value)}
-          className={cn(
-            "rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-colors",
-            theme === value
-              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
-              : "text-[var(--muted)] hover:text-[var(--foreground)]"
-          )}
-          aria-pressed={theme === value}
+          value={value}
+          className="capitalize data-pressed:bg-emerald-500/15 data-pressed:text-emerald-600 dark:data-pressed:text-emerald-300"
         >
           {value}
-        </button>
+        </ToggleGroupItem>
       ))}
-    </div>
+    </ToggleGroup>
   );
 }

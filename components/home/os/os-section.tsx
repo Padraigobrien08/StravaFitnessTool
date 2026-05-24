@@ -1,3 +1,4 @@
+import { TypographySectionLabel } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 
 export function OsSection({
@@ -15,10 +16,8 @@ export function OsSection({
 }) {
   return (
     <section id={id} className={cn("os-section", className)}>
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-zinc-500">
-          {title}
-        </h2>
+      <div className="mb-2.5 flex items-center justify-between gap-2">
+        <TypographySectionLabel>{title}</TypographySectionLabel>
         {action}
       </div>
       {children}

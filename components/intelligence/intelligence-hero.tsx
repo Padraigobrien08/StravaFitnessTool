@@ -31,11 +31,11 @@ export function IntelligenceHero({
   return (
     <section className="intelligence-hero rounded-xl border border-white/[0.06] bg-gradient-to-br from-[#12141a] via-[#0d0e12] to-[#0a0b0e] px-4 py-4 sm:px-5">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.04] pb-2.5">
-        <p className="text-[11px] text-zinc-600">
+        <p className="type-caption">
           Persistent athlete model
-          {metaLine ? <span className="text-zinc-700"> · {metaLine}</span> : null}
+          {metaLine ? <span className="text-muted-foreground/80"> · {metaLine}</span> : null}
         </p>
-        <p className="text-[11px] text-zinc-500">
+        <p className="type-caption">
           System confidence:{" "}
           <span className="text-zinc-400">{confidence.level}</span>
           <span className="text-zinc-700"> — {confidence.reason}</span>
@@ -45,26 +45,20 @@ export function IntelligenceHero({
       <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="min-w-0 space-y-2.5">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Current focus
-            </p>
-            <h1 className="font-display text-xl font-bold tracking-tight text-zinc-100 sm:text-2xl">
-              {state.currentFocus}
-            </h1>
+            <p className="type-section-label">Current focus</p>
+            <h1 className="type-page-title mt-1">{state.currentFocus}</h1>
           </div>
 
           <div>
-            <p className="text-[10px] font-medium text-zinc-600">Current belief</p>
-            <p className="mt-0.5 max-w-2xl text-[13px] leading-snug text-zinc-400">
-              {currentBelief}
+            <p className="type-section-label normal-case tracking-normal text-zinc-600">
+              Current belief
             </p>
+            <p className="type-body-muted mt-1 max-w-2xl">{currentBelief}</p>
           </div>
 
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-teal-500/70">
-              Primary action
-            </p>
-            <p className="mt-1 max-w-2xl text-[15px] font-medium leading-snug text-zinc-50 sm:text-[16px]">
+            <p className="type-eyebrow">Primary action</p>
+            <p className="type-body mt-1 max-w-2xl font-medium text-foreground">
               {primaryRecommendation}
             </p>
           </div>

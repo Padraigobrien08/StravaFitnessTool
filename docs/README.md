@@ -3,6 +3,9 @@
 | Document | Audience | Contents |
 |----------|----------|----------|
 | [../README.md](../README.md) | Everyone | Setup, routes, env, quick reference |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Operators | Vercel, Neon, Strava OAuth & webhook URLs |
+| [SMOKE_TEST.md](SMOKE_TEST.md) | QA / release | Manual MVP checklist (export + OAuth paths) |
+| [RELEASE_MVP.md](RELEASE_MVP.md) | Everyone | MVP scope, what needs API keys, tag notes |
 | [FEATURES.md](FEATURES.md) | Everyone | **Complete feature catalog** (every page, engine, tool) |
 | [../PRODUCT.md](../PRODUCT.md) | Product / eng | Positioning, IA rules, roadmap phases |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Engineers | Layers, data paths, API, folder map |
