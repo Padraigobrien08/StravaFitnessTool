@@ -5,8 +5,8 @@ Run after `npm install` (local) or after a production deploy. Mark each item pas
 **Automated gate (run first):**
 
 ```bash
-npm test
-npm run build
+npm test && npm run build
+# or: ./scripts/verify.sh
 ```
 
 ---

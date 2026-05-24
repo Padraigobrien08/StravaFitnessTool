@@ -85,10 +85,11 @@ No `DATABASE_URL` or Strava API app required.
 ### 3. Verify (CI gate)
 
 ```bash
-npm run verify
+npm test && npm run build
+# or: ./scripts/verify.sh
 ```
 
-Runs `npm test` then `npm run build`. For manual QA, use [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
+For manual QA, use [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
 
 ### 4. Production deploy
 
