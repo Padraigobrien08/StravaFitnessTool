@@ -29,6 +29,13 @@ Requires: app running, Strava connected, `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_
 - Export route `{id}` as GPX base64 (`strava_export_route_gpx`)
 - What clubs am I in? (`strava_list_clubs`)
 
+## Composite (Phase 5)
+
+- Analyze my last run with readiness (`analyze_last_run_with_readiness`)
+- Race week snapshot (`race_week_snapshot`)
+- PR context + starred segments (`pr_and_segments_snapshot` with `bucket: hm`)
+- Suggest routes for my long run (`long_run_route_suggestions`)
+
 ## Intelligence (StrideIQ-only)
 
 - Give me my coach brief (`get_coach_brief`)

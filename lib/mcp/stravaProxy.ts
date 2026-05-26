@@ -5,11 +5,11 @@ import {
 } from "@/lib/strava/api/compactStreams";
 import { exportRouteGpx, exportRouteTcx } from "@/lib/strava/api/exportRoute";
 import { exploreSegments } from "@/lib/strava/api/exploreSegments";
+import { fetchActivity } from "@/lib/strava/api/fetchActivity";
 import {
-  fetchActivity,
-  fetchAllAthleteActivities,
-  fetchAthleteActivitiesPage,
-} from "@/lib/strava/api/fetchActivity";
+  resolveActivitiesList,
+  resolveActivitiesListAll,
+} from "@/lib/mcp/resolveActivitiesList";
 import {
   fetchAthleteStats,
   fetchAthleteZones,
@@ -145,20 +145,19 @@ export async function handleStravaMcpAction(
       const page = parseInt(params.page ?? "1", 10);
       const afterRaw = params.after ? parseInt(params.after, 10) : NaN;
       const beforeRaw = params.before ? parseInt(params.before, 10) : NaN;
-      const activities = await fetchAthleteActivitiesPage(accessToken, {
+      return resolveActivitiesList(userId, accessToken, {
         page: Number.isFinite(page) ? page : 1,
         per_page: Number.isFinite(per_page) ? per_page : 30,
         after: Number.isFinite(afterRaw) ? afterRaw : undefined,
         before: Number.isFinite(beforeRaw) ? beforeRaw : undefined,
       });
-      return { activities, page, per_page };
     }
 
     case "activities_all": {
       const afterRaw = params.after ? parseInt(params.after, 10) : NaN;
       const beforeRaw = params.before ? parseInt(params.before, 10) : NaN;
       const max_pages = params.max_pages ? parseInt(params.max_pages, 10) : 10;
-      return fetchAllAthleteActivities(accessToken, {
+      return resolveActivitiesListAll(userId, accessToken, {
         after: Number.isFinite(afterRaw) ? afterRaw : undefined,
         before: Number.isFinite(beforeRaw) ? beforeRaw : undefined,
         max_pages: Number.isFinite(max_pages) ? max_pages : 10,

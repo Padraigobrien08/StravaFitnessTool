@@ -202,18 +202,16 @@ Only needed if users **never** open the web app:
 
 ---
 
-## Phase 5 — “On top” (ongoing, parallel-friendly)
+## Phase 5 — “On top” (shipped v0.5.0)
 
-StrideIQ value **above** strava-mcp parity — schedule alongside Phases 1–3.
-
-| Initiative | Description | Depends on |
-|------------|-------------|------------|
-| **Intelligence + raw Strava** | Coach tools that call both `/intelligence` and `/strava` (e.g. “analyze last ride streams + readiness”) | Phase 1 streams |
-| **DB-backed list** | `strava_list_activities` prefers Neon `activities` when fresh; falls back to live API | Existing sync |
-| **Segment ↔ analytics** | PR detection using segment efforts + existing `pr_context` | Phase 2 |
-| **Route ↔ plan** | Suggest long run routes from saved routes | Phase 3 |
-| **Scopes dashboard** | Settings UI: which MCP tools need which Strava scopes | Phase 4 |
-| **MCP resources** | Optional: expose GPX as MCP `resource` URI | Phase 3 exports |
+| Initiative | Status |
+|------------|--------|
+| **Intelligence + raw Strava** | `analyze_last_run_with_readiness`, `race_week_snapshot` composite tools |
+| **DB-backed list** | `strava_list_activities` uses Neon when sync &lt;24h fresh |
+| **Segment ↔ analytics** | `pr_and_segments_snapshot` |
+| **Route ↔ plan** | `long_run_route_suggestions` |
+| **Scopes dashboard** | Settings → Strava & MCP card |
+| **MCP resources** | `strideiq://activity/{id}/gpx` |
 
 ---
 

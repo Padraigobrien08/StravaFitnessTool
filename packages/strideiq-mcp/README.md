@@ -63,3 +63,18 @@ Auth: `STRIDEIQ_API_KEY` + `STRIDEIQ_BASE_URL`, or `STRIDEIQ_SESSION_COOKIE`. Se
 | `strava_export_route_tcx` | `route_export_tcx` |
 | `strava_list_clubs` | `clubs` |
 | `strava_format_workout_file` | `workout_gpx` |
+
+### Composite tools (Phase 5)
+
+| Tool | Action |
+|------|--------|
+| `analyze_last_run_with_readiness` | `last_run_analysis` |
+| `race_week_snapshot` | `race_week_snapshot` |
+| `pr_and_segments_snapshot` | `pr_and_segments` |
+| `long_run_route_suggestions` | `long_run_route_suggestions` |
+
+### Resources
+
+| URI | Content |
+|-----|---------|
+| `strideiq://activity/{activityId}/gpx` | Activity GPX |

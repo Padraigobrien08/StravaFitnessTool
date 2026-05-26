@@ -74,6 +74,23 @@ All use the connected user's Strava token from Neon.
 | `strava_format_workout_file` | `?action=workout_gpx&id=` |
 | `strideiq_mcp_version` | (local package version) |
 
+### Composite coach tools (Phase 5)
+
+Single MCP calls that blend intelligence + Strava:
+
+| MCP tool | API |
+|----------|-----|
+| `analyze_last_run_with_readiness` | `?action=last_run_analysis` |
+| `race_week_snapshot` | `?action=race_week_snapshot` |
+| `pr_and_segments_snapshot` | `?action=pr_and_segments` |
+| `long_run_route_suggestions` | `?action=long_run_route_suggestions` |
+
+`strava_list_activities` prefers **Neon** when last sync is &lt;24h old; otherwise live Strava API.
+
+### MCP resources
+
+- `strideiq://activity/{activityId}/gpx` — GPX from activity streams
+
 Intelligence tools unchanged — see [COACH_AND_INTELLIGENCE.md](./COACH_AND_INTELLIGENCE.md).
 
 ## HTTP examples

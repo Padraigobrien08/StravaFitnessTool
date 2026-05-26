@@ -85,6 +85,29 @@ export async function postStravaApi(
   return data;
 }
 
+export async function fetchCompositeCoach(
+  action: string,
+  query?: Record<string, string>
+): Promise<unknown> {
+  const url = new URL("/api/me/coach-composite", BASE);
+  url.searchParams.set("action", action);
+  if (query) {
+    for (const [k, v] of Object.entries(query)) {
+      if (v) url.searchParams.set(k, v);
+    }
+  }
+  const res = await fetch(url.toString(), { headers: headers() });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(
+      typeof data === "object" && data && "error" in data
+        ? String((data as { error: string }).error)
+        : `HTTP ${res.status}`
+    );
+  }
+  return data;
+}
+
 export function stravaQuery(
   entries: Record<string, string | undefined>
 ): Record<string, string> {

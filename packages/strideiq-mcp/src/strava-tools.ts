@@ -14,7 +14,7 @@ export function registerStravaTools(
     "strideiq_mcp_version",
     "StrideIQ MCP server version.",
     {},
-    async () => textResult({ name: "strideiq", version: "0.4.0" })
+    async () => textResult({ name: "strideiq", version: "0.5.0" })
   );
 
   server.tool(
