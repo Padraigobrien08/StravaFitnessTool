@@ -1,41 +1,32 @@
-import { STRAVA_API_BASE } from "./config";
+import { stravaGet } from "./client";
 import type { StravaLap, StravaStreamSet } from "./types";
 
-const STREAM_KEYS =
-  "time,heartrate,velocity_smooth,cadence,latlng,altitude";
+export const STREAM_KEYS =
+  "time,distance,heartrate,velocity_smooth,cadence,latlng,altitude,watts,temp,grade_smooth";
 
 export async function fetchActivityLaps(
   accessToken: string,
   activityId: number
 ): Promise<StravaLap[]> {
-  const res = await fetch(
-    `${STRAVA_API_BASE}/activities/${activityId}/laps`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+  const data = await stravaGet<StravaLap[]>(
+    accessToken,
+    `/activities/${activityId}/laps`,
+    undefined,
+    { allow404: true, context: `laps ${activityId}` }
   );
-  if (res.status === 404) return [];
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Strava laps ${activityId}: ${res.status} ${text}`);
-  }
-  return res.json() as Promise<StravaLap[]>;
+  return data ?? [];
 }
 
 export async function fetchActivityStreams(
   accessToken: string,
-  activityId: number
+  activityId: number,
+  keys: string = STREAM_KEYS
 ): Promise<StravaStreamSet | null> {
-  const params = new URLSearchParams({
-    keys: STREAM_KEYS,
-    key_by_type: "true",
-  });
-  const res = await fetch(
-    `${STRAVA_API_BASE}/activities/${activityId}/streams?${params}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+  const data = await stravaGet<StravaStreamSet>(
+    accessToken,
+    `/activities/${activityId}/streams`,
+    { keys, key_by_type: "true" },
+    { allow404: true, context: `streams ${activityId}` }
   );
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Strava streams ${activityId}: ${res.status} ${text}`);
-  }
-  return res.json() as Promise<StravaStreamSet>;
+  return data;
 }

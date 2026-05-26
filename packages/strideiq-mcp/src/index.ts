@@ -3,10 +3,11 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { fetchIntelligence } from "./client.js";
+import { registerStravaTools } from "./strava-tools.js";
 
 const server = new McpServer({
   name: "strideiq",
-  version: "0.2.0",
+  version: "0.4.0",
 });
 
 function textResult(data: unknown) {
@@ -184,6 +185,8 @@ server.tool(
       })
     )
 );
+
+registerStravaTools(server, textResult);
 
 async function main() {
   const transport = new StdioServerTransport();
