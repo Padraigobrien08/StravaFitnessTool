@@ -1,25 +1,39 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useStrava } from "@/lib/context/strava-context";
-import { Button } from "@/components/ui/button";
 
 export function RequireData({ children }: { children: React.ReactNode }) {
-  const { importData } = useStrava();
+  const { importData, loadDemo } = useStrava();
+  const router = useRouter();
 
   if (!importData) {
     return (
       <div className="rounded-xl border border-white/10 bg-white/[0.03] p-10 text-center">
-        <p className="text-lg text-zinc-300">No Strava data loaded yet</p>
+        <p className="text-lg text-zinc-300">No data loaded yet</p>
         <p className="mt-2 text-sm text-zinc-500">
-          Connect Strava or upload a bulk export folder to see insights.
+          Explore a full sample athlete instantly — no account, no setup — or
+          bring your own Strava data.
         </p>
-        <Link
-          href="/import"
-          className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-4 text-sm font-medium text-zinc-950 hover:bg-emerald-400"
-        >
-          Go to import
-        </Link>
+        <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => {
+              loadDemo();
+              router.push("/home");
+            }}
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-teal-400 px-5 text-sm font-semibold text-zinc-950 transition hover:bg-teal-300"
+          >
+            Try the demo
+          </button>
+          <Link
+            href="/import"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/15 px-5 text-sm font-medium text-zinc-200 hover:bg-white/5"
+          >
+            Import your data
+          </Link>
+        </div>
       </div>
     );
   }

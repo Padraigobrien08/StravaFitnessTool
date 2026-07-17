@@ -6,7 +6,13 @@
 
 Import Strava data. Get evidence-backed insights. Plan your week. Investigate *why* with a tool-grounded Coach.
 
-[Quick start](#quick-start) · [Features](#features) · [Deploy](#deploy) · [Docs](#documentation)
+[Try the demo](#-try-the-demo-zero-setup) · [Quick start](#quick-start) · [Features](#features) · [Deploy](#deploy) · [Docs](#documentation)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-14b8a6.svg)](LICENSE)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
+![React](https://img.shields.io/badge/React-19-149eca?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)
+![Tests](https://img.shields.io/badge/tests-241%20passing-2ea44f)
 
 </div>
 
@@ -19,8 +25,28 @@ StrideIQ is a **local-first** Next.js app that turns Strava exports (or live API
 
 ---
 
+## ⚡ Try the demo (zero setup)
+
+```bash
+npm install
+npm run dev
+```
+
+Open **[http://localhost:3000](http://localhost:3000)** and click **“Try the demo.”**
+
+That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half marathon) so you can explore *every* client-side surface instantly — **no Strava account, no database, no API key**. Hit **Exit demo** in the header to clear it. Prefer your own data? Use **Import** (100% in-browser) — see [Quick start](#quick-start).
+
+<!--
+  📸 Screenshots: run the demo, then capture Home / Intelligence / Goals into
+  docs/screenshots/{home,intelligence,goals}.png — see docs/screenshots/README.md.
+-->
+![StrideIQ Home — command briefing, readiness ring, intelligence feed](docs/screenshots/home.png)
+
+---
+
 ## Table of contents
 
+- [Try the demo](#-try-the-demo-zero-setup)
 - [Why StrideIQ](#why-strideiq)
 - [Features](#features)
 - [How it works](#how-it-works)
@@ -32,6 +58,7 @@ StrideIQ is a **local-first** Next.js app that turns Strava exports (or live API
 - [Development](#development)
 - [Documentation](#documentation)
 - [Tech stack](#tech-stack)
+- [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 ---
@@ -223,6 +250,10 @@ Production values and callback URLs: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Deploy
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Padraigobrien08/StravaFitnessTool)
+
+The app builds and runs with **zero environment variables** — the demo and local-export modes work out of the box. Add the variables below only for the optional server features.
+
 Hosted stack: **Vercel** (app) + **Neon** (database) + **Strava** (OAuth + optional webhooks).
 
 | Step | Guide |
@@ -384,9 +415,16 @@ Enable from **Settings** after OAuth is connected. Refresh the app after webhook
 
 ---
 
+## Troubleshooting
+
+**Dev server uses huge amounts of memory / the machine swaps or crashes.**
+Next.js/Turbopack picks the workspace root by walking *up* for a lockfile. If a stray `package.json`/`package-lock.json` sits in a parent directory (e.g. your home folder), it can root there and watch your *entire* home directory, exhausting memory. This repo pins the root via `turbopack.root` in [`next.config.ts`](next.config.ts); if you still hit it, remove the stray lockfile from the parent directory.
+
+---
+
 ## License
 
-Private project — not licensed for public redistribution unless otherwise noted.
+[MIT](LICENSE) © Padraig O'Brien
 
 ---
 

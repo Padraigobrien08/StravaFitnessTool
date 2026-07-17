@@ -1,7 +1,21 @@
 {
-  "name": "strava-fitness-tool",
+  "name": "strideiq",
   "version": "0.1.0",
   "private": true,
+  "description": "Private training intelligence for runners — import Strava data, get evidence-backed insights, and investigate your training with a tool-grounded Coach. Try it with zero setup via the built-in demo athlete.",
+  "license": "MIT",
+  "keywords": [
+    "running",
+    "strava",
+    "analytics",
+    "training",
+    "endurance",
+    "race-prediction",
+    "nextjs",
+    "react",
+    "typescript",
+    "fitness"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

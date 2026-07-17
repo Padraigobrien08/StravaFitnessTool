@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useStrava } from "@/lib/context/strava-context";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
@@ -25,6 +25,34 @@ import {
 } from "@/components/import/import-panels";
 import { dash } from "@/components/home/primitives/tokens";
 import { ArrowLeft } from "lucide-react";
+
+function DemoCallout() {
+  const { loadDemo } = useStrava();
+  const router = useRouter();
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-teal-400/25 bg-teal-400/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="text-sm font-semibold text-teal-200">
+          No Strava export handy? Try the demo.
+        </p>
+        <p className="mt-0.5 text-xs text-zinc-400">
+          Loads a full 12-month sample athlete so you can explore every insight
+          instantly — no account, database, or API key required.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => {
+          loadDemo();
+          router.push("/home");
+        }}
+        className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-teal-400 px-5 text-sm font-semibold text-zinc-950 transition hover:bg-teal-300"
+      >
+        Try the demo
+      </button>
+    </div>
+  );
+}
 
 function ImportBriefingBar() {
   return (
@@ -105,6 +133,7 @@ function ImportPageContent() {
   return (
     <ImportWorkspace>
       <ImportBriefingBar />
+      {!importData ? <DemoCallout /> : null}
       <DataIntelligenceHero hero={view.hero} />
 
       {(view.processingMessage || loading) && (
