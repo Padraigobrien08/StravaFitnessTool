@@ -179,11 +179,18 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
     }
     void refreshFitDetails();
     void (async () => {
-      const statusRes = await fetch("/api/me/status");
-      const status = (await statusRes.json()) as { connected?: boolean };
-      setApiConnected(Boolean(status.connected));
-      if (status.connected) {
-        await loadFromStravaApi();
+      try {
+        const statusRes = await fetch("/api/me/status");
+        const status = (await statusRes.json()) as { connected?: boolean };
+        setApiConnected(Boolean(status.connected));
+        if (status.connected) {
+          await loadFromStravaApi();
+        }
+      } catch (err) {
+        // Server down or non-JSON response — stay in local-only mode rather
+        // than surfacing an unhandled promise rejection.
+        console.error("Status check failed:", err);
+        setApiConnected(false);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once on mount
@@ -204,16 +211,25 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
   const raceGoal = useGoalStore((s) => s.raceGoal);
 
   const insights = useMemo(
-    () =>
-      effectiveImport
-        ? computeInsights(
-            effectiveImport,
-            fitDetails,
-            defaultWeeklyRuns,
-            raceGoal,
-            maxWeeklyKm > 0 ? maxWeeklyKm : undefined
-          )
-        : null,
+    () => {
+      if (!effectiveImport) return null;
+      // This runs during the provider's render, which is ABOVE every error
+      // boundary — an uncaught throw here white-screens the whole app on every
+      // route. Guard it so a bad analytics input degrades to "no insights"
+      // instead of taking the app down.
+      try {
+        return computeInsights(
+          effectiveImport,
+          fitDetails,
+          defaultWeeklyRuns,
+          raceGoal,
+          maxWeeklyKm > 0 ? maxWeeklyKm : undefined
+        );
+      } catch (err) {
+        console.error("computeInsights failed:", err);
+        return null;
+      }
+    },
     [
       effectiveImport,
       fitDetails,
