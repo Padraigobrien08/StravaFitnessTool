@@ -1,0 +1,30 @@
+# Local Postgres for StrideIQ.
+#
+#   docker compose up -d        # start the database
+#   npm run db:migrate          # create the schema
+#   docker compose down         # stop it (data is kept)
+#   docker compose down -v      # stop it AND wipe all data
+#
+# The matching connection string lives in .env.example / .env.local:
+#   DATABASE_URL=postgresql://strideiq:strideiq@localhost:5432/strideiq
+services:
+  db:
+    image: postgres:17
+    container_name: strideiq-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: strideiq
+      POSTGRES_PASSWORD: strideiq
+      POSTGRES_DB: strideiq
+    ports:
+      - "5432:5432"
+    volumes:
+      - strideiq-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U strideiq -d strideiq"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  strideiq-pgdata:

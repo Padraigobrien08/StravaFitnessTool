@@ -2,11 +2,19 @@ import { parseNum } from "@/lib/utils";
 import { pickField, parseCsvRows } from "./parseCsv";
 import type { ActivitySummary, RunActivity } from "./types";
 
-function parseStravaDate(raw: string): string {
+/**
+ * Returns an ISO date string, or null if the cell is empty/unparseable.
+ * Returning null (rather than the raw string) is critical: a garbage date
+ * that reaches analytics makes date-fns `format(parseISO(...))` throw
+ * "Invalid time value" inside a render path above the error boundary, which
+ * white-screens the entire app. Rows with a null date are dropped downstream.
+ */
+function parseStravaDate(raw: string): string | null {
   const cleaned = raw.replace(/^"|"$/g, "").trim();
+  if (!cleaned) return null;
   const d = new Date(cleaned);
   if (!Number.isNaN(d.getTime())) return d.toISOString();
-  return cleaned;
+  return null;
 }
 
 function distanceMeters(row: Record<string, string>): number {
@@ -47,6 +55,11 @@ export function parseActivitiesCsv(csvText: string): {
     const id = row["Activity ID"]?.trim();
     if (!id) continue;
 
+    // Drop rows with a missing/unparseable date entirely — every downstream
+    // analytic keys off the date, and an invalid one crashes rendering.
+    const date = parseStravaDate(row["Activity Date"] ?? "");
+    if (!date) continue;
+
     const distanceM = distanceMeters(row);
     const elapsedSec = elapsedSeconds(row);
     const movingSec = movingSeconds(row);
@@ -56,7 +69,7 @@ export function parseActivitiesCsv(csvText: string): {
 
     allActivities.push({
       id,
-      date: parseStravaDate(row["Activity Date"] ?? ""),
+      date,
       name: row["Activity Name"]?.trim() ?? "Untitled",
       type,
       distanceM,
@@ -76,7 +89,7 @@ export function parseActivitiesCsv(csvText: string): {
 
     runs.push({
       id,
-      date: parseStravaDate(row["Activity Date"] ?? ""),
+      date,
       name: row["Activity Name"]?.trim() ?? "Untitled",
       distanceM,
       elapsedSec,
@@ -108,5 +121,7 @@ export function parseActivitiesCsv(csvText: string): {
 }
 
 export function filterRuns(runs: RunActivity[]): RunActivity[] {
-  return runs.filter((r) => r.distanceM > 0);
+  return runs.filter(
+    (r) => r.distanceM > 0 && !Number.isNaN(new Date(r.date).getTime())
+  );
 }

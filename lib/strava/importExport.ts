@@ -47,20 +47,32 @@ export async function importFromFiles(
   const { runs, allActivities } = parseActivitiesCsv(activitiesText);
   const filteredRuns = filterRuns(runs);
 
+  // Optional files: a corrupt preferences/goals CSV must not discard an
+  // otherwise-valid activities import. Fall back to defaults on failure.
   const prefsFile = findFile(files, "general_preferences.csv");
-  const profile = prefsFile
-    ? parsePreferencesCsv(await readFileAsText(prefsFile))
-    : {
-        maxHeartRate: null,
-        athleteType: null,
-        ftp: null,
-        measurementPreference: null,
-      };
+  let profile: ReturnType<typeof parsePreferencesCsv> = {
+    maxHeartRate: null,
+    athleteType: null,
+    ftp: null,
+    measurementPreference: null,
+  };
+  if (prefsFile) {
+    try {
+      profile = parsePreferencesCsv(await readFileAsText(prefsFile));
+    } catch (err) {
+      console.error("Skipping unreadable general_preferences.csv:", err);
+    }
+  }
 
   const goalsFile = findFile(files, "goals.csv");
-  const goals = goalsFile
-    ? parseGoalsCsv(await readFileAsText(goalsFile))
-    : [];
+  let goals: ReturnType<typeof parseGoalsCsv> = [];
+  if (goalsFile) {
+    try {
+      goals = parseGoalsCsv(await readFileAsText(goalsFile));
+    } catch (err) {
+      console.error("Skipping unreadable goals.csv:", err);
+    }
+  }
 
   const fitFilenameById = new Map<string, string>();
   for (const run of filteredRuns) {
