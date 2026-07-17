@@ -489,11 +489,14 @@ Used by Coach (`POST /api/chat`) and MCP (`GET /api/me/intelligence`). Defined i
 
 | Feature | Description |
 |---------|-------------|
-| MCP server | Exposes same intelligence tools to Claude Desktop / Cursor |
+| MCP server | Intelligence + Strava parity + composite coach tools (v0.5) |
+| DB-backed MCP lists | Activity list uses Neon when sync &lt;24h fresh |
+| MCP resources | `strideiq://activity/{id}/gpx` |
 | Session or API key auth | Cookie or `STRIDEIQ_API_KEY` |
 | Tool parity | Same deterministic outputs as web Coach |
+| Strava MCP | Built-in — no external `@r-huijts/strava-mcp-server` required |
 
-See [packages/strideiq-mcp/README.md](../packages/strideiq-mcp/README.md).
+See [packages/strideiq-mcp/README.md](../packages/strideiq-mcp/README.md), [MCP_INTEGRATION.md](./MCP_INTEGRATION.md), [MCP_STRAVA_SMOKE.md](./MCP_STRAVA_SMOKE.md).
 
 ---
 

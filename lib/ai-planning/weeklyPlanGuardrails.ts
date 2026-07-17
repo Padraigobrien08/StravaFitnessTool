@@ -59,8 +59,11 @@ export function computeWeeklyPlanGuardrails(
   if (context.constraints.avoidIntensityStacking) {
     maxHardSessions = Math.min(maxHardSessions, 1);
   }
-  if (context.currentState.fatigueState === "fatigued") {
+  if (context.currentState.fatigueState === "fatigued" && !raceWeek) {
     maxHardSessions = 0;
+  }
+  if (raceWeek) {
+    maxHardSessions = Math.max(maxHardSessions, 1);
   }
 
   let maxVolumeIncreasePct = 10;

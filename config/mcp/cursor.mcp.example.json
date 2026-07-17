@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "strideiq": {
+      "command": "node",
+      "args": ["${workspaceFolder}/packages/strideiq-mcp/dist/index.js"],
+      "env": {
+        "STRIDEIQ_BASE_URL": "http://localhost:3000",
+        "STRIDEIQ_API_KEY": "your-secret-key-from-env-local"
+      }
+    }
+  }
+}

@@ -27,6 +27,7 @@ import { ThemeSegmentedControl } from "@/components/theme/theme-toggle";
 import { RaceGoalPicker } from "@/components/goals/race-goal-picker";
 import { DataQualityPanel } from "@/components/layout/data-quality-panel";
 import { StravaWebhookCard } from "@/components/settings/strava-webhook-card";
+import { StravaMcpScopesCard } from "@/components/settings/strava-mcp-scopes-card";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 
 export default function SettingsPage() {
@@ -138,6 +139,8 @@ export default function SettingsPage() {
       </Card>
 
       <StravaWebhookCard apiConnected={apiConnected} />
+
+      <StravaMcpScopesCard connected={apiConnected} />
 
       <RaceGoalPicker />
 

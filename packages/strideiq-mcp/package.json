@@ -1,7 +1,7 @@
 {
   "name": "@strideiq/mcp",
-  "version": "0.2.0",
-  "description": "StrideIQ MCP server — training intelligence tools for Claude Desktop",
+  "version": "0.5.0",
+  "description": "StrideIQ MCP server — training intelligence + Strava API proxy for Claude Desktop",
   "type": "module",
   "bin": {
     "strideiq-mcp": "./dist/index.js"

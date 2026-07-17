@@ -1,64 +1,172 @@
+<div align="center">
+
 # StrideIQ
 
-**Private training intelligence for runners** — import Strava data, get evidence-backed insights, explore a persistent **Athlete Intelligence Model**, and investigate training questions with a tool-grounded **Coach**.
+**Private training intelligence for runners**
 
-StrideIQ answers *why* things changed and *what to do next*, not only *what happened*. Analytics and reasoning run on deterministic engines; language layers (Coach, MCP) orchestrate tools and must not invent metrics.
+Import Strava data. Get evidence-backed insights. Plan your week. Investigate *why* with a tool-grounded Coach.
 
-📄 **Product contract:** [PRODUCT.md](PRODUCT.md)  
-📚 **Full docs index:** [docs/README.md](docs/README.md)  
-📋 **Every feature:** [docs/FEATURES.md](docs/FEATURES.md)  
-🚀 **Deploy:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) · **Smoke test:** [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) · **MVP release:** [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md)
+[Quick start](#quick-start) · [Features](#features) · [Deploy](#deploy) · [Docs](#documentation)
+
+</div>
 
 ---
 
-## What StrideIQ is
+StrideIQ is a **local-first** Next.js app that turns Strava exports (or live API sync) into a coherent training operating system — not another chart dashboard. Deterministic engines compute metrics; the Coach and LLM layers **orchestrate tools** and must not invent numbers.
 
-| Layer | What you get |
-|-------|----------------|
-| **Dashboard** | Question-led pages: training load, performance, goals, runs, reports |
-| **Intelligence** (`/intelligence`) | Curated **belief state** — signals, risks, memory, ecosystem, trajectory |
-| **Coach** (`/coach`) | **Investigation chat** — threaded reasoning with server-backed tools |
-| **Route replay** | GPS workspace with pace, HR, elevation (`/runs/[id]/route`) |
-| **MCP** | Same intelligence tools in Claude Desktop via `packages/strideiq-mcp` |
+> **Repository:** `StravaFitnessTool` on GitHub · **Product name:** StrideIQ  
+> **Status:** MVP (`v0.1.0-mvp`) — private beta
+
+---
+
+## Table of contents
+
+- [Why StrideIQ](#why-strideiq)
+- [Features](#features)
+- [How it works](#how-it-works)
+- [Quick start](#quick-start)
+- [Configuration](#configuration)
+- [Deploy](#deploy)
+- [Routes](#routes)
+- [Coach, API & MCP](#coach-api--mcp)
+- [Development](#development)
+- [Documentation](#documentation)
+- [Tech stack](#tech-stack)
+- [License](#license)
+
+---
+
+## Why StrideIQ
+
+| Typical Strava tooling | StrideIQ |
+|------------------------|----------|
+| Charts and totals | Question-led surfaces (“Am I ready?” “What changed?”) |
+| Static dashboards | **Athlete Intelligence Model** — curated belief state |
+| Generic AI chat | **Coach** with deterministic tool-use over your data |
+| Disconnected planning | **Adaptive week plan** with context, save, and execution vs actual |
+
+**Design principle:** every screen answers one user question. Insights ship with evidence, confidence, and recommendations — not orphaned graphs.
+
+---
+
+## Features
+
+### Data ingestion
+
+- **Strava bulk export** — `activities.csv` + optional FIT `activities/` folder (two-step import)
+- **Strava OAuth** — live sync to Neon Postgres
+- **Webhooks** — optional background activity sync
+- **Privacy-first export path** — no account or server required for core analytics
+
+### Training intelligence
+
+| Surface | What you get |
+|---------|----------------|
+| **Home** | Operating-system layout: focus, week board, change feed, decision support |
+| **Plan** | Planning context, AI/rule-based week generation, drag-and-drop board, planned vs actual |
+| **Goals** | Race briefing, readiness, forecasts, mission control |
+| **Training & Performance** | Volume, blocks, efficiency, projections, records |
+| **Runs** | Activity explorer, session intelligence, route replay (MapLibre) |
+| **Intelligence** | Persistent athlete belief model — signals, memory, ecosystem (not a chat UI) |
+| **Coach** | Investigation workspace — threaded reasoning with server-backed tools |
+| **Report** | Printable training change summary |
+
+### Engineering
+
+- **218+ Vitest tests** · production `next build`
+- **shadcn/ui** component layer · DM Sans + Syne typography
+- **MCP package** — same intelligence tools in Claude Desktop (`packages/strideiq-mcp`)
+
+---
+
+## How it works
+
+```mermaid
+flowchart LR
+  subgraph ingest [Ingest]
+    CSV[Strava export]
+    OAuth[Strava OAuth]
+    FIT[FIT streams]
+  end
+
+  subgraph core [Core]
+    Parsers[lib/strava + domain]
+    Analytics[Analytics engines]
+    Insights[Insight engine]
+  end
+
+  subgraph ui [Surfaces]
+    Home[Home / Plan / Goals]
+    Intel[Intelligence]
+    Coach[Coach]
+  end
+
+  CSV --> Parsers
+  OAuth --> Parsers
+  FIT --> Parsers
+  Parsers --> Analytics
+  Analytics --> Insights
+  Insights --> Home
+  Insights --> Intel
+  Analytics --> Coach
+```
+
+**Two runtime modes**
+
+| Mode | Storage | Coach / sync |
+|------|---------|----------------|
+| **Export only** | Browser `localStorage` + IndexedDB (FIT) | Client analytics only |
+| **Connected** | Neon Postgres + session cookie | Full Coach, webhooks, MCP |
 
 ---
 
 ## Quick start
 
-### 1. Install and run
+### Prerequisites
+
+- **Node.js** 20+
+- **npm** 10+
+
+### Run locally
 
 ```bash
+git clone https://github.com/Padraigobrien08/StravaFitnessTool.git
+cd StravaFitnessTool
 npm install
 cp .env.example .env.local   # optional — see paths below
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open **[http://localhost:3000](http://localhost:3000)**.
 
-### 2. Choose a data path
+### Choose your path
 
-| Path | `.env.local` | What works |
-|------|----------------|------------|
-| **A — Export only** | Empty or omit file | Home, Training, Goals, Plan (local), Runs, Report, Intelligence (client) |
-| **B — Full stack** | Strava + Neon + LLM keys | Everything including OAuth sync, Coach, webhooks |
+| Path | Setup time | `.env.local` | Capabilities |
+|------|------------|--------------|--------------|
+| **A — Export only** | ~5 min | Empty or omit | Home, Training, Goals, Plan, Runs, Report, Intelligence (client) |
+| **B — Full stack** | ~20 min | Strava + Neon + LLM | OAuth sync, Coach, webhooks, MCP |
 
-Details: [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md) (what needs the API).
+Capability matrix: [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md).
 
-#### Path A — Export only (clean machine, ~5 min)
+<details>
+<summary><strong>Path A — Export only (no API keys)</strong></summary>
 
-1. Strava → **Settings → My Account → Download or Delete Your Account** → request export → unzip.
-2. App → **Import** → upload export folder (must include `activities.csv`).
-3. Optional: second step — upload the `activities/` folder for FIT streams.
-4. **Home** → confirm runs load.
-5. **Goals** → set a race date.
-6. **Plan** → optional context → **Generate** → **Save week**.
-7. **Settings** → toggle theme; optional **Clear data** (confirmation dialog).
+1. Strava → **Settings → My Account** → download your data → unzip.
+2. **Import** → upload export folder (`activities.csv` required).
+3. Optional: upload the `activities/` folder for FIT stream detail.
+4. **Home** — confirm runs load.
+5. **Goals** — set race distance and date.
+6. **Plan** — add optional context → **Generate** → **Save week**.
+7. **Settings** — theme toggle; **Clear data** uses a confirmation dialog.
 
-No `DATABASE_URL` or Strava API app required.
+No Strava API app or database required.
 
-#### Path B — OAuth + Coach (~20 min first time)
+</details>
 
-1. Create [Neon](https://neon.tech) database; run migrations:
+<details>
+<summary><strong>Path B — OAuth + Coach</strong></summary>
+
+1. Create a [Neon](https://neon.tech) database and apply migrations:
 
    ```bash
    psql "$DATABASE_URL" -f db/migrations/001_initial.sql
@@ -66,9 +174,9 @@ No `DATABASE_URL` or Strava API app required.
    psql "$DATABASE_URL" -f db/migrations/003_route_geometry.sql
    ```
 
-2. Create [Strava API application](https://www.strava.com/settings/api); set callback domain to `localhost` for dev.
+2. Create a [Strava API application](https://www.strava.com/settings/api). For local dev, set **Authorization Callback Domain** to `localhost`.
 
-3. Fill `.env.local` from [`.env.example`](.env.example):
+3. Configure [`.env.local`](.env.example) (copy from [`.env.example`](.env.example)):
 
    ```bash
    DATABASE_URL=postgresql://...
@@ -76,87 +184,87 @@ No `DATABASE_URL` or Strava API app required.
    STRAVA_CLIENT_ID=...
    STRAVA_CLIENT_SECRET=...
    STRAVA_REDIRECT_URI=http://localhost:3000/api/auth/strava/callback
-   OPENAI_API_KEY=sk-...
+   OPENAI_API_KEY=sk-...   # or ANTHROPIC_API_KEY
    ```
 
-4. Restart `npm run dev` → **Import → Connect Strava** → sync.
-5. **Goals** → race goal → **Plan** → generate + save → **Coach** → ask a training question.
+4. Restart the dev server → **Import → Connect Strava** → sync activities.
+5. **Goals** → race goal → **Plan** → generate and save → **Coach** → ask a training question.
 
-### 3. Verify (CI gate)
+</details>
+
+### Verify
 
 ```bash
 npm test && npm run build
-# or: ./scripts/verify.sh
+# or
+./scripts/verify.sh
 ```
 
-For manual QA, use [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
-
-### 4. Production deploy
-
-[Vercel + Neon + Strava URLs](docs/DEPLOYMENT.md) — set production `STRAVA_REDIRECT_URI` and optional webhook callback, then run smoke Path C in [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
+Manual QA: [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
 
 ---
 
-## Main routes
+## Configuration
 
-### Training dashboard
+Copy [`.env.example`](.env.example) to `.env.local`. Never commit `.env.local`.
 
-| Route | Question |
-|-------|----------|
-| `/home` | Am I improving, training well, ready, what next, what changed? |
-| `/training` | Volume, blocks, efficiency, intensity |
-| `/performance` | Trends, records, effort |
-| `/goals` | Race readiness, predictions, weekly target |
-| `/runs` | Activity log |
-| `/runs/[id]` | Single-run execution analysis |
-| `/runs/[id]/route` | Map replay + streams |
-| `/report` | Printable change summary |
-| `/import` | CSV / FIT / Strava OAuth |
+| Variable | Required for |
+|----------|----------------|
+| `DATABASE_URL` | Strava sync, Coach, MCP |
+| `SESSION_SECRET` | Signed session cookies |
+| `STRAVA_CLIENT_ID` / `SECRET` / `REDIRECT_URI` | OAuth |
+| `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` | Coach + AI weekly plan |
+| `STRAVA_WEBHOOK_VERIFY_TOKEN` / `STRAVA_WEBHOOK_CALLBACK_URL` | Push auto-sync |
+| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` | MCP / automation |
+
+Production values and callback URLs: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+---
+
+## Deploy
+
+Hosted stack: **Vercel** (app) + **Neon** (database) + **Strava** (OAuth + optional webhooks).
+
+| Step | Guide |
+|------|--------|
+| Neon migrations | [docs/DEPLOYMENT.md § Neon](docs/DEPLOYMENT.md#1-neon-database) |
+| Strava callback & webhook URLs | [docs/DEPLOYMENT.md § Strava](docs/DEPLOYMENT.md#2-strava-api-application) |
+| Vercel env vars | [docs/DEPLOYMENT.md § Vercel](docs/DEPLOYMENT.md#3-vercel-project) |
+| Post-deploy smoke test | [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) Path C |
+
+---
+
+## Routes
+
+| Route | Purpose |
+|-------|---------|
+| `/home` | Training operating system — focus, week, insights |
+| `/plan` | Adaptive week workspace |
+| `/goals` | Race readiness and forecasts |
+| `/training` | Volume, blocks, load intelligence |
+| `/performance` | Trends, records, projections |
+| `/runs` | Activity explorer |
+| `/runs/[id]` | Session execution analysis |
+| `/runs/[id]/route` | GPS replay (pace, HR, elevation) |
+| `/intelligence` | Athlete Intelligence Model |
+| `/coach` | Investigation chat |
+| `/report` | Printable summary |
+| `/import` | CSV, FIT, Strava OAuth |
 | `/settings` | Units, privacy, webhooks, data quality |
 
-### Intelligence & Coach
+Legacy chart routes (`/dashboard`, `/trends`, `/effort`, `/records`, `/context`) remain for compatibility.
 
-| Route | Role |
-|-------|------|
-| `/intelligence` | **Athlete Intelligence Model** — what the system currently believes (not a chat UI) |
-| `/coach` | **Investigation workspace** — ask why, compare blocks, challenge recommendations |
-
-Deep link from Intelligence → Coach: `?domain=…`, `?q=…`, `?topic=…`, `&investigate=1`.
-
-Details: [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md).
-
-Legacy chart URLs (`/dashboard`, `/trends`, `/effort`, `/records`, `/context`) still work.
+Coach deep links from Intelligence: `?domain=…`, `?q=…`, `?topic=…`, `&investigate=1`.
 
 ---
 
-## Data & privacy
+## Coach, API & MCP
 
-### Two data paths (same analytics in the browser)
+### In-app Coach
 
-```
-Local export (CSV + optional FIT)  →  parsers  →  domain  →  analytics  →  UI
-Strava OAuth + Neon                →  sync API  →  /api/me/import  →  same pipeline
-```
-
-- **Local:** Parsing runs in the browser; optional `localStorage` snapshot; FIT streams in **IndexedDB**. No account required.
-- **Hosted:** Activities and streams in **Neon**; session cookie for API; required for Coach tool loop and MCP.
-
-**Privacy notes**
-
-- Do not commit `export_*/` folders ([`.gitignore`](.gitignore)).
-- `profile.csv` email is not loaded into app state.
-- **Clear data** from the app header resets client state.
-- When Strava sync is enabled, activity data is stored server-side for your account only.
-
----
-
-## Coach, API, and MCP
-
-### In-app Coach (`/coach`)
-
-- Fixed-height chat UI: scrollable thread, sticky composer, investigation sidebar, context rail.
-- `POST /api/chat` — OpenAI (preferred) or Anthropic with **tool-use** over deterministic intelligence.
-- Threads stored in **browser localStorage** (`lib/coach/threadStorage.ts`).
+- Investigation UI: thread, composer, sidebar, context rail
+- `POST /api/chat` — OpenAI (preferred) or Anthropic with **tool-use**
+- Threads in browser `localStorage`
 
 ### HTTP intelligence API
 
@@ -164,122 +272,126 @@ Strava OAuth + Neon                →  sync API  →  /api/me/import  →  same
 GET /api/me/intelligence?section=brief|readiness|compare_sessions|...
 ```
 
-Auth: session cookie (browser) or `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` (automation).
+Auth: session cookie (browser) or `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID`.
 
-### Reasoning tools (engines, not LLM guesses)
+### Reasoning tools (deterministic)
 
 | Tool | Purpose |
 |------|---------|
 | `compare_sessions` | Compare recent workouts |
 | `explain_readiness_delta` | Why readiness moved |
 | `find_best_phase` | Strongest training phases |
-| `attribute_improvement` | What preceded gains |
+| `attribute_improvement` | Patterns before gains |
 | `analyze_fade_pattern` | Late-run pace fade |
 | `pr_context` | Training before PRs |
 | `get_training_ecosystem` | Multi-sport fatigue context |
-| + core | readiness, predictions, week plan, fatigue, data quality, … |
 
-Full list: [docs/ARCHITECTURE.md](ARCHITECTURE.md).
+Full tool catalog: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-### MCP package
+### MCP (Claude Desktop)
 
 ```bash
 cd packages/strideiq-mcp && npm install && npm run build
 ```
 
-See [packages/strideiq-mcp/README.md](packages/strideiq-mcp/README.md) for Claude Desktop config.
+Setup: [packages/strideiq-mcp/README.md](packages/strideiq-mcp/README.md).
 
 ---
 
-## FIT import (two-step)
+## Development
 
-Strava’s CSV often references `activities/<id>.fit.gz` without including files.
-
-1. Upload export folder (must include `activities.csv`).
-2. Upload the `activities/` folder from the full archive (or the whole unzip).
-
-FIT data is matched via the `Filename` column and stored in IndexedDB for stream-rich run detail.
-
----
-
-## Strava webhooks (auto-sync)
-
-1. Set `STRAVA_WEBHOOK_VERIFY_TOKEN` and public `STRAVA_WEBHOOK_CALLBACK_URL` (e.g. ngrok → `https://….ngrok-free.app/api/webhooks/strava`).
-2. **Settings → Enable auto-sync** (requires API connection).
-3. Refresh the app after webhook events (client does not live-push yet).
-
-| Endpoint | Purpose |
-|----------|---------|
-| `GET/POST /api/webhooks/strava` | Challenge + activity events |
-| `GET/POST /api/webhooks/strava/subscribe` | Manage subscription |
-
----
-
-## Environment variables
-
-Copy [`.env.example`](.env.example) → `.env.local` (never commit `.env.local`).
-
-| Variable | Required for |
-|----------|----------------|
-| `DATABASE_URL` | Strava sync, Coach, MCP |
-| `SESSION_SECRET` | Signed session cookies (when using DB) |
-| `STRAVA_CLIENT_ID` / `SECRET` / `REDIRECT_URI` | OAuth |
-| `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` | Coach chat + AI plan |
-| `STRAVA_WEBHOOK_VERIFY_TOKEN` / `STRAVA_WEBHOOK_CALLBACK_URL` | Push auto-sync |
-| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` | MCP / automation (optional) |
-| `NEXT_PUBLIC_FORECAST_LAB=1` | Forecast lab in production (optional) |
-
-Full comments and production examples: [`.env.example`](.env.example), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-
----
-
-## Project structure
+### Project structure
 
 ```
-app/                    # Next.js routes (pages + API)
-components/
-  intelligence/         # Athlete Intelligence Model UI
-  coach/                # Coach workspace UI
-  training/ goals/ …    # Dashboard feature UI
+app/                      # Next.js App Router (pages + API)
+components/               # Feature UI (coach, plan, home, goals, …)
+components/ui/            # shadcn/ui primitives
 lib/
-  strava/ domain/       # Ingest + normalized activities
-  analytics/ insights/  # Metrics + narrative engine
-  reasoning/            # Deterministic reasoning primitives
-  ecosystem/            # Multi-sport context
+  strava/ domain/         # Ingest + normalized activities
+  analytics/ insights/  # Metrics + narratives
   intelligence/         # Server bundle, tools, chat
-  coach/                # Workspace state, threads, parsing
-  route-intelligence/   # GPS replay
-  db/ sync/             # Neon + Strava sync
-hooks/                  # useTrainingIntelligence, useAthleteIntelligence, …
-db/migrations/          # SQL schema
-packages/strideiq-mcp/  # MCP server
-docs/                   # Architecture + product deep dives
+  reasoning/            # Deterministic reasoning primitives
+  training-calendar/    # Plan persistence & validation
+hooks/                    # Data hooks for pages
+db/migrations/            # Postgres schema
+packages/strideiq-mcp/    # MCP server
+docs/                     # Architecture, deploy, smoke tests
 ```
 
 **Rule:** UI consumes domain models and view models — never raw Strava CSV rows.
 
-Architecture detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+### Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm test` | Vitest test suite |
+| `./scripts/verify.sh` | Test + build gate |
+
+### FIT import note
+
+Strava CSV often references `activities/<id>.fit.gz` without bundling files. Upload the export folder first, then the `activities/` directory from your full archive. FIT streams are stored in IndexedDB and power route replay and stream intelligence.
+
+### Webhooks
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET/POST /api/webhooks/strava` | Verification + activity events |
+| `GET/POST /api/webhooks/strava/subscribe` | Subscription management |
+
+Enable from **Settings** after OAuth is connected. Refresh the app after webhook events (no live push to the client yet).
+
+---
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/README.md](docs/README.md) | Documentation index |
+| [PRODUCT.md](PRODUCT.md) | Product contract and IA rules |
+| [docs/FEATURES.md](docs/FEATURES.md) | Complete feature catalog |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Layers, data flow, API |
+| [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md) | Intelligence vs Coach |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel + Neon + Strava production setup |
+| [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md) | Manual release checklist |
+| [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md) | MVP scope and API requirements |
+| [docs/DIFFERENTIATION_NORTH_STAR.md](docs/DIFFERENTIATION_NORTH_STAR.md) | Future moat features |
 
 ---
 
 ## Tech stack
 
-- **Framework:** Next.js 16, React 19, TypeScript
-- **UI:** Tailwind CSS v4, Recharts, MapLibre GL
-- **Data:** Papa Parse, fit-file-parser, Zod, Zustand
-- **Database:** Neon Postgres (`@neondatabase/serverless`)
-- **Testing:** Vitest
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 16, React 19, TypeScript |
+| UI | Tailwind CSS v4, shadcn/ui (Base UI), Recharts, MapLibre GL |
+| State | Zustand |
+| Data | Papa Parse, fit-file-parser, Zod |
+| Database | Neon Postgres (`@neondatabase/serverless`) |
+| LLM | OpenAI / Anthropic (Coach, optional planning) |
+| Testing | Vitest |
 
 ---
 
-## Differentiation roadmap
+## Known MVP limitations
 
-StrideIQ is evolving from “dashboard + chat” toward **interactive endurance reasoning** and **personal adaptation intelligence**.
-
-North star and gap analysis: [docs/DIFFERENTIATION_NORTH_STAR.md](docs/DIFFERENTIATION_NORTH_STAR.md).
+- Unit preference is saved in Settings; chart labels remain km-centric until a future release.
+- Saved training weeks live in browser `localStorage` (not synced per user to Neon).
+- Coach and full intelligence bundle require server env and LLM keys.
+- See [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md) for the full list.
 
 ---
 
 ## License
 
 Private project — not licensed for public redistribution unless otherwise noted.
+
+---
+
+<div align="center">
+
+**[StrideIQ](https://github.com/Padraigobrien08/StravaFitnessTool)** · Built for runners who want answers, not just activity logs.
+
+</div>
