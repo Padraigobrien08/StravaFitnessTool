@@ -40,13 +40,19 @@ export function WorkspaceFrame({
 }
 
 function WorkspaceMeta() {
-  const { importData, clearData, dataSourceLabel } = useStrava();
+  const { importData, clearData, dataSourceLabel, dataSources } = useStrava();
   if (!importData) return null;
+  const isDemo = Boolean(dataSources.demo);
   return (
     <div className="hidden items-center gap-2 text-xs text-zinc-500 xl:flex">
+      {isDemo ? (
+        <span className="rounded-full border border-teal-400/30 bg-teal-400/10 px-2 py-0.5 font-medium text-teal-300">
+          Demo
+        </span>
+      ) : null}
       <span>
         {importData.runs.length} runs
-        {dataSourceLabel ? ` · ${dataSourceLabel}` : ""}
+        {!isDemo && dataSourceLabel ? ` · ${dataSourceLabel}` : ""}
       </span>
       <Button
         variant="ghost"
@@ -54,7 +60,7 @@ function WorkspaceMeta() {
         className="h-7 px-2 text-xs text-zinc-500"
         onClick={clearData}
       >
-        Clear
+        {isDemo ? "Exit demo" : "Clear"}
       </Button>
     </div>
   );

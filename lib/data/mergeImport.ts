@@ -93,9 +93,12 @@ export function enrichImportWithFitDetails(
 export interface DataSources {
   localExport: boolean;
   stravaApi: boolean;
+  /** Synthetic sample athlete loaded via "Try the demo". */
+  demo?: boolean;
 }
 
 export function buildDataSourceLabel(sources: DataSources): string | null {
+  if (sources.demo) return "Demo data";
   if (!sources.localExport && !sources.stravaApi) return null;
   if (sources.localExport && sources.stravaApi) return "Export + Strava API";
   if (sources.stravaApi) return "Strava API";

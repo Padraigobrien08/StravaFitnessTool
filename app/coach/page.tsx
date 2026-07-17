@@ -8,8 +8,9 @@ import { CoachWorkspace } from "@/components/coach/coach-workspace";
 import { CoachReasoningWorkspace } from "@/components/coach/coach-reasoning-workspace";
 
 function CoachPageInner() {
-  const { apiConnected, importData } = useStrava();
+  const { apiConnected, importData, dataSources } = useStrava();
   const [serverReady, setServerReady] = useState(false);
+  const isDemo = Boolean(dataSources.demo);
 
   useSyncPreferences(apiConnected);
 
@@ -34,9 +35,11 @@ function CoachPageInner() {
         <CoachReasoningWorkspace
           disabled={chatDisabled}
           disabledReason={
-            !apiConnected
-              ? "Connect Strava on Import — Coach needs server-synced activities for tool-backed reasoning."
-              : "Sync activities from Import so investigations can use your full history."
+            isDemo
+              ? "Demo mode: the reasoning workspace below is live on the sample athlete, but the chat needs an LLM key. Add OPENAI_API_KEY (or ANTHROPIC_API_KEY) + DATABASE_URL to .env.local and connect Strava to enable tool-backed chat — see the README “Coach chat” section."
+              : !apiConnected
+                ? "Connect Strava on Import — Coach needs server-synced activities for tool-backed reasoning."
+                : "Sync activities from Import so investigations can use your full history."
           }
         />
       </CoachWorkspace>

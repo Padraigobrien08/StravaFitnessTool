@@ -30,6 +30,11 @@ import { FitRunDetailSchema } from "@/lib/strava/fitTypes";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useGoalStore } from "@/stores/goal-store";
+import {
+  buildDemoImport,
+  demoRaceGoal,
+  DEMO_EXPORT_LABEL,
+} from "@/lib/demo/generateDemoData";
 
 interface FitImportStatus {
   parsing: boolean;
@@ -54,6 +59,8 @@ interface StravaContextValue {
   fitStatus: FitImportStatus;
   importFiles: (files: File[], label?: string) => Promise<void>;
   importFitFiles: (files: File[]) => Promise<void>;
+  /** Load the synthetic sample athlete (zero-setup demo). */
+  loadDemo: () => void;
   clearData: () => Promise<void>;
   refreshFromStravaApi: () => Promise<void>;
   getRunById: (id: string) => import("@/lib/strava/types").RunActivity | undefined;
@@ -158,6 +165,11 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = loadImport();
+    if (stored?.exportLabel === DEMO_EXPORT_LABEL) {
+      // Demo is fully self-contained — restore it and skip server hydration.
+      commitImport(stored, { localExport: false, stravaApi: false, demo: true });
+      return;
+    }
     if (stored) {
       const label = stored.exportLabel ?? "";
       commitImport(stored, {
@@ -321,6 +333,16 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
     ]
   );
 
+  const loadDemo = useCallback(() => {
+    const now = new Date();
+    commitImport(buildDemoImport(now), {
+      localExport: false,
+      stravaApi: false,
+      demo: true,
+    });
+    useGoalStore.getState().setRaceGoal(demoRaceGoal(now));
+  }, [commitImport]);
+
   const clearData = useCallback(async () => {
     clearImport();
     await clearFitDetails();
@@ -337,6 +359,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
     setFitSuccess(null);
     setFitStatus(idleFitStatus);
     setFitDetails([]);
+    useGoalStore.getState().clearRaceGoal();
   }, []);
 
   const getRunById = useCallback(
@@ -365,6 +388,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         fitStatus,
         importFiles,
         importFitFiles,
+        loadDemo,
         clearData,
         refreshFromStravaApi: loadFromStravaApi,
         getRunById,
