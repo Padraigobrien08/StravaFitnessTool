@@ -47,7 +47,7 @@ export function validatePlan(
     adjusted = true;
   }
 
-  let hardCount = countHardSessions({ ...plan, sessions });
+  const hardCount = countHardSessions({ ...plan, sessions });
   if (tsb < -15 && hardCount > 2) {
     let removed = 0;
     sessions = sessions.map((s) => {

@@ -124,12 +124,13 @@ const baseAnalytics = {
       goals: [],
       allActivities: [],
       importedAt: new Date().toISOString(),
+      fitRunIds: [],
     },
     [],
     "medium",
     null
   ),
-} as DashboardInsights;
+} as unknown as DashboardInsights;
 
 describe("generateInsights", () => {
   it("warns on intensity-heavy training", () => {

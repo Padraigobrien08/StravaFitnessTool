@@ -29,6 +29,35 @@ import { Search } from "lucide-react";
 
 type SortKey = "date" | "distance" | "pace" | "hr" | "type";
 
+function SortHead({
+  label,
+  col,
+  sortKey,
+  sortAsc,
+  onSort,
+}: {
+  label: string;
+  col: SortKey;
+  sortKey: SortKey;
+  sortAsc: boolean;
+  onSort: (col: SortKey) => void;
+}) {
+  return (
+    <TableHead className="pr-4">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className="h-auto px-0 text-zinc-500 hover:text-zinc-300"
+        onClick={() => onSort(col)}
+      >
+        {label}
+        {sortKey === col ? (sortAsc ? " ↑" : " ↓") : ""}
+      </Button>
+    </TableHead>
+  );
+}
+
 const ALL_TYPES = "all" as const;
 
 export function RunsTable({
@@ -100,27 +129,6 @@ export function RunsTable({
     }
   }
 
-  const SortHead = ({
-    label,
-    col,
-  }: {
-    label: string;
-    col: SortKey;
-  }) => (
-    <TableHead className="pr-4">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="h-auto px-0 text-zinc-500 hover:text-zinc-300"
-        onClick={() => toggleSort(col)}
-      >
-        {label}
-        {sortKey === col ? (sortAsc ? " ↑" : " ↓") : ""}
-      </Button>
-    </TableHead>
-  );
-
   const typeOptions: (WorkoutType | typeof ALL_TYPES)[] = [
     ALL_TYPES,
     "easy",
@@ -171,12 +179,12 @@ export function RunsTable({
         <Table>
           <TableHeader>
             <TableRow className="border-white/10 hover:bg-transparent">
-              <SortHead label="Date" col="date" />
+              <SortHead label="Date" col="date" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
               <TableHead className="pr-4 text-zinc-500">Run</TableHead>
-              <SortHead label="Type" col="type" />
-              <SortHead label="Distance" col="distance" />
-              <SortHead label="Pace" col="pace" />
-              <SortHead label="HR" col="hr" />
+              <SortHead label="Type" col="type" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <SortHead label="Distance" col="distance" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <SortHead label="Pace" col="pace" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <SortHead label="HR" col="hr" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
               <TableHead className="text-zinc-500">FIT</TableHead>
             </TableRow>
           </TableHeader>

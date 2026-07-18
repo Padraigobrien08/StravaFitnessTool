@@ -23,6 +23,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "tsc --noEmit && eslint && vitest run",
     "setup": "node scripts/setup.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "db:reset": "node --env-file-if-exists=.env.local scripts/migrate.mjs --reset"

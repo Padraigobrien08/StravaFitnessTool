@@ -16,7 +16,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Production build — compiles and type-checks the app graph. The unit
-      # suite reads a local (git-ignored) Strava export fixture, so it runs
-      # locally via `npm test` rather than in CI.
+      # Typecheck + lint + unit tests. Tests that depend on the git-ignored
+      # Strava export fixture self-skip when it's absent (i.e. in CI).
+      - run: npm run check
       - run: npm run build

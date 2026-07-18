@@ -63,6 +63,7 @@ describe("classifyRun", () => {
       hrStream: [],
       paceStream: [],
       cadenceStream: [],
+      gpsStream: [],
       hrDriftPct: null,
       avgCadence: null,
       bestEfforts: [],

@@ -217,8 +217,8 @@ export function simulateRaceStrategy(
     (c) => c.label === cfg.consensusLabel
   );
 
-  let targetTimeSec = goal.targetTimeSec ?? consensus?.timeSec ?? 0;
-  let targetTimeSource = goal.targetTimeSec
+  const targetTimeSec = goal.targetTimeSec ?? consensus?.timeSec ?? 0;
+  const targetTimeSource = goal.targetTimeSec
     ? "Your goal time"
     : consensus
       ? "Consensus prediction"

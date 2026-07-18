@@ -45,6 +45,35 @@ import type { SessionIntelligence } from "@/lib/session-intelligence";
 const PAGE_SIZES = [25, 50, 100] as const;
 const ALL_TYPES = "all" as const;
 
+function Th({
+  label,
+  col,
+  sortKey,
+  sortAsc,
+  onSort,
+}: {
+  label: string;
+  col: ExplorerSortKey;
+  sortKey: ExplorerSortKey;
+  sortAsc: boolean;
+  onSort: (col: ExplorerSortKey) => void;
+}) {
+  return (
+    <th className="pb-1 pr-2">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => onSort(col)}
+        className="h-auto p-0 text-[9px] font-semibold uppercase tracking-wider text-zinc-600 hover:bg-transparent hover:text-zinc-400"
+      >
+        {label}
+        {sortKey === col ? (sortAsc ? " ↑" : " ↓") : ""}
+      </Button>
+    </th>
+  );
+}
+
 const markerConfig: Record<
   RunMarker,
   { label: string; icon: typeof Trophy; className: string }
@@ -163,21 +192,6 @@ export function RunExplorer({
     tableTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  const Th = ({ label, col }: { label: string; col: ExplorerSortKey }) => (
-    <th className="pb-1 pr-2">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => toggleSort(col)}
-        className="h-auto p-0 text-[9px] font-semibold uppercase tracking-wider text-zinc-600 hover:bg-transparent hover:text-zinc-400"
-      >
-        {label}
-        {sortKey === col ? (sortAsc ? " ↑" : " ↓") : ""}
-      </Button>
-    </th>
-  );
-
   return (
     <section ref={tableTopRef} className="rounded-xl border border-white/[0.06] bg-[#0a0b0e]/60">
       <div className="border-b border-white/[0.04] px-3 py-2.5">
@@ -265,17 +279,17 @@ export function RunExplorer({
             <tr className="border-b border-white/[0.05] bg-white/[0.02]">
               <th className="w-6 px-2 py-1.5" />
               <th className="w-5 px-1" />
-              <Th label="Date" col="date" />
+              <Th label="Date" col="date" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
               <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">
                 Session
               </th>
-              <Th label="Sig" col="significance" />
-              <Th label="Exec" col="execution" />
+              <Th label="Sig" col="significance" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <Th label="Exec" col="execution" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
               <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">
                 Tags
               </th>
-              <Th label="Dist" col="distance" />
-              <Th label="Pace" col="pace" />
+              <Th label="Dist" col="distance" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <Th label="Pace" col="pace" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
               <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">
                 HR
               </th>

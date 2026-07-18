@@ -46,3 +46,6 @@ next-env.d.ts
 # Strava exports (PII — never commit)
 export_*/
 **/export_*/
+
+# Local scratch / backlog notes
+FUTURE_IDEAS.md

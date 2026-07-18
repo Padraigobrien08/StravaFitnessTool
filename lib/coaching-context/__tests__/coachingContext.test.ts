@@ -14,7 +14,7 @@ import {
   taperWeek,
 } from "./fixtures";
 
-function build(fixture: ReturnType<typeof lowData>, opts?: Parameters<typeof buildCoachingContext>[0]["options"]) {
+function build(fixture: typeof lowData, opts?: Parameters<typeof buildCoachingContext>[0]["options"]) {
   return buildCoachingContext({
     analytics: fixture.analytics,
     quality: fixture.quality,
