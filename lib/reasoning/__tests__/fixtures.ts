@@ -61,6 +61,7 @@ export function emptyFit(activityId: string): FitRunDetail {
     hrStream: [],
     paceStream: [],
     cadenceStream: [],
+    gpsStream: [],
     hrDriftPct: null,
     avgCadence: null,
   };
@@ -71,9 +72,12 @@ const defaultQuality: ImportQualityReport = {
   activityCount: 10,
   fitParsed: 2,
   fitReferenced: 2,
+  skippedFit: 0,
+  lastImport: new Date().toISOString(),
+  sportTypes: ["Run"],
   fieldCoverage: [
-    { label: "Heart rate", count: 10, total: 10 },
-    { label: "GPS", count: 10, total: 10 },
+    { label: "Heart rate", count: 10, total: 10, level: "high" },
+    { label: "GPS", count: 10, total: 10, level: "high" },
   ],
   warnings: [],
   overallConfidence: "medium",
@@ -86,10 +90,16 @@ export function buildTestBundle(
 ): AthleteIntelligenceBundle {
   const importData = {
     runs,
-    profile: { name: "Test" },
+    profile: {
+      maxHeartRate: null,
+      athleteType: null,
+      ftp: null,
+      measurementPreference: null,
+    },
     goals: [],
     allActivities: [],
     importedAt: new Date().toISOString(),
+    fitRunIds: [],
   };
   const quality = { ...defaultQuality, runCount: runs.length };
   const analytics = computeInsights(importData, fitDetails, 3, null);

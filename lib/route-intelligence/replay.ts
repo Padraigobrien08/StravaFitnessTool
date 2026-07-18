@@ -19,7 +19,7 @@ export function advanceReplay(
 ): ReplayState {
   if (!state.playing) return state;
   const advance = (deltaMs / 1000) * state.speed;
-  let next = state.currentSec + advance;
+  const next = state.currentSec + advance;
   if (next >= state.durationSec) {
     return { ...state, currentSec: state.durationSec, playing: false };
   }

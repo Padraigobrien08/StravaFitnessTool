@@ -69,7 +69,7 @@ function modelAgreement(
 }
 
 function capabilityScoreFromEfforts(effortCount: number, modelCount: number): number {
-  let s = 45 + effortCount * 8 + modelCount * 6;
+  const s = 45 + effortCount * 8 + modelCount * 6;
   return Math.max(0, Math.min(100, Math.round(s)));
 }
 

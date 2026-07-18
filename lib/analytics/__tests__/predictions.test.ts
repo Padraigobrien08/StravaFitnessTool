@@ -23,10 +23,18 @@ function mockRun(
     distanceM: km * 1000,
     movingSec,
     elapsedSec: movingSec,
+    avgSpeedMps: null,
+    maxSpeedMps: null,
     avgHr: 155,
     maxHr: 175,
     elevationGainM: 50,
-    type: "Run",
+    calories: null,
+    relativeEffort: null,
+    trainingLoad: null,
+    gradeAdjustedPaceSecPerKm: null,
+    avgCadence: null,
+    totalSteps: null,
+    weatherTempC: null,
   };
 }
 

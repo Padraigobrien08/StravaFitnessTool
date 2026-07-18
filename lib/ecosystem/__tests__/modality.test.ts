@@ -129,6 +129,7 @@ describe("computeTrainingEcosystem from import", () => {
           },
         ],
         importedAt: new Date().toISOString(),
+        fitRunIds: [],
       },
       [],
       "low",

@@ -49,7 +49,7 @@ describe("mapStravaStreamsToFitDetail", () => {
         data: [
           [53.35, -6.26],
           [53.36, -6.25],
-        ],
+        ] as unknown as number[],
         series_type: "distance",
         original_size: 2,
         resolution: "high",

@@ -40,7 +40,8 @@ export function RaceGoalPicker() {
   const { raceGoal, setRaceGoal, clearRaceGoal } = useGoalStore();
   const [distance, setDistance] = useState<RaceDistance>(raceGoal?.distance ?? "hm");
   const [date, setDate] = useState(
-    raceGoal?.date ??
+    () =>
+      raceGoal?.date ??
       new Date(Date.now() + 56 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
   );
   const [targetTime, setTargetTime] = useState("");

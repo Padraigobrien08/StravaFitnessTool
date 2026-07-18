@@ -9,7 +9,7 @@ describe("buildActivityGpx", () => {
         data: [
           [53.0, -6.0],
           [53.01, -6.01],
-        ] as [number, number][],
+        ] as unknown as number[],
         series_type: "distance",
         original_size: 2,
         resolution: "high",

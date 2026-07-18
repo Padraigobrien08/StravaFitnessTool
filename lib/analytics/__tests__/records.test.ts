@@ -43,6 +43,7 @@ describe("findPersonalRecords", () => {
       hrStream: [],
       paceStream: [],
       cadenceStream: [],
+      gpsStream: [],
       hrDriftPct: null,
       avgCadence: null,
     };

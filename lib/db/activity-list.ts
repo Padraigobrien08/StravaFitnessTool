@@ -40,8 +40,8 @@ export async function getActivitiesSyncStatus(
   `;
   const { n, latest } = countRows[0] as { n: number; latest: Date | null };
 
-  let lastSyncAt: Date | null = sync?.finished_at ?? latest ?? null;
-  let source: ActivitiesSyncStatus["source"] = sync?.finished_at
+  const lastSyncAt: Date | null = sync?.finished_at ?? latest ?? null;
+  const source: ActivitiesSyncStatus["source"] = sync?.finished_at
     ? "sync_runs"
     : latest
       ? "activities_max"

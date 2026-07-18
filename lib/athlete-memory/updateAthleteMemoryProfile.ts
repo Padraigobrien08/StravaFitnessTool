@@ -80,7 +80,7 @@ function updateBeliefList(
   const byId = new Map(existing.map((b) => [b.id, b]));
 
   for (const belief of existing) {
-    let updated = { ...belief };
+    const updated = { ...belief };
 
     if (support.length) {
       updated.evidence = uniqueEvidence([...belief.evidence, ...support]);

@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { describe, expect, it } from "vitest";
 import { parseActivitiesCsv } from "../parseActivities";
@@ -8,15 +8,18 @@ const exportPath = path.join(
   "export_105352925",
   "activities.csv"
 );
+// The sample export is a git-ignored local fixture (real Strava PII), so these
+// tests only run when it's present — e.g. locally, not in CI.
+const hasExport = existsSync(exportPath);
 
 describe("parseActivitiesCsv", () => {
-  it("parses 57 runs from sample export", () => {
+  it.skipIf(!hasExport)("parses 57 runs from sample export", () => {
     const csv = readFileSync(exportPath, "utf-8");
     const { runs } = parseActivitiesCsv(csv);
     expect(runs.length).toBe(57);
   });
 
-  it("normalizes longest run distance to meters", () => {
+  it.skipIf(!hasExport)("normalizes longest run distance to meters", () => {
     const csv = readFileSync(exportPath, "utf-8");
     const { runs } = parseActivitiesCsv(csv);
     const longest = runs.reduce((a, b) =>
