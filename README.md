@@ -210,7 +210,7 @@ No Strava API app or database required.
    SESSION_SECRET=$(openssl rand -hex 32)
    STRAVA_CLIENT_ID=...
    STRAVA_CLIENT_SECRET=...
-   STRAVA_REDIRECT_URI=http://localhost:3000/api/auth/strava/callback
+   STRAVA_REDIRECT_URI=          # leave blank — callback follows the host you browse
    OPENAI_API_KEY=sk-...   # or ANTHROPIC_API_KEY
    ```
 
@@ -218,6 +218,26 @@ No Strava API app or database required.
 5. **Goals** → race goal → **Plan** → generate and save → **Coach** → ask a training question.
 
 </details>
+
+### View on your phone or tablet
+
+StrideIQ runs on your machine but is reachable from other devices.
+
+```bash
+npm run dev:lan   # serves on your LAN (0.0.0.0)
+npm run lan       # prints the URL to open on your phone + Strava setup hint
+```
+
+- **Demo & Strava-export import** work over the LAN URL (`http://<your-ip>:3000`) with no extra setup.
+- **Live Strava OAuth** needs the host registered as your Strava app's **Authorization Callback Domain** (the callback follows whatever host you browse, as long as `STRAVA_REDIRECT_URI` is blank):
+  - **Same Wi-Fi:** set the callback domain to your machine's LAN IP (shown by `npm run lan`), then open `http://<ip>:3000` on the device.
+  - **Anywhere / clean HTTPS:** run a tunnel and register its hostname instead —
+
+    ```bash
+    cloudflared tunnel --url http://localhost:3000   # or: ngrok http 3000
+    ```
+
+    Set the callback domain to the printed `*.trycloudflare.com` (or ngrok) host and open that URL on any device.
 
 ### Verify
 
@@ -356,9 +376,12 @@ docs/                     # Architecture, deploy, smoke tests
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Development server |
+| `npm run dev:lan` | Dev server on your LAN (reachable from other devices) |
+| `npm run lan` | Print the LAN URL + Strava callback hint for device access |
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm test` | Vitest test suite |
+| `npm run check` | Typecheck + lint + tests (CI gate) |
 | `./scripts/verify.sh` | Test + build gate |
 
 ### FIT import note

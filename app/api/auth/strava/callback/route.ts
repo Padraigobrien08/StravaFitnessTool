@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { exchangeCodeForTokens } from "@/lib/strava/api/oauth";
+import { resolveRedirectUri } from "@/lib/strava/api/config";
 import { upsertStravaConnection } from "@/lib/db/strava-connection";
 import { createUser, findUserByStravaAthleteId } from "@/lib/db/users";
 import { setSessionCookie } from "@/lib/auth/session";
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const tokens = await exchangeCodeForTokens(code);
+    const tokens = await exchangeCodeForTokens(code, resolveRedirectUri(request));
     if (!tokens.athlete?.id) {
       return NextResponse.redirect(
         new URL(`/import?strava=error`, request.url)
