@@ -19,6 +19,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:lan": "next dev -H 0.0.0.0",
+    "lan": "node scripts/lan-url.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

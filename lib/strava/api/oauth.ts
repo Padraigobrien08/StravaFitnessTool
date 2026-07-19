@@ -6,8 +6,11 @@ import {
 } from "./config";
 import type { StravaTokenResponse } from "./types";
 
-export function buildStravaAuthorizeUrl(state: string): string {
-  const { clientId, redirectUri } = stravaConfig();
+export function buildStravaAuthorizeUrl(
+  state: string,
+  redirectUri: string
+): string {
+  const { clientId } = stravaConfig();
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -20,9 +23,10 @@ export function buildStravaAuthorizeUrl(state: string): string {
 }
 
 export async function exchangeCodeForTokens(
-  code: string
+  code: string,
+  redirectUri: string
 ): Promise<StravaTokenResponse> {
-  const { clientId, clientSecret, redirectUri } = stravaConfig();
+  const { clientId, clientSecret } = stravaConfig();
   const res = await fetch(STRAVA_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
