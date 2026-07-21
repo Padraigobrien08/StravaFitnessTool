@@ -1,5 +1,7 @@
 import { STRAVA_API_BASE } from "./config";
 
+const STRAVA_ORIGIN = new URL(STRAVA_API_BASE).origin;
+
 export class StravaApiError extends Error {
   constructor(
     message: string,
@@ -9,6 +11,27 @@ export class StravaApiError extends Error {
     super(message);
     this.name = "StravaApiError";
   }
+}
+
+/**
+ * Build a Strava API request URL from a path and assert it stays on Strava's
+ * origin. Request paths interpolate activity/segment/route ids that ultimately
+ * originate from user input; every request here carries the user's bearer
+ * token, so a tainted URL pointing elsewhere would leak that token (SSRF).
+ * Validating the origin against a constant allowlist prevents that.
+ */
+export function stravaUrl(path: string): string {
+  const raw = path.startsWith("http")
+    ? path
+    : `${STRAVA_API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const url = new URL(raw);
+  if (url.origin !== STRAVA_ORIGIN) {
+    throw new StravaApiError(
+      `Refusing to send Strava credentials to non-Strava host: ${url.origin}`,
+      0
+    );
+  }
+  return url.toString();
 }
 
 function authHeaders(accessToken: string): HeadersInit {
@@ -34,9 +57,7 @@ export async function stravaGet<T>(
   searchParams?: Record<string, string | number | undefined>,
   options?: { allow404?: boolean; context?: string }
 ): Promise<T | null> {
-  const url = new URL(
-    path.startsWith("http") ? path : `${STRAVA_API_BASE}${path.startsWith("/") ? path : `/${path}`}`
-  );
+  const url = new URL(stravaUrl(path));
   if (searchParams) {
     for (const [k, v] of Object.entries(searchParams)) {
       if (v !== undefined && v !== "") url.searchParams.set(k, String(v));
@@ -75,7 +96,7 @@ export async function stravaGetText(
   path: string,
   context?: string
 ): Promise<string> {
-  const url = `${STRAVA_API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const url = stravaUrl(path);
   const res = await fetch(url, { headers: authHeaders(accessToken) });
   if (!res.ok) await parseError(res, context ?? path);
   return res.text();
@@ -87,7 +108,7 @@ export async function stravaPut<T>(
   body: unknown,
   context?: string
 ): Promise<T> {
-  const url = `${STRAVA_API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  const url = stravaUrl(path);
   const res = await fetch(url, {
     method: "PUT",
     headers: {
