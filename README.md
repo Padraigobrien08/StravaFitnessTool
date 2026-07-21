@@ -81,7 +81,7 @@ That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half mar
 ### Data ingestion
 
 - **Strava bulk export** — `activities.csv` + optional FIT `activities/` folder (two-step import)
-- **Strava OAuth** — live sync to Neon Postgres
+- **Strava OAuth** — live sync to Postgres (local Docker or hosted Neon)
 - **Webhooks** — optional background activity sync
 - **Privacy-first export path** — no account or server required for core analytics
 
@@ -143,7 +143,7 @@ flowchart LR
 | Mode | Storage | Coach / sync |
 |------|---------|----------------|
 | **Export only** | Browser `localStorage` + IndexedDB (FIT) | Client analytics only |
-| **Connected** | Neon Postgres + session cookie | Full Coach, webhooks, MCP |
+| **Connected** | Postgres (local/Neon) + session cookie | Full Coach, webhooks, MCP |
 
 ---
 
@@ -153,6 +153,7 @@ flowchart LR
 
 - **Node.js** 20+
 - **npm** 10+
+- **Docker** — optional, only for the local Postgres in Path B (skip if you use hosted Neon)
 
 ### Run locally
 
@@ -171,7 +172,7 @@ Open **[http://localhost:3000](http://localhost:3000)**.
 | Path | Setup time | `.env.local` | Capabilities |
 |------|------------|--------------|--------------|
 | **A — Export only** | ~5 min | Empty or omit | Home, Training, Goals, Plan, Runs, Report, Intelligence (client) |
-| **B — Full stack** | ~20 min | Strava + Neon + LLM | OAuth sync, Coach, webhooks, MCP |
+| **B — Full stack** | ~20 min | Strava + Postgres (local/Neon) + LLM | OAuth sync, Coach, webhooks, MCP |
 
 Capability matrix: [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md).
 
@@ -193,29 +194,40 @@ No Strava API app or database required.
 <details>
 <summary><strong>Path B — OAuth + Coach</strong></summary>
 
-1. Create a [Neon](https://neon.tech) database and apply migrations:
+1. **Scaffold `.env.local`** — generates a `SESSION_SECRET` and presets the local database URL:
 
    ```bash
-   psql "$DATABASE_URL" -f db/migrations/001_initial.sql
-   psql "$DATABASE_URL" -f db/migrations/002_coach.sql
-   psql "$DATABASE_URL" -f db/migrations/003_route_geometry.sql
+   npm run setup
    ```
 
-2. Create a [Strava API application](https://www.strava.com/settings/api). For local dev, set **Authorization Callback Domain** to `localhost`.
+2. **Set up the database.** Pick one:
 
-3. Configure [`.env.local`](.env.example) (copy from [`.env.example`](.env.example)):
+   - **Local Postgres (Docker)** — no cloud account:
+
+     ```bash
+     docker compose up -d    # Postgres on localhost:5432
+     npm run db:migrate      # apply db/migrations/*
+     ```
+
+   - **Hosted (Neon or any Postgres):** put its connection string in `DATABASE_URL`, then `npm run db:migrate`.
+
+   The driver is auto-selected from the connection string. `npm run db:reset` rebuilds the schema from scratch.
+
+3. Create a [Strava API application](https://www.strava.com/settings/api). For local dev, set **Authorization Callback Domain** to `localhost`.
+
+4. Fill in the rest of [`.env.local`](.env.example) (`npm run setup` already set `SESSION_SECRET` and `DATABASE_URL`):
 
    ```bash
-   DATABASE_URL=postgresql://...
-   SESSION_SECRET=$(openssl rand -hex 32)
+   # DATABASE_URL preset to local Docker; replace for Neon:
+   #   DATABASE_URL=postgresql://strideiq:strideiq@localhost:5432/strideiq
    STRAVA_CLIENT_ID=...
    STRAVA_CLIENT_SECRET=...
    STRAVA_REDIRECT_URI=          # leave blank — callback follows the host you browse
    OPENAI_API_KEY=sk-...   # or ANTHROPIC_API_KEY
    ```
 
-4. Restart the dev server → **Import → Connect Strava** → sync activities.
-5. **Goals** → race goal → **Plan** → generate and save → **Coach** → ask a training question.
+5. Restart the dev server → **Import → Connect Strava** → sync activities.
+6. **Goals** → race goal → **Plan** → generate and save → **Coach** → ask a training question.
 
 </details>
 
@@ -423,7 +435,7 @@ Enable from **Settings** after OAuth is connected. Refresh the app after webhook
 | UI | Tailwind CSS v4, shadcn/ui (Base UI), Recharts, MapLibre GL |
 | State | Zustand |
 | Data | Papa Parse, fit-file-parser, Zod |
-| Database | Neon Postgres (`@neondatabase/serverless`) |
+| Database | Postgres — local Docker or Neon; driver auto-selected (`postgres` / `@neondatabase/serverless`) |
 | LLM | OpenAI / Anthropic (Coach, optional planning) |
 | Testing | Vitest |
 
