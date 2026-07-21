@@ -4,7 +4,6 @@ import Link from "next/link";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import type { PerformanceDistributionView } from "@/lib/performance/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
-import { cn } from "@/lib/utils";
 
 export function PerformanceDistributionPanel({
   data,

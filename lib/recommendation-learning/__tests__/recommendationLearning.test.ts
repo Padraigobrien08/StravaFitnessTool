@@ -8,7 +8,7 @@ import {
 } from "../index";
 import { updateBeliefsFromOutcome } from "../updateBeliefsFromOutcome";
 import { emptyProfile } from "@/lib/athlete-memory/beliefUtils";
-import { lowData, insightsFrom, mkRun } from "@/lib/coaching-context/__tests__/fixtures";
+import { lowData } from "@/lib/coaching-context/__tests__/fixtures";
 
 describe("recommendation learning", () => {
   beforeEach(() => clearOutcomeStore("test"));

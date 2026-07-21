@@ -9,8 +9,6 @@ import { confidenceFromRuns } from "@/lib/intelligence/envelope";
 import { subDays, parseISO } from "date-fns";
 import type { ExplainReadinessDeltaArgs, ReasoningContext, ReasoningResult } from "./types";
 
-const HARD = new Set(["tempo", "interval", "race"]);
-
 export function explainReadinessDelta(
   ctx: ReasoningContext,
   args: ExplainReadinessDeltaArgs = {}
@@ -99,14 +97,6 @@ export function explainReadinessDelta(
     });
 
   const recentVol = lastNDaysVolume(runsNow, weeks * 7);
-  const hardInWindow = sessionsInWindow.filter((s) =>
-    HARD.has(
-      ctx.labelByRunId.get(
-        ctx.runs.find((r) => r.date.startsWith(s.date))?.id ?? ""
-      )?.type ?? ""
-    )
-  ).length;
-
   const distanceLabel = useRace
     ? RACE_READINESS_CONFIG[goal.distance].label
     : "Half marathon";

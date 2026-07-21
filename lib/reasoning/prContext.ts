@@ -1,4 +1,3 @@
-import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import { lastNDaysVolume } from "@/lib/analytics/volume";
 import { weeklyLoadSeries, acuteChronicLoad } from "@/lib/analytics/fatigue";
 import { confidenceFromRuns } from "@/lib/intelligence/envelope";

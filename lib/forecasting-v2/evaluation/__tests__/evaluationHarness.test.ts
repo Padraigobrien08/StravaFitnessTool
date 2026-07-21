@@ -7,12 +7,10 @@ import {
 } from "../evaluateForecastV2";
 import {
   FORECAST_FIXTURES,
-  fatigueHeavyRunnerInput,
   hmReadyRunnerInput,
   inconsistentModelEstimatesInput,
   lowDataRunnerInput,
   missingHrDataAthleteInput,
-  raceWeekTaperAthleteInput,
   strong5kNoLongRunsInput,
 } from "../fixtures";
 import { runSanityRules } from "../sanityRules";

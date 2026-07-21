@@ -3,7 +3,6 @@ import FitParser from "fit-file-parser";
 import { inflate } from "pako";
 import { parseFitFile } from "../lib/strava/parseFit.ts";
 import { parseActivitiesCsv } from "../lib/strava/parseActivities.ts";
-import { findPersonalRecords } from "../lib/analytics/records.ts";
 
 const fitPath = process.argv[2] ?? "export_105352925/activities/19494160905.fit.gz";
 

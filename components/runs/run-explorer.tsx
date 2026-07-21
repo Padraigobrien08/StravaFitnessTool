@@ -102,8 +102,8 @@ export function RunExplorer({
   const [typeFilter, setTypeFilter] = useState<WorkoutType | typeof ALL_TYPES>(
     ALL_TYPES
   );
-  const [significance, setSignificance] = useState<string>("all");
-  const [effortFilter, setEffortFilter] = useState<"all" | "easy" | "hard">(
+  const [significance] = useState<string>("all");
+  const [effortFilter] = useState<"all" | "easy" | "hard">(
     "all"
   );
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");

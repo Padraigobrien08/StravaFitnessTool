@@ -50,7 +50,6 @@ export function findPersonalRecords(
   fitDetails: FitRunDetail[] = []
 ): PersonalRecord[] {
   const prs: PersonalRecord[] = [];
-  const fitByRun = new Map(fitDetails.map((f) => [f.activityId, f]));
 
   for (const bucket of DISTANCE_BUCKETS) {
     if (bucket.key === "long") {

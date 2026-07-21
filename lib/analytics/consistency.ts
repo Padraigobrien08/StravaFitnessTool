@@ -1,7 +1,7 @@
 import type { RunActivity } from "@/lib/strava/types";
 import type { GoalProgress } from "./goals";
 import { weeklyVolume } from "./volume";
-import { parseISO, startOfWeek, format } from "date-fns";
+import { startOfWeek, format } from "date-fns";
 
 export interface ConsistencyScore {
   overall: number;

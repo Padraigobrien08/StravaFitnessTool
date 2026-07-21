@@ -1,4 +1,4 @@
-import { buildAthleteMemoryProfile, selectRelevantBeliefs } from "@/lib/athlete-memory";
+import { selectRelevantBeliefs } from "@/lib/athlete-memory";
 import {
   buildAdaptiveIntelligence,
   buildAdaptivePlanningNotes,

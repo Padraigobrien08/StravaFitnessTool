@@ -8,8 +8,7 @@ import { prepareCapabilityEfforts } from "../effortSelection";
 import { assessDurability } from "../durabilityModel";
 import { assessFreshness } from "../freshnessModel";
 import { assessSpecificity } from "../specificityModel";
-import { buildUncertaintyAssessment, buildPredictionInterval } from "../uncertaintyModel";
-import { buildContributors } from "../contributionModel";
+import { buildPredictionInterval } from "../uncertaintyModel";
 import { buildScenarios } from "../scenarioModel";
 import { buildRaceForecastV2 } from "../forecastEngine";
 import {

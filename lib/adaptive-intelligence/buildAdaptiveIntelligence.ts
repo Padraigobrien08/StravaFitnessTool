@@ -1,4 +1,3 @@
-import type { DashboardInsights } from "@/lib/analytics";
 import type { AthleteIntelligenceBundle } from "@/lib/intelligence/types";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import {

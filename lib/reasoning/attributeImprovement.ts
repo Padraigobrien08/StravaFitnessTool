@@ -14,7 +14,6 @@ function outcomeAfterBlock(
   blockEnd: Date,
   metric: AttributeMetric
 ): number | null {
-  const blockStart = subWeeks(blockEnd, 4);
   const followEnd = subWeeks(blockEnd, -4);
   const follow = ctx.runs.filter((r) => {
     const d = parseISO(r.date);

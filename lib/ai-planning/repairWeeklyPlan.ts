@@ -3,7 +3,6 @@ import type {
   WeeklyTrainingPlan,
   PlannedWorkout,
 } from "./types";
-import { DAY_ORDER } from "./weeklyPlanGuardrails";
 
 function isHardRun(w: PlannedWorkout): boolean {
   if (w.modality !== "run") return false;

@@ -2,7 +2,6 @@ import type { StravaImport } from "@/lib/strava/types";
 import type { RunActivity as StravaRun } from "@/lib/strava/types";
 import type {
   ActivitySummary,
-  AthleteProfile,
   RunActivity,
   SportType,
   TrainingDataset,

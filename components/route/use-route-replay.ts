@@ -6,7 +6,6 @@ import {
   clampReplayTime,
   createReplayState,
 } from "@/lib/route-intelligence/replay";
-import type { ReplayState } from "@/lib/route-intelligence/types";
 
 export function useRouteReplay(durationSec: number) {
   const [state, setState] = useState(() => createReplayState(durationSec));

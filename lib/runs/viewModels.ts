@@ -259,7 +259,7 @@ function buildNotableSessions(
   runs: RunActivity[],
   analytics: DashboardInsights,
   workoutMap: Map<string, WorkoutClassification>,
-  prByRun: Map<string, PersonalRecord>
+  _prByRun: Map<string, PersonalRecord>
 ): NotableSessionView[] {
   const sessions: NotableSessionView[] = [];
   const sorted = [...runs].sort(
@@ -511,7 +511,6 @@ function classificationConfidenceNote(
 ): { note: string; byType: { type: string; level: string }[] } {
   const recent = labels.slice(-40);
   const high = recent.filter((l) => l.classification.confidence === "high").length;
-  const med = recent.filter((l) => l.classification.confidence === "medium").length;
   const ratio = recent.length > 0 ? high / recent.length : 0;
 
   const byTypeMap = new Map<WorkoutType, { high: number; total: number }>();
@@ -559,7 +558,6 @@ export function buildRunsPageView(
     recent.some((r) => r.id === l.runId)
   );
 
-  const typeSet = new Set(recentLabels.map((l) => l.classification.type));
   const totalKm = runs.reduce((s, r) => s + r.distanceM, 0) / 1000;
 
   const topMix = [...analytics.workoutTypeMix].sort(

@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { WhatThisMeans } from "@/components/layout/what-this-means";
 import { WorkoutTypeBadge } from "@/components/workout/workout-type-badge";
 import type { WeekPlan } from "@/lib/training/planEngine";
-import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 
 const STORAGE_KEY = "strideiq-plan-checks-v1";
 
