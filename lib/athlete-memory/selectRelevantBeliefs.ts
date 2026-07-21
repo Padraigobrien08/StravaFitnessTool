@@ -44,12 +44,6 @@ export function selectRelevantBeliefs(
     forPlanning?: boolean;
   }
 ): RelevantMemorySelection {
-  const daysUntilRace =
-    opts?.coachingContext?.goal?.daysUntilRace ??
-    opts?.goal?.date
-      ? undefined
-      : undefined;
-
   let days: number | undefined = opts?.coachingContext?.goal?.daysUntilRace;
   if (days == null && opts?.goal?.date) {
     const d = Math.ceil(

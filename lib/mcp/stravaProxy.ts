@@ -188,7 +188,6 @@ export async function handleStravaMcpAction(
     case "streams": {
       const id = parseId(params);
       const includeLaps = params.include_laps !== "false";
-      const compact = params.compact !== "false";
       const verbose = params.verbose === "true";
 
       const [streams, laps] = await Promise.all([

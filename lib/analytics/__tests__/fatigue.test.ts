@@ -39,7 +39,7 @@ describe("fatigue", () => {
       runs.push(mockRun(format(d, "yyyy-MM-dd"), 20 + (8 - i) * 15));
     }
     const series = weeklyLoadSeries(runs);
-    const { atl, ctl, tsb } = acuteChronicLoad(series);
+    const { atl, tsb } = acuteChronicLoad(series);
     expect(atl).toBeGreaterThan(0);
     expect(tsb).toBeLessThan(atl);
   });

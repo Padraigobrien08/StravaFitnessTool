@@ -40,7 +40,7 @@ export function compareCurrentToStrongestBlock(
 
 export function compareTaperToHistory(
   bundle: AthleteIntelligenceBundle,
-  raceGoal: RaceGoal | null
+  _raceGoal: RaceGoal | null
 ): LongitudinalComparison | null {
   const analytics = bundle.analytics;
   const r = analytics.raceReadiness;

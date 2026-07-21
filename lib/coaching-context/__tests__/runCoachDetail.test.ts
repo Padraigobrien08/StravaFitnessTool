@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { computeInsights } from "@/lib/analytics";
 import { assessImportQuality } from "@/lib/quality/assessImport";
 import { buildRunCoachDetail } from "../buildRunCoachDetail";
-import { buildRecentSessionDetails } from "../buildRecentSessionDetails";
 import { serializeCoachingContextForLLM } from "../serializeForLLM";
 import { buildCoachingContext } from "../buildCoachingContext";
 import { mkImport, mkRun } from "./fixtures";

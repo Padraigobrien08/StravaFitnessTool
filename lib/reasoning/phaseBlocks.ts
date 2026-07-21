@@ -1,4 +1,3 @@
-import type { RunActivity } from "@/lib/strava/types";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
 import { paceSecPerKm } from "@/lib/analytics/pace";
 import { weeklyVolume } from "@/lib/analytics/volume";

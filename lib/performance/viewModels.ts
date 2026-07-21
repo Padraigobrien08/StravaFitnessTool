@@ -8,7 +8,7 @@ import {
   buildProgressionView,
   type ProgressionViewModel,
 } from "@/lib/home/dashboardData";
-import { formatDuration, formatKm, formatPace } from "@/lib/utils";
+import { formatDuration, formatPace } from "@/lib/utils";
 import { parseISO } from "date-fns";
 
 export type PerformanceSeverity = "positive" | "neutral" | "warning";

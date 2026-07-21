@@ -134,7 +134,6 @@ export function buildForecastV2View(opts: {
       gapSec <= 0
         ? `${formatDuration(Math.abs(gapSec))} ahead of target`
         : `${formatDuration(gapSec)} behind target`;
-    const p50 = raw.predictionIntervalSec.p50;
     const beatsTarget = targetTimeSec >= raw.predictionIntervalSec.p25;
     targetChance = beatsTarget
       ? "Current evidence suggests target is within realistic range (p25–p75 corridor)."

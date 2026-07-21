@@ -3,7 +3,7 @@ import type { RaceGoal } from "@/lib/analytics/readiness";
 import type { ImportQualityReport } from "@/lib/quality/assessImport";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { RunActivity } from "@/lib/strava/types";
-import type { WorkoutClassification, WorkoutType } from "@/lib/analytics/workoutType";
+import type { WorkoutClassification } from "@/lib/analytics/workoutType";
 import type { IntelligenceConfidence } from "@/lib/intelligence/types";
 
 export interface ReasoningContext {

@@ -1,5 +1,4 @@
 import type { StravaImport } from "@/lib/strava/types";
-import type { TrainingDataset } from "@/lib/domain/activity";
 import { mapStravaImport } from "@/lib/domain/mapFromStrava";
 
 export type ConfidenceLevel = "low" | "medium" | "high";

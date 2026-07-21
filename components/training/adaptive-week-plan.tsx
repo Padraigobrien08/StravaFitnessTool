@@ -5,7 +5,6 @@ import Link from "next/link";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { AdaptiveWeekPlanView } from "@/lib/training/viewModels";
-import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 import {
   ArrowRight,

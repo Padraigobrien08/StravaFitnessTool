@@ -1,4 +1,3 @@
-import type { CoachingContext } from "@/lib/coaching-context";
 import type {
   RecommendationIntegrityReport,
   RecommendationIssue,

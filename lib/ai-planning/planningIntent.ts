@@ -45,16 +45,6 @@ export type PlanModificationKind =
   | "reduce_volume"
   | "limit_days";
 
-const DAY_NAMES = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-] as const;
-
 const DAY_ABBREV: Record<string, string> = {
   mon: "Mon",
   monday: "Mon",

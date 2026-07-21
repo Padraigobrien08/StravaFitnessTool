@@ -26,7 +26,6 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  Sparkles,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";

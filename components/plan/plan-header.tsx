@@ -39,7 +39,6 @@ export function PlanHeader({
   onRevert,
   onViewPreview,
   onViewSaved,
-  showingPreview,
   coachHref,
 }: {
   title: string;

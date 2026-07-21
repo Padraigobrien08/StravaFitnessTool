@@ -1,6 +1,5 @@
 import type { PlanModificationKind } from "./planningIntent";
 import type {
-  PlannedWorkout,
   WeeklyPlanGuardrails,
   WeeklyTrainingPlan,
 } from "./types";

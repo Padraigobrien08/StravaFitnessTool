@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { CalendarWorkout, TrainingCalendarWeek } from "@/lib/training-calendar";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, MoreHorizontal, X } from "lucide-react";
 

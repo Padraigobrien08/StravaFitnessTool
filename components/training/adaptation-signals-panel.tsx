@@ -16,13 +16,6 @@ export function AdaptationSignalsPanel({ data }: { data: AdaptationSignalView })
         ? TrendingDown
         : Minus;
 
-  const trendColor =
-    data.trend === "improving"
-      ? "text-teal-400"
-      : data.trend === "declining"
-        ? "text-amber-400"
-        : "text-zinc-500";
-
   return (
     <PanelChrome title="Adaptation signals" href="/performance" accent>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(220px,320px)] lg:items-start">
