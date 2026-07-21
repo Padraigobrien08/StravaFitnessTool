@@ -1,6 +1,8 @@
 import { STRAVA_API_BASE } from "./config";
 
-const STRAVA_ORIGIN = new URL(STRAVA_API_BASE).origin;
+// Literal host allowlist. Kept as a string literal (not derived from a URL) so
+// static analysis recognizes the SSRF guards below as a constant-host check.
+const STRAVA_HOST = "www.strava.com";
 
 export class StravaApiError extends Error {
   constructor(
@@ -21,13 +23,14 @@ export class StravaApiError extends Error {
  * Validating the origin against a constant allowlist prevents that.
  */
 export function stravaUrl(path: string): string {
-  const raw = path.startsWith("http")
-    ? path
-    : `${STRAVA_API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
-  const url = new URL(raw);
-  if (url.origin !== STRAVA_ORIGIN) {
+  // Always build against the constant Strava base; `path` only contributes the
+  // path/query, never the host. The hostname assertion is a defensive allowlist.
+  const url = new URL(
+    `${STRAVA_API_BASE}${path.startsWith("/") ? path : `/${path}`}`
+  );
+  if (url.hostname !== STRAVA_HOST) {
     throw new StravaApiError(
-      `Refusing to send Strava credentials to non-Strava host: ${url.origin}`,
+      `Refusing to send Strava credentials to non-Strava host: ${url.hostname}`,
       0
     );
   }
@@ -62,6 +65,11 @@ export async function stravaGet<T>(
     for (const [k, v] of Object.entries(searchParams)) {
       if (v !== undefined && v !== "") url.searchParams.set(k, String(v));
     }
+  }
+  // Re-assert the host on the exact URL that reaches fetch(), so the SSRF guard
+  // is local to the request sink.
+  if (url.hostname !== STRAVA_HOST) {
+    throw new StravaApiError(`Refusing to call non-Strava host: ${url.hostname}`, 0);
   }
 
   const context = options?.context ?? path;
