@@ -7,21 +7,20 @@ import {
   fetchActivityStreams,
 } from "@/lib/strava/api/fetchStreams";
 import { mapStravaStreamsToFitDetail } from "@/lib/strava/api/mapToFitDetail";
-import { STRAVA_API_BASE } from "@/lib/strava/api/config";
+import { stravaGet } from "@/lib/strava/api/client";
 
 export async function fetchActivityById(
   accessToken: string,
   activityId: number
 ): Promise<StravaActivity | null> {
-  const res = await fetch(`${STRAVA_API_BASE}/activities/${activityId}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Strava activity ${activityId}: ${res.status} ${text}`);
-  }
-  return res.json() as Promise<StravaActivity>;
+  // Routed through the shared client so the request URL is validated against
+  // Strava's origin (guards the bearer token against SSRF).
+  return stravaGet<StravaActivity>(
+    accessToken,
+    `/activities/${activityId}`,
+    undefined,
+    { allow404: true, context: `Strava activity ${activityId}` }
+  );
 }
 
 export async function syncSingleActivityForUser(
