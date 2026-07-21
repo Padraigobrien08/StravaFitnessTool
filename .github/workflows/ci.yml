@@ -20,3 +20,15 @@ jobs:
       # Strava export fixture self-skip when it's absent (i.e. in CI).
       - run: npm run check
       - run: npm run build
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Coverage summary for visibility (non-blocking — no enforced thresholds).
+      - run: npm run test:coverage

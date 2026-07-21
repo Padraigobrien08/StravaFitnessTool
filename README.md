@@ -8,11 +8,12 @@ Import Strava data. Get evidence-backed insights. Plan your week. Investigate *w
 
 [Try the demo](#-try-the-demo-zero-setup) · [Quick start](#quick-start) · [Features](#features) · [Deploy](#deploy) · [Docs](#documentation)
 
+[![CI](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/ci.yml/badge.svg)](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/codeql.yml/badge.svg)](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-14b8a6.svg)](LICENSE)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149eca?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)
-![Tests](https://img.shields.io/badge/tests-241%20passing-2ea44f)
 
 </div>
 

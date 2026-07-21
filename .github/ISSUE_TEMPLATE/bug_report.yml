@@ -1,0 +1,51 @@
+name: Bug report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please don't include Strava data with personal
+        info (names, GPS, tokens). For security issues, see SECURITY.md instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What went wrong, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to '...'
+        2. Click '...'
+        3. See error
+    validations:
+      required: true
+  - type: dropdown
+    id: data-path
+    attributes:
+      label: Data path
+      description: How is data loaded?
+      options:
+        - Demo (sample athlete)
+        - Strava export import (CSV/FIT)
+        - Strava OAuth sync
+        - Not data-related
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Node version (`node -v`), browser, and how you're running (localhost / LAN / tunnel).
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console / server logs
+      description: Relevant errors from the browser console or terminal. Redact any tokens.
+      render: shell
