@@ -54,6 +54,27 @@ export function getCalendarWeek(weekStart: string): TrainingCalendarWeek | null 
   return readIndex().weeks[weekStart] ?? null;
 }
 
+/**
+ * Merge server-sourced weeks into the local cache (cross-device hydration).
+ * Last-write-wins by `updatedAt`; server weeks keep their own revision (no
+ * snapshot or bump). Returns true if anything changed locally.
+ */
+export function mergeServerWeeks(weeks: TrainingCalendarWeek[]): boolean {
+  if (weeks.length === 0) return false;
+  const index = readIndex();
+  let changed = false;
+  for (const week of weeks) {
+    if (!week?.weekStart) continue;
+    const local = index.weeks[week.weekStart];
+    if (!local || (week.updatedAt ?? "") > (local.updatedAt ?? "")) {
+      index.weeks[week.weekStart] = week;
+      changed = true;
+    }
+  }
+  if (changed) writeIndex(index);
+  return changed;
+}
+
 export function listCalendarWeeks(): TrainingCalendarWeek[] {
   return Object.values(readIndex().weeks).sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 }
