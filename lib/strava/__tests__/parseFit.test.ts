@@ -1,5 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { matchFitFileToActivityId } from "../parseFit";
+import { gzip } from "pako";
+import { decompressFitBuffer, matchFitFileToActivityId } from "../parseFit";
+
+describe("decompressFitBuffer", () => {
+  // Strava exports FIT files gzipped (.fit.gz); the decompressor must inflate
+  // them and pass raw .fit bytes through untouched. Guards the pako dependency.
+  it("inflates gzip-compressed bytes back to the original", () => {
+    const original = new Uint8Array(Array.from({ length: 256 }, (_, i) => (i * 7) % 256));
+    const compressed = gzip(original);
+    expect(compressed[0]).toBe(0x1f);
+    expect(compressed[1]).toBe(0x8b);
+
+    const result = decompressFitBuffer(compressed.buffer);
+    expect(Array.from(result)).toEqual(Array.from(original));
+  });
+
+  it("passes uncompressed bytes through unchanged", () => {
+    const raw = new Uint8Array([0x0e, 0x10, 0x2e, 0x46, 0x49, 0x54]); // ".FIT" header, no gzip magic
+    const result = decompressFitBuffer(raw.buffer);
+    expect(Array.from(result)).toEqual(Array.from(raw));
+  });
+});
 
 describe("matchFitFileToActivityId", () => {
   const map = new Map([
