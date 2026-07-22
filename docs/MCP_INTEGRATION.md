@@ -7,7 +7,7 @@ StrideIQ ships a **single MCP server** ([`packages/strideiq-mcp`](../packages/st
 
 No need to install `@r-huijts/strava-mcp-server` separately.
 
-**Roadmap history:** [MCP_STRAVA_ROADMAP.md](./MCP_STRAVA_ROADMAP.md) · **Smoke tests:** [MCP_STRAVA_SMOKE.md](./MCP_STRAVA_SMOKE.md)
+**Roadmap history:** [internal/MCP_STRAVA_ROADMAP.md](./internal/MCP_STRAVA_ROADMAP.md) · **Smoke tests:** [MCP_STRAVA_SMOKE.md](./MCP_STRAVA_SMOKE.md)
 
 ## Prerequisites
 

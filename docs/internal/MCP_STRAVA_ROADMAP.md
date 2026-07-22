@@ -2,11 +2,11 @@
 
 Goal: **Replace dependency on [@r-huijts/strava-mcp-server](https://github.com/r-huijts/strava-mcp)** with first-party Strava API tools in StrideIQ, while **keeping and extending** the intelligence layer (Coach brief, readiness, plan, etc.) that strava-mcp does not provide.
 
-**Status: implemented (v0.4.0).** One MCP server + `GET|POST /api/me/strava` covers strava-mcp parity. Smoke: [MCP_STRAVA_SMOKE.md](./MCP_STRAVA_SMOKE.md).
+**Status: implemented (v0.4.0).** One MCP server + `GET|POST /api/me/strava` covers strava-mcp parity. Smoke: [MCP_STRAVA_SMOKE.md](../MCP_STRAVA_SMOKE.md).
 
 **Baseline was:** ~5/25 strava-mcp tools; now **25/25** via `packages/strideiq-mcp` + 12 intelligence tools.
 
-Related: [MCP_INTEGRATION.md](./MCP_INTEGRATION.md), [packages/strideiq-mcp/README.md](../packages/strideiq-mcp/README.md).
+Related: [MCP_INTEGRATION.md](../MCP_INTEGRATION.md), [packages/strideiq-mcp/README.md](../../packages/strideiq-mcp/README.md).
 
 ---
 
@@ -100,7 +100,7 @@ Intelligence tools continue to call `GET /api/me/intelligence` — no merge with
 **Exit criteria**
 
 - [ ] MCP tool list covers: profile, stats, zones, shoes, recent/all activities, activity detail, laps, streams (compact + verbose + chunk), photos
-- [ ] [docs/MCP_INTEGRATION.md](./MCP_INTEGRATION.md) tool table updated
+- [ ] [docs/MCP_INTEGRATION.md](../MCP_INTEGRATION.md) tool table updated
 - [ ] Manual smoke: 5 prompts from strava-mcp README (“recent activities”, “HR on last ride”, “YTD runs”, “zones”, “laps”)
 
 **Rough parity:** 12–14 / 25 strava-mcp tools.
@@ -191,8 +191,8 @@ Only needed if users **never** open the web app:
 
 ### 4.2 Deprecate external strava-mcp
 
-- Remove `strava` entry from [config/mcp/*.example.json](../config/mcp/)
-- [MCP_INTEGRATION.md](./MCP_INTEGRATION.md): StrideIQ-only path
+- Remove `strava` entry from [config/mcp/*.example.json](../../config/mcp/)
+- [MCP_INTEGRATION.md](../MCP_INTEGRATION.md): StrideIQ-only path
 - README: “Full Strava MCP surface built-in”
 
 **Exit criteria**
@@ -308,4 +308,4 @@ Store parity prompts in `docs/MCP_STRAVA_SMOKE.md` (create in Phase 1).
 4. Stream chunking for long activities
 5. `docs/MCP_STRAVA_SMOKE.md` with 10 prompts
 
-After sprint: update [FEATURES.md](./FEATURES.md) §12 and bump `@strideiq/mcp` to **0.4.0**.
+After sprint: update [FEATURES.md](../FEATURES.md) §12 and bump `@strideiq/mcp` to **0.4.0**.

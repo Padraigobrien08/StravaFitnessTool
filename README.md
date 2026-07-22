@@ -415,17 +415,17 @@ Enable from **Settings** after OAuth is connected. Refresh the app after webhook
 
 ## Documentation
 
-| Document                                                                 | Description                             |
-| ------------------------------------------------------------------------ | --------------------------------------- |
-| [docs/README.md](docs/README.md)                                         | Documentation index                     |
-| [PRODUCT.md](PRODUCT.md)                                                 | Product contract and IA rules           |
-| [docs/FEATURES.md](docs/FEATURES.md)                                     | Complete feature catalog                |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                             | Layers, data flow, API                  |
-| [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md)         | Intelligence vs Coach                   |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)                                 | Vercel + Neon + Strava production setup |
-| [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md)                                 | Manual release checklist                |
-| [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md)                               | MVP scope and API requirements          |
-| [docs/DIFFERENTIATION_NORTH_STAR.md](docs/DIFFERENTIATION_NORTH_STAR.md) | Future moat features                    |
+| Document                                                                                   | Description                             |
+| ------------------------------------------------------------------------------------------ | --------------------------------------- |
+| [docs/README.md](docs/README.md)                                                           | Documentation index                     |
+| [PRODUCT.md](PRODUCT.md)                                                                   | Product contract and IA rules           |
+| [docs/FEATURES.md](docs/FEATURES.md)                                                       | Complete feature catalog                |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                               | Layers, data flow, API                  |
+| [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md)                           | Intelligence vs Coach                   |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)                                                   | Vercel + Neon + Strava production setup |
+| [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md)                                                   | Manual release checklist                |
+| [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md)                                                 | MVP scope and API requirements          |
+| [docs/internal/DIFFERENTIATION_NORTH_STAR.md](docs/internal/DIFFERENTIATION_NORTH_STAR.md) | Future moat features                    |
 
 ---
 
