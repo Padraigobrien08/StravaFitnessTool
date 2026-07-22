@@ -100,6 +100,7 @@ export type IntelligenceToolName =
   | "get_readiness"
   | "get_predictions"
   | "get_week_plan"
+  | "recommend_today_session"
   | "get_race_strategy"
   | "get_fatigue_load"
   | "list_recent_runs"
