@@ -23,9 +23,7 @@ const statusLabel: Record<string, string> = {
 
 type PatchWorkoutFn = (
   id: string,
-  patch: Partial<
-    Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">
-  >
+  patch: Partial<Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">>,
 ) => void;
 
 export function PlanCalendarView({
@@ -97,7 +95,7 @@ function DayColumn({
     <div
       className={cn(
         "flex min-h-[168px] flex-col rounded-lg border px-2 py-2",
-        intensityStyles[w.intensity] ?? intensityStyles.easy
+        intensityStyles[w.intensity] ?? intensityStyles.easy,
       )}
     >
       <div className="mb-1.5 flex items-center justify-between gap-1">
@@ -120,12 +118,7 @@ function DayColumn({
         </span>
       ) : null}
       {editing && editable ? (
-        <EditPopover
-          w={w}
-          onClose={onClose}
-          onPatch={onPatch}
-          onDelete={onDelete}
-        />
+        <EditPopover w={w} onClose={onClose} onPatch={onPatch} onDelete={onDelete} />
       ) : null}
     </div>
   );
@@ -152,7 +145,7 @@ function DayCard({
     <div
       className={cn(
         "rounded-lg border px-3 py-2.5",
-        intensityStyles[w.intensity] ?? intensityStyles.easy
+        intensityStyles[w.intensity] ?? intensityStyles.easy,
       )}
     >
       <div className="flex items-center justify-between gap-2">
@@ -160,42 +153,27 @@ function DayCard({
           {w.day} · {w.date.slice(5)}
         </span>
         {editable && w.modality !== "rest" ? (
-          <button
-            type="button"
-            className="text-[10px] text-zinc-600"
-            onClick={onEdit}
-          >
+          <button type="button" className="text-[10px] text-zinc-600" onClick={onEdit}>
             Edit
           </button>
         ) : null}
       </div>
       <WorkoutBody w={w} className="mt-1" />
       {editing && editable ? (
-        <EditPopover
-          w={w}
-          onClose={onClose}
-          onPatch={onPatch}
-          onDelete={onDelete}
-        />
+        <EditPopover w={w} onClose={onClose} onPatch={onPatch} onDelete={onDelete} />
       ) : null}
     </div>
   );
 }
 
-function WorkoutBody({
-  w,
-  className,
-}: {
-  w: CalendarWorkout;
-  className?: string;
-}) {
+function WorkoutBody({ w, className }: { w: CalendarWorkout; className?: string }) {
   const isRest = w.modality === "rest";
   return (
     <div className={cn("min-w-0 flex-1", className)}>
       <p
         className={cn(
           "text-[12px] font-medium leading-snug",
-          isRest ? "text-zinc-600" : "text-zinc-200"
+          isRest ? "text-zinc-600" : "text-zinc-200",
         )}
       >
         {w.title}
@@ -210,9 +188,7 @@ function WorkoutBody({
             {w.distanceKm != null && w.durationMin != null ? " · " : null}
             {w.durationMin != null ? `${w.durationMin} min` : null}
           </p>
-          <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-zinc-500">
-            {w.purpose}
-          </p>
+          <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-zinc-500">{w.purpose}</p>
           {w.constraintsApplied && w.constraintsApplied.length > 0 ? (
             <span className="mt-1 inline-block rounded bg-white/[0.04] px-1 py-0.5 text-[9px] text-zinc-600">
               constrained
@@ -238,9 +214,7 @@ function EditPopover({
   onDelete?: (id: string) => void;
 }) {
   const [title, setTitle] = useState(w.title);
-  const [distanceKm, setDistanceKm] = useState(
-    w.distanceKm != null ? String(w.distanceKm) : ""
-  );
+  const [distanceKm, setDistanceKm] = useState(w.distanceKm != null ? String(w.distanceKm) : "");
 
   return (
     <div className="mt-2 space-y-2 border-t border-white/[0.06] pt-2">

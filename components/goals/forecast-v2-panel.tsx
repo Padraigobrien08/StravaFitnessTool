@@ -42,12 +42,8 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
           </div>
           <div>
             <p className={dash.label}>Confidence</p>
-            <p className="text-lg font-semibold text-zinc-200">
-              {forecast.confidence}
-            </p>
-            <p className="mt-0.5 text-xs text-zinc-600">
-              Score {forecast.confidenceScore}/100
-            </p>
+            <p className="text-lg font-semibold text-zinc-200">{forecast.confidence}</p>
+            <p className="mt-0.5 text-xs text-zinc-600">Score {forecast.confidenceScore}/100</p>
           </div>
           {forecast.targetGapDisplay ? (
             <div>
@@ -55,7 +51,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
               <p
                 className={cn(
                   "text-sm font-medium",
-                  forecast.targetRealistic ? "text-teal-400/90" : "text-amber-400/85"
+                  forecast.targetRealistic ? "text-teal-400/90" : "text-amber-400/85",
                 )}
               >
                 {forecast.targetGapDisplay}
@@ -88,9 +84,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                     ? "Weakens confidence"
                     : "Neutral"}
               </p>
-              <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">
-                {c.explanation}
-              </p>
+              <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">{c.explanation}</p>
             </div>
           ))}
         </div>
@@ -107,7 +101,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                   <span
                     className={cn(
                       "mt-1.5 h-1.5 shrink-0 rounded-full bg-teal-500/70",
-                      magnitudeDot[c.magnitude as keyof typeof magnitudeDot] ?? "w-1.5"
+                      magnitudeDot[c.magnitude as keyof typeof magnitudeDot] ?? "w-1.5",
                     )}
                   />
                   <div>
@@ -130,7 +124,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                   <span
                     className={cn(
                       "mt-1.5 h-1.5 shrink-0 rounded-full bg-amber-500/60",
-                      magnitudeDot[c.magnitude as keyof typeof magnitudeDot] ?? "w-1.5"
+                      magnitudeDot[c.magnitude as keyof typeof magnitudeDot] ?? "w-1.5",
                     )}
                   />
                   <div>
@@ -146,8 +140,8 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
 
       <PanelChrome title="Model agreement" accent>
         <p className={`${dash.muted} mb-3`}>
-          {forecast.modelAgreement.explanation} Spread:{" "}
-          {forecast.modelAgreement.spread} ({forecast.modelAgreement.label} agreement).
+          {forecast.modelAgreement.explanation} Spread: {forecast.modelAgreement.spread} (
+          {forecast.modelAgreement.label} agreement).
         </p>
         <div className="space-y-2.5">
           {forecast.modelRows.map((row) => (
@@ -160,9 +154,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                 <p className="text-[11px] text-zinc-600 truncate">{row.reason}</p>
               </div>
               <div className="text-right">
-                <p className="font-display text-lg font-bold tabular-nums text-white">
-                  {row.time}
-                </p>
+                <p className="font-display text-lg font-bold tabular-nums text-white">{row.time}</p>
                 <p className="text-[11px] text-zinc-600">Weight {row.weightPct}%</p>
               </div>
             </div>
@@ -183,9 +175,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                   {s.time}
                 </span>
               </div>
-              <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">
-                {s.description}
-              </p>
+              <p className="mt-1.5 text-xs leading-relaxed text-zinc-600">{s.description}</p>
             </div>
           ))}
         </div>
@@ -225,8 +215,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
             <ul className="mt-2 space-y-2">
               {forecast.uncertaintyDrivers.map((u) => (
                 <li key={u.label} className="text-xs text-zinc-600">
-                  <span className="text-zinc-400">{u.label}</span> ({u.impact}) —{" "}
-                  {u.explanation}
+                  <span className="text-zinc-400">{u.label}</span> ({u.impact}) — {u.explanation}
                 </li>
               ))}
             </ul>
@@ -235,9 +224,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
         {forecast.targetPath ? (
           <p className="mt-4 text-sm text-teal-400/85">{forecast.targetPath}</p>
         ) : null}
-        <p className="mt-4 text-xs leading-relaxed text-zinc-600">
-          {forecast.recommendation}
-        </p>
+        <p className="mt-4 text-xs leading-relaxed text-zinc-600">{forecast.recommendation}</p>
         {forecast.limitations.length > 0 ? (
           <p className="mt-3 text-[11px] text-zinc-600">
             Limitations: {forecast.limitations.slice(0, 3).join(" · ")}

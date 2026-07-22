@@ -12,7 +12,7 @@ declare module "fit-file-parser" {
     constructor(options?: FitParserOptions);
     parse(
       content: Uint8Array,
-      callback: (error: Error | undefined, data: Record<string, unknown>) => void
+      callback: (error: Error | undefined, data: Record<string, unknown>) => void,
     ): void;
   }
 }

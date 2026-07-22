@@ -9,8 +9,6 @@ export function RunsWorkspace({
   className?: string;
 }) {
   return (
-    <div className={cn(ops.dashboard, "dashboard-enter w-full pb-6", className)}>
-      {children}
-    </div>
+    <div className={cn(ops.dashboard, "dashboard-enter w-full pb-6", className)}>{children}</div>
   );
 }

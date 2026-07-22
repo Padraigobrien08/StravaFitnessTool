@@ -2,10 +2,7 @@ import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { WorkoutClassification } from "@/lib/analytics/workoutType";
 import type { DashboardInsights } from "@/lib/analytics";
-import {
-  computeLateFadePct,
-  scoreSessionExecution,
-} from "@/lib/reasoning/executionScore";
+import { computeLateFadePct, scoreSessionExecution } from "@/lib/reasoning/executionScore";
 import type { ExecutionQuality, SessionIntelligence } from "./types";
 import { compareToHistoricalSessions } from "./compareToHistoricalSessions";
 import { inferLikelyAdaptation } from "./inferLikelyAdaptation";
@@ -21,7 +18,7 @@ function mapQuality(score: number): ExecutionQuality {
 function fatigueCostFromContext(
   analytics: DashboardInsights | null,
   workout: WorkoutClassification,
-  lateFade: number | null
+  lateFade: number | null,
 ): SessionIntelligence["fatigueCost"] {
   if (workout.type === "easy" || workout.type === "recovery") return "low";
   if (analytics && analytics.fatigue.tsb < -15) return "high";
@@ -32,7 +29,7 @@ function fatigueCostFromContext(
 
 function goalAlignment(
   workout: WorkoutClassification,
-  analytics: DashboardInsights | null
+  analytics: DashboardInsights | null,
 ): SessionIntelligence["goalAlignment"] {
   if (!analytics?.raceReadiness) {
     return workout.type === "easy" ? "moderate" : "weak";
@@ -57,20 +54,14 @@ export function evaluateSessionExecution(
   opts?: {
     analytics?: DashboardInsights | null;
     historicalRuns?: RunActivity[];
-  }
+  },
 ): SessionIntelligence {
   const scored = scoreSessionExecution(run, fit, workout);
   const lateFade = computeLateFadePct(fit);
   const executionQuality = mapQuality(scored.qualityScore);
-  const peers = (opts?.historicalRuns ?? []).filter(
-    (r) => r.date < run.date
-  );
+  const peers = (opts?.historicalRuns ?? []).filter((r) => r.date < run.date);
   const historicalComparison = compareToHistoricalSessions(run, workout, peers);
-  const likelyAdaptations = inferLikelyAdaptation(
-    workout,
-    executionQuality,
-    lateFade
-  );
+  const likelyAdaptations = inferLikelyAdaptation(workout, executionQuality, lateFade);
 
   const evidence: string[] = [
     `Workout classified as ${workout.type}`,
@@ -84,18 +75,13 @@ export function evaluateSessionExecution(
 
   let hrAssessment: string | undefined;
   if (scored.hrDriftPct != null && scored.hrDriftPct > 8) {
-    hrAssessment =
-      "HR drift appears elevated — may indicate heat, fatigue, or pacing early";
+    hrAssessment = "HR drift appears elevated — may indicate heat, fatigue, or pacing early";
   } else if (run.avgHr != null) {
     hrAssessment = `Average HR ${run.avgHr} bpm for session type`;
   }
 
   const confidence: SessionIntelligence["confidence"] =
-    fit?.paceStream && fit.paceStream.length >= 20
-      ? "medium"
-      : run.avgHr != null
-        ? "low"
-        : "low";
+    fit?.paceStream && fit.paceStream.length >= 20 ? "medium" : run.avgHr != null ? "low" : "low";
 
   const session: SessionIntelligence = {
     sessionId: run.id,

@@ -6,11 +6,7 @@ import type { PerformanceIntegrityView } from "@/lib/performance/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 
-export function PerformanceIntegrityPanel({
-  data,
-}: {
-  data: PerformanceIntegrityView;
-}) {
+export function PerformanceIntegrityPanel({ data }: { data: PerformanceIntegrityView }) {
   return (
     <section>
       <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
@@ -63,7 +59,7 @@ export function PerformanceIntegrityPanel({
                     "ml-1.5 font-medium tabular-nums",
                     f.level === "high" && "text-teal-400/80",
                     f.level === "medium" && "text-zinc-400",
-                    f.level === "low" && "text-amber-400/80"
+                    f.level === "low" && "text-amber-400/80",
                   )}
                 >
                   {f.pct}%

@@ -11,13 +11,13 @@ export interface StravaPhoto {
 
 export async function fetchActivityPhotos(
   accessToken: string,
-  activityId: number
+  activityId: number,
 ): Promise<StravaPhoto[]> {
   const data = await stravaGet<StravaPhoto[]>(
     accessToken,
     `/activities/${activityId}/photos`,
     { size: 5000 },
-    { allow404: true, context: `photos ${activityId}` }
+    { allow404: true, context: `photos ${activityId}` },
   );
   return data ?? [];
 }

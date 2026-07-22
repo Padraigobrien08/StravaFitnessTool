@@ -6,9 +6,7 @@ export interface ActivityTypeMix {
   pct: number;
 }
 
-export function activityTypeMix(
-  activities: ActivitySummary[]
-): ActivityTypeMix[] {
+export function activityTypeMix(activities: ActivitySummary[]): ActivityTypeMix[] {
   const counts = new Map<string, number>();
   for (const a of activities) {
     counts.set(a.type, (counts.get(a.type) ?? 0) + 1);

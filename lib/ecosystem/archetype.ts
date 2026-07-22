@@ -12,7 +12,7 @@ function pct(part: number, total: number): number {
 
 export function detectAthleteArchetype(
   rolling56: RollingEcosystemSnapshot | undefined,
-  rolling84?: RollingEcosystemSnapshot
+  rolling84?: RollingEcosystemSnapshot,
 ): AthleteArchetypeResult {
   const snap = rolling56 ?? rolling84;
   if (!snap || snap.totalTrainingMinutes < 30) {
@@ -21,9 +21,7 @@ export function detectAthleteArchetype(
       label: "Insufficient multi-modality data",
       confidence: "low",
       evidence: ["Less than 30 training minutes in rolling window"],
-      coachingNotes: [
-        "Sync Strava activities across sports for archetype detection.",
-      ],
+      coachingNotes: ["Sync Strava activities across sports for archetype detection."],
     };
   }
 
@@ -48,7 +46,7 @@ export function detectAthleteArchetype(
     archetype = "runner";
     label = "Run-focused endurance athlete";
     coachingNotes.push(
-      "Recommendations prioritize run volume and quality; cross-training is contextual support."
+      "Recommendations prioritize run volume and quality; cross-training is contextual support.",
     );
   } else if (runPct >= 40 && bikePct >= 15 && swimPct >= 10) {
     archetype = "triathlete";
@@ -112,10 +110,9 @@ export function archetypeDisplayLabel(archetype: AthleteArchetype): string {
 
 /** Coverage buckets for import UI */
 export function modalityCoverageFromDistribution(
-  dist: Partial<Record<ActivityModality, number>>
+  dist: Partial<Record<ActivityModality, number>>,
 ): ModalityCoverage {
-  const sum = (...keys: ActivityModality[]) =>
-    keys.reduce((s, k) => s + (dist[k] ?? 0), 0);
+  const sum = (...keys: ActivityModality[]) => keys.reduce((s, k) => s + (dist[k] ?? 0), 0);
   const total = Object.values(dist).reduce((s, n) => s + (n ?? 0), 0);
   return {
     running: dist.run ?? 0,

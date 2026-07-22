@@ -46,7 +46,7 @@ export function LoadIntelligencePanel({
           <p
             className={cn(
               "mt-1 text-sm font-medium",
-              labelColor[data.freshnessLabel] ?? "text-zinc-400"
+              labelColor[data.freshnessLabel] ?? "text-zinc-400",
             )}
           >
             {data.freshnessLabel}
@@ -66,7 +66,7 @@ export function LoadIntelligencePanel({
             <dd
               className={cn(
                 "mt-0.5 font-semibold",
-                data.tsb >= 0 ? "text-teal-400/90" : "text-amber-400/90"
+                data.tsb >= 0 ? "text-teal-400/90" : "text-amber-400/90",
               )}
             >
               {data.tsb > 0 ? "+" : ""}
@@ -82,7 +82,7 @@ export function LoadIntelligencePanel({
             key={chip}
             className={cn(
               "rounded-md px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset",
-              chipStyles[chip] ?? chipStyles.Neutral
+              chipStyles[chip] ?? chipStyles.Neutral,
             )}
           >
             {chip}
@@ -90,16 +90,11 @@ export function LoadIntelligencePanel({
         ))}
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-        {data.interpretation}
-      </p>
+      <p className="mt-3 text-sm leading-relaxed text-zinc-400">{data.interpretation}</p>
       <p className="mt-2 text-xs text-teal-400/75">{data.trendNote}</p>
 
       <div className="mt-4 rounded-lg bg-white/[0.02] px-2 py-2 ring-1 ring-inset ring-white/[0.04]">
-        <LoadIntelligenceChart
-          data={data.chartData}
-          currentIndex={data.currentIndex}
-        />
+        <LoadIntelligenceChart data={data.chartData} currentIndex={data.currentIndex} />
         <p className="px-2 pb-1 text-[10px] text-zinc-600">
           Teal = chronic fitness · Amber = recent fatigue · dots = current week
         </p>

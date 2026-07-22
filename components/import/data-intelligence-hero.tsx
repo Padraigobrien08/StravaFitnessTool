@@ -9,22 +9,14 @@ import { cn } from "@/lib/utils";
 import { Check, Minus } from "lucide-react";
 
 function DataQualityRing({ score }: { score: number }) {
-  const color =
-    score >= 72 ? "#2dd4bf" : score >= 45 ? "#fbbf24" : "#f87171";
+  const color = score >= 72 ? "#2dd4bf" : score >= 45 ? "#fbbf24" : "#f87171";
   const r = 44;
   const c = 2 * Math.PI * r;
   const offset = c - (score / 100) * c;
   return (
     <div className="relative mx-auto flex h-[108px] w-[108px] items-center justify-center">
       <svg width={108} height={108} className="-rotate-90">
-        <circle
-          cx={54}
-          cy={54}
-          r={r}
-          fill="none"
-          stroke="var(--chart-grid)"
-          strokeWidth={8}
-        />
+        <circle cx={54} cy={54} r={r} fill="none" stroke="var(--chart-grid)" strokeWidth={8} />
         <circle
           cx={54}
           cy={54}
@@ -38,9 +30,7 @@ function DataQualityRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="font-display text-2xl font-bold tabular-nums text-white">
-          {score}
-        </span>
+        <span className="font-display text-2xl font-bold tabular-nums text-white">{score}</span>
         <span className="text-[9px] font-semibold uppercase tracking-widest text-zinc-500">
           quality
         </span>
@@ -70,7 +60,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
       className={cn(
         "border-l-[3px]",
         borderTone,
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_55%)]"
+        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_55%)]",
       )}
     >
       <div className="relative grid gap-6 lg:grid-cols-[1fr_minmax(220px,280px)] lg:gap-8">
@@ -85,9 +75,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
             )}
           </div>
 
-          <p className={cn(dash.lead, "text-zinc-300/90")}>
-            {hero.ingestionSummary}
-          </p>
+          <p className={cn(dash.lead, "text-zinc-300/90")}>{hero.ingestionSummary}</p>
 
           <div className="space-y-1.5 text-sm text-zinc-400">
             <p>
@@ -105,10 +93,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
               <ul className="mt-2 space-y-1">
                 {hero.unlockedCapabilities.length > 0 ? (
                   hero.unlockedCapabilities.slice(0, 5).map((c) => (
-                    <li
-                      key={c}
-                      className="flex items-center gap-2 text-xs text-zinc-400"
-                    >
+                    <li key={c} className="flex items-center gap-2 text-xs text-zinc-400">
                       <Check className="h-3 w-3 shrink-0 text-teal-500/80" />
                       {c}
                     </li>
@@ -122,10 +107,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
               <p className={dash.label}>Still limited</p>
               <ul className="mt-2 space-y-1">
                 {hero.missingCapabilities.slice(0, 4).map((c) => (
-                  <li
-                    key={c}
-                    className="flex items-center gap-2 text-xs text-zinc-600"
-                  >
+                  <li key={c} className="flex items-center gap-2 text-xs text-zinc-600">
                     <Minus className="h-3 w-3 shrink-0 text-zinc-600" />
                     {c}
                   </li>
@@ -148,10 +130,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
               {streamBars.map((on, i) => (
                 <div
                   key={i}
-                  className={cn(
-                    "h-6 w-2 rounded-sm",
-                    on ? "bg-teal-500/55" : "bg-white/[0.06]"
-                  )}
+                  className={cn("h-6 w-2 rounded-sm", on ? "bg-teal-500/55" : "bg-white/[0.06]")}
                 />
               ))}
             </div>

@@ -22,8 +22,7 @@ export function createBelief(params: {
   const evidenceCount = params.evidence.length;
   let confidence = params.confidence;
   if (!confidence) {
-    confidence =
-      evidenceCount >= 3 ? "medium" : evidenceCount >= 2 ? "low" : "low";
+    confidence = evidenceCount >= 3 ? "medium" : evidenceCount >= 2 ? "low" : "low";
   }
   if (evidenceCount < 2 && confidence === "high") {
     confidence = "medium";
@@ -57,10 +56,7 @@ export function allBeliefs(profile: AthleteMemoryProfile): AthleteBelief[] {
   ];
 }
 
-export function bumpConfidence(
-  current: BeliefConfidence,
-  supportCount: number
-): BeliefConfidence {
+export function bumpConfidence(current: BeliefConfidence, supportCount: number): BeliefConfidence {
   if (supportCount >= 4) return "high";
   if (supportCount >= 2) return current === "low" ? "medium" : current;
   return "low";

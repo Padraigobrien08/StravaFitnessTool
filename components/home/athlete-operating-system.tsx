@@ -25,20 +25,14 @@ export function AthleteOperatingSystem({
   calendarHydrated: boolean;
   onPatchWorkout?: (
     id: string,
-    patch: Partial<
-      Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">
-    >
+    patch: Partial<Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">>,
   ) => void;
   onGeneratePlan?: () => void;
   planLoading?: boolean;
 }) {
   return (
     <div className="athlete-os flex w-full flex-col gap-3 sm:gap-3.5">
-      <OsHero
-        hero={vm.hero}
-        onGeneratePlan={onGeneratePlan}
-        planLoading={planLoading}
-      />
+      <OsHero hero={vm.hero} onGeneratePlan={onGeneratePlan} planLoading={planLoading} />
 
       <OsWeekCalendar
         savedWeek={savedWeek}

@@ -42,8 +42,7 @@ export function DataConfidencePanel({
   return (
     <PanelChrome title="Data confidence" accent elevated>
       <p className={`${dash.muted} mb-4`}>
-        Coverage drives model trust — gaps explain reduced readiness and prediction
-        confidence.
+        Coverage drives model trust — gaps explain reduced readiness and prediction confidence.
       </p>
       <div className="space-y-3">
         {coverage.map((row) => (
@@ -80,18 +79,14 @@ export function DataConfidencePanel({
   );
 }
 
-export function ModalityCoveragePanel({
-  rows,
-}: {
-  rows: ModalityCoverageRow[];
-}) {
+export function ModalityCoveragePanel({ rows }: { rows: ModalityCoverageRow[] }) {
   if (rows.length === 0) return null;
   const total = rows.reduce((s, r) => s + r.count, 0);
   return (
     <PanelChrome title="Modality coverage" subdued>
       <p className={`${dash.muted} mb-3`}>
-        Strava <span className="text-zinc-400">sport_type</span> distribution —
-        StrideIQ is modality-aware; running stays primary for race intelligence.
+        Strava <span className="text-zinc-400">sport_type</span> distribution — StrideIQ is
+        modality-aware; running stays primary for race intelligence.
       </p>
       <div className="flex flex-wrap gap-2">
         {rows.map((r) => (
@@ -125,9 +120,8 @@ export function HistoricalImportPanel({
   return (
     <PanelChrome title="Historical import" accent>
       <p className={`${dash.muted} mb-3`}>
-        Bulk exports unlock long-term progression, performance curves, historical
-        readiness trends, and pacing adaptation modeling — especially before API
-        history exists.
+        Bulk exports unlock long-term progression, performance curves, historical readiness trends,
+        and pacing adaptation modeling — especially before API history exists.
       </p>
       <ul className="mb-4 space-y-1 text-xs text-zinc-500">
         <li>· Full Strava archive (activities.csv + optional FIT folder)</li>
@@ -167,8 +161,8 @@ export function FitIntelligencePanel({
   return (
     <PanelChrome title="Advanced workout intelligence" elevated>
       <p className={`${dash.muted} mb-4`}>
-        FIT streams are StrideIQ&apos;s deepest signal — interval structure, drift,
-        and execution scoring all depend on them.
+        FIT streams are StrideIQ&apos;s deepest signal — interval structure, drift, and execution
+        scoring all depend on them.
       </p>
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2">
@@ -176,10 +170,7 @@ export function FitIntelligencePanel({
           <p className={dash.label}>Without FIT streams</p>
           <ul className="mt-2 space-y-1">
             {comparison.without.map((item) => (
-              <li
-                key={item}
-                className="flex items-center gap-2 text-xs text-zinc-600"
-              >
+              <li key={item} className="flex items-center gap-2 text-xs text-zinc-600">
                 <X className="h-3 w-3 shrink-0" />
                 {item}
               </li>
@@ -190,10 +181,7 @@ export function FitIntelligencePanel({
           <p className={dash.label}>With FIT streams</p>
           <ul className="mt-2 space-y-1">
             {comparison.with.map((item) => (
-              <li
-                key={item}
-                className="flex items-center gap-2 text-xs text-zinc-400"
-              >
+              <li key={item} className="flex items-center gap-2 text-xs text-zinc-400">
                 <Check className="h-3 w-3 shrink-0 text-teal-500/80" />
                 {item}
               </li>
@@ -247,7 +235,7 @@ export function ProcessingTrustPanel({
             key={step.label}
             className={cn(
               "flex items-center gap-3 text-xs",
-              step.done ? "text-zinc-500" : step.active ? "text-teal-300/90" : "text-zinc-600"
+              step.done ? "text-zinc-500" : step.active ? "text-teal-300/90" : "text-zinc-600",
             )}
           >
             <span
@@ -257,14 +245,10 @@ export function ProcessingTrustPanel({
                   ? "bg-teal-500/20 text-teal-300"
                   : step.done
                     ? "bg-white/[0.06] text-zinc-500"
-                    : "bg-white/[0.04] text-zinc-600"
+                    : "bg-white/[0.04] text-zinc-600",
               )}
             >
-              {step.active ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                i + 1
-              )}
+              {step.active ? <Loader2 className="h-3 w-3 animate-spin" /> : i + 1}
             </span>
             {step.label}
           </li>
@@ -286,11 +270,7 @@ export function ProcessingTrustPanel({
   );
 }
 
-export function MissingDataGuidancePanel({
-  items,
-}: {
-  items: MissingGuidanceView[];
-}) {
+export function MissingDataGuidancePanel({ items }: { items: MissingGuidanceView[] }) {
   const severityStyle = {
     critical: "border-l-red-500/50 bg-red-500/[0.04]",
     warning: "border-l-amber-500/45 bg-amber-500/[0.03]",
@@ -305,7 +285,7 @@ export function MissingDataGuidancePanel({
             key={`${item.title}-${i}`}
             className={cn(
               "rounded-xl border border-white/[0.05] border-l-[3px] px-4 py-3.5",
-              severityStyle[item.severity]
+              severityStyle[item.severity],
             )}
           >
             <h3 className="text-sm font-semibold text-zinc-200">{item.title}</h3>
@@ -324,11 +304,7 @@ export function MissingDataGuidancePanel({
   );
 }
 
-export function CapabilitiesMatrixPanel({
-  capabilities,
-}: {
-  capabilities: CapabilityItem[];
-}) {
+export function CapabilitiesMatrixPanel({ capabilities }: { capabilities: CapabilityItem[] }) {
   return (
     <PanelChrome title="Intelligence unlock matrix" subdued>
       <div className="grid gap-2 sm:grid-cols-2">
@@ -339,7 +315,7 @@ export function CapabilitiesMatrixPanel({
               "flex items-center justify-between rounded-lg px-3 py-2.5 text-xs ring-1 ring-inset",
               c.unlocked
                 ? "bg-teal-500/[0.06] text-zinc-300 ring-teal-500/15"
-                : "bg-white/[0.02] text-zinc-600 ring-white/[0.05]"
+                : "bg-white/[0.02] text-zinc-600 ring-white/[0.05]",
             )}
           >
             <span>{c.label}</span>

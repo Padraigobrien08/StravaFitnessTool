@@ -19,8 +19,7 @@ function findFile(files: File[], name: string): File | undefined {
 
 function countFitFiles(files: File[]): number {
   return files.filter((f) => {
-    const path =
-      (f as File & { webkitRelativePath?: string }).webkitRelativePath ?? f.name;
+    const path = (f as File & { webkitRelativePath?: string }).webkitRelativePath ?? f.name;
     return /\.fit(\.gz)?$/i.test(path);
   }).length;
 }
@@ -34,13 +33,11 @@ export interface ImportResult {
 export async function importFromFiles(
   files: File[],
   exportLabel?: string,
-  onFitProgress?: (done: number, total: number) => void
+  onFitProgress?: (done: number, total: number) => void,
 ): Promise<ImportResult> {
   const activitiesFile = findFile(files, "activities.csv");
   if (!activitiesFile) {
-    throw new Error(
-      "activities.csv not found. Upload your full Strava export folder."
-    );
+    throw new Error("activities.csv not found. Upload your full Strava export folder.");
   }
 
   const activitiesText = await readFileAsText(activitiesFile);
@@ -87,7 +84,7 @@ export async function importFromFiles(
     const { details: fitDetails } = await parseFitFilesFromUpload(
       files,
       fitFilenameById,
-      onFitProgress
+      onFitProgress,
     );
     if (fitDetails.length > 0) {
       await saveFitDetails(fitDetails);

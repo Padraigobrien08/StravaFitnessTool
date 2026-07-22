@@ -28,17 +28,9 @@ import { ArrowLeft, Map } from "lucide-react";
 export default function RunDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const {
-    getRunById,
-    importData,
-    insights,
-    fitRunIds,
-    getFitDetailForRun,
-  } = useStrava();
+  const { getRunById, importData, insights, fitRunIds, getFitDetailForRun } = useStrava();
   const run = getRunById(id);
-  const [fit, setFit] = useState<FitRunDetail | null>(() =>
-    getFitDetailForRun(id) ?? null
-  );
+  const [fit, setFit] = useState<FitRunDetail | null>(() => getFitDetailForRun(id) ?? null);
   const [streamsLoading, setStreamsLoading] = useState(false);
   const [streamsError, setStreamsError] = useState<string | null>(null);
 
@@ -49,13 +41,7 @@ export default function RunDetailPage() {
 
   const view = useMemo(() => {
     if (!run || !workout) return null;
-    return buildWorkoutDetailView(
-      run,
-      workout,
-      fit,
-      importData?.runs ?? [],
-      insights
-    );
+    return buildWorkoutDetailView(run, workout, fit, importData?.runs ?? [], insights);
   }, [run, workout, fit, importData?.runs, insights]);
 
   useEffect(() => {
@@ -72,9 +58,7 @@ export default function RunDetailPage() {
       const fromCtx = getFitDetailForRun(id);
       if (
         fromCtx &&
-        (fromCtx.paceStream.length > 0 ||
-          fromCtx.hrStream.length > 0 ||
-          fromCtx.laps.length > 0)
+        (fromCtx.paceStream.length > 0 || fromCtx.hrStream.length > 0 || fromCtx.laps.length > 0)
       ) {
         setFit(fromCtx);
         return;
@@ -83,9 +67,7 @@ export default function RunDetailPage() {
       if (cancelled) return;
       if (
         local &&
-        (local.paceStream.length > 0 ||
-          local.hrStream.length > 0 ||
-          local.laps.length > 0)
+        (local.paceStream.length > 0 || local.hrStream.length > 0 || local.laps.length > 0)
       ) {
         setFit(local);
         return;
@@ -97,13 +79,11 @@ export default function RunDetailPage() {
         if (!res.ok) {
           if (res.status === 404) {
             setStreamsError(
-              "No stream data from Strava for this run yet. Use Import → Sync to backfill."
+              "No stream data from Strava for this run yet. Use Import → Sync to backfill.",
             );
           } else {
             const body = await res.json().catch(() => ({}));
-            setStreamsError(
-              (body as { error?: string }).error ?? "Could not load streams"
-            );
+            setStreamsError((body as { error?: string }).error ?? "Could not load streams");
           }
           return;
         }
@@ -126,10 +106,7 @@ export default function RunDetailPage() {
 
   const listedWithStreams = fitRunIds.includes(id);
   const hasStreamData =
-    fit &&
-    (fit.paceStream.length > 0 ||
-      fit.hrStream.length > 0 ||
-      fit.laps.length > 0);
+    fit && (fit.paceStream.length > 0 || fit.hrStream.length > 0 || fit.laps.length > 0);
 
   return (
     <RequireData>
@@ -187,9 +164,8 @@ export default function RunDetailPage() {
 
           {!fit && !listedWithStreams && run.fitFilename && (
             <p className="text-sm text-zinc-500">
-              FIT file referenced ({run.fitFilename}) but not loaded. Re-import
-              your Strava export including{" "}
-              <code className="text-teal-400/90">activities/</code>.
+              FIT file referenced ({run.fitFilename}) but not loaded. Re-import your Strava export
+              including <code className="text-teal-400/90">activities/</code>.
             </p>
           )}
         </div>

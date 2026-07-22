@@ -17,9 +17,8 @@ export function PlanTodayFocus({
     <div
       className={cn(
         "rounded-lg border border-teal-500/15 bg-teal-500/[0.04] px-3 py-2.5 ring-1 ring-teal-500/10 backdrop-blur-md",
-        sticky &&
-          "sticky top-[52px] z-30 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.65)]",
-        className
+        sticky && "sticky top-[52px] z-30 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.65)]",
+        className,
       )}
     >
       <p className="text-[10px] font-semibold uppercase tracking-wide text-teal-500/75">

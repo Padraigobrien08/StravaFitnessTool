@@ -39,10 +39,7 @@ function signalHeadline(text: string): string {
   return first && first.length < 72 ? first : text.slice(0, 68).trim() + "…";
 }
 
-function signalEvidence(
-  o: ActiveObservation,
-  analytics: DashboardInsights
-): string {
+function signalEvidence(o: ActiveObservation, analytics: DashboardInsights): string {
   switch (o.id) {
     case "eff-trend":
       return "Recent HR-backed runs";
@@ -66,7 +63,7 @@ export function getAthleteIntelligenceState(
   analytics: DashboardInsights | null,
   insights: Insight[],
   raceGoal: RaceGoal | null,
-  threadMessages: import("@/lib/coach/types").CoachMessage[] = []
+  threadMessages: import("@/lib/coach/types").CoachMessage[] = [],
 ): CoachWorkspaceState | null {
   if (!analytics) return null;
   return buildCoachWorkspaceState(analytics, insights, raceGoal, threadMessages);
@@ -74,7 +71,7 @@ export function getAthleteIntelligenceState(
 
 export function getActiveSignals(
   state: CoachWorkspaceState,
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): IntelligenceSignal[] {
   return state.observations.slice(0, 6).map((o) => ({
     id: o.id,
@@ -87,27 +84,21 @@ export function getActiveSignals(
   }));
 }
 
-export function getLongitudinalMemory(
-  state: CoachWorkspaceState
-): MemorySnippet[] {
+export function getLongitudinalMemory(state: CoachWorkspaceState): MemorySnippet[] {
   return state.memory;
 }
 
-export function getRisksAndOpportunities(
-  state: CoachWorkspaceState
-): RiskOpportunity[] {
+export function getRisksAndOpportunities(state: CoachWorkspaceState): RiskOpportunity[] {
   return state.risksAndOpportunities;
 }
 
-export function getTrainingEcosystem(
-  analytics: DashboardInsights
-): TrainingEcosystemView {
+export function getTrainingEcosystem(analytics: DashboardInsights): TrainingEcosystemView {
   return buildTrainingEcosystemView(analytics);
 }
 
 export function getCoachDefaultInvestigation(
   analytics: DashboardInsights,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ) {
   return buildDefaultInvestigation(analytics, raceGoal);
 }
@@ -116,7 +107,7 @@ export { DEFAULT_INVESTIGATION_QUESTION };
 
 export function getCoachDomainContext(
   state: CoachWorkspaceState,
-  domainId: string | null
+  domainId: string | null,
 ): CoachingDomain | null {
   if (!domainId) return state.domains[0] ?? null;
   return state.domains.find((d) => d.id === domainId) ?? null;
@@ -124,7 +115,7 @@ export function getCoachDomainContext(
 
 export function getPrimaryRecommendation(
   state: CoachWorkspaceState,
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): string {
   if (analytics.fatigue.tsb < -12) {
     return "Prioritize recovery — cap hard sessions and protect easy aerobic rhythm until freshness rebounds.";
@@ -138,16 +129,16 @@ export function getPrimaryRecommendation(
   if (analytics.efficiencySummary.trend === "improving") {
     return "Protect the aerobic adaptation trend with polarized easy days between quality work.";
   }
-  return state.focusRationale || "Maintain consistent aerobic rhythm and align hard sessions with freshness windows.";
+  return (
+    state.focusRationale ||
+    "Maintain consistent aerobic rhythm and align hard sessions with freshness windows."
+  );
 }
 
-export function getTrajectorySeries(
-  analytics: DashboardInsights
-): TrajectorySeries[] {
+export function getTrajectorySeries(analytics: DashboardInsights): TrajectorySeries[] {
   const weeks = analytics.weeklyVolume.slice(-8);
   const volTrend =
-    weeks.length >= 2 &&
-    weeks[weeks.length - 1]!.distanceKm > weeks[weeks.length - 2]!.distanceKm
+    weeks.length >= 2 && weeks[weeks.length - 1]!.distanceKm > weeks[weeks.length - 2]!.distanceKm
       ? "up"
       : weeks.length >= 2 &&
           weeks[weeks.length - 1]!.distanceKm < weeks[weeks.length - 2]!.distanceKm
@@ -193,10 +184,8 @@ export function getTrajectorySeries(
           : "Flat · hold pattern",
   };
 
-  const rScore =
-    analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score;
-  const rLabel =
-    analytics.raceReadiness?.label ?? analytics.halfMarathonReadiness.label;
+  const rScore = analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score;
+  const rLabel = analytics.raceReadiness?.label ?? analytics.halfMarathonReadiness.label;
 
   const readiness: TrajectorySeries = {
     id: "readiness",
@@ -222,8 +211,8 @@ export function getTrajectorySeries(
         Math.min(
           100,
           analytics.fatigue.freshness +
-            (i - weeks.length + 1) * (analytics.fatigue.tsb > 0 ? 2 : -1)
-        )
+            (i - weeks.length + 1) * (analytics.fatigue.tsb > 0 ? 2 : -1),
+        ),
       ),
     })),
     trend: freshTrend,
@@ -240,7 +229,7 @@ export function getTrajectorySeries(
 
 export function getCoachingStateBullets(
   state: CoachWorkspaceState,
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): string[] {
   const bullets: string[] = [];
   if (analytics.fatigue.freshness >= 65) bullets.push("Freshness high");

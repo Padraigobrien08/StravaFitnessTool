@@ -5,9 +5,7 @@ import type {
   CalendarValidationResult,
   TrainingCalendarWeek,
 } from "./types";
-function maxSeverity(
-  issues: CalendarValidationIssue[]
-): CalendarValidationIssue["severity"] {
+function maxSeverity(issues: CalendarValidationIssue[]): CalendarValidationIssue["severity"] {
   if (issues.some((i) => i.severity === "high")) return "high";
   if (issues.some((i) => i.severity === "medium")) return "medium";
   if (issues.length > 0) return "low";
@@ -19,7 +17,7 @@ export function validateCalendarWeek(
   opts?: {
     guardrails?: WeeklyPlanGuardrails;
     integritySeverity?: TrainingCalendarWeek["integritySeverity"];
-  }
+  },
 ): CalendarValidationResult {
   const issues: CalendarValidationIssue[] = [];
   const ids = new Set<string>();
@@ -91,10 +89,9 @@ export function validateBeforeSave(
   plan: WeeklyTrainingPlan,
   guardrails: WeeklyPlanGuardrails,
   integritySeverity?: TrainingCalendarWeek["integritySeverity"],
-  opts?: { source?: "llm" | "repaired" | "fallback" }
+  opts?: { source?: "llm" | "repaired" | "fallback" },
 ): CalendarValidationResult {
-  const blockOnIntegrity =
-    opts?.source !== "fallback" && integritySeverity === "high";
+  const blockOnIntegrity = opts?.source !== "fallback" && integritySeverity === "high";
   return validateCalendarWeek(week, {
     guardrails,
     integritySeverity: blockOnIntegrity ? "high" : undefined,

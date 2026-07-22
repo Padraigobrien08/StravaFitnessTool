@@ -11,7 +11,7 @@ const HARD = new Set(["tempo", "interval", "race"]);
 function summarizeWindow(
   ctx: ReasoningContext,
   start: Date,
-  end: Date
+  end: Date,
 ): {
   fourWeekVolumeKm: number;
   hardSessions: number;
@@ -25,7 +25,7 @@ function summarizeWindow(
   });
   const daysSpan = Math.max(
     1,
-    Math.round((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000))
+    Math.round((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)),
   );
   const vol = lastNDaysVolume(inWindow, Math.min(28, daysSpan));
   let hardSessions = 0;
@@ -48,10 +48,7 @@ function summarizeWindow(
   };
 }
 
-function pickPr(
-  ctx: ReasoningContext,
-  args: PrContextArgs
-): PersonalRecord | null {
+function pickPr(ctx: ReasoningContext, args: PrContextArgs): PersonalRecord | null {
   const prs = ctx.analytics.personalRecords;
   if (args.runId) {
     return prs.find((p) => p.runId === args.runId) ?? null;
@@ -66,7 +63,7 @@ function pickPr(
 
 export function prContext(
   ctx: ReasoningContext,
-  args: PrContextArgs = {}
+  args: PrContextArgs = {},
 ): ReasoningResult<{
   pr: {
     label: string;
@@ -110,17 +107,17 @@ export function prContext(
   const volDelta = prepWindow.fourWeekVolumeKm - priorWindow.fourWeekVolumeKm;
   if (Math.abs(volDelta) >= 5) {
     changes.push(
-      `4-week volume ${volDelta > 0 ? "up" : "down"} ~${Math.abs(volDelta).toFixed(0)} km before PR`
+      `4-week volume ${volDelta > 0 ? "up" : "down"} ~${Math.abs(volDelta).toFixed(0)} km before PR`,
     );
   }
   if (prepWindow.hardSessions !== priorWindow.hardSessions) {
     changes.push(
-      `Hard sessions: ${priorWindow.hardSessions} → ${prepWindow.hardSessions} in 8 weeks before PR`
+      `Hard sessions: ${priorWindow.hardSessions} → ${prepWindow.hardSessions} in 8 weeks before PR`,
     );
   }
   if (prepWindow.longestRunKm > priorWindow.longestRunKm + 1) {
     changes.push(
-      `Longest run built to ${prepWindow.longestRunKm} km (was ${priorWindow.longestRunKm} km)`
+      `Longest run built to ${prepWindow.longestRunKm} km (was ${priorWindow.longestRunKm} km)`,
     );
   }
   if (
@@ -128,9 +125,7 @@ export function prContext(
     priorWindow.tsbAtEnd != null &&
     prepWindow.tsbAtEnd > priorWindow.tsbAtEnd + 5
   ) {
-    changes.push(
-      `TSB fresher before PR (${prepWindow.tsbAtEnd} vs ${priorWindow.tsbAtEnd})`
-    );
+    changes.push(`TSB fresher before PR (${prepWindow.tsbAtEnd} vs ${priorWindow.tsbAtEnd})`);
   }
   if (changes.length === 0) {
     changes.push("Training load pattern similar between the two 8-week windows.");

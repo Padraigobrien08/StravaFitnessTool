@@ -58,7 +58,7 @@ export function comparableEffortSubset(
   points: EfficiencyPoint[],
   athleteMaxHr: number,
   minPct = 0.7,
-  maxPct = 0.82
+  maxPct = 0.82,
 ): EfficiencyPoint[] {
   return points.filter((p) => {
     const pct = p.avgHr / athleteMaxHr;
@@ -66,9 +66,7 @@ export function comparableEffortSubset(
   });
 }
 
-export function efficiencyMonthOverMonth(
-  points: EfficiencyPoint[]
-): EfficiencyMonthOverMonth {
+export function efficiencyMonthOverMonth(points: EfficiencyPoint[]): EfficiencyMonthOverMonth {
   const byMonth = new Map<string, number[]>();
   for (const p of points) {
     const key = format(parseISO(p.date), "yyyy-MM");
@@ -103,13 +101,9 @@ export function efficiencyMonthOverMonth(
     };
   }
 
-  const currentAvg =
-    currentRuns.reduce((a, b) => a + b, 0) / currentRuns.length;
+  const currentAvg = currentRuns.reduce((a, b) => a + b, 0) / currentRuns.length;
   const priorAvg = priorRuns.reduce((a, b) => a + b, 0) / priorRuns.length;
-  const pctChange =
-    priorAvg !== 0
-      ? Math.round(((priorAvg - currentAvg) / priorAvg) * 100)
-      : null;
+  const pctChange = priorAvg !== 0 ? Math.round(((priorAvg - currentAvg) / priorAvg) * 100) : null;
 
   const currentLabel = format(parseISO(`${currentMonth}-01`), "MMMM");
   const priorLabel = format(parseISO(`${priorMonth}-01`), "MMMM");

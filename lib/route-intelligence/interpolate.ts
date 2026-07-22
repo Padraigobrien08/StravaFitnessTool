@@ -3,7 +3,7 @@
 export function interpolateAtTime<T extends { elapsedSec: number }>(
   stream: T[],
   t: number,
-  pick: (p: T) => number | null
+  pick: (p: T) => number | null,
 ): number | null {
   if (stream.length === 0) return null;
   if (t <= stream[0].elapsedSec) return pick(stream[0]);
@@ -18,20 +18,14 @@ export function interpolateAtTime<T extends { elapsedSec: number }>(
       const vb = pick(b);
       if (va == null) return vb;
       if (vb == null) return va;
-      const ratio =
-        (t - a.elapsedSec) / Math.max(0.001, b.elapsedSec - a.elapsedSec);
+      const ratio = (t - a.elapsedSec) / Math.max(0.001, b.elapsedSec - a.elapsedSec);
       return va + (vb - va) * ratio;
     }
   }
   return pick(last);
 }
 
-export function haversineM(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+export function haversineM(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371000;
   const toRad = (d: number) => (d * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);

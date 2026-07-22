@@ -41,9 +41,7 @@ export function InsightCard({ insight }: { insight: Insight }) {
             → {insight.recommendation}
           </p>
         ) : null}
-        <TypographyCaption className="mt-2">
-          Confidence: {insight.confidence}
-        </TypographyCaption>
+        <TypographyCaption className="mt-2">Confidence: {insight.confidence}</TypographyCaption>
       </AlertDescription>
     </Alert>
   );

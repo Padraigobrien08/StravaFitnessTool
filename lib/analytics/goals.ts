@@ -12,15 +12,12 @@ export interface GoalProgress {
   weeklyBreakdown: { week: string; runs: number; met: boolean }[];
 }
 
-export function runGoalProgress(
-  runs: RunActivity[],
-  goals: Goal[]
-): GoalProgress | null {
+export function runGoalProgress(runs: RunActivity[], goals: Goal[]): GoalProgress | null {
   const runGoal = goals.find(
     (g) =>
       g.activityType.toLowerCase() === "run" &&
       g.type.toLowerCase() === "count" &&
-      g.timePeriod.toLowerCase() === "week"
+      g.timePeriod.toLowerCase() === "week",
   );
   if (!runGoal) return null;
 
@@ -28,9 +25,7 @@ export function runGoalProgress(
   if (Number.isNaN(goalStart.getTime())) {
     return null;
   }
-  const weeks = weeklyVolume(
-    runs.filter((r) => !isBefore(parseISO(r.date), goalStart))
-  );
+  const weeks = weeklyVolume(runs.filter((r) => !isBefore(parseISO(r.date), goalStart)));
 
   const breakdown = weeks.map((w) => ({
     week: w.label,
@@ -43,11 +38,7 @@ export function runGoalProgress(
   const currentWeekStart = startOfWeek(now, { weekStartsOn: 1 });
   const currentWeekRuns = runs.filter((r) => {
     const d = parseISO(r.date);
-    return (
-      !isBefore(d, currentWeekStart) &&
-      !isAfter(d, now) &&
-      !isBefore(d, goalStart)
-    );
+    return !isBefore(d, currentWeekStart) && !isAfter(d, now) && !isBefore(d, goalStart);
   }).length;
 
   return {

@@ -44,7 +44,7 @@ export function buildAdaptivePlanningNotes(params: {
   const contradicted = params.outcomes.filter((o) => o.evaluation === "contradicted");
   if (contradicted.length >= 2) {
     notes.push(
-      "Recent recommendations were contradicted — bias conservative until patterns clarify"
+      "Recent recommendations were contradicted — bias conservative until patterns clarify",
     );
   }
 

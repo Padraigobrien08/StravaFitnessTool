@@ -10,7 +10,7 @@ import type { RouteIntelligenceSession } from "./types";
 export function buildRouteIntelligenceSession(
   run: RunActivity,
   fit: FitRunDetail | null,
-  workoutType?: WorkoutType
+  workoutType?: WorkoutType,
 ): RouteIntelligenceSession {
   const empty: RouteIntelligenceSession = {
     activityId: run.id,
@@ -32,11 +32,7 @@ export function buildRouteIntelligenceSession(
   if (timeline.length < 2) return empty;
 
   const geometry = buildRouteGeometry(run.id, timeline);
-  const overlays = detectWorkoutOverlays(
-    timeline,
-    fit.laps,
-    workoutType
-  );
+  const overlays = detectWorkoutOverlays(timeline, fit.laps, workoutType);
   const elevationSegments = analyzeElevationSegments(timeline);
 
   return {

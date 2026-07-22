@@ -73,10 +73,6 @@ describe("mergeStravaImports", () => {
   it("unions fitRunIds", () => {
     const a = { ...emptyImport(), fitRunIds: ["1", "2"] };
     const b = { ...emptyImport(), fitRunIds: ["2", "3"] };
-    expect(mergeStravaImports(a, b)!.fitRunIds.sort()).toEqual([
-      "1",
-      "2",
-      "3",
-    ]);
+    expect(mergeStravaImports(a, b)!.fitRunIds.sort()).toEqual(["1", "2", "3"]);
   });
 });

@@ -17,7 +17,7 @@ function isInterferingActivity(a: NormalizedActivity): boolean {
 
 export function detectInterference(
   activities: NormalizedActivity[],
-  windowHours = 48
+  windowHours = 48,
 ): InterferenceFlag[] {
   const hardRuns = activities.filter(isQualityRun);
   const interferers = activities.filter(isInterferingActivity);
@@ -31,11 +31,7 @@ export function detectInterference(
       if (hours > windowHours) continue;
 
       const severity =
-        hours <= 24 && nr.perceivedIntensity === "high"
-          ? "high"
-          : hours <= 36
-            ? "medium"
-            : "low";
+        hours <= 24 && nr.perceivedIntensity === "high" ? "high" : hours <= 36 ? "medium" : "low";
 
       flags.push({
         id: `if-${nr.id}-${run.id}`,
@@ -63,21 +59,21 @@ export function detectInterference(
 
   return flags.sort(
     (a, b) =>
-      ({ high: 0, medium: 1, low: 2 }[a.severity] ?? 3) -
-      ({ high: 0, medium: 1, low: 2 }[b.severity] ?? 3)
+      (({ high: 0, medium: 1, low: 2 })[a.severity] ?? 3) -
+      ({ high: 0, medium: 1, low: 2 }[b.severity] ?? 3),
   );
 }
 
 export function detectWeeklyHighIntensityDensity(
   activities: NormalizedActivity[],
-  maxPer7Days = 4
+  maxPer7Days = 4,
 ): InterferenceFlag[] {
   const recent = activities.filter((a) => inWindow(a.startDate, 7));
   const hi = recent.filter(
     (a) =>
       a.perceivedIntensity === "high" ||
       a.modality === "high_intensity_cross_training" ||
-      (a.modality === "strength" && a.perceivedIntensity !== "low")
+      (a.modality === "strength" && a.perceivedIntensity !== "low"),
   );
   if (hi.length <= maxPer7Days) return [];
   return [
@@ -101,14 +97,14 @@ export function detectWeeklyHighIntensityDensity(
 
 export function detectHybridLoadClusters(
   activities: NormalizedActivity[],
-  clusterDays = 3
+  clusterDays = 3,
 ): InterferenceFlag[] {
   const sorted = [...activities]
     .filter(
       (a) =>
         isQualityRun(a) ||
         a.modality === "high_intensity_cross_training" ||
-        (a.modality === "strength" && a.perceivedIntensity !== "low")
+        (a.modality === "strength" && a.perceivedIntensity !== "low"),
     )
     .sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime());
 
@@ -122,9 +118,7 @@ export function detectHybridLoadClusters(
       else break;
     }
     const hasRun = cluster.some((a) => a.modality === "run");
-    const hasHiit = cluster.some(
-      (a) => a.modality === "high_intensity_cross_training"
-    );
+    const hasHiit = cluster.some((a) => a.modality === "high_intensity_cross_training");
     const hasStrength = cluster.some((a) => a.modality === "strength");
     if (cluster.length >= 3 && hasRun && (hasHiit || hasStrength)) {
       flags.push({
@@ -136,10 +130,7 @@ export function detectHybridLoadClusters(
         nonRunDate: sorted[i].startDate,
         hoursApart: clusterDays * 24,
         message: `Hard run + HIIT/strength clustered within ${clusterDays} days — hybrid load concentration.`,
-        evidence: cluster.map(
-          (a) =>
-            `${a.sportType}: ${a.name} (${a.perceivedIntensity})`
-        ),
+        evidence: cluster.map((a) => `${a.sportType}: ${a.name} (${a.perceivedIntensity})`),
         confidence: "medium",
       });
       i += cluster.length - 1;
@@ -150,7 +141,7 @@ export function detectHybridLoadClusters(
 
 export function detectRaceWeekInterference(
   activities: NormalizedActivity[],
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): InterferenceFlag[] {
   if (!raceGoal?.date) return [];
   const raceTime = parseISO(raceGoal.date).getTime();
@@ -194,7 +185,7 @@ export function detectRaceWeekInterference(
 
 export function collectInterferenceFlags(
   activities: NormalizedActivity[],
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): InterferenceFlag[] {
   return [
     ...detectInterference(activities, 48),

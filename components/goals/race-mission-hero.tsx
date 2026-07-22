@@ -25,7 +25,7 @@ export function RaceMissionHero({ hero }: { hero: RaceMissionHeroView }) {
       className={cn(
         "border-l-[3px]",
         borderTone,
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_55%)]"
+        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_55%)]",
       )}
     >
       <div className="relative grid gap-5 lg:grid-cols-[1fr_minmax(240px,300px)] lg:gap-8">
@@ -45,13 +45,10 @@ export function RaceMissionHero({ hero }: { hero: RaceMissionHeroView }) {
 
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md bg-white/[0.04] px-2.5 py-1 text-xs text-zinc-300 ring-1 ring-inset ring-white/[0.06]">
-              Readiness ·{" "}
-              <strong className="text-teal-300/90">{hero.readinessLabel}</strong>
+              Readiness · <strong className="text-teal-300/90">{hero.readinessLabel}</strong>
             </span>
             <ConfidenceBadge level={hero.confidence} />
-            <span className="text-xs text-zinc-600">
-              Confidence {hero.confidenceLabel}
-            </span>
+            <span className="text-xs text-zinc-600">Confidence {hero.confidenceLabel}</span>
           </div>
 
           <div className="grid gap-2 text-sm sm:grid-cols-2">
@@ -69,8 +66,7 @@ export function RaceMissionHero({ hero }: { hero: RaceMissionHeroView }) {
 
           {!hero.hasRaceGoal ? (
             <p className="text-xs text-zinc-600">
-              Set a race date below to unlock countdown and mission-specific
-              readiness.
+              Set a race date below to unlock countdown and mission-specific readiness.
             </p>
           ) : null}
         </div>
@@ -97,9 +93,7 @@ export function RaceMissionHero({ hero }: { hero: RaceMissionHeroView }) {
                 {hero.raceDateDisplay}
               </p>
               <p className="mt-0.5 tabular-nums">
-                {hero.daysUntilRace === 0
-                  ? "Race day"
-                  : `${hero.daysUntilRace} days out`}
+                {hero.daysUntilRace === 0 ? "Race day" : `${hero.daysUntilRace} days out`}
               </p>
             </div>
           ) : null}

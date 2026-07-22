@@ -51,7 +51,7 @@ export function planPhaseLabel(planType?: string): string {
 
 export function goalContextLabel(
   raceGoal: RaceGoal | null,
-  analytics: DashboardInsights | null
+  analytics: DashboardInsights | null,
 ): string | null {
   if (!raceGoal && !analytics?.raceReadiness) return null;
   const r = analytics?.raceReadiness;
@@ -65,7 +65,7 @@ export function goalContextLabel(
 
 export function buildWeekTelemetry(
   week: TrainingCalendarWeek,
-  analytics: DashboardInsights | null
+  analytics: DashboardInsights | null,
 ): PlanWeekTelemetry {
   const volumeKm =
     week.totalRunDistanceKm ??
@@ -80,7 +80,7 @@ export function buildWeekTelemetry(
         w.modality === "run" &&
         w.status !== "skipped" &&
         (w.intensity === "hard" ||
-          /\btempo|interval|threshold|race|quality\b/i.test(`${w.type} ${w.title}`))
+          /\btempo|interval|threshold|race|quality\b/i.test(`${w.type} ${w.title}`)),
     ).length;
 
   const freshness = analytics?.fatigue.freshness ?? 0;
@@ -115,8 +115,7 @@ export function buildTodayInPlan(week: TrainingCalendarWeek): PlanTodayFocus {
   const workout =
     week.workouts.find(
       (w) =>
-        w.date.slice(0, 10) === todayIso ||
-        w.day.toLowerCase().startsWith(dayShort.toLowerCase())
+        w.date.slice(0, 10) === todayIso || w.day.toLowerCase().startsWith(dayShort.toLowerCase()),
     ) ?? null;
 
   if (!workout || workout.modality === "rest") {
@@ -146,10 +145,7 @@ export function buildTodayInPlan(week: TrainingCalendarWeek): PlanTodayFocus {
   };
 }
 
-function inferAvoid(
-  workout: CalendarWorkout,
-  week: TrainingCalendarWeek
-): string | null {
+function inferAvoid(workout: CalendarWorkout, week: TrainingCalendarWeek): string | null {
   const isEasy =
     workout.intensity === "easy" ||
     workout.intensity === "recovery" ||
@@ -159,7 +155,7 @@ function inferAvoid(
       w.id !== workout.id &&
       w.modality === "run" &&
       w.intensity === "hard" &&
-      w.status !== "skipped"
+      w.status !== "skipped",
   );
   if (isEasy && hardNearby) {
     return "Additional threshold work or heavy gym sessions.";
@@ -175,21 +171,18 @@ function inferAvoid(
 
 export function buildIntegrityItems(
   week: TrainingCalendarWeek,
-  preview: GenerateWeeklyPlanResult | null
+  preview: GenerateWeeklyPlanResult | null,
 ): PlanIntegrityItem[] {
   const validation = validateCalendarWeek(week, {
     guardrails: preview?.guardrails,
     integritySeverity:
       preview?.source === "fallback"
         ? undefined
-        : week.integritySeverity ?? preview?.integrity?.severity,
+        : (week.integritySeverity ?? preview?.integrity?.severity),
   });
 
   const hardWorkouts = week.workouts.filter(
-    (w) =>
-      w.modality === "run" &&
-      w.status !== "skipped" &&
-      isHardTrainingRun(w)
+    (w) => w.modality === "run" && w.status !== "skipped" && isHardTrainingRun(w),
   );
 
   return validation.issues.map((issue, i) => ({

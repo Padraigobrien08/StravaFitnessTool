@@ -17,7 +17,4 @@ export {
   evaluatePendingOutcomes,
   clearOutcomeStore,
 } from "./trackRecommendationOutcome";
-export {
-  updateBeliefsFromOutcome,
-  applyOutcomesToMemory,
-} from "./updateBeliefsFromOutcome";
+export { updateBeliefsFromOutcome, applyOutcomesToMemory } from "./updateBeliefsFromOutcome";

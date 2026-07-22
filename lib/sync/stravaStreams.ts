@@ -4,10 +4,7 @@ import {
   upsertFitDetail,
 } from "@/lib/db/activity-streams";
 import { getValidAccessToken } from "@/lib/db/strava-connection";
-import {
-  fetchActivityLaps,
-  fetchActivityStreams,
-} from "@/lib/strava/api/fetchStreams";
+import { fetchActivityLaps, fetchActivityStreams } from "@/lib/strava/api/fetchStreams";
 import { mapStravaStreamsToFitDetail } from "@/lib/strava/api/mapToFitDetail";
 
 const DEFAULT_MAX_RUNS = 40;
@@ -19,7 +16,7 @@ function sleep(ms: number): Promise<void> {
 
 export async function syncStravaStreamsForUser(
   userId: string,
-  options?: { maxRuns?: number }
+  options?: { maxRuns?: number },
 ): Promise<{ streamsSynced: number; skipped: number }> {
   const maxRuns = options?.maxRuns ?? DEFAULT_MAX_RUNS;
   const runIds = await listRunIdsMissingStreams(userId, maxRuns);
@@ -38,11 +35,7 @@ export async function syncStravaStreamsForUser(
         fetchActivityLaps(accessToken, activityId),
       ]);
 
-      const detail = mapStravaStreamsToFitDetail(
-        String(activityId),
-        streams,
-        laps
-      );
+      const detail = mapStravaStreamsToFitDetail(String(activityId), streams, laps);
 
       if (!detail) {
         skipped += 1;

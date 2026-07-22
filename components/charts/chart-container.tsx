@@ -14,9 +14,7 @@ export function ChartContainer({
   children: (size: { width: number; height: number }) => ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState<{ width: number; height: number } | null>(
-    null
-  );
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -37,11 +35,7 @@ export function ChartContainer({
   }, [height]);
 
   return (
-    <div
-      ref={ref}
-      className={cn("min-h-0 min-w-0 w-full", className)}
-      style={{ height }}
-    >
+    <div ref={ref} className={cn("min-h-0 min-w-0 w-full", className)} style={{ height }}>
       {size ? children(size) : null}
     </div>
   );

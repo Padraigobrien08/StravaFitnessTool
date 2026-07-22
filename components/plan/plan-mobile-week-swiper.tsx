@@ -36,7 +36,7 @@ export function PlanMobileWeekSwiper({
   const todayIndex = workouts.findIndex(
     (w) =>
       (todayDateIso && w.date.slice(0, 10) === todayDateIso) ||
-      w.date.slice(0, 10) === format(new Date(), "yyyy-MM-dd")
+      w.date.slice(0, 10) === format(new Date(), "yyyy-MM-dd"),
   );
 
   const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
@@ -103,14 +103,13 @@ export function PlanMobileWeekSwiper({
       >
         {workouts.map((w, index) => {
           const isToday =
-            todayIndex === index ||
-            w.date.slice(0, 10) === format(new Date(), "yyyy-MM-dd");
+            todayIndex === index || w.date.slice(0, 10) === format(new Date(), "yyyy-MM-dd");
           return (
             <div
               key={w.id}
               className={cn(
                 "w-[min(100%,calc(100vw-2.5rem))] shrink-0 snap-center",
-                isToday && "snap-always"
+                isToday && "snap-always",
               )}
             >
               {children({
@@ -132,10 +131,8 @@ export function PlanMobileWeekSwiper({
             onClick={() => scrollToIndex(i)}
             className={cn(
               "h-1.5 rounded-full transition-all",
-              i === activeIndex
-                ? "w-5 bg-teal-500/70"
-                : "w-1.5 bg-zinc-700 hover:bg-zinc-600",
-              i === todayIndex && i !== activeIndex && "ring-1 ring-teal-500/40"
+              i === activeIndex ? "w-5 bg-teal-500/70" : "w-1.5 bg-zinc-700 hover:bg-zinc-600",
+              i === todayIndex && i !== activeIndex && "ring-1 ring-teal-500/40",
             )}
           />
         ))}

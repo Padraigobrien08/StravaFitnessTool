@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildSplitPlan,
-  fadeRiskScore,
-  simulateRaceStrategy,
-} from "../raceStrategy";
+import { buildSplitPlan, fadeRiskScore, simulateRaceStrategy } from "../raceStrategy";
 import type { RaceGoal } from "../readiness";
 import type { RacePredictionAnalysis } from "../predictions";
 import type { FatigueSnapshot } from "../fatigue";
 
 const minimalPrediction: RacePredictionAnalysis = {
-  efforts: [{ distanceKm: 18, timeSec: 5400, runId: "1", runName: "Long", date: "2025-01-01", source: "Full run" }],
+  efforts: [
+    {
+      distanceKm: 18,
+      timeSec: 5400,
+      runId: "1",
+      runName: "Long",
+      date: "2025-01-01",
+      source: "Full run",
+    },
+  ],
   models: [],
   consensus: [
     {
@@ -45,9 +50,7 @@ describe("buildSplitPlan", () => {
     const last = splits[splits.length - 1];
     expect(Math.abs(last.cumulativeSec - target)).toBeLessThanOrEqual(30);
     for (let i = 1; i < splits.length; i++) {
-      expect(splits[i].cumulativeSec).toBeGreaterThanOrEqual(
-        splits[i - 1].cumulativeSec
-      );
+      expect(splits[i].cumulativeSec).toBeGreaterThanOrEqual(splits[i - 1].cumulativeSec);
     }
   });
 });
@@ -66,13 +69,7 @@ describe("simulateRaceStrategy", () => {
       date: "2025-06-01",
       targetTimeSec: 6600,
     };
-    const result = simulateRaceStrategy(
-      goal,
-      minimalPrediction,
-      fatigue,
-      null,
-      "even"
-    );
+    const result = simulateRaceStrategy(goal, minimalPrediction, fatigue, null, "even");
     expect(result).not.toBeNull();
     expect(result!.splits.length).toBeGreaterThan(3);
     expect(result!.fadeRisk).toBeDefined();

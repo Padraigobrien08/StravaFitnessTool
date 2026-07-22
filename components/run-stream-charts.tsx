@@ -49,24 +49,12 @@ export function RunStreamCharts({ fit }: { fit: FitRunDetail }) {
                 tick={chartTick}
                 tickFormatter={(s) => `${Math.round(s / 60)}m`}
               />
-              <YAxis
-                tick={chartTick}
-                reversed
-                tickFormatter={(v) => formatPace(v)}
-              />
+              <YAxis tick={chartTick} reversed tickFormatter={(v) => formatPace(v)} />
               <Tooltip
                 contentStyle={chart.tooltip}
-                formatter={(v) => [
-                  typeof v === "number" ? formatPace(v) : "—",
-                  "Pace",
-                ]}
+                formatter={(v) => [typeof v === "number" ? formatPace(v) : "—", "Pace"]}
               />
-              <Line
-                type="monotone"
-                dataKey="paceSecPerKm"
-                stroke="#34d399"
-                dot={false}
-              />
+              <Line type="monotone" dataKey="paceSecPerKm" stroke="#34d399" dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

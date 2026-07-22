@@ -1,43 +1,22 @@
 import { getValidAccessToken, getStravaConnection } from "@/lib/db/strava-connection";
-import {
-  compactActivityStreams,
-  downsampleCompactStreams,
-} from "@/lib/strava/api/compactStreams";
+import { compactActivityStreams, downsampleCompactStreams } from "@/lib/strava/api/compactStreams";
 import { exportRouteGpx, exportRouteTcx } from "@/lib/strava/api/exportRoute";
 import { exploreSegments } from "@/lib/strava/api/exploreSegments";
 import { fetchActivity } from "@/lib/strava/api/fetchActivity";
-import {
-  resolveActivitiesList,
-  resolveActivitiesListAll,
-} from "@/lib/mcp/resolveActivitiesList";
-import {
-  fetchAthleteStats,
-  fetchAthleteZones,
-} from "@/lib/strava/api/fetchAthlete";
+import { resolveActivitiesList, resolveActivitiesListAll } from "@/lib/mcp/resolveActivitiesList";
+import { fetchAthleteStats, fetchAthleteZones } from "@/lib/strava/api/fetchAthlete";
 import { listAthleteClubs } from "@/lib/strava/api/fetchClubs";
 import { fetchAthleteGear } from "@/lib/strava/api/fetchGear";
 import { fetchActivityPhotos } from "@/lib/strava/api/fetchPhotos";
 import { fetchRoute, listAthleteRoutes } from "@/lib/strava/api/fetchRoutes";
-import {
-  fetchSegment,
-  fetchStarredSegments,
-} from "@/lib/strava/api/fetchSegments";
-import {
-  fetchSegmentEffort,
-  fetchSegmentEfforts,
-} from "@/lib/strava/api/fetchSegmentEfforts";
+import { fetchSegment, fetchStarredSegments } from "@/lib/strava/api/fetchSegments";
+import { fetchSegmentEffort, fetchSegmentEfforts } from "@/lib/strava/api/fetchSegmentEfforts";
 import { fetchSegmentLeaderboard } from "@/lib/strava/api/fetchSegmentLeaderboard";
-import {
-  fetchActivityLaps,
-  fetchActivityStreams,
-} from "@/lib/strava/api/fetchStreams";
+import { fetchActivityLaps, fetchActivityStreams } from "@/lib/strava/api/fetchStreams";
 import { formatActivitySummary } from "@/lib/strava/api/formatActivitySummary";
 import { activityGpxExport } from "@/lib/strava/api/formatWorkoutFile";
 import { starSegment } from "@/lib/strava/api/starSegment";
-import {
-  chunkCompactStreams,
-  selectStreamChunk,
-} from "@/lib/strava/api/streamChunks";
+import { chunkCompactStreams, selectStreamChunk } from "@/lib/strava/api/streamChunks";
 import { verboseActivityStreams } from "@/lib/strava/api/verboseStreams";
 
 export const STRAVA_MCP_ACTIONS = [
@@ -101,9 +80,7 @@ export interface StravaMcpParams {
 async function requireConnection(userId: string) {
   const conn = await getStravaConnection(userId);
   if (!conn) {
-    throw new Error(
-      "No Strava connection. Sign in via Strava in the StrideIQ app first."
-    );
+    throw new Error("No Strava connection. Sign in via Strava in the StrideIQ app first.");
   }
   const { accessToken, athlete } = await getValidAccessToken(userId);
   const athleteId = Number(conn.strava_athlete_id);
@@ -130,7 +107,7 @@ function parseBounds(params: StravaMcpParams): [number, number, number, number] 
 export async function handleStravaMcpAction(
   userId: string,
   action: StravaMcpAction,
-  params: StravaMcpParams
+  params: StravaMcpParams,
 ): Promise<unknown> {
   const { conn, accessToken, athlete, athleteId } = await requireConnection(userId);
 
@@ -210,9 +187,7 @@ export async function handleStravaMcpAction(
         };
       }
 
-      const downsampleN = params.downsample
-        ? parseInt(params.downsample, 10)
-        : NaN;
+      const downsampleN = params.downsample ? parseInt(params.downsample, 10) : NaN;
       if (Number.isFinite(downsampleN) && downsampleN > 0) {
         payload = downsampleCompactStreams(payload, downsampleN);
       }
@@ -242,15 +217,12 @@ export async function handleStravaMcpAction(
 
     case "stats": {
       if (!Number.isFinite(athleteId)) throw new Error("Invalid athlete id");
-      const stats =
-        conn.athlete_stats_json ??
-        (await fetchAthleteStats(accessToken, athleteId));
+      const stats = conn.athlete_stats_json ?? (await fetchAthleteStats(accessToken, athleteId));
       return stats;
     }
 
     case "zones": {
-      const zones =
-        conn.athlete_zones_json ?? (await fetchAthleteZones(accessToken));
+      const zones = conn.athlete_zones_json ?? (await fetchAthleteZones(accessToken));
       return { zones };
     }
 
@@ -258,11 +230,7 @@ export async function handleStravaMcpAction(
       return fetchAthleteGear(accessToken);
 
     case "segments_explore":
-      return exploreSegments(
-        accessToken,
-        parseBounds(params),
-        params.activity_type
-      );
+      return exploreSegments(accessToken, parseBounds(params), params.activity_type);
 
     case "segments_starred":
       return { segments: await fetchStarredSegments(accessToken) };
@@ -283,15 +251,11 @@ export async function handleStravaMcpAction(
 
     case "segment_efforts":
       return {
-        efforts: await fetchSegmentEfforts(
-          accessToken,
-          parseId(params, "segment id"),
-          {
-            start_date_local: params.start_date_local,
-            end_date_local: params.end_date_local,
-            per_page: params.per_page ? parseInt(params.per_page, 10) : 30,
-          }
-        ),
+        efforts: await fetchSegmentEfforts(accessToken, parseId(params, "segment id"), {
+          start_date_local: params.start_date_local,
+          end_date_local: params.end_date_local,
+          per_page: params.per_page ? parseInt(params.per_page, 10) : 30,
+        }),
       };
 
     case "segment_star": {
@@ -302,9 +266,7 @@ export async function handleStravaMcpAction(
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         if (msg.includes("403")) {
-          throw new Error(
-            "Cannot star segment — check Strava app scopes include segment access."
-          );
+          throw new Error("Cannot star segment — check Strava app scopes include segment access.");
         }
         throw e;
       }
@@ -319,29 +281,23 @@ export async function handleStravaMcpAction(
           accessToken,
           athleteId,
           Number.isFinite(page) ? page : 1,
-          Number.isFinite(per_page) ? per_page : 30
+          Number.isFinite(per_page) ? per_page : 30,
         ),
       };
     }
 
     case "route": {
-      const routeId = params.route_id
-        ? parseInt(params.route_id, 10)
-        : parseId(params, "route id");
+      const routeId = params.route_id ? parseInt(params.route_id, 10) : parseId(params, "route id");
       return fetchRoute(accessToken, routeId);
     }
 
     case "route_export_gpx": {
-      const routeId = params.route_id
-        ? parseInt(params.route_id, 10)
-        : parseId(params, "route id");
+      const routeId = params.route_id ? parseInt(params.route_id, 10) : parseId(params, "route id");
       return exportRouteGpx(accessToken, routeId);
     }
 
     case "route_export_tcx": {
-      const routeId = params.route_id
-        ? parseInt(params.route_id, 10)
-        : parseId(params, "route id");
+      const routeId = params.route_id ? parseInt(params.route_id, 10) : parseId(params, "route id");
       return exportRouteTcx(accessToken, routeId);
     }
 
@@ -352,11 +308,7 @@ export async function handleStravaMcpAction(
       const id = parseId(params, "activity id");
       const activity = await fetchActivity(accessToken, id);
       const streams = await fetchActivityStreams(accessToken, id);
-      return activityGpxExport(
-        id,
-        String(activity.name ?? `Activity ${id}`),
-        streams
-      );
+      return activityGpxExport(id, String(activity.name ?? `Activity ${id}`), streams);
     }
 
     default: {

@@ -25,8 +25,8 @@ html.dark {
   --surface-panel: #0e1015;
   --header-bg: rgba(9, 9, 11, 0.88);
   --input-bg: rgba(255, 255, 255, 0.03);
-  --surface-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
-    0 10px 40px -18px rgba(0, 0, 0, 0.55);
+  --surface-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 10px 40px -18px rgba(0, 0, 0, 0.55);
   --surface-shadow-subtle: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset;
   --chart-grid: rgba(255, 255, 255, 0.06);
   --chart-tick-fill: #a1a1aa;
@@ -75,8 +75,7 @@ html.light {
   --surface-panel: #ffffff;
   --header-bg: rgba(244, 244, 245, 0.92);
   --input-bg: #ffffff;
-  --surface-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.04) inset,
-    0 8px 30px -12px rgba(0, 0, 0, 0.12);
+  --surface-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.04) inset, 0 8px 30px -12px rgba(0, 0, 0, 0.12);
   --surface-shadow-subtle: 0 1px 0 0 rgba(0, 0, 0, 0.03) inset;
   --chart-grid: rgba(0, 0, 0, 0.08);
   --chart-tick-fill: #52525b;
@@ -165,7 +164,9 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
-  font-feature-settings: "kern" 1, "liga" 1;
+  font-feature-settings:
+    "kern" 1,
+    "liga" 1;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
@@ -275,21 +276,39 @@ html.light option {
   animation: dashboard-fade-in 0.35s ease-out both;
 }
 
-.dashboard-stagger-1 { animation: dashboard-fade-in 0.4s ease-out 0.02s both; }
-.dashboard-stagger-2 { animation: dashboard-fade-in 0.4s ease-out 0.06s both; }
-.dashboard-stagger-3 { animation: dashboard-fade-in 0.4s ease-out 0.1s both; }
-.dashboard-stagger-4 { animation: dashboard-fade-in 0.4s ease-out 0.14s both; }
-.dashboard-stagger-5 { animation: dashboard-fade-in 0.4s ease-out 0.18s both; }
-.dashboard-stagger-6 { animation: dashboard-fade-in 0.4s ease-out 0.22s both; }
-.dashboard-stagger-7 { animation: dashboard-fade-in 0.4s ease-out 0.26s both; }
+.dashboard-stagger-1 {
+  animation: dashboard-fade-in 0.4s ease-out 0.02s both;
+}
+.dashboard-stagger-2 {
+  animation: dashboard-fade-in 0.4s ease-out 0.06s both;
+}
+.dashboard-stagger-3 {
+  animation: dashboard-fade-in 0.4s ease-out 0.1s both;
+}
+.dashboard-stagger-4 {
+  animation: dashboard-fade-in 0.4s ease-out 0.14s both;
+}
+.dashboard-stagger-5 {
+  animation: dashboard-fade-in 0.4s ease-out 0.18s both;
+}
+.dashboard-stagger-6 {
+  animation: dashboard-fade-in 0.4s ease-out 0.22s both;
+}
+.dashboard-stagger-7 {
+  animation: dashboard-fade-in 0.4s ease-out 0.26s both;
+}
 
 .sparkline-enter .sparkline-area {
   animation: spark-fade 0.6s ease-out both;
 }
 
 @keyframes spark-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 html.light .coach-terminal {
@@ -329,8 +348,7 @@ html.light .intelligence-evolution {
 
 html.light .route-terminal {
   background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(16, 185, 129, 0.06), transparent 55%),
-    #f4f4f5;
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(16, 185, 129, 0.06), transparent 55%), #f4f4f5;
 }
 
 html.light .route-scrubber {
@@ -554,8 +572,12 @@ html.coach-route .coach-message-column {
 }
 
 @keyframes coach-shimmer-slide {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(400%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
 }
 
 .coach-card-section + .coach-card-section {
@@ -578,9 +600,15 @@ html.coach-route .coach-message-column {
   animation: coach-card-in 0.45s ease-out both;
 }
 
-.coach-domain-card:nth-child(2) { animation-delay: 0.05s; }
-.coach-domain-card:nth-child(3) { animation-delay: 0.1s; }
-.coach-domain-card:nth-child(4) { animation-delay: 0.14s; }
+.coach-domain-card:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.coach-domain-card:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.coach-domain-card:nth-child(4) {
+  animation-delay: 0.14s;
+}
 
 .coach-main {
   background-image:
@@ -604,8 +632,7 @@ html.coach-route .coach-message-column {
 /* Route intelligence replay */
 .route-terminal {
   background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(16, 185, 129, 0.05), transparent 55%),
-    #09090b;
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(16, 185, 129, 0.05), transparent 55%), #09090b;
   min-height: calc(100dvh - 8rem);
 }
 
@@ -633,8 +660,12 @@ html.coach-route .coach-message-column {
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .skeleton-shimmer {

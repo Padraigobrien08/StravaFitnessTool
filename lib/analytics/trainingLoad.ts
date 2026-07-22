@@ -15,10 +15,7 @@ export interface FitnessIndexPoint {
 }
 
 /** Simple CTL-style EMA on weekly sum of training load */
-export function fitnessIndex(
-  runs: RunActivity[],
-  tauWeeks = 6
-): FitnessIndexPoint[] {
+export function fitnessIndex(runs: RunActivity[], tauWeeks = 6): FitnessIndexPoint[] {
   const weekly = new Map<string, number>();
   for (const run of runs) {
     if (run.trainingLoad === null) continue;

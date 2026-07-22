@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,11 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGoalStore } from "@/stores/goal-store";
-import {
-  RACE_DISTANCE_LABELS,
-  type RaceDistance,
-  type RaceGoal,
-} from "@/lib/analytics/readiness";
+import { RACE_DISTANCE_LABELS, type RaceDistance, type RaceGoal } from "@/lib/analytics/readiness";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,8 +40,7 @@ export function CompactRaceGoalForm() {
   const [distance, setDistance] = useState<RaceDistance>(raceGoal?.distance ?? "hm");
   const [date, setDate] = useState(
     () =>
-      raceGoal?.date ??
-      new Date(Date.now() + 56 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      raceGoal?.date ?? new Date(Date.now() + 56 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
   );
   const [targetTime, setTargetTime] = useState("");
 
@@ -97,10 +88,7 @@ export function CompactRaceGoalForm() {
         >
           <div className="space-y-2">
             <Label className="text-xs text-zinc-500">Distance</Label>
-            <Select
-              value={distance}
-              onValueChange={(v) => setDistance(v as RaceDistance)}
-            >
+            <Select value={distance} onValueChange={(v) => setDistance(v as RaceDistance)}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>

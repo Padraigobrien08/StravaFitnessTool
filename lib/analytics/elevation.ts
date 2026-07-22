@@ -28,9 +28,5 @@ export function elevationPerKm(runs: RunActivity[]): ElevationPoint[] {
 
 export function avgElevationPerKm(points: ElevationPoint[]): number | null {
   if (points.length === 0) return null;
-  return (
-    Math.round(
-      (points.reduce((s, p) => s + p.gainPerKm, 0) / points.length) * 10
-    ) / 10
-  );
+  return Math.round((points.reduce((s, p) => s + p.gainPerKm, 0) / points.length) * 10) / 10;
 }

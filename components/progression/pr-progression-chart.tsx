@@ -49,9 +49,7 @@ export function PrProgressionChart({ timeline }: { timeline: PrTimelinePoint[] }
     return row;
   });
 
-  const hasData = chartData.some((row) =>
-    buckets.some((b) => typeof row[b] === "number")
-  );
+  const hasData = chartData.some((row) => buckets.some((b) => typeof row[b] === "number"));
 
   if (!hasData) {
     return (
@@ -69,9 +67,7 @@ export function PrProgressionChart({ timeline }: { timeline: PrTimelinePoint[] }
         <YAxis tick={chartTick} tickFormatter={formatTimeTick} reversed />
         <Tooltip
           contentStyle={chart.tooltip}
-          formatter={(v) =>
-            typeof v === "number" ? formatDuration(v) : String(v)
-          }
+          formatter={(v) => (typeof v === "number" ? formatDuration(v) : String(v))}
         />
         <Legend wrapperStyle={{ fontSize: 11 }} />
         {buckets.map((b) => (

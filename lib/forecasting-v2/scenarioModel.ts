@@ -1,8 +1,4 @@
-import type {
-  ExecutionAssessment,
-  ForecastScenario,
-  FreshnessAssessment,
-} from "./forecastTypes";
+import type { ExecutionAssessment, ForecastScenario, FreshnessAssessment } from "./forecastTypes";
 
 export function buildScenarios(opts: {
   mostLikelyTimeSec: number;
@@ -29,8 +25,7 @@ export function buildScenarios(opts: {
     {
       name: "Optimistic",
       predictedTimeSec: opts.optimisticTimeSec,
-      description:
-        "Freshness holds and pacing execution is strong without late fade.",
+      description: "Freshness holds and pacing execution is strong without late fade.",
     },
   ];
 
@@ -38,7 +33,7 @@ export function buildScenarios(opts: {
     scenarios.push({
       name: "Fade-risk pacing",
       predictedTimeSec: Math.round(
-        opts.mostLikelyTimeSec + opts.execution.conservativePaddingSec * 1.4
+        opts.mostLikelyTimeSec + opts.execution.conservativePaddingSec * 1.4,
       ),
       description:
         "Aggressive early pace — current evidence suggests elevated second-half fade risk.",

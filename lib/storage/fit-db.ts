@@ -37,9 +37,7 @@ export async function mergeFitDetails(details: FitRunDetail[]): Promise<void> {
   });
 }
 
-export async function getFitDetail(
-  activityId: string
-): Promise<FitRunDetail | null> {
+export async function getFitDetail(activityId: string): Promise<FitRunDetail | null> {
   if (typeof indexedDB === "undefined") return null;
   const db = await openDb();
   return new Promise((resolve, reject) => {
@@ -96,7 +94,7 @@ export async function getAllFitDetails(): Promise<FitRunDetail[]> {
               return null;
             }
           })
-          .filter((x): x is FitRunDetail => x !== null)
+          .filter((x): x is FitRunDetail => x !== null),
       );
     };
     req.onerror = () => reject(req.error);

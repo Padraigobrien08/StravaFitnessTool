@@ -50,9 +50,7 @@ function CoachPageInner() {
 export default function CoachPage() {
   return (
     <Suspense
-      fallback={
-        <div className="h-full min-h-[240px] animate-pulse rounded-xl bg-white/[0.02]" />
-      }
+      fallback={<div className="h-full min-h-[240px] animate-pulse rounded-xl bg-white/[0.02]" />}
     >
       <CoachPageInner />
     </Suspense>

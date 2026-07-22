@@ -3,11 +3,7 @@ export const STRAVA_SCOPE_GROUPS = [
   {
     scope: "read",
     description: "Basic read access",
-    tools: [
-      "strava_get_athlete",
-      "strava_connection_status",
-      "get_connection_status",
-    ],
+    tools: ["strava_get_athlete", "strava_connection_status", "get_connection_status"],
   },
   {
     scope: "activity:read_all",
@@ -26,11 +22,7 @@ export const STRAVA_SCOPE_GROUPS = [
   {
     scope: "profile:read_all",
     description: "Athlete profile, stats, zones, shoes",
-    tools: [
-      "strava_get_athlete_stats",
-      "strava_get_athlete_zones",
-      "strava_get_athlete_shoes",
-    ],
+    tools: ["strava_get_athlete_stats", "strava_get_athlete_zones", "strava_get_athlete_shoes"],
   },
 ] as const;
 
@@ -65,5 +57,4 @@ export const STRAVA_OPTIONAL_FEATURES = [
   },
 ] as const;
 
-export const DEFAULT_STRAVA_SCOPES =
-  "read,activity:read_all,profile:read_all";
+export const DEFAULT_STRAVA_SCOPES = "read,activity:read_all,profile:read_all";

@@ -30,8 +30,8 @@ export function CoachEmptyState({
           {athleteName ? `${athleteName}, ` : ""}your endurance reasoning workspace
         </h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500">
-          Not a chatbot — a grounded analyst that compares sessions, explains
-          readiness, and remembers how your body responds over time.
+          Not a chatbot — a grounded analyst that compares sessions, explains readiness, and
+          remembers how your body responds over time.
         </p>
       </div>
 
@@ -60,9 +60,7 @@ export function CoachEmptyState({
               <div className="mb-3 flex items-center gap-2">
                 <Icon className="h-4 w-4 text-teal-500/70" />
                 <div>
-                  <h3 className="text-sm font-semibold text-zinc-200">
-                    {group.title}
-                  </h3>
+                  <h3 className="text-sm font-semibold text-zinc-200">{group.title}</h3>
                   <p className="text-[11px] text-zinc-600">{group.description}</p>
                 </div>
               </div>

@@ -1,13 +1,7 @@
 import { getSql } from "./client";
-import type {
-  StravaActivityStats,
-  StravaActivityZone,
-} from "@/lib/strava/api/fetchAthlete";
+import type { StravaActivityStats, StravaActivityZone } from "@/lib/strava/api/fetchAthlete";
 import type { StravaAthlete, StravaTokenResponse } from "@/lib/strava/api/types";
-import {
-  fetchAthleteStats,
-  fetchAthleteZones,
-} from "@/lib/strava/api/fetchAthlete";
+import { fetchAthleteStats, fetchAthleteZones } from "@/lib/strava/api/fetchAthlete";
 import { refreshAccessToken } from "@/lib/strava/api/oauth";
 
 export interface StravaConnectionRow {
@@ -24,14 +18,13 @@ export interface StravaConnectionRow {
 
 export async function upsertStravaConnection(
   userId: string,
-  tokens: StravaTokenResponse
+  tokens: StravaTokenResponse,
 ): Promise<void> {
   const sql = getSql();
   const existing = await getStravaConnection(userId);
   const athlete = tokens.athlete ?? existing?.athlete_json ?? null;
   const stravaAthleteId =
-    tokens.athlete?.id ??
-    (existing ? Number(existing.strava_athlete_id) : null);
+    tokens.athlete?.id ?? (existing ? Number(existing.strava_athlete_id) : null);
   if (stravaAthleteId == null || !Number.isFinite(stravaAthleteId)) {
     throw new Error("Strava athlete id missing on token update");
   }
@@ -62,9 +55,7 @@ export async function upsertStravaConnection(
   `;
 }
 
-export async function getStravaConnection(
-  userId: string
-): Promise<StravaConnectionRow | null> {
+export async function getStravaConnection(userId: string): Promise<StravaConnectionRow | null> {
   const sql = getSql();
   const rows = await sql`
     SELECT user_id, strava_athlete_id, access_token, refresh_token,
@@ -79,7 +70,7 @@ export async function getStravaConnection(
 
 /** Returns a valid access token, refreshing if needed. */
 export async function getValidAccessToken(
-  userId: string
+  userId: string,
 ): Promise<{ accessToken: string; athlete: StravaAthlete | null }> {
   const conn = await getStravaConnection(userId);
   if (!conn) throw new Error("No Strava connection for user");

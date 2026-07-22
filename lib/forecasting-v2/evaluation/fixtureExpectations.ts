@@ -18,24 +18,19 @@ const CONFIDENCE_RANK: Record<RaceForecastV2["confidence"], number> = {
 export function evaluateFixtureExpectations(
   profile: ForecastFixtureProfile,
   forecast: RaceForecastV2,
-  report: ForecastEvaluationReport
+  report: ForecastEvaluationReport,
 ): FixtureExpectationResult {
   const failures: string[] = [];
   const exp = profile.expectations;
   const rank = CONFIDENCE_RANK[forecast.confidence];
-  const intervalWidth =
-    forecast.predictionIntervalSec.p90 - forecast.predictionIntervalSec.p10;
+  const intervalWidth = forecast.predictionIntervalSec.p90 - forecast.predictionIntervalSec.p10;
   const rec = forecast.recommendation.toLowerCase();
 
   if (exp.maxConfidence != null && rank > CONFIDENCE_RANK[exp.maxConfidence]) {
-    failures.push(
-      `Expected confidence ≤ ${exp.maxConfidence}, got ${forecast.confidence}.`
-    );
+    failures.push(`Expected confidence ≤ ${exp.maxConfidence}, got ${forecast.confidence}.`);
   }
   if (exp.minConfidence != null && rank < CONFIDENCE_RANK[exp.minConfidence]) {
-    failures.push(
-      `Expected confidence ≥ ${exp.minConfidence}, got ${forecast.confidence}.`
-    );
+    failures.push(`Expected confidence ≥ ${exp.minConfidence}, got ${forecast.confidence}.`);
   }
 
   if (exp.requireWarnings) {
@@ -48,14 +43,10 @@ export function evaluateFixtureExpectations(
   }
 
   if (exp.minIntervalWidthSec != null && intervalWidth < exp.minIntervalWidthSec) {
-    failures.push(
-      `Expected interval width ≥ ${exp.minIntervalWidthSec}s, got ${intervalWidth}s.`
-    );
+    failures.push(`Expected interval width ≥ ${exp.minIntervalWidthSec}s, got ${intervalWidth}s.`);
   }
   if (exp.maxIntervalWidthSec != null && intervalWidth > exp.maxIntervalWidthSec) {
-    failures.push(
-      `Expected interval width ≤ ${exp.maxIntervalWidthSec}s, got ${intervalWidth}s.`
-    );
+    failures.push(`Expected interval width ≤ ${exp.maxIntervalWidthSec}s, got ${intervalWidth}s.`);
   }
 
   if (exp.durabilityLabel != null) {
@@ -87,7 +78,7 @@ export function evaluateFixtureExpectations(
     const errors = report.rules.filter((r) => !r.passed && r.severity === "error");
     if (errors.length > 0) {
       failures.push(
-        `Expected all rules to pass; ${errors.length} error(s): ${errors.map((e) => e.ruleId).join(", ")}.`
+        `Expected all rules to pass; ${errors.length} error(s): ${errors.map((e) => e.ruleId).join(", ")}.`,
       );
     }
   }

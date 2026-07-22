@@ -4,11 +4,11 @@ Read this before making non-trivial changes.
 
 ## Product split
 
-| Surface | Route | Do |
-|---------|-------|-----|
-| Dashboard | `/home`, `/training`, … | Question-led charts + insights |
-| Intelligence | `/intelligence` | Curated belief model (read-first) |
-| Coach | `/coach` | Threaded investigation chat |
+| Surface      | Route                   | Do                                |
+| ------------ | ----------------------- | --------------------------------- |
+| Dashboard    | `/home`, `/training`, … | Question-led charts + insights    |
+| Intelligence | `/intelligence`         | Curated belief model (read-first) |
+| Coach        | `/coach`                | Threaded investigation chat       |
 
 Do **not** merge Intelligence into Coach or duplicate full dashboards in either surface.
 
@@ -46,6 +46,7 @@ npm run build
 ```
 
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.

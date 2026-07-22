@@ -4,7 +4,7 @@ import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail, FitLap } from "@/lib/strava/fitTypes";
 
 function mockRun(
-  overrides: Partial<RunActivity> & { id: string; name: string; date: string }
+  overrides: Partial<RunActivity> & { id: string; name: string; date: string },
 ): RunActivity {
   const movingSec = 3000;
   return {

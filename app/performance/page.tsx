@@ -61,10 +61,7 @@ export default function PerformancePage() {
         <PerformanceWorkspace className="max-w-5xl">
           <PerformanceEvidenceBanner />
           <PerformanceStateHero hero={view.hero} />
-          <PerformanceTrajectoryPanel
-            data={view.progression}
-            prTimeline={analytics.prTimeline}
-          />
+          <PerformanceTrajectoryPanel data={view.progression} prTimeline={analytics.prTimeline} />
           <RaceProjectionPanel
             projection={view.projection}
             predictionTimeline={analytics.predictionTimeline}
@@ -83,7 +80,7 @@ export default function PerformancePage() {
               <ChevronDown
                 className={cn(
                   "h-4 w-4 text-zinc-600 transition-transform",
-                  advancedOpen && "rotate-180"
+                  advancedOpen && "rotate-180",
                 )}
               />
             </button>

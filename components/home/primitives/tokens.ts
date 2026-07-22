@@ -25,11 +25,9 @@ export const dash = {
 
 export const ops = {
   dashboard: "flex w-full flex-col gap-3 sm:gap-4 lg:gap-5",
-  weekRow:
-    "grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 lg:gap-5",
+  weekRow: "grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 lg:gap-5",
   /** 12-col workspace grid: insights dominate */
-  intelRow:
-    "grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:gap-5 lg:items-start",
+  intelRow: "grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:gap-5 lg:items-start",
   intelMain: "lg:col-span-7 xl:col-span-8",
   intelSide: "lg:col-span-5 xl:col-span-4",
   panelShell: "flex flex-col",

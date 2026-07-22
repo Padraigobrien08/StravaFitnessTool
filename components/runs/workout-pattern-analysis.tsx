@@ -13,28 +13,19 @@ const toneBorder = {
   warning: "border-amber-500/20",
 };
 
-export function WorkoutPatternAnalysis({
-  patterns,
-}: {
-  patterns: PatternInsightView[];
-}) {
+export function WorkoutPatternAnalysis({ patterns }: { patterns: PatternInsightView[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
     <section>
-      <p className="mb-2 text-[11px] font-medium text-zinc-500">
-        Evolving observations
-      </p>
+      <p className="mb-2 text-[11px] font-medium text-zinc-500">Evolving observations</p>
       <ul className="space-y-1.5">
         {patterns.map((p) => {
           const open = expanded === p.id;
           return (
             <li
               key={p.id}
-              className={cn(
-                "rounded-lg border bg-white/[0.015] px-3 py-2",
-                toneBorder[p.tone]
-              )}
+              className={cn("rounded-lg border bg-white/[0.015] px-3 py-2", toneBorder[p.tone])}
             >
               <button
                 type="button"
@@ -42,18 +33,11 @@ export function WorkoutPatternAnalysis({
                 onClick={() => setExpanded(open ? null : p.id)}
               >
                 <div>
-                  <p className="text-[12px] font-medium text-zinc-300">
-                    {p.title}
-                  </p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">
-                    {p.body}
-                  </p>
+                  <p className="text-[12px] font-medium text-zinc-300">{p.title}</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">{p.body}</p>
                 </div>
                 <ChevronDown
-                  className={cn(
-                    "mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-600",
-                    open && "rotate-180"
-                  )}
+                  className={cn("mt-0.5 h-3.5 w-3.5 shrink-0 text-zinc-600", open && "rotate-180")}
                 />
               </button>
               {open ? (

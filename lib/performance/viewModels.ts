@@ -4,10 +4,7 @@ import type { RacePredictionAnalysis, ConsensusPrediction } from "@/lib/analytic
 import type { PrTimelinePoint } from "@/lib/analytics/progression";
 import type { Insight } from "@/lib/insights/types";
 import type { ImportQualityReport } from "@/lib/quality/assessImport";
-import {
-  buildProgressionView,
-  type ProgressionViewModel,
-} from "@/lib/home/dashboardData";
+import { buildProgressionView, type ProgressionViewModel } from "@/lib/home/dashboardData";
 import { formatDuration, formatPace } from "@/lib/utils";
 import { parseISO } from "date-fns";
 
@@ -38,11 +35,7 @@ export interface RaceProjectionSummary {
   confidence: "low" | "medium" | "high";
 }
 
-export type MilestoneCategory =
-  | "speed"
-  | "endurance"
-  | "consistency"
-  | "race_execution";
+export type MilestoneCategory = "speed" | "endurance" | "consistency" | "race_execution";
 
 export interface AchievementMilestoneView {
   id: string;
@@ -117,9 +110,7 @@ export interface PerformancePageView {
 }
 
 function performanceInsights(insights: Insight[]): Insight[] {
-  return insights.filter(
-    (i) => i.question === "improving" || i.question === "ready"
-  );
+  return insights.filter((i) => i.question === "improving" || i.question === "ready");
 }
 
 function trajectoryScore(analytics: DashboardInsights): {
@@ -143,17 +134,14 @@ function trajectoryScore(analytics: DashboardInsights): {
 
   score = Math.max(0, Math.min(100, Math.round(score)));
   const label =
-    score >= 72
-      ? "Upward trajectory"
-      : score >= 55
-        ? "Stable trajectory"
-        : "Softening trajectory";
+    score >= 72 ? "Upward trajectory" : score >= 55 ? "Stable trajectory" : "Softening trajectory";
   return { score, label };
 }
 
-function classifyPerformance(
-  analytics: DashboardInsights
-): { classification: string; severity: PerformanceSeverity } {
+function classifyPerformance(analytics: DashboardInsights): {
+  classification: string;
+  severity: PerformanceSeverity;
+} {
   const eff = analytics.efficiencySummary.trend;
   const { score } = trajectoryScore(analytics);
   if (eff === "improving" && score >= 65) {
@@ -167,7 +155,7 @@ function classifyPerformance(
 
 function pickPrimaryProjection(
   analysis: RacePredictionAnalysis,
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): ConsensusPrediction | null {
   if (analysis.consensus.length === 0) return null;
   const goalDist = analytics.raceReadiness?.distance;
@@ -180,12 +168,13 @@ function pickPrimaryProjection(
           : goalDist === "10k"
             ? "10K"
             : "5K";
-    return analysis.consensus.find((c) => c.label === key) ?? analysis.consensus.find((c) => c.label.includes("Half")) ?? analysis.consensus[0];
+    return (
+      analysis.consensus.find((c) => c.label === key) ??
+      analysis.consensus.find((c) => c.label.includes("Half")) ??
+      analysis.consensus[0]
+    );
   }
-  return (
-    analysis.consensus.find((c) => c.label === "Half Marathon") ??
-    analysis.consensus[0]
-  );
+  return analysis.consensus.find((c) => c.label === "Half Marathon") ?? analysis.consensus[0];
 }
 
 function formatProjectionRange(c: ConsensusPrediction): string | null {
@@ -194,15 +183,12 @@ function formatProjectionRange(c: ConsensusPrediction): string | null {
   return `±${formatDuration(half)}`;
 }
 
-function priorPrForRecord(
-  pr: PersonalRecord,
-  timeline: PrTimelinePoint[]
-): PrTimelinePoint | null {
+function priorPrForRecord(pr: PersonalRecord, timeline: PrTimelinePoint[]): PrTimelinePoint | null {
   const improvements = timeline
     .filter((p) => p.bucket === pr.bucket && p.isNewPr)
     .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
   const idx = improvements.findIndex(
-    (p) => p.runId === pr.runId && Math.abs(p.timeSec - pr.timeSec) < 2
+    (p) => p.runId === pr.runId && Math.abs(p.timeSec - pr.timeSec) < 2,
   );
   if (idx <= 0) return null;
   return improvements[idx - 1] ?? null;
@@ -221,10 +207,7 @@ const categoryLabels: Record<MilestoneCategory, string> = {
   race_execution: "Race execution",
 };
 
-function buildMilestoneTriggers(
-  pr: PersonalRecord,
-  analytics: DashboardInsights
-): string[] {
+function buildMilestoneTriggers(pr: PersonalRecord, analytics: DashboardInsights): string[] {
   const triggers: string[] = [];
   if (analytics.bestBlock) {
     triggers.push(`Strong ${analytics.bestBlock.label} volume block`);
@@ -246,13 +229,13 @@ function buildMilestoneTriggers(
 
 function buildMilestones(
   analytics: DashboardInsights,
-  insights: Insight[]
+  insights: Insight[],
 ): AchievementMilestoneView[] {
   const timeline = analytics.prTimeline;
   const items: AchievementMilestoneView[] = [];
 
   for (const pr of analytics.personalRecords.filter((p) =>
-    ["5k", "10k", "hm", "long"].includes(p.bucket)
+    ["5k", "10k", "hm", "long"].includes(p.bucket),
   )) {
     const prior = priorPrForRecord(pr, timeline);
     let deltaDisplay: string | null = null;
@@ -277,9 +260,7 @@ function buildMilestones(
       runName: pr.runName,
       runId: pr.runId,
       confidence:
-        pr.source === "segment" || pr.source === "laps"
-          ? "high"
-          : analytics.dataConfidence,
+        pr.source === "segment" || pr.source === "laps" ? "high" : analytics.dataConfidence,
       triggers: buildMilestoneTriggers(pr, analytics),
     });
   }
@@ -323,9 +304,7 @@ function buildMilestones(
   return items.slice(0, 8);
 }
 
-function buildProjectionView(
-  analytics: DashboardInsights
-): RaceProjectionView {
+function buildProjectionView(analytics: DashboardInsights): RaceProjectionView {
   const analysis = analytics.racePredictionAnalysis;
   const primary = pickPrimaryProjection(analysis, analytics);
 
@@ -374,7 +353,8 @@ function buildProjectionView(
     if (primary.distanceKm >= 20 && analytics.fatigue.tsb < -15) {
       fadeRisk = "Elevated fatigue may increase late-race fade risk vs projection.";
     } else if (primary.distanceKm >= 20) {
-      fadeRisk = "Moderate fade risk if fueling or heat are unmanaged — projection assumes steady effort.";
+      fadeRisk =
+        "Moderate fade risk if fueling or heat are unmanaged — projection assumes steady effort.";
     }
   }
 
@@ -398,9 +378,7 @@ function buildProjectionView(
       label: c.label,
       timeDisplay: formatDuration(c.timeSec),
       rangeDisplay:
-        c.spreadSec > 45
-          ? `${formatDuration(c.timeMin)} – ${formatDuration(c.timeMax)}`
-          : null,
+        c.spreadSec > 45 ? `${formatDuration(c.timeMin)} – ${formatDuration(c.timeMax)}` : null,
     })),
     confidenceDrivers: confidenceDrivers.slice(0, 4),
     confidenceReducers: confidenceReducers.slice(0, 4),
@@ -414,7 +392,7 @@ function buildProjectionView(
 
 function buildAdaptationTrends(
   analytics: DashboardInsights,
-  progression: ProgressionViewModel
+  progression: ProgressionViewModel,
 ): AdaptationTrendView[] {
   const mom = analytics.efficiencyMoM;
   return [
@@ -433,10 +411,9 @@ function buildAdaptationTrends(
     {
       id: "pace",
       label: "Pace velocity",
-      interpretation:
-        progression.trends.pace.positive
-          ? "Recent runs trending faster — speed responding to training."
-          : "Pace stable or easing — may reflect fatigue, heat, or intentional easy running.",
+      interpretation: progression.trends.pace.positive
+        ? "Recent runs trending faster — speed responding to training."
+        : "Pace stable or easing — may reflect fatigue, heat, or intentional easy running.",
       data: progression.trends.pace.data,
       positive: progression.trends.pace.positive,
     },
@@ -463,17 +440,17 @@ function buildDistribution(analytics: DashboardInsights): PerformanceDistributio
   const correlations: string[] = [];
   if (analytics.efficiencySummary.trend === "improving" && adv.currentEasyPct >= 70) {
     correlations.push(
-      "Recent gains align with a strong easy-volume base and controlled hard-session density."
+      "Recent gains align with a strong easy-volume base and controlled hard-session density.",
     );
   }
   if (adv.status === "too_hard") {
     correlations.push(
-      "Hard-run share is elevated — threshold work may be outpacing recovery for current freshness."
+      "Hard-run share is elevated — threshold work may be outpacing recovery for current freshness.",
     );
   }
   if (correlations.length === 0) {
     correlations.push(
-      "Balanced intensity distribution supports sustainable progression when freshness is stable."
+      "Balanced intensity distribution supports sustainable progression when freshness is stable.",
     );
   }
 
@@ -494,7 +471,7 @@ function buildDistribution(analytics: DashboardInsights): PerformanceDistributio
 function buildIntegrity(
   analytics: DashboardInsights,
   quality: ImportQualityReport | null,
-  projection: RaceProjectionView
+  projection: RaceProjectionView,
 ): PerformanceIntegrityView {
   const basedOn: string[] = [
     `${analytics.summary.runCount} runs in export`,
@@ -513,7 +490,8 @@ function buildIntegrity(
 
   return {
     overallConfidence: analytics.dataConfidence,
-    predictionConfidence: projection.primary?.confidence ?? analytics.racePredictionAnalysis.confidence,
+    predictionConfidence:
+      projection.primary?.confidence ?? analytics.racePredictionAnalysis.confidence,
     basedOn,
     missing: [...new Set(missing)].slice(0, 5),
     limitations: [
@@ -534,14 +512,13 @@ function buildIntegrity(
 export function buildPerformancePageView(
   analytics: DashboardInsights,
   insights: Insight[] = [],
-  quality: ImportQualityReport | null = null
+  quality: ImportQualityReport | null = null,
 ): PerformancePageView {
   const related = performanceInsights(insights);
   const top = related[0];
   const { classification, severity } = classifyPerformance(analytics);
   const traj = trajectoryScore(analytics);
-  const readiness =
-    analytics.raceReadiness ?? analytics.halfMarathonReadiness;
+  const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const progression = buildProgressionView(analytics, insights);
   const projection = buildProjectionView(analytics);
 
@@ -559,9 +536,7 @@ export function buildPerformancePageView(
     ? {
         label: primaryProj.label,
         timeDisplay: primaryProj.timeDisplay,
-        rangeDisplay: primaryProj.spreadDisplay.startsWith("±")
-          ? primaryProj.spreadDisplay
-          : null,
+        rangeDisplay: primaryProj.spreadDisplay.startsWith("±") ? primaryProj.spreadDisplay : null,
         confidenceLabel: primaryProj.confidenceLabel,
         confidence: primaryProj.confidence,
       }
@@ -621,7 +596,10 @@ export function buildPerformancePageView(
               : analytics.efficiencySummary.trend === "declining"
                 ? "Softening"
                 : "Stable",
-          hint: effMom.pctChange != null ? `${effMom.pctChange > 0 ? "+" : ""}${effMom.pctChange}% MoM` : undefined,
+          hint:
+            effMom.pctChange != null
+              ? `${effMom.pctChange > 0 ? "+" : ""}${effMom.pctChange}% MoM`
+              : undefined,
         },
       ],
       projection: heroProjection,

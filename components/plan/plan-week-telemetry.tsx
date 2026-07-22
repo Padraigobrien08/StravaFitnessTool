@@ -7,12 +7,13 @@ export function PlanWeekTelemetryStrip({ telemetry }: { telemetry: PlanWeekTelem
     telemetry.volumeKm != null
       ? { label: "Volume", value: `${telemetry.volumeKm} km planned` }
       : null,
-    { label: "Intensity", value: `${telemetry.hardSessions} hard session${telemetry.hardSessions === 1 ? "" : "s"}` },
+    {
+      label: "Intensity",
+      value: `${telemetry.hardSessions} hard session${telemetry.hardSessions === 1 ? "" : "s"}`,
+    },
     { label: "Freshness", value: `${telemetry.freshness} · ${telemetry.freshnessLabel}` },
     { label: "Goal alignment", value: telemetry.goalAlignment },
-    telemetry.riskSummary
-      ? { label: "Risk", value: telemetry.riskSummary, warn: true }
-      : null,
+    telemetry.riskSummary ? { label: "Risk", value: telemetry.riskSummary, warn: true } : null,
     { label: "Confidence", value: telemetry.confidence },
   ].filter(Boolean) as {
     label: string;

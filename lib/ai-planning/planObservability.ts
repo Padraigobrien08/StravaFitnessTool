@@ -20,10 +20,7 @@ export function hashCoachingContext(context: CoachingContext): string {
     runWeeks: context.recentTraining.weeks.length,
     dataQuality: context.dataQuality.activityCount,
   };
-  return createHash("sha256")
-    .update(JSON.stringify(payload))
-    .digest("hex")
-    .slice(0, 16);
+  return createHash("sha256").update(JSON.stringify(payload)).digest("hex").slice(0, 16);
 }
 
 export function recordPlanRun(
@@ -34,7 +31,7 @@ export function recordPlanRun(
     repairsApplied?: boolean;
     modification?: string;
     rawModelOutput?: unknown;
-  }
+  },
 ): PlanToolObservability {
   const entry: PlanToolObservability = {
     timestamp: new Date().toISOString(),
@@ -67,7 +64,7 @@ export function getRecentPlanRuns(limit = 5): PlanToolObservability[] {
 
 export function buildPlanReplySummary(
   result: GenerateWeeklyPlanResult,
-  extras?: { explanation?: string }
+  extras?: { explanation?: string },
 ): string {
   const { plan } = result;
   const lines = [
@@ -75,9 +72,7 @@ export function buildPlanReplySummary(
     "",
     `Plan type: ${plan.planType.replace("_", " ")} (week of ${plan.weekStart})`,
     `Hard sessions: ${plan.hardSessionCount}`,
-    plan.totalRunDistanceKm != null
-      ? `Run volume: ~${plan.totalRunDistanceKm} km`
-      : "",
+    plan.totalRunDistanceKm != null ? `Run volume: ~${plan.totalRunDistanceKm} km` : "",
     "",
     plan.rationale.primaryGoal,
   ];
@@ -89,7 +84,7 @@ export function buildPlanReplySummary(
 
 export function buildExplainResponse(
   plan: WeeklyTrainingPlan,
-  topic: "taper" | "plan" | "pb"
+  topic: "taper" | "plan" | "pb",
 ): string {
   if (topic === "taper") {
     return [

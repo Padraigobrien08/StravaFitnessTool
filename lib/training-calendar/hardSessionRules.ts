@@ -9,10 +9,7 @@ type WorkoutLike = {
 };
 
 export function isRaceDayWorkout(w: WorkoutLike): boolean {
-  return (
-    w.type === "race" ||
-    /\b(half marathon|marathon|10k|5k|race day)\b/i.test(w.title)
-  );
+  return w.type === "race" || /\b(half marathon|marathon|10k|5k|race day)\b/i.test(w.title);
 }
 
 /**
@@ -25,10 +22,7 @@ export function isHardTrainingRun(w: WorkoutLike): boolean {
 
   if (isRaceDayWorkout(w)) return false;
 
-  if (
-    /pre[- ]?race|shakeout/i.test(`${w.type} ${w.title}`) &&
-    w.intensity !== "hard"
-  ) {
+  if (/pre[- ]?race|shakeout/i.test(`${w.type} ${w.title}`) && w.intensity !== "hard") {
     return false;
   }
 

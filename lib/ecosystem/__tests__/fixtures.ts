@@ -1,7 +1,8 @@
 import type { NormalizedActivity } from "../types";
 
 function act(
-  partial: Partial<NormalizedActivity> & Pick<NormalizedActivity, "id" | "sportType" | "modality" | "startDate">
+  partial: Partial<NormalizedActivity> &
+    Pick<NormalizedActivity, "id" | "sportType" | "modality" | "startDate">,
 ): NormalizedActivity {
   return {
     source: "strava_api",
@@ -30,7 +31,7 @@ export const pureRunner: NormalizedActivity[] = Array.from({ length: 12 }, (_, i
     startDate: new Date(Date.now() - i * 3 * 86400000).toISOString(),
     isHardRun: i % 4 === 0,
     perceivedIntensity: i % 4 === 0 ? "high" : "low",
-  })
+  }),
 );
 
 /** Run + strength + HIIT */
@@ -95,7 +96,7 @@ export const strengthHeavy: NormalizedActivity[] = [
       modality: "strength",
       startDate: new Date(Date.now() - i * 2 * 86400000).toISOString(),
       perceivedIntensity: i % 2 === 0 ? "high" : "moderate",
-    })
+    }),
   ),
   act({
     id: "hiit-s",

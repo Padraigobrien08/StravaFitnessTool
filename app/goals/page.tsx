@@ -7,10 +7,7 @@ import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
 import { useGoalStore } from "@/stores/goal-store";
 import { buildGoalsPageView } from "@/lib/goals/viewModels";
-import {
-  GoalsWorkspace,
-  GoalsIntelRow,
-} from "@/components/goals/goals-workspace";
+import { GoalsWorkspace, GoalsIntelRow } from "@/components/goals/goals-workspace";
 import { CompactRaceGoalForm } from "@/components/goals/compact-race-goal-form";
 import { RaceMissionHero } from "@/components/goals/race-mission-hero";
 import { ReadinessIntelligencePanel } from "@/components/goals/readiness-intelligence-panel";
@@ -32,9 +29,7 @@ function GoalsBriefingBar() {
   return (
     <div className="border-b border-white/[0.04] pb-3">
       <p className={dash.labelAccent}>Race intelligence & goal planning</p>
-      <p className="mt-0.5 text-xs text-zinc-600">
-        Forecast briefing · readiness · execution
-      </p>
+      <p className="mt-0.5 text-xs text-zinc-600">Forecast briefing · readiness · execution</p>
     </div>
   );
 }
@@ -82,9 +77,7 @@ export default function GoalsPage() {
           <GoalsBriefingBar />
           <CompactRaceGoalForm />
 
-          {raceGoal ? (
-            <GenerateWeekPlanButton label="Generate next week" />
-          ) : null}
+          {raceGoal ? <GenerateWeekPlanButton label="Generate next week" /> : null}
 
           {useBriefLayout && view.raceBrief && view.forecastV2 ? (
             <>
@@ -109,9 +102,7 @@ export default function GoalsPage() {
           ) : (
             <>
               <RaceMissionHero hero={view.hero} />
-              {view.forecastV2 ? (
-                <ForecastV2Panel forecast={view.forecastV2} />
-              ) : null}
+              {view.forecastV2 ? <ForecastV2Panel forecast={view.forecastV2} /> : null}
               <GoalsIntelRow>
                 <div className="lg:col-span-7">
                   <PredictionIntegrityPanel projection={view.projection} />
@@ -126,18 +117,14 @@ export default function GoalsPage() {
             </>
           )}
 
-          <ReadinessIntelligencePanel
-            dimensions={view.dimensions}
-            readiness={view.readiness}
-          />
+          <ReadinessIntelligencePanel dimensions={view.dimensions} readiness={view.readiness} />
 
           {raceGoal ? (
             <ExecutionIntelligencePanel raceGoal={raceGoal} analytics={analytics} />
           ) : (
             <section className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] px-4 py-8 text-center">
               <p className="text-sm text-zinc-500">
-                Set a race mission above to unlock execution intelligence and
-                segment pacing plans.
+                Set a race mission above to unlock execution intelligence and segment pacing plans.
               </p>
             </section>
           )}
@@ -164,10 +151,7 @@ export default function GoalsPage() {
             </div>
           </GoalsIntelRow>
 
-          <GoalsExplainability
-            data={view.explain}
-            confidence={analytics.dataConfidence}
-          />
+          <GoalsExplainability data={view.explain} confidence={analytics.dataConfidence} />
 
           <p className="text-center text-xs text-zinc-600">
             <Link href="/records" className="text-teal-400/90 hover:underline">

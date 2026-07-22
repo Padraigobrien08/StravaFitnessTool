@@ -10,9 +10,7 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
   if (!items.length) return null;
   return (
     <div>
-      <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-        {title}
-      </p>
+      <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">{title}</p>
       <ul className="mt-1 space-y-0.5 text-[11px] leading-snug text-zinc-500">
         {items.slice(0, 6).map((item) => (
           <li key={item}>· {item}</li>
@@ -37,18 +35,15 @@ export function PlanSidebar({
     return (
       <aside className="rounded-xl border border-white/[0.06] bg-[#0c0d10]/60 p-4">
         <p className="text-[12px] text-zinc-600">
-          Generate or save a plan to see reasoning, constraints, and integrity
-          status.
+          Generate or save a plan to see reasoning, constraints, and integrity status.
         </p>
       </aside>
     );
   }
 
   const integrity = preview?.integrity;
-  const passed =
-    week?.integrityPassed ?? integrity?.passed ?? preview?.validation.valid;
-  const severity =
-    week?.integritySeverity ?? integrity?.severity ?? "none";
+  const passed = week?.integrityPassed ?? integrity?.passed ?? preview?.validation.valid;
+  const severity = week?.integritySeverity ?? integrity?.severity ?? "none";
 
   return (
     <aside className="plan-sidebar space-y-3 rounded-xl border border-white/[0.06] bg-[#0c0d10]/80 p-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
@@ -56,9 +51,7 @@ export function PlanSidebar({
         <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
           Plan reasoning
         </p>
-        <p className="mt-1 text-[13px] leading-relaxed text-zinc-300">
-          {data.summary}
-        </p>
+        <p className="mt-1 text-[13px] leading-relaxed text-zinc-300">{data.summary}</p>
       </div>
 
       <div className="flex flex-wrap gap-2 text-[10px] text-zinc-600">
@@ -85,7 +78,7 @@ export function PlanSidebar({
       <div
         className={cn(
           "flex items-start gap-2 rounded-lg px-2.5 py-2",
-          passed ? "bg-teal-500/[0.06]" : "bg-amber-500/[0.06]"
+          passed ? "bg-teal-500/[0.06]" : "bg-amber-500/[0.06]",
         )}
       >
         {passed ? (
@@ -132,7 +125,7 @@ export function PlanSidebar({
                   integrity: preview.integrity,
                 },
                 null,
-                2
+                2,
               )}
             </pre>
           ) : null}

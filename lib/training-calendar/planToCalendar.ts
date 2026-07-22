@@ -30,9 +30,7 @@ function newWorkoutId(weekStart: string, day: string, suffix = ""): string {
   return `w-${weekStart}-${day.slice(0, 3).toLowerCase()}${suffix ? `-${suffix}` : ""}`;
 }
 
-function mapSource(
-  source: GenerateWeeklyPlanResult["source"]
-): CalendarWeekSource {
+function mapSource(source: GenerateWeeklyPlanResult["source"]): CalendarWeekSource {
   if (source === "fallback") return "fallback";
   return "ai_generated";
 }
@@ -41,7 +39,7 @@ function plannedToCalendarWorkout(
   weekStart: string,
   w: PlannedWorkout,
   planId: string,
-  now: string
+  now: string,
 ): CalendarWorkout {
   return {
     id: newWorkoutId(weekStart, w.day),
@@ -82,7 +80,7 @@ function restDayWorkout(weekStart: string, day: string, now: string): CalendarWo
 /** Ensure Mon–Sun are represented; explicit rest days where no session exists. */
 export function fillWeekWorkouts(
   weekStart: string,
-  workouts: CalendarWorkout[]
+  workouts: CalendarWorkout[],
 ): CalendarWorkout[] {
   const byDay = new Map<string, CalendarWorkout>();
   for (const w of workouts) {
@@ -101,18 +99,13 @@ export function fillWeekWorkouts(
 
 export function weeklyPlanToCalendarWeek(
   plan: WeeklyTrainingPlan,
-  result: Pick<
-    GenerateWeeklyPlanResult,
-    "source" | "guardrails" | "integrity"
-  >,
-  opts?: { planId?: string; generatedAt?: string; planningContext?: string }
+  result: Pick<GenerateWeeklyPlanResult, "source" | "guardrails" | "integrity">,
+  opts?: { planId?: string; generatedAt?: string; planningContext?: string },
 ): TrainingCalendarWeek {
   const now = new Date().toISOString();
   const weekStart = plan.weekStart;
   const planId = opts?.planId ?? `plan-${weekStart}-${Date.now()}`;
-  const mapped = plan.workouts.map((w) =>
-    plannedToCalendarWorkout(weekStart, w, planId, now)
-  );
+  const mapped = plan.workouts.map((w) => plannedToCalendarWorkout(weekStart, w, planId, now));
   const workouts = fillWeekWorkouts(weekStart, mapped);
 
   return {
@@ -145,14 +138,11 @@ export function weeklyPlanToCalendarWeek(
   };
 }
 
-export function calendarWeekToWeeklyPlan(
-  week: TrainingCalendarWeek
-): WeeklyTrainingPlan {
+export function calendarWeekToWeeklyPlan(week: TrainingCalendarWeek): WeeklyTrainingPlan {
   const sessions = week.workouts.filter((w) => w.modality !== "rest");
   return {
     weekStart: week.weekStart,
-    planType:
-      (week.planType as WeeklyTrainingPlan["planType"]) ?? "maintain",
+    planType: (week.planType as WeeklyTrainingPlan["planType"]) ?? "maintain",
     summary: week.summary,
     totalRunDistanceKm: week.totalRunDistanceKm,
     hardSessionCount:
@@ -160,7 +150,7 @@ export function calendarWeekToWeeklyPlan(
       sessions.filter(
         (w) =>
           w.modality === "run" &&
-          (w.intensity === "hard" || /\btempo|interval|threshold/i.test(w.type))
+          (w.intensity === "hard" || /\btempo|interval|threshold/i.test(w.type)),
       ).length,
     workouts: sessions.map((w) => ({
       day: w.day,

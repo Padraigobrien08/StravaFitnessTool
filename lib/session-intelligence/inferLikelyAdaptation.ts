@@ -4,7 +4,7 @@ import type { ExecutionQuality } from "./types";
 export function inferLikelyAdaptation(
   workout: WorkoutClassification,
   executionQuality: ExecutionQuality,
-  lateFadePct: number | null
+  lateFadePct: number | null,
 ): string[] {
   const out: string[] = [];
   const type = workout.type;

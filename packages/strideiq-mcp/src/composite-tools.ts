@@ -8,7 +8,7 @@ type TextResult = {
 
 export function registerCompositeTools(
   server: McpServer,
-  textResult: (data: unknown) => TextResult
+  textResult: (data: unknown) => TextResult,
 ) {
   server.tool(
     "analyze_last_run_with_readiness",
@@ -20,16 +20,16 @@ export function registerCompositeTools(
           "last_run_analysis",
           stravaQuery({
             downsample: downsample != null ? String(downsample) : "200",
-          })
-        )
-      )
+          }),
+        ),
+      ),
   );
 
   server.tool(
     "race_week_snapshot",
     "Coach brief, AI weekly plan, fatigue load, and Strava connection status.",
     {},
-    async () => textResult(await fetchCompositeCoach("race_week_snapshot"))
+    async () => textResult(await fetchCompositeCoach("race_week_snapshot")),
   );
 
   server.tool(
@@ -40,18 +40,14 @@ export function registerCompositeTools(
     },
     async ({ bucket }) =>
       textResult(
-        await fetchCompositeCoach(
-          "pr_and_segments",
-          stravaQuery(bucket ? { bucket } : {})
-        )
-      )
+        await fetchCompositeCoach("pr_and_segments", stravaQuery(bucket ? { bucket } : {})),
+      ),
   );
 
   server.tool(
     "long_run_route_suggestions",
     "Match saved Strava routes to this week's long run distance from the plan engine.",
     {},
-    async () =>
-      textResult(await fetchCompositeCoach("long_run_route_suggestions"))
+    async () => textResult(await fetchCompositeCoach("long_run_route_suggestions")),
   );
 }

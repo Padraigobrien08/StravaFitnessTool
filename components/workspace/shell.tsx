@@ -31,7 +31,7 @@ export function WorkspaceFrame({
         isCoach
           ? cn(COACH_WORKSPACE_MAX, "px-3 sm:px-4 lg:px-5")
           : cn(WORKSPACE_MAX, "px-4 sm:px-5 lg:px-6"),
-        className
+        className,
       )}
     >
       {children}
@@ -84,15 +84,12 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
     <div
       className={cn(
         "relative z-10 flex w-full flex-col",
-        isCoach ? "h-dvh max-h-dvh overflow-hidden" : "min-h-dvh"
+        isCoach ? "h-dvh max-h-dvh overflow-hidden" : "min-h-dvh",
       )}
     >
       <header className="sticky top-0 z-50 shrink-0 border-b border-[var(--border-subtle)] bg-[var(--header-bg)] backdrop-blur-xl">
         <WorkspaceFrame className="flex h-[var(--app-nav-height)] items-center gap-3 sm:gap-5">
-          <Link
-            href="/home"
-            className="type-title shrink-0 text-[1.0625rem] tracking-[-0.03em]"
-          >
+          <Link href="/home" className="type-title shrink-0 text-[1.0625rem] tracking-[-0.03em]">
             Stride<span className="text-teal-400">IQ</span>
           </Link>
           <Nav variant="app" className="min-w-0 flex-1" />
@@ -101,18 +98,14 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
         </WorkspaceFrame>
       </header>
 
-      <main
-        className={cn(
-          isCoach ? "flex min-h-0 flex-1 flex-col overflow-hidden" : "flex-1"
-        )}
-      >
+      <main className={cn(isCoach ? "flex min-h-0 flex-1 flex-col overflow-hidden" : "flex-1")}>
         <WorkspaceFrame
           variant={isCoach ? "coach" : "default"}
           className={cn(
             isCoach
               ? "flex h-full min-h-0 flex-1 flex-col overflow-hidden py-1 sm:py-1.5"
               : "py-4 sm:py-5",
-            isHome && "pb-8"
+            isHome && "pb-8",
           )}
         >
           {children}

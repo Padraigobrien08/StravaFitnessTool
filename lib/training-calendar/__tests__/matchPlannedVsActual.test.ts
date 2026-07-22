@@ -25,7 +25,7 @@ function workout(
   id: string,
   day: string,
   date: string,
-  partial: Partial<CalendarWorkout> = {}
+  partial: Partial<CalendarWorkout> = {},
 ): CalendarWorkout {
   return {
     id,
@@ -80,7 +80,7 @@ describe("matchPlannedVsActual", () => {
     const summary = matchPlannedVsActual(
       w,
       [run("r1", "2026-05-25", 7800)],
-      new Date("2026-05-26T12:00:00.000Z")
+      new Date("2026-05-26T12:00:00.000Z"),
     );
     expect(summary.rows[0].status).toBe("matched");
     expect(summary.matchedDays).toBe(1);
@@ -88,11 +88,7 @@ describe("matchPlannedVsActual", () => {
 
   it("marks missed when no activity", () => {
     const w = week([workout("w-mon", "Mon", "2026-05-25")]);
-    const summary = matchPlannedVsActual(
-      w,
-      [],
-      new Date("2026-05-26T12:00:00.000Z")
-    );
+    const summary = matchPlannedVsActual(w, [], new Date("2026-05-26T12:00:00.000Z"));
     expect(summary.rows[0].status).toBe("missed");
   });
 
@@ -107,7 +103,7 @@ describe("matchPlannedVsActual", () => {
     const summary = matchPlannedVsActual(
       w,
       [run("r1", "2026-05-25", 5000)],
-      new Date("2026-05-26T12:00:00.000Z")
+      new Date("2026-05-26T12:00:00.000Z"),
     );
     expect(summary.rows[0].status).toBe("rest_unplanned_run");
   });

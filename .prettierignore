@@ -1,0 +1,18 @@
+# Build output & generated
+.next/
+out/
+build/
+coverage/
+next-env.d.ts
+*.tsbuildinfo
+
+# Dependencies & lockfiles
+node_modules/
+package-lock.json
+
+# Data (PII) and assets
+export_*/
+public/
+
+# SQL migrations — keep as authored
+db/migrations/

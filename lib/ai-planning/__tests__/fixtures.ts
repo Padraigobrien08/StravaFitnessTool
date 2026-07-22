@@ -14,7 +14,7 @@ import { format, addDays } from "date-fns";
 
 export function coachingContextFrom(
   fixture: ReturnType<typeof insightsFrom>,
-  goal?: RaceGoal | null
+  goal?: RaceGoal | null,
 ): CoachingContext {
   return buildCoachingContext({
     analytics: fixture.analytics,
@@ -29,9 +29,7 @@ export const contexts = {
   lowData: () => coachingContextFrom(lowData),
   noGoal: () =>
     coachingContextFrom(
-      insightsFrom(
-        Array.from({ length: 12 }, (_, i) => mkRun(i + 1, { distanceM: 10000 }))
-      )
+      insightsFrom(Array.from({ length: 12 }, (_, i) => mkRun(i + 1, { distanceM: 10000 }))),
     ),
   hybrid: () => coachingContextFrom(hybridAthlete()),
   overloaded: () => coachingContextFrom(overloadedBlock()),
@@ -52,9 +50,7 @@ export const contexts = {
   },
   missingHr: () => coachingContextFrom(lowData),
   fatigueHeavy: () => {
-    const runs = Array.from({ length: 14 }, (_, i) =>
-      mkRun(i, { distanceM: 12000, avgHr: 170 })
-    );
+    const runs = Array.from({ length: 14 }, (_, i) => mkRun(i, { distanceM: 12000, avgHr: 170 }));
     const f = insightsFrom(runs, {
       distance: "hm",
       date: format(addDays(new Date(), 30), "yyyy-MM-dd"),

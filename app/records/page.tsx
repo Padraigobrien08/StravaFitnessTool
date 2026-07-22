@@ -28,16 +28,17 @@ export default function RecordsPage() {
           <h1 className="font-display text-2xl font-bold text-white">Records & predictions</h1>
           {needsReimport ? (
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-              FIT data in your browser is from an older import and has no pace streams.
-              Go to <a href="/import" className="underline">Import</a> → Step 2 and
-              re-select your <code className="text-amber-100">activities</code> folder
+              FIT data in your browser is from an older import and has no pace streams. Go to{" "}
+              <a href="/import" className="underline">
+                Import
+              </a>{" "}
+              → Step 2 and re-select your <code className="text-amber-100">activities</code> folder
               once more.
             </div>
           ) : (
             <p className="text-sm text-zinc-500">
-              PRs use fastest <strong className="text-zinc-400">segments</strong> inside
-              longer runs when stream/lap data is loaded ({fitRunIds.length}{" "}
-              runs).
+              PRs use fastest <strong className="text-zinc-400">segments</strong> inside longer runs
+              when stream/lap data is loaded ({fitRunIds.length} runs).
             </p>
           )}
 
@@ -63,13 +64,8 @@ export default function RecordsPage() {
                     </thead>
                     <tbody>
                       {insights.personalRecords.map((pr) => (
-                        <tr
-                          key={pr.bucket}
-                          className="border-b border-white/5 text-zinc-300"
-                        >
-                          <td className="py-3 pr-4 font-medium text-white">
-                            {pr.label}
-                          </td>
+                        <tr key={pr.bucket} className="border-b border-white/5 text-zinc-300">
+                          <td className="py-3 pr-4 font-medium text-white">{pr.label}</td>
                           <td className="py-3 pr-4">
                             <Link
                               href={`/runs/${pr.runId}`}
@@ -78,12 +74,8 @@ export default function RecordsPage() {
                               {pr.runName}
                             </Link>
                           </td>
-                          <td className="py-3 pr-4">
-                            {new Date(pr.date).toLocaleDateString()}
-                          </td>
-                          <td className="py-3 pr-4 tabular-nums">
-                            {formatDuration(pr.timeSec)}
-                          </td>
+                          <td className="py-3 pr-4">{new Date(pr.date).toLocaleDateString()}</td>
+                          <td className="py-3 pr-4 tabular-nums">{formatDuration(pr.timeSec)}</td>
                           <td className="py-3 pr-4 tabular-nums text-emerald-400">
                             {formatPace(pr.paceSecPerKm)}
                           </td>
@@ -109,9 +101,8 @@ export default function RecordsPage() {
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-xs text-zinc-500">
-                Step changes when your best 5K, 10K, or half marathon effort
-                improved over time (includes segments inside longer runs when
-                FIT data is loaded).
+                Step changes when your best 5K, 10K, or half marathon effort improved over time
+                (includes segments inside longer runs when FIT data is loaded).
               </p>
               <PrProgressionChart timeline={insights.prTimeline} />
             </CardContent>

@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  aerobicEfficiencyTrend,
-  efficiencyMonthOverMonth,
-} from "../efficiency";
+import { aerobicEfficiencyTrend, efficiencyMonthOverMonth } from "../efficiency";
 import type { RunActivity } from "@/lib/strava/types";
 
 function mockRun(date: string, paceMin: number): RunActivity {
@@ -33,12 +30,8 @@ function mockRun(date: string, paceMin: number): RunActivity {
 describe("efficiencyMonthOverMonth", () => {
   it("produces narrative with two months of data", () => {
     const runs = [
-      ...Array.from({ length: 3 }, (_, i) =>
-        mockRun(`2025-01-${10 + i}`, 5.5)
-      ),
-      ...Array.from({ length: 3 }, (_, i) =>
-        mockRun(`2025-02-${10 + i}`, 5.0)
-      ),
+      ...Array.from({ length: 3 }, (_, i) => mockRun(`2025-01-${10 + i}`, 5.5)),
+      ...Array.from({ length: 3 }, (_, i) => mockRun(`2025-02-${10 + i}`, 5.0)),
     ];
     const points = aerobicEfficiencyTrend(runs);
     const mom = efficiencyMonthOverMonth(points);

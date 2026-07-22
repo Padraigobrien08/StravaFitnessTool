@@ -6,17 +6,12 @@ import { findBestPhase } from "../bestPhase";
 import { attributeImprovement } from "../attributeImprovement";
 import { analyzeFadePattern } from "../fadePattern";
 import { prContext } from "../prContext";
-import {
-  buildTestBundle,
-  emptyFit,
-  makePaceStream,
-  makeRun,
-} from "./fixtures";
+import { buildTestBundle, emptyFit, makePaceStream, makeRun } from "./fixtures";
 import type { RunWorkoutLabel } from "@/lib/analytics/workoutType";
 
 function labelsFor(
   runs: ReturnType<typeof makeRun>[],
-  type: RunWorkoutLabel["classification"]["type"]
+  type: RunWorkoutLabel["classification"]["type"],
 ): RunWorkoutLabel[] {
   return runs.map((r) => ({
     runId: r.id,
@@ -49,7 +44,7 @@ describe("compareSessions", () => {
 describe("explainReadinessDelta", () => {
   it("reports score and drivers", () => {
     const runs = Array.from({ length: 12 }, (_, i) =>
-      makeRun(`r${i}`, `2026-0${1 + Math.floor(i / 4)}-${10 + i}T00:00:00Z`, 10 + i)
+      makeRun(`r${i}`, `2026-0${1 + Math.floor(i / 4)}-${10 + i}T00:00:00Z`, 10 + i),
     );
     const bundle = buildTestBundle(runs);
     const ctx = buildTestReasoningContext(runs, [], bundle, null);
@@ -70,7 +65,7 @@ describe("findBestPhase", () => {
       runs.push(
         makeRun(`w${w}a`, iso, km / 3),
         makeRun(`w${w}b`, iso, km / 3),
-        makeRun(`w${w}c`, iso, km / 3)
+        makeRun(`w${w}c`, iso, km / 3),
       );
     }
     runs.push(makeRun("last", "2026-05-20T00:00:00Z", 12));
@@ -121,11 +116,7 @@ describe("analyzeFadePattern", () => {
 describe("prContext", () => {
   it("summarizes prep vs prior window when PR exists", () => {
     const runs = Array.from({ length: 20 }, (_, i) =>
-      makeRun(
-        `r${i}`,
-        new Date(Date.UTC(2026, 2, 1 + i * 3)).toISOString(),
-        8 + (i % 5)
-      )
+      makeRun(`r${i}`, new Date(Date.UTC(2026, 2, 1 + i * 3)).toISOString(), 8 + (i % 5)),
     );
     const bundle = buildTestBundle(runs);
     bundle.analytics.personalRecords = [

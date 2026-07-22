@@ -31,16 +31,10 @@ export function GenerateWeekPlanButton({
           if (r) onGenerated?.();
         }}
       >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Sparkles className="h-4 w-4" />
-        )}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
         {label}
       </Button>
-      {error ? (
-        <p className="text-sm text-red-400/90">{error}</p>
-      ) : null}
+      {error ? <p className="text-sm text-red-400/90">{error}</p> : null}
       {result ? (
         <AiWeeklyPlanPanel
           plan={result.plan}

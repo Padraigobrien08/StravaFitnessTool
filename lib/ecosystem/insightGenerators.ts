@@ -17,12 +17,9 @@ export function buildEcosystemInsightList(input: {
   rolling28?: RollingEcosystemSnapshot;
 }): EcosystemInsight[] {
   const out: EcosystemInsight[] = [];
-  const { scores, supportSignals, interferenceFlags, archetype, rolling28 } =
-    input;
+  const { scores, supportSignals, interferenceFlags, archetype, rolling28 } = input;
 
-  const hiFlags = interferenceFlags.filter(
-    (f) => f.severity !== "low" && f.kind !== "race_week"
-  );
+  const hiFlags = interferenceFlags.filter((f) => f.severity !== "low" && f.kind !== "race_week");
 
   if (hiFlags.length > 0) {
     out.push({
@@ -34,9 +31,7 @@ export function buildEcosystemInsightList(input: {
       recommendation:
         "Separate HIIT, CrossFit, or heavy strength from tempo, intervals, and long runs by 24–48h when possible.",
       confidence: hiFlags[0].confidence,
-      limitations: [
-        "May interfere with run quality — not a medical assessment.",
-      ],
+      limitations: ["May interfere with run quality — not a medical assessment."],
       directness: "fatigue_context",
     });
   }
@@ -50,8 +45,7 @@ export function buildEcosystemInsightList(input: {
       severity: "warning",
       evidence: cluster.evidence,
       recommendation:
-        archetype.archetype === "hybrid_runner" ||
-        archetype.archetype === "strength_endurance"
+        archetype.archetype === "hybrid_runner" || archetype.archetype === "strength_endurance"
           ? "Spread gym, HIIT, and quality runs — avoid stacking within 3 days."
           : "Review weekly intensity distribution on Training.",
       confidence: "medium",
@@ -86,8 +80,7 @@ export function buildEcosystemInsightList(input: {
       title: strengthSig.label,
       severity: scores.strengthSupport >= 70 ? "positive" : "neutral",
       evidence: strengthSig.evidence,
-      recommendation:
-        "Maintain strength 24–48h from key runs; reduce load in race week.",
+      recommendation: "Maintain strength 24–48h from key runs; reduce load in race week.",
       confidence: strengthSig.confidence,
       limitations: strengthSig.limitations,
       directness: strengthSig.directness,
@@ -103,8 +96,7 @@ export function buildEcosystemInsightList(input: {
       title: sig?.label ?? "Mobility consistency low",
       severity: "warning",
       evidence: sig?.evidence ?? [],
-      recommendation:
-        "Short mobility or easy walks after hard sessions support recovery context.",
+      recommendation: "Short mobility or easy walks after hard sessions support recovery context.",
       confidence: sig?.confidence ?? "low",
       limitations: sig?.limitations ?? [],
       directness: "recovery_context",

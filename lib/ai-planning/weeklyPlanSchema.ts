@@ -44,7 +44,7 @@ export const weeklyTrainingPlanSchema = z.object({
         name: z.string().max(80),
         summary: z.string().max(300),
         changes: z.array(z.string().max(200)).max(6),
-      })
+      }),
     )
     .max(2)
     .optional(),
@@ -53,7 +53,7 @@ export const weeklyTrainingPlanSchema = z.object({
 export type WeeklyTrainingPlanParsed = z.infer<typeof weeklyTrainingPlanSchema>;
 
 export function parseWeeklyTrainingPlan(
-  raw: unknown
+  raw: unknown,
 ): { success: true; data: WeeklyTrainingPlanParsed } | { success: false; error: z.ZodError } {
   const result = weeklyTrainingPlanSchema.safeParse(raw);
   if (result.success) return { success: true, data: result.data };

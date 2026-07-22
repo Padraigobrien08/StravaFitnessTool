@@ -22,12 +22,8 @@ describe("evaluateForecastV2 sanity rules", () => {
     const rules = runSanityRules(hmReadyRunnerInput, forecast);
     const intervalRules = rules.filter((r) => r.category === "interval");
     expect(intervalRules.every((r) => r.passed)).toBe(true);
-    expect(forecast.conservativeTimeSec).toBeGreaterThanOrEqual(
-      forecast.mostLikelyTimeSec
-    );
-    expect(forecast.optimisticTimeSec).toBeLessThanOrEqual(
-      forecast.mostLikelyTimeSec
-    );
+    expect(forecast.conservativeTimeSec).toBeGreaterThanOrEqual(forecast.mostLikelyTimeSec);
+    expect(forecast.optimisticTimeSec).toBeLessThanOrEqual(forecast.mostLikelyTimeSec);
   });
 
   it("flags inverted conservative/most-likely when tampered", () => {
@@ -37,7 +33,7 @@ describe("evaluateForecastV2 sanity rules", () => {
       conservativeTimeSec: forecast.mostLikelyTimeSec - 120,
     };
     const failed = runSanityRules(hmReadyRunnerInput, bad).find(
-      (r) => r.ruleId === "conservative_slower_than_most_likely"
+      (r) => r.ruleId === "conservative_slower_than_most_likely",
     );
     expect(failed?.passed).toBe(false);
     expect(failed?.severity).toBe("error");
@@ -48,7 +44,7 @@ describe("evaluateForecastV2 sanity rules", () => {
     const rule = runSanityRules(strong5kNoLongRunsInput, forecast).find(
       (r) =>
         r.ruleId === "low_specificity_widens_uncertainty" ||
-        r.ruleId === "high_agreement_low_specificity"
+        r.ruleId === "high_agreement_low_specificity",
     );
     expect(forecast.componentScores.specificity).toBeLessThan(40);
     expect(rule?.passed === false || forecast.confidence === "low").toBe(true);
@@ -57,7 +53,7 @@ describe("evaluateForecastV2 sanity rules", () => {
   it("caps marathon confidence on 5K-only evidence", () => {
     const forecast = buildRaceForecastV2(strong5kNoLongRunsInput);
     const rule = runSanityRules(strong5kNoLongRunsInput, forecast).find(
-      (r) => r.ruleId === "short_anchor_marathon_confidence"
+      (r) => r.ruleId === "short_anchor_marathon_confidence",
     );
     expect(rule?.passed).toBe(true);
     expect(forecast.confidence).not.toBe("high");
@@ -68,7 +64,7 @@ describe("recommendation contradiction detection", () => {
   it("flags recommendation confidence mismatch for low-data forecast", () => {
     const forecast = buildRaceForecastV2(lowDataRunnerInput);
     const rule = runRecommendationRules(lowDataRunnerInput, forecast).find(
-      (r) => r.ruleId === "recommendation_confidence_alignment"
+      (r) => r.ruleId === "recommendation_confidence_alignment",
     );
     expect(forecast.confidence).toMatch(/low|medium/);
     if (forecast.recommendation.toLowerCase().includes("medium-high")) {
@@ -78,18 +74,16 @@ describe("recommendation contradiction detection", () => {
 
   it("race-week taper forbids volume increase phrasing", () => {
     const report = evaluateForecastFixture(
-      FORECAST_FIXTURES.find((f) => f.id === "race_week_taper")!
+      FORECAST_FIXTURES.find((f) => f.id === "race_week_taper")!,
     );
     expect(report.fixtureExpectation?.met).toBe(true);
-    const volumeRule = report.rules.find(
-      (r) => r.ruleId === "race_week_no_volume_push"
-    );
+    const volumeRule = report.rules.find((r) => r.ruleId === "race_week_no_volume_push");
     expect(volumeRule?.passed).toBe(true);
   });
 
   it("fatigue-heavy recommendation avoids volume push", () => {
     const report = evaluateForecastFixture(
-      FORECAST_FIXTURES.find((f) => f.id === "fatigue_heavy")!
+      FORECAST_FIXTURES.find((f) => f.id === "fatigue_heavy")!,
     );
     expect(report.fixtureExpectation?.met).toBe(true);
     expect(report.forecast.recommendation.toLowerCase()).toMatch(/freshness|hard/);
@@ -106,7 +100,7 @@ describe("fixture athletes", () => {
       expect(report.observability.modelEstimates.length).toBeGreaterThan(0);
       expect(report.observability.failedRules.length).toBeGreaterThanOrEqual(0);
       expect(report.observability.passedRules.length).toBeGreaterThan(0);
-    }
+    },
   );
 
   it("low-data runner has capped confidence and warnings", () => {
@@ -130,8 +124,7 @@ describe("fixture athletes", () => {
       fixtureId: "inconsistent_models",
     });
     const width =
-      report.forecast.predictionIntervalSec.p90 -
-      report.forecast.predictionIntervalSec.p10;
+      report.forecast.predictionIntervalSec.p90 - report.forecast.predictionIntervalSec.p10;
     expect(width).toBeGreaterThanOrEqual(180);
     expect(report.fixtureExpectation?.met).toBe(true);
   });
@@ -147,7 +140,7 @@ describe("fixture athletes", () => {
 
   it("marathon underprepared surfaces weak durability", () => {
     const report = evaluateForecastFixture(
-      FORECAST_FIXTURES.find((f) => f.id === "marathon_underprepared")!
+      FORECAST_FIXTURES.find((f) => f.id === "marathon_underprepared")!,
     );
     expect(report.fixtureExpectation?.met).toBe(true);
     expect(report.forecast.componentScores.durability).toBeLessThan(60);
@@ -155,7 +148,7 @@ describe("fixture athletes", () => {
 
   it("near-race 20.5k + 10-mile efforts predict HM under 2:00", () => {
     const report = evaluateForecastFixture(
-      FORECAST_FIXTURES.find((f) => f.id === "near_race_evidence")!
+      FORECAST_FIXTURES.find((f) => f.id === "near_race_evidence")!,
     );
     expect(report.fixtureExpectation?.met).toBe(true);
     expect(report.forecast.mostLikelyTimeSec).toBeLessThan(7200);
@@ -171,7 +164,7 @@ describe("production readiness gate", () => {
       .filter((r) => !r.fixtureExpectation?.met || r.errorCount > 0)
       .map(
         (r) =>
-          `${r.fixtureExpectation?.fixtureId}: errors=${r.errorCount} ${r.fixtureExpectation?.failures?.join("; ")}`
+          `${r.fixtureExpectation?.fixtureId}: errors=${r.errorCount} ${r.fixtureExpectation?.failures?.join("; ")}`,
       );
     if (failures.length) {
       // Log for debugging; errors block production, fixture failures block too

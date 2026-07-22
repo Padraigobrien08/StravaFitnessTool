@@ -24,10 +24,7 @@ function nameSignals(name: string): { high: boolean; low: boolean } {
   };
 }
 
-function hrLevel(
-  avgHr: number | undefined,
-  athleteMaxHr: number
-): PerceivedIntensity | null {
+function hrLevel(avgHr: number | undefined, athleteMaxHr: number): PerceivedIntensity | null {
   if (avgHr == null || athleteMaxHr <= 0) return null;
   const pct = avgHr / athleteMaxHr;
   if (pct >= 0.85) return "high";
@@ -38,16 +35,9 @@ function hrLevel(
 export function inferActivityIntensity(
   activity: Pick<
     NormalizedActivity,
-    | "modality"
-    | "sportType"
-    | "movingTimeSec"
-    | "avgHr"
-    | "maxHr"
-    | "name"
-    | "isHardRun"
-    | "power"
+    "modality" | "sportType" | "movingTimeSec" | "avgHr" | "maxHr" | "name" | "isHardRun" | "power"
   >,
-  athleteMaxHr = 190
+  athleteMaxHr = 190,
 ): IntensityInference {
   const evidence: string[] = [];
   const { modality, movingTimeSec, avgHr, sportType, name } = activity;
@@ -79,7 +69,7 @@ export function inferActivityIntensity(
   const hr = hrLevel(avgHr, athleteMaxHr);
   if (hr) {
     evidence.push(
-      `Avg HR ${avgHr} (~${Math.round((avgHr! / athleteMaxHr) * 100)}% of max ${athleteMaxHr})`
+      `Avg HR ${avgHr} (~${Math.round((avgHr! / athleteMaxHr) * 100)}% of max ${athleteMaxHr})`,
     );
   }
 
@@ -90,10 +80,18 @@ export function inferActivityIntensity(
     }
     if (hr) return { level: hr, confidence: "medium", evidence };
     if (names.high) {
-      return { level: "high", confidence: "low", evidence: [...evidence, "Name keywords suggest quality"] };
+      return {
+        level: "high",
+        confidence: "low",
+        evidence: [...evidence, "Name keywords suggest quality"],
+      };
     }
     if (names.low) {
-      return { level: "low", confidence: "low", evidence: [...evidence, "Name keywords suggest easy"] };
+      return {
+        level: "low",
+        confidence: "low",
+        evidence: [...evidence, "Name keywords suggest easy"],
+      };
     }
     return {
       level: "moderate",
@@ -104,9 +102,7 @@ export function inferActivityIntensity(
 
   if (modality === "strength") {
     if (names.high || movingTimeSec > 3600) {
-      evidence.push(
-        names.high ? "Name suggests heavy lifting" : "Duration > 60 min"
-      );
+      evidence.push(names.high ? "Name suggests heavy lifting" : "Duration > 60 min");
       return { level: "high", confidence: "low", evidence };
     }
     if (movingTimeSec > 2400) {
@@ -172,7 +168,7 @@ export function inferActivityIntensity(
 }
 
 function isAerobicModality(
-  m: NormalizedActivity["modality"]
+  m: NormalizedActivity["modality"],
 ): m is "aerobic_cross_training" | "outdoor_endurance" {
   return m === "aerobic_cross_training" || m === "outdoor_endurance";
 }
@@ -181,7 +177,7 @@ export function inferActivityPurpose(
   activity: Pick<
     NormalizedActivity,
     "modality" | "perceivedIntensity" | "name" | "sportType" | "isHardRun"
-  >
+  >,
 ): string {
   const { modality, perceivedIntensity, sportType } = activity;
 

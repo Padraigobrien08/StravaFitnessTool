@@ -45,15 +45,11 @@ export function StreamIntelligencePanel({
     );
   }
 
-  if (
-    !fit ||
-    (fit.hrStream.length < 3 && fit.paceStream.length < 3)
-  ) {
+  if (!fit || (fit.hrStream.length < 3 && fit.paceStream.length < 3)) {
     return (
       <PanelChrome title="Stream intelligence" subdued>
         <p className="text-sm text-zinc-500">
-          No stream data — sync from Strava or re-import FIT for telemetry
-          interpretation.
+          No stream data — sync from Strava or re-import FIT for telemetry interpretation.
         </p>
       </PanelChrome>
     );
@@ -68,10 +64,7 @@ export function StreamIntelligencePanel({
     <PanelChrome title="Workout telemetry interpretation">
       <ul className="mb-4 space-y-1.5">
         {annotations.map((a, i) => (
-          <li
-            key={i}
-            className="flex gap-2 text-xs leading-relaxed text-zinc-500"
-          >
+          <li key={i} className="flex gap-2 text-xs leading-relaxed text-zinc-500">
             <span
               className={
                 a.kind === "hr"
@@ -149,10 +142,7 @@ export function StreamIntelligencePanel({
                 />
                 <Tooltip
                   contentStyle={chart.tooltip}
-                  formatter={(v) => [
-                    typeof v === "number" ? formatPace(v) : "—",
-                    "Pace",
-                  ]}
+                  formatter={(v) => [typeof v === "number" ? formatPace(v) : "—", "Pace"]}
                 />
                 <Line
                   type="monotone"

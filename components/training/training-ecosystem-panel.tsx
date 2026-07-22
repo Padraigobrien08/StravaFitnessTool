@@ -22,8 +22,8 @@ export function TrainingEcosystemPanel({
     return (
       <PanelChrome title="Training ecosystem" className={className}>
         <p className="text-sm text-zinc-500">
-          Log bike, strength, yoga, and other sports on Strava to see cross-training
-          load, durability support, and interference context alongside your runs.
+          Log bike, strength, yoga, and other sports on Strava to see cross-training load,
+          durability support, and interference context alongside your runs.
         </p>
       </PanelChrome>
     );
@@ -68,38 +68,15 @@ export function TrainingEcosystemPanel({
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-8 text-center">
             <Stat label="Run volume" value={data.crossTrainingLoad.runKm} />
-            <Stat
-              label="Runs"
-              value={String(data.crossTrainingLoad.runSessions)}
-            />
-            <Stat
-              label="Bike"
-              value={`${data.crossTrainingLoad.bikeMinutes}m`}
-            />
-            <Stat
-              label="Swim"
-              value={`${data.crossTrainingLoad.swimMinutes}m`}
-            />
-            <Stat
-              label="Other aerobic"
-              value={`${data.crossTrainingLoad.crossTrainingMinutes}m`}
-            />
-            <Stat
-              label="Strength"
-              value={String(data.crossTrainingLoad.strengthSessions)}
-            />
-            <Stat
-              label="Mobility"
-              value={String(data.crossTrainingLoad.mobilitySessions)}
-            />
-            <Stat
-              label="HIIT/sport"
-              value={String(data.crossTrainingLoad.hiitSessions)}
-            />
+            <Stat label="Runs" value={String(data.crossTrainingLoad.runSessions)} />
+            <Stat label="Bike" value={`${data.crossTrainingLoad.bikeMinutes}m`} />
+            <Stat label="Swim" value={`${data.crossTrainingLoad.swimMinutes}m`} />
+            <Stat label="Other aerobic" value={`${data.crossTrainingLoad.crossTrainingMinutes}m`} />
+            <Stat label="Strength" value={String(data.crossTrainingLoad.strengthSessions)} />
+            <Stat label="Mobility" value={String(data.crossTrainingLoad.mobilitySessions)} />
+            <Stat label="HIIT/sport" value={String(data.crossTrainingLoad.hiitSessions)} />
           </div>
-          <p className="mt-3 text-xs text-zinc-500">
-            {data.crossTrainingLoad.headline}
-          </p>
+          <p className="mt-3 text-xs text-zinc-500">{data.crossTrainingLoad.headline}</p>
         </div>
 
         {data.interferenceWarnings.length > 0 ? (
@@ -121,10 +98,7 @@ export function TrainingEcosystemPanel({
 
         <div className="grid gap-3 sm:grid-cols-2">
           {data.supportCards.map((card) => (
-            <div
-              key={card.id}
-              className="rounded-lg border border-white/[0.05] bg-black/15 p-3"
-            >
+            <div key={card.id} className="rounded-lg border border-white/[0.05] bg-black/15 p-3">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-medium text-zinc-200">{card.title}</p>
                 <span className={cn("text-xs font-mono", trendColor(card.trend))}>
@@ -150,8 +124,8 @@ export function TrainingEcosystemPanel({
         )}
 
         <p className="text-[10px] text-zinc-600 leading-relaxed">
-          {data.limitations[0]} Running remains primary for race performance; non-run
-          work informs fatigue and durability context only.
+          {data.limitations[0]} Running remains primary for race performance; non-run work informs
+          fatigue and durability context only.
         </p>
       </div>
     </PanelChrome>

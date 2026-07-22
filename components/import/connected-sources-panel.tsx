@@ -46,7 +46,7 @@ export function ConnectedSourcesPanel({
                   <span
                     className={cn(
                       "rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-inset",
-                      statusStyle[source.status]
+                      statusStyle[source.status],
                     )}
                   >
                     {source.statusLabel}
@@ -56,14 +56,8 @@ export function ConnectedSourcesPanel({
               </div>
               {source.id === "strava" && status?.connected ? (
                 <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => void handleSync()}
-                    disabled={syncing}
-                  >
-                    <RefreshCw
-                      className={cn("mr-1.5 h-3.5 w-3.5", syncing && "animate-spin")}
-                    />
+                  <Button size="sm" onClick={() => void handleSync()} disabled={syncing}>
+                    <RefreshCw className={cn("mr-1.5 h-3.5 w-3.5", syncing && "animate-spin")} />
                     {syncing ? "Syncing…" : "Sync now"}
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => void handleDisconnect()}>
@@ -88,12 +82,8 @@ export function ConnectedSourcesPanel({
                 {source.activitiesAvailable > 0
                   ? `${source.runsSynced > 0 ? " · " : ""}${source.activitiesAvailable} activities`
                   : null}
-                {source.streamsLoaded > 0
-                  ? ` · ${source.streamsLoaded} with streams`
-                  : null}
-                {source.streamsPending > 0
-                  ? ` · ${source.streamsPending} pending`
-                  : null}
+                {source.streamsLoaded > 0 ? ` · ${source.streamsLoaded} with streams` : null}
+                {source.streamsPending > 0 ? ` · ${source.streamsPending} pending` : null}
               </p>
             ) : null}
 
@@ -107,10 +97,7 @@ export function ConnectedSourcesPanel({
                 <ul className="mt-1.5 space-y-0.5">
                   {source.enabledCapabilities.length > 0 ? (
                     source.enabledCapabilities.map((c) => (
-                      <li
-                        key={c}
-                        className="flex items-center gap-1.5 text-xs text-zinc-500"
-                      >
+                      <li key={c} className="flex items-center gap-1.5 text-xs text-zinc-500">
                         <Check className="h-3 w-3 text-teal-500/70" />
                         {c}
                       </li>
@@ -125,10 +112,7 @@ export function ConnectedSourcesPanel({
                 <ul className="mt-1.5 space-y-0.5">
                   {source.missingItems.length > 0 ? (
                     source.missingItems.map((m) => (
-                      <li
-                        key={m}
-                        className="flex items-center gap-1.5 text-xs text-amber-400/85"
-                      >
+                      <li key={m} className="flex items-center gap-1.5 text-xs text-amber-400/85">
                         <AlertTriangle className="h-3 w-3 shrink-0" />
                         {m}
                       </li>

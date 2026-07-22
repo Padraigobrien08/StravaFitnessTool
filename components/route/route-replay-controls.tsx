@@ -24,11 +24,7 @@ export function RouteReplayControls({
         className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-500/15 text-teal-300 ring-1 ring-teal-500/25 transition-colors hover:bg-teal-500/25"
         aria-label={state.playing ? "Pause" : "Play"}
       >
-        {state.playing ? (
-          <Pause className="h-4 w-4" />
-        ) : (
-          <Play className="h-4 w-4 ml-0.5" />
-        )}
+        {state.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
       </button>
       <button
         type="button"
@@ -40,10 +36,7 @@ export function RouteReplayControls({
       </button>
       <span className="font-display text-sm font-semibold tabular-nums text-white">
         {formatReplayClock(state.currentSec)}
-        <span className="text-zinc-600">
-          {" "}
-          / {formatReplayClock(state.durationSec)}
-        </span>
+        <span className="text-zinc-600"> / {formatReplayClock(state.durationSec)}</span>
       </span>
       <div className="ml-auto flex gap-1">
         {REPLAY_SPEEDS.map((s) => (
@@ -55,7 +48,7 @@ export function RouteReplayControls({
               "rounded-md px-2 py-1 text-[11px] font-medium tabular-nums transition-colors",
               state.speed === s
                 ? "bg-teal-500/20 text-teal-200"
-                : "text-zinc-500 hover:text-zinc-300"
+                : "text-zinc-500 hover:text-zinc-300",
             )}
           >
             {s}x

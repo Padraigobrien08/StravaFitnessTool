@@ -59,10 +59,7 @@ export function GoalsExplainability({
         >
           Model assumptions
           <ChevronDown
-            className={cn(
-              "h-4 w-4 transition-transform",
-              assumptionsOpen && "rotate-180"
-            )}
+            className={cn("h-4 w-4 transition-transform", assumptionsOpen && "rotate-180")}
           />
         </button>
         {assumptionsOpen ? (

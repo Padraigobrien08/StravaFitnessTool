@@ -3,7 +3,9 @@ import { validateCalendarWeek } from "../calendarValidation";
 import type { CalendarWorkout, TrainingCalendarWeek } from "../types";
 import type { WeeklyPlanGuardrails } from "@/lib/ai-planning";
 
-function workout(partial: Partial<CalendarWorkout> & Pick<CalendarWorkout, "id" | "day" | "date">): CalendarWorkout {
+function workout(
+  partial: Partial<CalendarWorkout> & Pick<CalendarWorkout, "id" | "day" | "date">,
+): CalendarWorkout {
   return {
     modality: "run",
     type: "easy",
@@ -25,8 +27,21 @@ function raceWeekPlan(): TrainingCalendarWeek {
     source: "fallback",
     summary: "Race week",
     workouts: [
-      workout({ id: "w-mon", day: "Mon", date: "2026-05-25", title: "Easy aerobic", distanceKm: 5 }),
-      workout({ id: "w-wed", day: "Wed", date: "2026-05-27", title: "Strides", distanceKm: 4, intensity: "easy" }),
+      workout({
+        id: "w-mon",
+        day: "Mon",
+        date: "2026-05-25",
+        title: "Easy aerobic",
+        distanceKm: 5,
+      }),
+      workout({
+        id: "w-wed",
+        day: "Wed",
+        date: "2026-05-27",
+        title: "Strides",
+        distanceKm: 4,
+        intensity: "easy",
+      }),
       workout({
         id: "w-fri",
         day: "Fri",

@@ -36,12 +36,12 @@ export function IntelligenceReport({
             <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-zinc-900 print:text-black sm:text-4xl">
               Athlete Intelligence Report
             </h1>
-            <p className="mt-2 text-sm text-zinc-600">
-              Generated {view.meta.generatedAt}
-            </p>
+            <p className="mt-2 text-sm text-zinc-600">Generated {view.meta.generatedAt}</p>
           </div>
           <div className="text-right text-xs text-zinc-600">
-            <p>{view.meta.runCount} runs · {view.meta.totalDistanceKm} total</p>
+            <p>
+              {view.meta.runCount} runs · {view.meta.totalDistanceKm} total
+            </p>
             {view.meta.dateRangeLabel ? <p>{view.meta.dateRangeLabel}</p> : null}
             {view.meta.exportLabel ? (
               <p className="mt-1 text-zinc-500">{view.meta.exportLabel}</p>
@@ -139,9 +139,8 @@ export function IntelligenceReport({
       </div>
 
       <footer className="report-footer mt-14 border-t border-zinc-300 pt-6 text-xs text-zinc-500 print:mt-10">
-        StrideIQ — endurance intelligence from your training export. Not medical
-        advice. Predictions are estimates; race-day execution, weather, and
-        fueling can shift outcomes.
+        StrideIQ — endurance intelligence from your training export. Not medical advice. Predictions
+        are estimates; race-day execution, weather, and fueling can shift outcomes.
       </footer>
     </article>
   );

@@ -3,7 +3,7 @@ import type { AthleteBelief, AthleteMemoryProfile } from "./types";
 
 export function serializeAthleteMemoryForLLM(
   profile: AthleteMemoryProfile,
-  beliefs?: AthleteBelief[]
+  beliefs?: AthleteBelief[],
 ): string {
   const list = beliefs ?? allBeliefs(profile).slice(0, 8);
   if (list.length === 0) {
@@ -30,7 +30,7 @@ export function serializeAthleteMemoryForLLM(
 
 export function serializeMemoryForCoachAnswer(
   profile: AthleteMemoryProfile,
-  topic?: "fatigue" | "adaptation" | "pacing" | "taper" | "modality" | "all"
+  topic?: "fatigue" | "adaptation" | "pacing" | "taper" | "modality" | "all",
 ): string {
   let beliefs = allBeliefs(profile);
   if (topic && topic !== "all") {
@@ -40,15 +40,15 @@ export function serializeMemoryForCoachAnswer(
     return "I don't have enough repeated evidence to state a reliable pattern yet. More consistent training history will sharpen this.";
   }
 
-  const parts = beliefs.slice(0, 6).map(
-    (b) =>
-      `**${b.statement}** (${b.confidence} confidence, ${b.stability})\n` +
-      `Evidence: ${b.evidence.slice(0, 2).join("; ")}\n` +
-      (b.counterEvidence.length
-        ? `Uncertainty: ${b.counterEvidence[0]}`
-        : "") +
-      `\nHow to use this: ${b.recommendedUse}`
-  );
+  const parts = beliefs
+    .slice(0, 6)
+    .map(
+      (b) =>
+        `**${b.statement}** (${b.confidence} confidence, ${b.stability})\n` +
+        `Evidence: ${b.evidence.slice(0, 2).join("; ")}\n` +
+        (b.counterEvidence.length ? `Uncertainty: ${b.counterEvidence[0]}` : "") +
+        `\nHow to use this: ${b.recommendedUse}`,
+    );
 
   return parts.join("\n\n");
 }

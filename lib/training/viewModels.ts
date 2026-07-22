@@ -56,11 +56,7 @@ export interface AdaptiveWeekPlanView {
 }
 
 export type LoadStateChip =
-  | "Fresh"
-  | "Neutral"
-  | "Accumulating fatigue"
-  | "Recovery trend"
-  | "High adaptation window";
+  "Fresh" | "Neutral" | "Accumulating fatigue" | "Recovery trend" | "High adaptation window";
 
 export interface LoadIntelligenceView {
   freshness: number;
@@ -135,13 +131,13 @@ function trainingInsights(insights: Insight[]): Insight[] {
       i.question === "ready" ||
       i.id === "fatigue-high" ||
       i.id === "intensity-heavy" ||
-      i.id === "next-week-plan"
+      i.id === "next-week-plan",
   );
 }
 
 function classifyState(
   fatigue: FatigueSnapshot,
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): { classification: string; severity: TrainingStateSeverity } {
   const adv = analytics.intensityAdvice;
   if (fatigue.label === "Fatigued" || fatigue.tsb < -20) {
@@ -150,10 +146,7 @@ function classifyState(
   if (adv.status === "too_hard") {
     return { classification: "Intensity elevated", severity: "warning" };
   }
-  if (
-    fatigue.label === "Fresh" &&
-    analytics.efficiencySummary.trend === "improving"
-  ) {
+  if (fatigue.label === "Fresh" && analytics.efficiencySummary.trend === "improving") {
     return { classification: "Fresh & adapting", severity: "positive" };
   }
   if (fatigue.label === "Fresh") {
@@ -168,11 +161,10 @@ function classifyState(
 function heroTitle(
   classification: string,
   analytics: DashboardInsights,
-  top: Insight | undefined
+  top: Insight | undefined,
 ): string {
   if (top?.title) return top.title;
-  const readiness =
-    analytics.raceReadiness ?? analytics.halfMarathonReadiness;
+  const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   if (classification === "Fresh & adapting") {
     return `Fresh and adapting — ${readiness.label.toLowerCase()}`;
   }
@@ -195,16 +187,10 @@ function estimateSessionLoad(s: PlannedSession): number {
   return Math.round(mid * 10 * mult);
 }
 
-function buildPlanView(
-  plan: WeekPlan,
-  analytics: DashboardInsights
-): AdaptiveWeekPlanView {
+function buildPlanView(plan: WeekPlan, analytics: DashboardInsights): AdaptiveWeekPlanView {
   const lo = round1(plan.totalKmRange[0]);
   const hi = round1(plan.totalKmRange[1]);
-  const estimatedLoad = plan.sessions.reduce(
-    (s, sess) => s + estimateSessionLoad(sess),
-    0
-  );
+  const estimatedLoad = plan.sessions.reduce((s, sess) => s + estimateSessionLoad(sess), 0);
   const lastKm = analytics.previousWeek?.distanceKm ?? analytics.currentWeek.distanceKm;
   const midPlan = (lo + hi) / 2;
   const loadVs =
@@ -213,9 +199,7 @@ function buildPlanView(
       : null;
 
   const templateLabel =
-    plan.template === "race_week"
-      ? "race week"
-      : plan.template.replace(/_/g, " ");
+    plan.template === "race_week" ? "race week" : plan.template.replace(/_/g, " ");
   const keyTypes: WorkoutType[] = ["long", "tempo", "interval", "race"];
 
   return {
@@ -235,10 +219,7 @@ function buildPlanView(
       day: s.day ?? "—",
       type: s.type,
       typeLabel: WORKOUT_TYPE_LABELS[s.type],
-      kmRange: formatKmRange(
-        round1(s.distanceKmRange[0]),
-        round1(s.distanceKmRange[1])
-      ),
+      kmRange: formatKmRange(round1(s.distanceKmRange[0]), round1(s.distanceKmRange[1])),
       goal: s.description,
       loadScore: estimateSessionLoad(s),
       isKey: keyTypes.includes(s.type),
@@ -248,7 +229,7 @@ function buildPlanView(
 
 function loadStateChips(
   fatigue: FatigueSnapshot,
-  history: DashboardInsights["loadHistory"]
+  history: DashboardInsights["loadHistory"],
 ): LoadStateChip[] {
   const chips: LoadStateChip[] = [];
   if (fatigue.label === "Fresh") chips.push("Fresh");
@@ -304,7 +285,7 @@ function z3z5Pct(analytics: DashboardInsights): number | null {
 function buildExplain(
   analytics: DashboardInsights,
   plan: WeekPlan,
-  related: Insight[]
+  related: Insight[],
 ): CoachingExplainView {
   const hrSupported = analytics.hrZones.reduce((s, z) => s + z.runCount, 0);
   const zPct = z3z5Pct(analytics);
@@ -318,7 +299,7 @@ function buildExplain(
   if (zPct !== null) basedOn.push(`Z3–Z5 share ~${zPct}% of HR-tagged efforts`);
   if (analytics.previousWeek) {
     basedOn.push(
-      `Last week ${formatKm(analytics.previousWeek.distanceKm)} (${analytics.previousWeek.runCount} runs)`
+      `Last week ${formatKm(analytics.previousWeek.distanceKm)} (${analytics.previousWeek.runCount} runs)`,
     );
   }
   plan.rationale.slice(0, 2).forEach((r) => basedOn.push(r));
@@ -343,11 +324,7 @@ function buildExplain(
   const top = related[0];
   const confidence = top?.confidence ?? analytics.dataConfidence;
   const confidenceLabel =
-    confidence === "high"
-      ? "High"
-      : confidence === "medium"
-        ? "Medium-high"
-        : "Medium";
+    confidence === "high" ? "High" : confidence === "medium" ? "Medium-high" : "Medium";
 
   return {
     confidenceLabel,
@@ -365,16 +342,12 @@ function buildExplain(
 
 export function buildTrainingPageView(
   analytics: DashboardInsights,
-  insights: Insight[] = []
+  insights: Insight[] = [],
 ): TrainingPageView {
   const related = trainingInsights(insights);
   const top = related[0];
-  const { classification, severity } = classifyState(
-    analytics.fatigue,
-    analytics
-  );
-  const readiness =
-    analytics.raceReadiness ?? analytics.halfMarathonReadiness;
+  const { classification, severity } = classifyState(analytics.fatigue, analytics);
+  const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const plan = analytics.nextWeekPlan;
   const loadSparkline = analytics.loadHistory.slice(-12).map((h) => h.ctl);
 
@@ -471,9 +444,7 @@ export function buildTrainingPageView(
             : "Stable",
       deltaPct: mom.pctChange,
       comparablePeriod:
-        mom.currentMonth && mom.priorMonth
-          ? `${mom.priorMonth} → ${mom.currentMonth}`
-          : null,
+        mom.currentMonth && mom.priorMonth ? `${mom.priorMonth} → ${mom.currentMonth}` : null,
       confidence: analytics.dataConfidence,
       trend: analytics.efficiencySummary.trend,
       chartData: analytics.efficiencyTrend.slice(-16).map((p) => ({
@@ -523,7 +494,7 @@ export function formatPlanForReport(plan: WeekPlan): string[] {
     ...plan.rationale.map((r) => `• ${r}`),
     ...plan.sessions.map(
       (s) =>
-        `• ${s.day ? s.day + ": " : ""}${WORKOUT_TYPE_LABELS[s.type]} — ${s.description} (${formatKmRange(s.distanceKmRange[0], s.distanceKmRange[1])})`
+        `• ${s.day ? s.day + ": " : ""}${WORKOUT_TYPE_LABELS[s.type]} — ${s.description} (${formatKmRange(s.distanceKmRange[0], s.distanceKmRange[1])})`,
     ),
   ];
   if (plan.warnings.length) {

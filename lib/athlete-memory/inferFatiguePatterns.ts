@@ -2,34 +2,24 @@ import type { DashboardInsights } from "@/lib/analytics";
 import { createBelief } from "./beliefUtils";
 import type { AthleteBelief } from "./types";
 
-export function inferFatiguePatterns(
-  analytics: DashboardInsights
-): AthleteBelief[] {
+export function inferFatiguePatterns(analytics: DashboardInsights): AthleteBelief[] {
   const out: AthleteBelief[] = [];
   const { fatigue, intensityAdvice } = analytics;
 
-  if (
-    intensityAdvice.status === "too_hard" ||
-    intensityAdvice.hardRunsLast14d >= 3
-  ) {
+  if (intensityAdvice.status === "too_hard" || intensityAdvice.hardRunsLast14d >= 3) {
     out.push(
       createBelief({
         id: "fatigue-hard-density",
         category: "fatigue",
-        statement:
-          "Freshness appears sensitive to hard-session density in a short window.",
+        statement: "Freshness appears sensitive to hard-session density in a short window.",
         evidence: [
           `${intensityAdvice.hardRunsLast14d} hard runs in 14 days`,
           intensityAdvice.recommendations[0] ?? "Intensity stacking signal",
           `TSB ${Math.round(fatigue.tsb)}`,
         ].filter(Boolean),
-        confidence:
-          intensityAdvice.hardRunsLast14d >= 4 && fatigue.tsb < -10
-            ? "medium"
-            : "low",
-        recommendedUse:
-          "Space quality sessions and cap hard days when planning the next week.",
-      })
+        confidence: intensityAdvice.hardRunsLast14d >= 4 && fatigue.tsb < -10 ? "medium" : "low",
+        recommendedUse: "Space quality sessions and cap hard days when planning the next week.",
+      }),
     );
   }
 
@@ -45,11 +35,9 @@ export function inferFatiguePatterns(
           `Freshness ${Math.round(fatigue.freshness)} (${fatigue.label})`,
         ],
         confidence: fatigue.tsb < -18 ? "medium" : "low",
-        counterEvidence:
-          fatigue.freshness >= 60 ? ["Freshness still moderate despite TSB"] : [],
-        recommendedUse:
-          "Bias plans toward recovery or maintenance until TSB improves.",
-      })
+        counterEvidence: fatigue.freshness >= 60 ? ["Freshness still moderate despite TSB"] : [],
+        recommendedUse: "Bias plans toward recovery or maintenance until TSB improves.",
+      }),
     );
   }
 
@@ -60,14 +48,10 @@ export function inferFatiguePatterns(
         category: "fatigue",
         statement:
           "When freshness is high, quality sessions tend to be absorbable without immediate regression.",
-        evidence: [
-          `Freshness ${Math.round(fatigue.freshness)}`,
-          `TSB ${Math.round(fatigue.tsb)}`,
-        ],
+        evidence: [`Freshness ${Math.round(fatigue.freshness)}`, `TSB ${Math.round(fatigue.tsb)}`],
         confidence: "low",
-        recommendedUse:
-          "Use fresh windows for one focused quality session, not stacked intensity.",
-      })
+        recommendedUse: "Use fresh windows for one focused quality session, not stacked intensity.",
+      }),
     );
   }
 

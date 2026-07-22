@@ -8,7 +8,7 @@ const PAUSE_PACE = 480;
 export function detectWorkoutOverlays(
   timeline: TimelinePoint[],
   laps: FitLap[],
-  workoutType?: string
+  workoutType?: string,
 ): OverlaySegment[] {
   const overlays: OverlaySegment[] = [];
   if (timeline.length < 4) return overlays;

@@ -3,13 +3,7 @@ import { ecosystemHeadline } from "@/lib/ecosystem/insights";
 import type { Insight } from "@/lib/insights/types";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
 import { topInsightForHome } from "@/lib/insights/generate";
-import {
-  formatDuration,
-  formatKm,
-  formatKmRange,
-  formatKmValue,
-  formatPace,
-} from "@/lib/utils";
+import { formatDuration, formatKm, formatKmRange, formatKmValue, formatPace } from "@/lib/utils";
 import { parseISO, isWithinInterval, endOfWeek, getDay } from "date-fns";
 import type { PanelSeverity } from "./panelCopy";
 import type { InsightConfidence } from "@/lib/insights/types";
@@ -148,7 +142,7 @@ function pctChange(current: number, previous: number): number | null {
 function estimateLoad(
   type: WorkoutType,
   lo?: number,
-  hi?: number
+  hi?: number,
 ): { loadScore: number; intensityPct: number } {
   const mid = lo != null && hi != null ? (lo + hi) / 2 : 6;
   const factor = LOAD_FACTOR[type];
@@ -163,8 +157,8 @@ function estimateLoad(
             ? 42
             : type === "recovery"
               ? 28
-              : 50) * factor
-    )
+              : 50) * factor,
+    ),
   );
   return {
     loadScore: Math.round(mid * factor * 10) / 10,
@@ -204,13 +198,9 @@ function bestWeekLabel(weeks: { distanceKm: number }[]): string | null {
   return null;
 }
 
-export function buildHeroView(
-  insights: Insight[],
-  analytics: DashboardInsights
-): HeroViewModel {
+export function buildHeroView(insights: Insight[], analytics: DashboardInsights): HeroViewModel {
   const top = topInsightForHome(insights);
-  const readiness =
-    analytics.raceReadiness ?? analytics.halfMarathonReadiness;
+  const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const loadSparkline = analytics.loadHistory.slice(-10).map((h) => h.ctl);
 
   const base = {
@@ -266,12 +256,7 @@ export function buildHeroView(
     title: readiness.label,
     interpretation: `${readiness.score}/100 readiness · ${analytics.consistencyScore.label} consistency · ${analytics.fatigue.label.toLowerCase()} recovery state.`,
     whyBullets: analytics.weeklyNarrative.bullets.slice(0, 2),
-    severity:
-      readiness.score >= 70
-        ? "positive"
-        : readiness.score >= 50
-          ? "neutral"
-          : "warning",
+    severity: readiness.score >= 70 ? "positive" : readiness.score >= 50 ? "neutral" : "warning",
   };
 }
 
@@ -280,15 +265,12 @@ export function buildKpis(analytics: DashboardInsights): KpiViewModel[] {
   const lastMonth = months.at(-1);
   const prevMonth = months.at(-2);
   const runDelta =
-    lastMonth && prevMonth
-      ? pctChange(lastMonth.runCount, prevMonth.runCount)
-      : null;
+    lastMonth && prevMonth ? pctChange(lastMonth.runCount, prevMonth.runCount) : null;
 
   const volWeeks = analytics.weeklyVolume;
   const weekRunCounts = volWeeks.slice(-10).map((w) => w.runCount);
   const weekKm = volWeeks.slice(-10).map((w) => w.distanceKm);
-  const volTrendUp =
-    weekKm.length >= 2 && weekKm.at(-1)! >= weekKm.at(-2)!;
+  const volTrendUp = weekKm.length >= 2 && weekKm.at(-1)! >= weekKm.at(-2)!;
   const bestLabel = bestWeekLabel(volWeeks);
 
   const lastPace = analytics.summary.avgPaceSecPerKm;
@@ -296,11 +278,9 @@ export function buildKpis(analytics: DashboardInsights): KpiViewModel[] {
     .slice(-10)
     .map((p) => p.paceSecPerKm ?? 0)
     .filter((v) => v > 0);
-  const paceTrendUp =
-    paceSpark.length >= 2 && paceSpark.at(-1)! <= paceSpark.at(-2)!;
+  const paceTrendUp = paceSpark.length >= 2 && paceSpark.at(-1)! <= paceSpark.at(-2)!;
 
-  const readiness =
-    analytics.raceReadiness ?? analytics.halfMarathonReadiness;
+  const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const ctlSpark = analytics.loadHistory.slice(-10).map((h) => h.ctl);
   const ctlUp = ctlSpark.length >= 2 && ctlSpark.at(-1)! >= ctlSpark.at(-2)!;
 
@@ -387,16 +367,12 @@ export function buildKpis(analytics: DashboardInsights): KpiViewModel[] {
   ];
 }
 
-function weekSessionsFromPlan(
-  plan: DashboardInsights["nextWeekPlan"]
-): WeekSessionChip[] {
+function weekSessionsFromPlan(plan: DashboardInsights["nextWeekPlan"]): WeekSessionChip[] {
   return plan.sessions.map((s, i) => {
     const [lo, hi] = s.distanceKmRange;
     const { loadScore, intensityPct } = estimateLoad(s.type, lo, hi);
     const dayStr = s.day ?? WEEKDAYS[i % 7];
-    const dayIndex = WEEKDAYS.indexOf(
-      dayStr.slice(0, 3) as (typeof WEEKDAYS)[number]
-    );
+    const dayIndex = WEEKDAYS.indexOf(dayStr.slice(0, 3) as (typeof WEEKDAYS)[number]);
     return {
       dayIndex: dayIndex >= 0 ? dayIndex : i,
       day: dayStr,
@@ -411,7 +387,7 @@ function weekSessionsFromPlan(
 
 function weekSessionsFromLabels(
   analytics: DashboardInsights,
-  weekStart: string
+  weekStart: string,
 ): WeekSessionChip[] {
   const start = parseISO(weekStart);
   const end = endOfWeek(start, { weekStartsOn: 1 });
@@ -439,15 +415,12 @@ export function buildThisWeekOps(analytics: DashboardInsights): WeekOpsViewModel
   const cw = analytics.currentWeek;
   const pw = analytics.previousWeek;
   const sessions = weekSessionsFromLabels(analytics, cw.weekStart);
-  const totalLoadScore = Math.round(
-    sessions.reduce((s, x) => s + x.loadScore, 0) * 10
-  ) / 10;
+  const totalLoadScore = Math.round(sessions.reduce((s, x) => s + x.loadScore, 0) * 10) / 10;
 
   return {
     weekLabel: cw.weekLabel,
     loadKm: Math.round(cw.distanceKm * 10) / 10,
-    loadDeltaPct:
-      pw && pw.distanceKm > 0 ? pctChange(cw.distanceKm, pw.distanceKm) : null,
+    loadDeltaPct: pw && pw.distanceKm > 0 ? pctChange(cw.distanceKm, pw.distanceKm) : null,
     runCount: cw.runCount,
     totalLoadScore,
     sessions,
@@ -459,9 +432,7 @@ export function buildNextWeekOps(analytics: DashboardInsights): WeekOpsViewModel
   const p = analytics.nextWeekPlan;
   const [lo, hi] = p.totalKmRange;
   const sessions = weekSessionsFromPlan(p);
-  const totalLoadScore = Math.round(
-    sessions.reduce((s, x) => s + x.loadScore, 0) * 10
-  ) / 10;
+  const totalLoadScore = Math.round(sessions.reduce((s, x) => s + x.loadScore, 0) * 10) / 10;
 
   return {
     weekLabel: p.weekLabel,
@@ -476,7 +447,7 @@ export function buildNextWeekOps(analytics: DashboardInsights): WeekOpsViewModel
 
 export function buildInsightRows(
   analytics: DashboardInsights,
-  insights: Insight[]
+  insights: Insight[],
 ): InsightRowViewModel[] {
   const rows: InsightRowViewModel[] = [];
   const z3 = runsAboveZ3(analytics);
@@ -515,10 +486,7 @@ export function buildInsightRows(
       summary: `${z3.count} of ${z3.total} HR runs spent above Z3`,
       whyItMatters:
         "Too much moderate-hard running blurs recovery — polarize with more true easy days.",
-      pills: [
-        `${z3.count} above Z3`,
-        `${Math.round((z3.count / z3.total) * 100)}% of HR runs`,
-      ],
+      pills: [`${z3.count} above Z3`, `${Math.round((z3.count / z3.total) * 100)}% of HR runs`],
       recommendation: "Cap intensity to 1–2 sessions this week; fill gaps with easy aerobic runs.",
       recommendationHref: "/training",
       trend: { text: "Z3+ elevated", positive: false },
@@ -604,7 +572,7 @@ export function buildInsightRows(
 
   const ecoHeadline = ecosystemHeadline(analytics.trainingEcosystem);
   const ecoInterference = analytics.trainingEcosystem.interferenceFlags.filter(
-    (f) => f.severity !== "low"
+    (f) => f.severity !== "low",
   );
   if (ecoHeadline && analytics.trainingEcosystem.totalContext.last28Days.nonRunSessions > 0) {
     rows.push({
@@ -630,9 +598,7 @@ export function buildInsightRows(
         text: ecoInterference.length > 0 ? "Interference" : "Ecosystem OK",
         positive: ecoInterference.length === 0,
       },
-      evidence: analytics.trainingEcosystem.supportSignals
-        .slice(0, 2)
-        .flatMap((s) => s.evidence),
+      evidence: analytics.trainingEcosystem.supportSignals.slice(0, 2).flatMap((s) => s.evidence),
     });
   }
 
@@ -671,9 +637,12 @@ export function buildInsightRows(
 
 export function buildProgressionView(
   analytics: DashboardInsights,
-  insights: Insight[]
+  insights: Insight[],
 ): ProgressionViewModel {
-  const prs = analytics.prTimeline.filter((p) => p.isNewPr).slice(-5).reverse();
+  const prs = analytics.prTimeline
+    .filter((p) => p.isNewPr)
+    .slice(-5)
+    .reverse();
   const achievements: AchievementItem[] = prs.map((p) => ({
     id: p.runId + p.bucket,
     title: `${p.label} PR`,
@@ -735,14 +704,11 @@ export function buildProgressionView(
     .map((p) => p.paceSecPerKm ?? 0)
     .filter((v) => v > 0);
 
-  const pacePositive =
-    paceData.length >= 2 && paceData.at(-1)! < paceData.at(-2)!;
-  const volPositive =
-    volumeData.length >= 2 && volumeData.at(-1)! >= volumeData.at(-2)!;
+  const pacePositive = paceData.length >= 2 && paceData.at(-1)! < paceData.at(-2)!;
+  const volPositive = volumeData.length >= 2 && volumeData.at(-1)! >= volumeData.at(-2)!;
   const effPositive =
     analytics.efficiencySummary.trend === "improving" ||
-    (efficiencyData.length >= 2 &&
-      efficiencyData.at(-1)! < efficiencyData.at(-2)!);
+    (efficiencyData.length >= 2 && efficiencyData.at(-1)! < efficiencyData.at(-2)!);
 
   const best = analytics.bestBlock;
   const trajectory =
@@ -779,16 +745,11 @@ export function buildProgressionView(
     achievements: achievements.slice(0, 5),
     milestones,
     trajectory,
-    bestBlock: best
-      ? `${formatKm(best.distanceKm)} · ${best.runCount} runs (${best.label})`
-      : null,
+    bestBlock: best ? `${formatKm(best.distanceKm)} · ${best.runCount} runs (${best.label})` : null,
     trends: {
       efficiency: {
         label: "Efficiency",
-        data:
-          efficiencyData.length >= 2
-            ? efficiencyData
-            : volumeData,
+        data: efficiencyData.length >= 2 ? efficiencyData : volumeData,
         positive: effPositive,
         caption: effPct != null ? `${effPct > 0 ? "+" : ""}${effPct}% MoM` : undefined,
       },
@@ -809,9 +770,7 @@ export function buildProgressionView(
 
 export const buildImprovementView = buildProgressionView;
 
-export function buildGoalMission(
-  analytics: DashboardInsights
-): GoalMissionViewModel {
+export function buildGoalMission(analytics: DashboardInsights): GoalMissionViewModel {
   const r = analytics.raceReadiness;
   const hm = analytics.halfMarathonReadiness;
 
@@ -819,9 +778,7 @@ export function buildGoalMission(
     {
       id: "endurance",
       label: "Endurance",
-      score: r
-        ? Math.min(100, Math.round(r.volumePct))
-        : Math.min(100, Math.round(hm.volumePct)),
+      score: r ? Math.min(100, Math.round(r.volumePct)) : Math.min(100, Math.round(hm.volumePct)),
     },
     {
       id: "pacing",
@@ -848,15 +805,11 @@ export function buildGoalMission(
       label: r.label,
       raceDate: r.raceDate,
       daysOut: r.daysUntilRace,
-      targetFinish: r.targetTimeSec
-        ? formatDuration(r.targetTimeSec)
-        : undefined,
+      targetFinish: r.targetTimeSec ? formatDuration(r.targetTimeSec) : undefined,
       probability: r.probabilityBand,
       confidence: analytics.dataConfidence,
       segments,
-      focusAreas: r.gaps.slice(0, 2).map(
-        (g) => `${g.metric}: ${g.current} → ${g.target}`
-      ),
+      focusAreas: r.gaps.slice(0, 2).map((g) => `${g.metric}: ${g.current} → ${g.target}`),
       href: "/goals",
     };
   }

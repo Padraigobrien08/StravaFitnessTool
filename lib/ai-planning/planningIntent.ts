@@ -103,7 +103,7 @@ function parseDayCount(text: string): number | undefined {
 }
 
 function parsePreference(
-  text: string
+  text: string,
 ): GenerateNextWeekPlanToolInput["planPreference"] | undefined {
   if (/\bconservative\b/i.test(text)) return "conservative";
   if (/\baggressive\b/i.test(text)) return "aggressive";
@@ -114,9 +114,7 @@ function parseRaceWeekHint(text: string): boolean {
   return /\brace week\b/i.test(text) || /\btaper plan\b/i.test(text);
 }
 
-export function parseToolInputFromMessage(
-  text: string
-): GenerateNextWeekPlanToolInput {
+export function parseToolInputFromMessage(text: string): GenerateNextWeekPlanToolInput {
   const args: GenerateNextWeekPlanToolInput = {};
   const pref = parsePreference(text);
   if (pref) args.planPreference = pref;
@@ -130,10 +128,7 @@ export function parseToolInputFromMessage(
     ];
   }
   if (parseRaceWeekHint(text)) {
-    args.constraints = [
-      ...(args.constraints ?? []),
-      "Focus on race-week or taper structure",
-    ];
+    args.constraints = [...(args.constraints ?? []), "Focus on race-week or taper structure"];
   }
   if (/\bhm\b|half marathon|half-marathon/i.test(text)) {
     args.constraints = [...(args.constraints ?? []), "Half marathon goal context"];
@@ -147,10 +142,7 @@ export function parseToolInputFromMessage(
   return args;
 }
 
-export function classifyPlanningMessage(
-  text: string,
-  hasPreviousPlan: boolean
-): PlanningRoute {
+export function classifyPlanningMessage(text: string, hasPreviousPlan: boolean): PlanningRoute {
   const t = text.trim();
   if (!t) return null;
 

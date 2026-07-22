@@ -32,7 +32,7 @@ export interface StravaActivityZone {
 
 export async function fetchAthleteStats(
   accessToken: string,
-  athleteId: number
+  athleteId: number,
 ): Promise<StravaActivityStats> {
   const res = await fetch(`${STRAVA_API_BASE}/athletes/${athleteId}/stats`, {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -44,9 +44,7 @@ export async function fetchAthleteStats(
   return res.json() as Promise<StravaActivityStats>;
 }
 
-export async function fetchAthleteZones(
-  accessToken: string
-): Promise<StravaActivityZone[]> {
+export async function fetchAthleteZones(accessToken: string): Promise<StravaActivityZone[]> {
   const res = await fetch(`${STRAVA_API_BASE}/athlete/zones`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });

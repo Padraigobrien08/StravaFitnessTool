@@ -6,7 +6,7 @@ import type { LongitudinalComparison } from "./types";
 
 export function compareCurrentToStrongestBlock(
   bundle: AthleteIntelligenceBundle,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): LongitudinalComparison | null {
   const ctx = buildReasoningContext(bundle, raceGoal);
   const result = findBestPhase(ctx, { metric: "aerobic" });
@@ -40,7 +40,7 @@ export function compareCurrentToStrongestBlock(
 
 export function compareTaperToHistory(
   bundle: AthleteIntelligenceBundle,
-  _raceGoal: RaceGoal | null
+  _raceGoal: RaceGoal | null,
 ): LongitudinalComparison | null {
   const analytics = bundle.analytics;
   const r = analytics.raceReadiness;
@@ -58,17 +58,14 @@ export function compareTaperToHistory(
     summary,
     currentLabel: `Race −${r.daysUntilRace}d`,
     referenceLabel: "Prior build phase",
-    evidence: [
-      `Freshness ${Math.round(freshness)}`,
-      `TSB ${Math.round(analytics.fatigue.tsb)}`,
-    ],
+    evidence: [`Freshness ${Math.round(freshness)}`, `TSB ${Math.round(analytics.fatigue.tsb)}`],
     confidence: r.daysUntilRace <= 10 ? "medium" : "low",
   };
 }
 
 export function buildLongitudinalComparisons(
   bundle: AthleteIntelligenceBundle,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): LongitudinalComparison[] {
   const out: LongitudinalComparison[] = [];
   const block = compareCurrentToStrongestBlock(bundle, raceGoal);

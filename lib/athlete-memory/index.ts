@@ -29,7 +29,7 @@ export { classifyMemoryQuestion } from "./memoryIntent";
 
 /** Display adapter for Intelligence tiles (legacy MemorySnippet shape). */
 export function beliefsToMemoryDisplay(
-  beliefs: import("./types").AthleteBelief[]
+  beliefs: import("./types").AthleteBelief[],
 ): import("@/lib/coach/memorySnippets").MemorySnippet[] {
   return beliefs.map((b) => ({
     id: b.id,

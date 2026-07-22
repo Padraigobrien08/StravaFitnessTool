@@ -1,8 +1,4 @@
-import {
-  OperationalDashboard,
-  OpsWeekRow,
-  OpsIntelRow,
-} from "./operational-dashboard";
+import { OperationalDashboard, OpsWeekRow, OpsIntelRow } from "./operational-dashboard";
 import { DashboardPanel } from "./dashboard-panel";
 
 function Bone({ className }: { className?: string }) {

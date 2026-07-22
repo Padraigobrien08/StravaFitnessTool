@@ -3,15 +3,17 @@ import type { CoachingConstraints } from "./types";
 
 export function buildConstraints(
   insights: DashboardInsights,
-  maxWeeklyKm?: number
+  maxWeeklyKm?: number,
 ): CoachingConstraints {
   const notes: string[] = [];
   const days = insights.raceReadiness?.daysUntilRace;
   const raceWeek = days != null && days <= 7 && days >= 0;
   const tapering =
     raceWeek ||
-    (days != null && days <= 21 && insights.currentWeek.distanceKm <
-      (insights.previousWeek?.distanceKm ?? insights.currentWeek.distanceKm));
+    (days != null &&
+      days <= 21 &&
+      insights.currentWeek.distanceKm <
+        (insights.previousWeek?.distanceKm ?? insights.currentWeek.distanceKm));
 
   if (raceWeek) {
     notes.push("Race week — prioritize freshness over load accumulation.");

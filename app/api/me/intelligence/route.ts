@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
         bundle.analytics,
         bundle.insights,
         bundle.quality,
-        resolved.raceGoal ?? null
+        resolved.raceGoal ?? null,
       );
       return NextResponse.json(
         wrapIntelligence(
@@ -37,8 +37,8 @@ export async function GET(req: NextRequest) {
             insightCount: bundle.insights.length,
             runCount: bundle.quality.runCount,
           },
-          bundle.quality
-        )
+          bundle.quality,
+        ),
       );
     }
 
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     if (!toolName) {
       return NextResponse.json(
         { error: `Unknown section. Use: brief, full, ${Object.keys(toolMap).join(", ")}` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

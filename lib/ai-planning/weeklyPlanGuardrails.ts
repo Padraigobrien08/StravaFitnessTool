@@ -33,9 +33,7 @@ function inferPlanType(context: CoachingContext): WeeklyPlanType {
   return "maintain";
 }
 
-export function computeWeeklyPlanGuardrails(
-  context: CoachingContext
-): WeeklyPlanGuardrails {
+export function computeWeeklyPlanGuardrails(context: CoachingContext): WeeklyPlanGuardrails {
   const weekStart = nextPlanWeekStart();
   const daysUntilRace = context.goal?.daysUntilRace;
   const raceWeek =
@@ -77,18 +75,17 @@ export function computeWeeklyPlanGuardrails(
     maxVolumeIncreasePct = -20;
   }
 
-  let maxWeeklyRunKm = Math.round(
-    Math.min(
-      context.constraints.maxWeeklyVolumeKm ?? baselineKm * 1.15,
-      baselineKm * (1 + maxVolumeIncreasePct / 100)
-    ) * 10
-  ) / 10;
+  let maxWeeklyRunKm =
+    Math.round(
+      Math.min(
+        context.constraints.maxWeeklyVolumeKm ?? baselineKm * 1.15,
+        baselineKm * (1 + maxVolumeIncreasePct / 100),
+      ) * 10,
+    ) / 10;
 
   if (raceWeek && context.goal?.distanceMeters) {
     const raceKm = context.goal.distanceMeters / 1000;
-    maxWeeklyRunKm = Math.round(
-      Math.max(maxWeeklyRunKm, raceKm + 14) * 10
-    ) / 10;
+    maxWeeklyRunKm = Math.round(Math.max(maxWeeklyRunKm, raceKm + 14) * 10) / 10;
   }
 
   const minWeeklyRunKm =

@@ -2,13 +2,7 @@
 
 import type { CoachContextSnapshot } from "@/lib/coach/types";
 import { cn } from "@/lib/utils";
-import {
-  AlertTriangle,
-  Gauge,
-  Layers,
-  Target,
-  TrendingUp,
-} from "lucide-react";
+import { AlertTriangle, Gauge, Layers, Target, TrendingUp } from "lucide-react";
 
 const adaptColors = {
   improving: "text-teal-400",
@@ -23,11 +17,7 @@ const riskColors = {
   elevated: "border-red-500/25 text-red-300/90",
 };
 
-export function CoachOperationalStrip({
-  snapshot,
-}: {
-  snapshot: CoachContextSnapshot;
-}) {
+export function CoachOperationalStrip({ snapshot }: { snapshot: CoachContextSnapshot }) {
   return (
     <div className="coach-ops-strip shrink-0 border-b border-white/[0.05] bg-[#08090c]/90 px-3 py-2.5">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px]">
@@ -36,15 +26,13 @@ export function CoachOperationalStrip({
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400/50 opacity-60" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-teal-400" />
           </span>
-          <span className="truncate font-medium text-zinc-300">
-            {snapshot.currentFocus}
-          </span>
+          <span className="truncate font-medium text-zinc-300">{snapshot.currentFocus}</span>
         </div>
 
         <span
           className={cn(
             "inline-flex items-center gap-1 rounded border px-2 py-0.5",
-            adaptColors[snapshot.adaptationTrend]
+            adaptColors[snapshot.adaptationTrend],
           )}
         >
           <TrendingUp className="h-3 w-3" />
@@ -54,7 +42,7 @@ export function CoachOperationalStrip({
         <span
           className={cn(
             "inline-flex items-center gap-1 rounded border px-2 py-0.5",
-            riskColors[snapshot.riskLevel]
+            riskColors[snapshot.riskLevel],
           )}
         >
           <AlertTriangle className="h-3 w-3" />

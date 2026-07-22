@@ -55,7 +55,7 @@ export function CoachReasoningWorkspace({
       setSidebarOpen(false);
       void thread.send(domain.suggestedQuery);
     },
-    [thread]
+    [thread],
   );
 
   const showSidebar = intel.state && !intel.loading;
@@ -71,27 +71,16 @@ export function CoachReasoningWorkspace({
               onClick={() => setSidebarOpen((o) => !o)}
               aria-label={sidebarOpen ? "Close threads" : "Open threads"}
             >
-              {sidebarOpen ? (
-                <X className="h-4 w-4" />
-              ) : (
-                <Menu className="h-4 w-4" />
-              )}
+              {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           ) : null}
           <div className="min-w-0">
-            <h1 className="font-display text-sm font-bold text-zinc-100 sm:text-base">
-              Coach
-            </h1>
-            <p className="truncate text-[12px] text-zinc-600">
-              Training investigations
-            </p>
+            <h1 className="font-display text-sm font-bold text-zinc-100 sm:text-base">Coach</h1>
+            <p className="truncate text-[12px] text-zinc-600">Training investigations</p>
           </div>
         </div>
         <div className="hidden shrink-0 items-center gap-2 text-[10px] text-zinc-600 sm:flex">
-          <Link
-            href={intelligenceUrl()}
-            className="hover:text-teal-400/80 hover:underline"
-          >
+          <Link href={intelligenceUrl()} className="hover:text-teal-400/80 hover:underline">
             Intelligence
           </Link>
           <span className="text-zinc-800">·</span>
@@ -124,7 +113,7 @@ export function CoachReasoningWorkspace({
               "z-40 lg:relative lg:z-auto",
               sidebarOpen
                 ? "fixed inset-y-0 left-0 flex max-w-[85vw] shadow-2xl lg:static lg:max-w-none lg:shadow-none"
-                : "hidden lg:flex"
+                : "hidden lg:flex",
             )}
             threads={thread.threads}
             activeId={thread.activeId}

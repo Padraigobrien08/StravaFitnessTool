@@ -36,8 +36,7 @@ export function IntelligenceHero({
           {metaLine ? <span className="text-muted-foreground/80"> · {metaLine}</span> : null}
         </p>
         <p className="type-caption">
-          System confidence:{" "}
-          <span className="text-zinc-400">{confidence.level}</span>
+          System confidence: <span className="text-zinc-400">{confidence.level}</span>
           <span className="text-zinc-700"> — {confidence.reason}</span>
         </p>
       </div>
@@ -76,9 +75,7 @@ export function IntelligenceHero({
             </div>
           ) : null}
 
-          {trustLine ? (
-            <p className="text-[10px] text-zinc-700">{trustLine}</p>
-          ) : null}
+          {trustLine ? <p className="text-[10px] text-zinc-700">{trustLine}</p> : null}
 
           <div className="flex flex-wrap gap-2 pt-1">
             <Link
@@ -96,10 +93,7 @@ export function IntelligenceHero({
               Ask Coach
             </Link>
             <Link
-              href={topicCoachLink(
-                "readiness-change",
-                "Why did my readiness change this week?"
-              )}
+              href={topicCoachLink("readiness-change", "Why did my readiness change this week?")}
               className="rounded-lg px-3 py-1.5 text-[12px] text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
             >
               Investigate readiness

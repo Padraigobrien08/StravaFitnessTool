@@ -18,9 +18,7 @@ const intensityStyles: Record<string, string> = {
 
 type PatchFn = (
   id: string,
-  patch: Partial<
-    Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">
-  >
+  patch: Partial<Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">>,
 ) => void;
 
 type BoardVariant = "full" | "compact";
@@ -95,7 +93,7 @@ export function PlanWeekBoard({
       setDragId(null);
       setDropTargetId(null);
     },
-    [dragId, onSwapWorkouts]
+    [dragId, onSwapWorkouts],
   );
 
   const sharedDayProps = {
@@ -130,9 +128,7 @@ export function PlanWeekBoard({
             highlighted={highlightWorkoutIds.includes(w.id)}
             editing={editId === w.id}
             expanded={expandedId === w.id}
-            onToggleExpand={() =>
-              setExpandedId((id) => (id === w.id ? null : w.id))
-            }
+            onToggleExpand={() => setExpandedId((id) => (id === w.id ? null : w.id))}
             onEdit={() => setEditId(w.id)}
             {...sharedDayProps}
           />
@@ -157,9 +153,7 @@ export function PlanWeekBoard({
               showWhy={styles.showWhy}
               titleClass={styles.titleClass}
               onEdit={() => setEditId(workout.id)}
-              onToggleExpand={() =>
-                setExpandedId((id) => (id === workout.id ? null : workout.id))
-              }
+              onToggleExpand={() => setExpandedId((id) => (id === workout.id ? null : workout.id))}
               onCloseEdit={() => setEditId(null)}
               onPatch={onPatchWorkout}
               onDelete={onDeleteWorkout}
@@ -262,7 +256,7 @@ function DayBoardColumn({
         isRest && restMinH,
         isDragging && "opacity-50",
         isDropTarget && "scale-[1.02] ring-2 ring-teal-400/60",
-        canDrag && "cursor-grab active:cursor-grabbing"
+        canDrag && "cursor-grab active:cursor-grabbing",
       )}
     >
       <div className="mb-1 flex items-center justify-between gap-0.5">
@@ -303,9 +297,7 @@ function DayBoardColumn({
       ) : null}
 
       {showWhy && expanded && !isRest ? (
-        <p className="mt-1 text-[9px] leading-snug text-zinc-500">
-          {w.reasoning ?? w.purpose}
-        </p>
+        <p className="mt-1 text-[9px] leading-snug text-zinc-500">{w.reasoning ?? w.purpose}</p>
       ) : null}
 
       {editing && editable ? (
@@ -350,15 +342,13 @@ function DayBoardCard({
         "rounded-lg border px-3 py-2",
         intensityStyles[w.intensity] ?? intensityStyles.easy,
         highlighted && "ring-2 ring-amber-400/50",
-        isToday && "ring-1 ring-teal-500/35"
+        isToday && "ring-1 ring-teal-500/35",
       )}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-medium text-zinc-500">
           {w.day} · {w.date.slice(5)}
-          {isToday ? (
-            <span className="ml-1 text-teal-500/80">· today</span>
-          ) : null}
+          {isToday ? <span className="ml-1 text-teal-500/80">· today</span> : null}
         </span>
         {editable && w.modality !== "rest" ? (
           <button type="button" className="text-[10px] text-zinc-600" onClick={onEdit}>
@@ -408,7 +398,7 @@ function WorkoutBoardBody({
         className={cn(
           "font-semibold leading-tight",
           titleClass,
-          isRest ? "text-zinc-600" : race ? "text-teal-200" : "text-zinc-100"
+          isRest ? "text-zinc-600" : race ? "text-teal-200" : "text-zinc-100",
         )}
       >
         {w.title}
@@ -420,12 +410,8 @@ function WorkoutBoardBody({
             {w.distanceKm != null && w.durationMin != null ? " · " : null}
             {w.durationMin != null ? `${w.durationMin} min` : null}
           </p>
-          <p className="mt-1 line-clamp-2 text-[9px] leading-snug text-zinc-600">
-            {w.purpose}
-          </p>
-          {emphasis ? (
-            <p className="mt-1 text-[9px] text-teal-500/70">{emphasis}</p>
-          ) : null}
+          <p className="mt-1 line-clamp-2 text-[9px] leading-snug text-zinc-600">{w.purpose}</p>
+          {emphasis ? <p className="mt-1 text-[9px] text-teal-500/70">{emphasis}</p> : null}
         </>
       ) : (
         <p className="mt-0.5 text-[9px] text-zinc-700">Recovery</p>
@@ -475,9 +461,7 @@ function EditPanel({
   onDelete?: (id: string) => void;
 }) {
   const [title, setTitle] = useState(w.title);
-  const [distanceKm, setDistanceKm] = useState(
-    w.distanceKm != null ? String(w.distanceKm) : ""
-  );
+  const [distanceKm, setDistanceKm] = useState(w.distanceKm != null ? String(w.distanceKm) : "");
 
   return (
     <div className="mt-2 space-y-2 border-t border-[var(--border-subtle)] pt-2">

@@ -23,9 +23,7 @@ export function IntelligenceRecentlyLearned({
   return (
     <section className="rounded-lg border border-teal-500/12 bg-teal-500/[0.03] px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] font-medium text-zinc-500">
-          What the system recently learned
-        </p>
+        <p className="text-[11px] font-medium text-zinc-500">What the system recently learned</p>
         <Link
           href={coachUrl({ q: "What have you learned about me recently?" })}
           className="text-[10px] text-zinc-600 hover:text-zinc-400"
@@ -35,10 +33,7 @@ export function IntelligenceRecentlyLearned({
       </div>
       <ul className="mt-2 space-y-1.5">
         {visible.map((item) => (
-          <li
-            key={item.slice(0, 48)}
-            className="flex gap-2 text-[12px] leading-snug text-zinc-400"
-          >
+          <li key={item.slice(0, 48)} className="flex gap-2 text-[12px] leading-snug text-zinc-400">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500/50" />
             {item}
           </li>

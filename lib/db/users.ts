@@ -10,15 +10,11 @@ export async function createUser(): Promise<string> {
   return row.id;
 }
 
-export async function findUserByStravaAthleteId(
-  stravaAthleteId: number
-): Promise<string | null> {
+export async function findUserByStravaAthleteId(stravaAthleteId: number): Promise<string | null> {
   return findUserIdByStravaAthleteId(stravaAthleteId);
 }
 
-export async function findUserIdByStravaAthleteId(
-  stravaAthleteId: number
-): Promise<string | null> {
+export async function findUserIdByStravaAthleteId(stravaAthleteId: number): Promise<string | null> {
   const sql = getSql();
   const rows = await sql`
     SELECT user_id FROM strava_connections

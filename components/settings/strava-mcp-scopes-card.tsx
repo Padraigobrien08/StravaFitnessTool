@@ -13,11 +13,9 @@ export function StravaMcpScopesCard({ connected }: { connected: boolean }) {
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
         <p className="text-zinc-400">
-          The built-in StrideIQ MCP server uses your app OAuth token — connect
-          Strava here, then configure Claude/Cursor with{" "}
-          <code className="text-zinc-300">STRIDEIQ_API_KEY</code>. See{" "}
-          <span className="text-emerald-400">docs/MCP_INTEGRATION.md</span>
-          .
+          The built-in StrideIQ MCP server uses your app OAuth token — connect Strava here, then
+          configure Claude/Cursor with <code className="text-zinc-300">STRIDEIQ_API_KEY</code>. See{" "}
+          <span className="text-emerald-400">docs/MCP_INTEGRATION.md</span>.
         </p>
         <p className="text-zinc-500">
           Status:{" "}
@@ -27,8 +25,7 @@ export function StravaMcpScopesCard({ connected }: { connected: boolean }) {
           {connected && (
             <>
               {" "}
-              · Scopes requested:{" "}
-              <code className="text-zinc-400">{DEFAULT_STRAVA_SCOPES}</code>
+              · Scopes requested: <code className="text-zinc-400">{DEFAULT_STRAVA_SCOPES}</code>
             </>
           )}
         </p>
@@ -40,9 +37,7 @@ export function StravaMcpScopesCard({ connected }: { connected: boolean }) {
               <li key={g.scope} className="rounded-lg border border-zinc-800 p-3">
                 <p className="font-mono text-xs text-emerald-400/90">{g.scope}</p>
                 <p className="mt-1 text-zinc-500">{g.description}</p>
-                <p className="mt-2 text-xs text-zinc-600">
-                  Tools: {g.tools.join(", ")}
-                </p>
+                <p className="mt-2 text-xs text-zinc-600">Tools: {g.tools.join(", ")}</p>
               </li>
             ))}
           </ul>

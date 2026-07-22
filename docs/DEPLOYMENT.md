@@ -6,11 +6,11 @@ StrideIQ is a Next.js 16 app. Production hosting is designed around **Vercel** f
 
 ## Prerequisites
 
-| Service | Purpose |
-|---------|---------|
-| [Vercel](https://vercel.com) | Host Next.js (`app/`, API routes) |
-| [Neon](https://neon.tech) | Postgres for activities, sessions, coach threads |
-| [Strava API app](https://www.strava.com/settings/api) | OAuth + optional webhooks |
+| Service                                               | Purpose                                          |
+| ----------------------------------------------------- | ------------------------------------------------ |
+| [Vercel](https://vercel.com)                          | Host Next.js (`app/`, API routes)                |
+| [Neon](https://neon.tech)                             | Postgres for activities, sessions, coach threads |
+| [Strava API app](https://www.strava.com/settings/api) | OAuth + optional webhooks                        |
 
 Local-only (export CSV) builds do **not** require Neon or Strava API keys.
 
@@ -35,27 +35,27 @@ Local-only (export CSV) builds do **not** require Neon or Strava API keys.
 
 In [Strava → My API Application](https://www.strava.com/settings/api):
 
-| Field | Production value |
-|-------|------------------|
+| Field                             | Production value                                                 |
+| --------------------------------- | ---------------------------------------------------------------- |
 | **Authorization Callback Domain** | Your Vercel hostname only (e.g. `strideiq.vercel.app`) — no path |
-| **Website** | Marketing URL or repo (optional) |
+| **Website**                       | Marketing URL or repo (optional)                                 |
 
 Environment variables (Vercel → Settings → Environment Variables):
 
-| Variable | Example (production) |
-|----------|----------------------|
-| `STRAVA_CLIENT_ID` | From Strava app |
-| `STRAVA_CLIENT_SECRET` | From Strava app |
-| `STRAVA_REDIRECT_URI` | `https://YOUR_DOMAIN/api/auth/strava/callback` |
+| Variable               | Example (production)                           |
+| ---------------------- | ---------------------------------------------- |
+| `STRAVA_CLIENT_ID`     | From Strava app                                |
+| `STRAVA_CLIENT_SECRET` | From Strava app                                |
+| `STRAVA_REDIRECT_URI`  | `https://YOUR_DOMAIN/api/auth/strava/callback` |
 
 **Must match exactly** what Strava accepts for the callback domain + path.
 
 ### Webhooks (optional auto-sync)
 
-| Variable | Value |
-|----------|--------|
+| Variable                      | Value                                                      |
+| ----------------------------- | ---------------------------------------------------------- |
 | `STRAVA_WEBHOOK_VERIFY_TOKEN` | Random string you choose (Strava subscription + challenge) |
-| `STRAVA_WEBHOOK_CALLBACK_URL` | `https://YOUR_DOMAIN/api/webhooks/strava` |
+| `STRAVA_WEBHOOK_CALLBACK_URL` | `https://YOUR_DOMAIN/api/webhooks/strava`                  |
 
 After deploy:
 
@@ -79,26 +79,26 @@ Strava will send `GET` challenge and `POST` activity events to `/api/webhooks/st
 
 Copy from [`.env.example`](../.env.example). Minimum for **full** MVP:
 
-| Variable | Required | Notes |
-|----------|----------|--------|
-| `DATABASE_URL` | OAuth / Coach | Neon pooled URL |
-| `SESSION_SECRET` | OAuth / Coach | `openssl rand -hex 32` |
-| `STRAVA_CLIENT_ID` | OAuth | |
-| `STRAVA_CLIENT_SECRET` | OAuth | |
-| `STRAVA_REDIRECT_URI` | OAuth | Production callback URL |
-| `OPENAI_API_KEY` | Coach + AI plan | Or `ANTHROPIC_API_KEY` |
-| `STRAVA_WEBHOOK_VERIFY_TOKEN` | Webhooks | Optional |
-| `STRAVA_WEBHOOK_CALLBACK_URL` | Webhooks | Optional |
+| Variable                      | Required        | Notes                   |
+| ----------------------------- | --------------- | ----------------------- |
+| `DATABASE_URL`                | OAuth / Coach   | Neon pooled URL         |
+| `SESSION_SECRET`              | OAuth / Coach   | `openssl rand -hex 32`  |
+| `STRAVA_CLIENT_ID`            | OAuth           |                         |
+| `STRAVA_CLIENT_SECRET`        | OAuth           |                         |
+| `STRAVA_REDIRECT_URI`         | OAuth           | Production callback URL |
+| `OPENAI_API_KEY`              | Coach + AI plan | Or `ANTHROPIC_API_KEY`  |
+| `STRAVA_WEBHOOK_VERIFY_TOKEN` | Webhooks        | Optional                |
+| `STRAVA_WEBHOOK_CALLBACK_URL` | Webhooks        | Optional                |
 
 Optional:
 
-| Variable | Purpose |
-|----------|---------|
-| `OPENAI_MODEL` | Coach model (default `gpt-4o-mini`) |
-| `OPENAI_WEEKLY_PLAN_MODEL` | Weekly plan generation |
-| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | Coach fallback |
-| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` | MCP / automation |
-| `NEXT_PUBLIC_FORECAST_LAB=1` | Expose `/dev/forecast-lab` in production |
+| Variable                                        | Purpose                                  |
+| ----------------------------------------------- | ---------------------------------------- |
+| `OPENAI_MODEL`                                  | Coach model (default `gpt-4o-mini`)      |
+| `OPENAI_WEEKLY_PLAN_MODEL`                      | Weekly plan generation                   |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL`         | Coach fallback                           |
+| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` | MCP / automation                         |
+| `NEXT_PUBLIC_FORECAST_LAB=1`                    | Expose `/dev/forecast-lab` in production |
 
 Apply to **Production** (and Preview if you want OAuth on preview deployments — use a separate Strava callback or ngrok for previews).
 

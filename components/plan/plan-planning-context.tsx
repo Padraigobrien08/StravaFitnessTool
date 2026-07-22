@@ -10,10 +10,7 @@ import {
   PLAN_CONTEXT_MAX_CHARS,
   PLAN_CONTEXT_SUGGESTIONS,
 } from "@/lib/plan/planContextConstants";
-import {
-  loadPlanContextDraft,
-  savePlanContextDraft,
-} from "@/lib/plan/planContextStorage";
+import { loadPlanContextDraft, savePlanContextDraft } from "@/lib/plan/planContextStorage";
 import { cn } from "@/lib/utils";
 
 export function PlanPlanningContext({
@@ -48,7 +45,7 @@ export function PlanPlanningContext({
       onChange(next.slice(0, PLAN_CONTEXT_MAX_CHARS));
       setExpanded(true);
     },
-    [value, onChange]
+    [value, onChange],
   );
 
   const chars = value.length;
@@ -58,7 +55,7 @@ export function PlanPlanningContext({
     <section
       className={cn(
         "rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-subdued)]/50 p-3",
-        className
+        className,
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -68,8 +65,8 @@ export function PlanPlanningContext({
             <span className="ml-1.5 font-normal text-zinc-600">(optional)</span>
           </p>
           <p className="mt-0.5 max-w-xl text-[11px] text-zinc-600">
-            Tell the planner what this week is about — post-race recovery, travel,
-            no goal, returning from break, etc.
+            Tell the planner what this week is about — post-race recovery, travel, no goal,
+            returning from break, etc.
           </p>
         </div>
         <Button
@@ -102,14 +99,8 @@ export function PlanPlanningContext({
       />
 
       <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
-        <p
-          className={cn(
-            "text-[10px]",
-            nearLimit ? "text-amber-400/80" : "text-zinc-600"
-          )}
-        >
-          {chars.toLocaleString()} / {PLAN_CONTEXT_MAX_CHARS.toLocaleString()}{" "}
-          characters
+        <p className={cn("text-[10px]", nearLimit ? "text-amber-400/80" : "text-zinc-600")}>
+          {chars.toLocaleString()} / {PLAN_CONTEXT_MAX_CHARS.toLocaleString()} characters
         </p>
       </div>
 

@@ -32,8 +32,7 @@ import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 
 export default function SettingsPage() {
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
-  const { clearData, importData, dataSources, dataSourceLabel, apiConnected } =
-    useStrava();
+  const { clearData, importData, dataSources, dataSourceLabel, apiConnected } = useStrava();
   const { quality } = useTrainingIntelligence();
   const {
     distanceUnit,
@@ -56,8 +55,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="type-body-muted">
-            Choose light or dark mode. Charts, maps, and panels adapt to your
-            selection.
+            Choose light or dark mode. Charts, maps, and panels adapt to your selection.
           </p>
           <ThemeSegmentedControl />
         </CardContent>
@@ -69,22 +67,16 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-zinc-400">
           <p>
-            Summary runs live in localStorage (export and/or API merge). Stream
-            and lap detail live in IndexedDB (FIT upload or Strava API). We
-            never load your email from profile.csv.
+            Summary runs live in localStorage (export and/or API merge). Stream and lap detail live
+            in IndexedDB (FIT upload or Strava API). We never load your email from profile.csv.
           </p>
           {importData && (
             <ul className="list-inside list-disc space-y-1 text-zinc-500">
               <li>
-                Data: {dataSourceLabel ?? "loaded"} — {importData.runs.length}{" "}
-                runs
+                Data: {dataSourceLabel ?? "loaded"} — {importData.runs.length} runs
               </li>
-              <li>
-                Strava API: {apiConnected ? "connected" : "not connected"}
-              </li>
-              <li>
-                Local export file: {dataSources.localExport ? "yes" : "no"}
-              </li>
+              <li>Strava API: {apiConnected ? "connected" : "not connected"}</li>
+              <li>Local export file: {dataSources.localExport ? "yes" : "no"}</li>
             </ul>
           )}
           <div className="flex flex-wrap gap-3">
@@ -95,11 +87,7 @@ export default function SettingsPage() {
             </Link>
             {importData && (
               <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setClearDialogOpen(true)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => setClearDialogOpen(true)}>
                   Clear all data & disconnect
                 </Button>
                 <Dialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
@@ -107,16 +95,12 @@ export default function SettingsPage() {
                     <DialogHeader>
                       <DialogTitle>Clear all data?</DialogTitle>
                       <DialogDescription>
-                        This removes your local runs, plans, and disconnects
-                        Strava from this browser. You can import again later.
+                        This removes your local runs, plans, and disconnects Strava from this
+                        browser. You can import again later.
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="gap-2 sm:gap-0">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setClearDialogOpen(false)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => setClearDialogOpen(false)}>
                         Cancel
                       </Button>
                       <Button
@@ -159,9 +143,7 @@ export default function SettingsPage() {
               min={1}
               max={7}
               value={defaultWeeklyRuns}
-              onChange={(e) =>
-                setDefaultWeeklyRuns(Number(e.target.value) || 3)
-              }
+              onChange={(e) => setDefaultWeeklyRuns(Number(e.target.value) || 3)}
             />
           </div>
           <div className="space-y-2">
@@ -188,10 +170,7 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label className="text-zinc-500">Distance</Label>
-            <Select
-              value={distanceUnit}
-              onValueChange={(v) => setDistanceUnit(v as "km" | "mi")}
-            >
+            <Select value={distanceUnit} onValueChange={(v) => setDistanceUnit(v as "km" | "mi")}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -203,12 +182,7 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2">
             <Label className="text-zinc-500">Pace</Label>
-            <Select
-              value={paceUnit}
-              onValueChange={(v) =>
-                setPaceUnit(v as "min/km" | "min/mi")
-              }
-            >
+            <Select value={paceUnit} onValueChange={(v) => setPaceUnit(v as "min/km" | "min/mi")}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -219,8 +193,7 @@ export default function SettingsPage() {
             </Select>
           </div>
           <p className="text-xs text-zinc-600">
-            Unit conversion on charts is coming in the next release; preference is
-            saved now.
+            Unit conversion on charts is coming in the next release; preference is saved now.
           </p>
         </CardContent>
       </Card>

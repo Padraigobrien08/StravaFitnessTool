@@ -23,18 +23,12 @@ const HM_KM = 21.0975;
 const TYPICAL_4WK_HM_KM = 160;
 
 /** Longest run as % of official race distance (not the shorter training long-run benchmark). */
-export function longRunPercentOfRace(
-  longestKm: number,
-  raceDistanceKm: number
-): number {
+export function longRunPercentOfRace(longestKm: number, raceDistanceKm: number): number {
   if (raceDistanceKm <= 0) return 0;
   return Math.round(Math.min(100, (longestKm / raceDistanceKm) * 100));
 }
 
-export function formatLongRunVsRace(
-  longestKm: number,
-  raceDistanceKm: number
-): string {
+export function formatLongRunVsRace(longestKm: number, raceDistanceKm: number): string {
   const pct = longRunPercentOfRace(longestKm, raceDistanceKm);
   return `${longestKm.toFixed(1)} km (${pct}% of ${raceDistanceKm.toFixed(1)} km race)`;
 }
@@ -129,10 +123,7 @@ function probabilityBand(score: number): string {
   return "Stretch goal";
 }
 
-function paceSignalPct(
-  pr: PersonalRecord | undefined,
-  predictedSec: number | undefined
-): number {
+function paceSignalPct(pr: PersonalRecord | undefined, predictedSec: number | undefined): number {
   if (!pr || !predictedSec || predictedSec <= 0) return 50;
   const ratio = pr.timeSec / predictedSec;
   if (ratio <= 1.05) return 100;
@@ -162,21 +153,18 @@ export function raceReadiness(
   runs: RunActivity[],
   goal: RaceGoal,
   personalRecords: PersonalRecord[],
-  predictionAnalysis: RacePredictionAnalysis
+  predictionAnalysis: RacePredictionAnalysis,
 ): RaceReadiness {
   const config = RACE_READINESS_CONFIG[goal.distance];
   const longest = runs.reduce((m, r) => Math.max(m, r.distanceM), 0) / 1000;
   const fourWeek = lastNDaysVolume(runs, 28).distanceKm;
 
   const longestPct = longRunPercentOfRace(longest, config.raceDistanceKm);
-  const volumePct = Math.min(
-    100,
-    (fourWeek / config.fourWeekVolumeTargetKm) * 100
-  );
+  const volumePct = Math.min(100, (fourWeek / config.fourWeekVolumeTargetKm) * 100);
 
   const pr = personalRecords.find((p) => p.bucket === config.prBucket);
   const predictedSec = predictionAnalysis.consensus.find(
-    (c) => c.label === config.consensusLabel
+    (c) => c.label === config.consensusLabel,
   )?.timeSec;
 
   const pacePct = paceSignalPct(pr, predictedSec);
@@ -185,7 +173,7 @@ export function raceReadiness(
   const score = Math.round(
     usePaceWeight
       ? longestPct * 0.5 + volumePct * 0.35 + pacePct * 0.15
-      : longestPct * 0.6 + volumePct * 0.4
+      : longestPct * 0.6 + volumePct * 0.4,
   );
 
   const raceDate = parseISO(goal.date);

@@ -1,8 +1,5 @@
 import { selectRelevantBeliefs } from "@/lib/athlete-memory";
-import {
-  buildAdaptiveIntelligence,
-  buildAdaptivePlanningNotes,
-} from "@/lib/adaptive-intelligence";
+import { buildAdaptiveIntelligence, buildAdaptivePlanningNotes } from "@/lib/adaptive-intelligence";
 import { buildCoachingContext } from "@/lib/coaching-context";
 import type { IntelligenceContext } from "@/lib/intelligence/types";
 import { computeAthleteIntelligence, resolveIntelligenceContext } from "@/lib/intelligence/service";
@@ -15,21 +12,14 @@ import {
   recordPlanRun,
 } from "./planObservability";
 import type { PlanModificationKind } from "./planningIntent";
-import {
-  evaluateWeeklyPlan,
-  repairPlanFromIntegrity,
-} from "@/lib/recommendation-integrity";
+import { evaluateWeeklyPlan, repairPlanFromIntegrity } from "@/lib/recommendation-integrity";
 import { repairWeeklyPlan } from "./repairWeeklyPlan";
 import { validateWeeklyPlan } from "./validateWeeklyPlan";
 import { computeWeeklyPlanGuardrails } from "./weeklyPlanGuardrails";
 import { inferPlanHintsFromContext } from "@/lib/plan/inferPlanHintsFromContext";
 import { PLAN_CONTEXT_MAX_CHARS } from "@/lib/plan/planContextConstants";
 import { generateWeeklyPlanFromContext } from "./generateWeeklyPlan";
-import type {
-  GenerateNextWeekPlanToolInput,
-  PlanToolResult,
-  WeeklyTrainingPlan,
-} from "./types";
+import type { GenerateNextWeekPlanToolInput, PlanToolResult, WeeklyTrainingPlan } from "./types";
 
 export async function executeGenerateNextWeekTrainingPlan(
   ctx: IntelligenceContext,
@@ -38,17 +28,14 @@ export async function executeGenerateNextWeekTrainingPlan(
     previousPlan?: WeeklyTrainingPlan;
     modification?: PlanModificationKind;
     forceFallback?: boolean;
-  }
+  },
 ): Promise<PlanToolResult> {
   const [bundle, resolved] = await Promise.all([
     computeAthleteIntelligence(ctx),
     resolveIntelligenceContext(ctx.userId, ctx),
   ]);
 
-  const maxKm =
-    resolved.settings.maxWeeklyKm > 0
-      ? resolved.settings.maxWeeklyKm
-      : undefined;
+  const maxKm = resolved.settings.maxWeeklyKm > 0 ? resolved.settings.maxWeeklyKm : undefined;
 
   const windowDays = input.windowDays ?? 21;
 
@@ -67,15 +54,10 @@ export async function executeGenerateNextWeekTrainingPlan(
   });
 
   let guardrails = computeWeeklyPlanGuardrails(coachingContext);
-  guardrails = applyPlanPreferenceToGuardrails(
-    guardrails,
-    input.planPreference
-  );
+  guardrails = applyPlanPreferenceToGuardrails(guardrails, input.planPreference);
 
   if (input.availableDays?.length) {
-    guardrails.constraintNotes.push(
-      `Train only on: ${input.availableDays.join(", ")}`
-    );
+    guardrails.constraintNotes.push(`Train only on: ${input.availableDays.join(", ")}`);
   }
   if (input.constraints?.length) {
     guardrails.constraintNotes.push(...input.constraints);
@@ -83,9 +65,7 @@ export async function executeGenerateNextWeekTrainingPlan(
 
   const planningContext = input.planningContext?.trim().slice(0, PLAN_CONTEXT_MAX_CHARS);
   if (planningContext) {
-    guardrails.constraintNotes.push(
-      `Athlete planning context: ${planningContext}`
-    );
+    guardrails.constraintNotes.push(`Athlete planning context: ${planningContext}`);
     const hints = inferPlanHintsFromContext(planningContext);
     if (hints.notes.length) {
       guardrails.constraintNotes.push(...hints.notes);
@@ -102,7 +82,7 @@ export async function executeGenerateNextWeekTrainingPlan(
     resolved.raceGoal ?? null,
     bundle.insights,
     ctx.userId,
-    { trackPrimaryRecommendation: true }
+    { trackPrimaryRecommendation: true },
   );
 
   const memoryProfile = adaptive.memory;
@@ -134,12 +114,9 @@ export async function executeGenerateNextWeekTrainingPlan(
   }
 
   if (opts?.previousPlan && opts.modification) {
-    let plan = applyPlanModification(
-      opts.previousPlan,
-      opts.modification,
-      guardrails,
-      { availableDays: input.availableDays }
-    );
+    let plan = applyPlanModification(opts.previousPlan, opts.modification, guardrails, {
+      availableDays: input.availableDays,
+    });
     let validation = validateWeeklyPlan(plan, coachingContext, guardrails);
     if (!validation.valid) {
       plan = repairWeeklyPlan(plan, guardrails);
@@ -150,7 +127,7 @@ export async function executeGenerateNextWeekTrainingPlan(
       plan = repairPlanFromIntegrity(
         plan,
         { plan, context: coachingContext, guardrails },
-        integrity
+        integrity,
       );
       validation = validateWeeklyPlan(plan, coachingContext, guardrails);
       integrity = evaluateWeeklyPlan({ plan, context: coachingContext, guardrails });
@@ -193,11 +170,7 @@ export async function executeGenerateNextWeekTrainingPlan(
     if (!validation.valid) {
       plan = repairWeeklyPlan(plan, guardrails);
     }
-    genResult.validation = validateWeeklyPlan(
-      plan,
-      coachingContext,
-      guardrails
-    );
+    genResult.validation = validateWeeklyPlan(plan, coachingContext, guardrails);
     genResult.plan = plan;
   }
 
@@ -214,7 +187,7 @@ export async function executeGenerateNextWeekTrainingPlan(
 
 export function executeExplainWeeklyPlan(
   plan: WeeklyTrainingPlan,
-  topic: "taper" | "plan" | "pb"
+  topic: "taper" | "plan" | "pb",
 ): { explanationOnly: string; replySummary: string } {
   const explanationOnly = buildExplainResponse(plan, topic);
   return {

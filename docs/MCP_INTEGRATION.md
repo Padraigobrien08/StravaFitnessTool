@@ -46,44 +46,44 @@ Example: [config/mcp/claude-desktop.example.json](../config/mcp/claude-desktop.e
 
 All use the connected user's Strava token from Neon.
 
-| MCP tool | API |
-|----------|-----|
-| `strava_connection_status` | `?action=connection_status` |
-| `strava_list_activities` | `?action=activities` |
-| `strava_list_all_activities` | `?action=activities_all` |
-| `strava_get_activity` | `?action=activity&id=` |
-| `strava_get_activity_laps` | `?action=laps&id=` |
-| `strava_get_activity_photos` | `?action=photos&id=` |
-| `strava_get_activity_streams` | `?action=streams&id=` |
-| `strava_get_athlete` | `?action=athlete` |
-| `strava_get_athlete_stats` | `?action=stats` |
-| `strava_get_athlete_zones` | `?action=zones` |
-| `strava_get_athlete_shoes` | `?action=shoes` |
-| `strava_explore_segments` | `?action=segments_explore&south=&west=&north=&east=` |
-| `strava_list_starred_segments` | `?action=segments_starred` |
-| `strava_get_segment` | `?action=segment&id=` |
-| `strava_get_segment_leaderboard` | `?action=segment_leaderboard&id=` |
-| `strava_get_segment_effort` | `?action=segment_effort&id=` |
-| `strava_list_segment_efforts` | `?action=segment_efforts&id=` |
-| `strava_star_segment` | `POST` body `{ action, id, starred }` |
-| `strava_list_routes` | `?action=routes` |
-| `strava_get_route` | `?action=route&id=` |
-| `strava_export_route_gpx` | `?action=route_export_gpx&id=` |
-| `strava_export_route_tcx` | `?action=route_export_tcx&id=` |
-| `strava_list_clubs` | `?action=clubs` |
-| `strava_format_workout_file` | `?action=workout_gpx&id=` |
-| `strideiq_mcp_version` | (local package version) |
+| MCP tool                         | API                                                  |
+| -------------------------------- | ---------------------------------------------------- |
+| `strava_connection_status`       | `?action=connection_status`                          |
+| `strava_list_activities`         | `?action=activities`                                 |
+| `strava_list_all_activities`     | `?action=activities_all`                             |
+| `strava_get_activity`            | `?action=activity&id=`                               |
+| `strava_get_activity_laps`       | `?action=laps&id=`                                   |
+| `strava_get_activity_photos`     | `?action=photos&id=`                                 |
+| `strava_get_activity_streams`    | `?action=streams&id=`                                |
+| `strava_get_athlete`             | `?action=athlete`                                    |
+| `strava_get_athlete_stats`       | `?action=stats`                                      |
+| `strava_get_athlete_zones`       | `?action=zones`                                      |
+| `strava_get_athlete_shoes`       | `?action=shoes`                                      |
+| `strava_explore_segments`        | `?action=segments_explore&south=&west=&north=&east=` |
+| `strava_list_starred_segments`   | `?action=segments_starred`                           |
+| `strava_get_segment`             | `?action=segment&id=`                                |
+| `strava_get_segment_leaderboard` | `?action=segment_leaderboard&id=`                    |
+| `strava_get_segment_effort`      | `?action=segment_effort&id=`                         |
+| `strava_list_segment_efforts`    | `?action=segment_efforts&id=`                        |
+| `strava_star_segment`            | `POST` body `{ action, id, starred }`                |
+| `strava_list_routes`             | `?action=routes`                                     |
+| `strava_get_route`               | `?action=route&id=`                                  |
+| `strava_export_route_gpx`        | `?action=route_export_gpx&id=`                       |
+| `strava_export_route_tcx`        | `?action=route_export_tcx&id=`                       |
+| `strava_list_clubs`              | `?action=clubs`                                      |
+| `strava_format_workout_file`     | `?action=workout_gpx&id=`                            |
+| `strideiq_mcp_version`           | (local package version)                              |
 
 ### Composite coach tools (Phase 5)
 
 Single MCP calls that blend intelligence + Strava:
 
-| MCP tool | API |
-|----------|-----|
-| `analyze_last_run_with_readiness` | `?action=last_run_analysis` |
-| `race_week_snapshot` | `?action=race_week_snapshot` |
-| `pr_and_segments_snapshot` | `?action=pr_and_segments` |
-| `long_run_route_suggestions` | `?action=long_run_route_suggestions` |
+| MCP tool                          | API                                  |
+| --------------------------------- | ------------------------------------ |
+| `analyze_last_run_with_readiness` | `?action=last_run_analysis`          |
+| `race_week_snapshot`              | `?action=race_week_snapshot`         |
+| `pr_and_segments_snapshot`        | `?action=pr_and_segments`            |
+| `long_run_route_suggestions`      | `?action=long_run_route_suggestions` |
 
 `strava_list_activities` prefers **Neon** when last sync is &lt;24h old; otherwise live Strava API.
 

@@ -66,10 +66,7 @@ export function buildAllowedEvidenceTokens(context: CoachingContext): Set<string
   return tokens;
 }
 
-export function evidenceItemGrounded(
-  item: string,
-  allowed: Set<string>
-): boolean {
+export function evidenceItemGrounded(item: string, allowed: Set<string>): boolean {
   const lower = item.trim().toLowerCase();
   if (lower.length < 8) return false;
 

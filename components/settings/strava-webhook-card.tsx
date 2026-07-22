@@ -51,7 +51,7 @@ export function StravaWebhookCard({ apiConnected }: { apiConnected: boolean }) {
       setMessage(
         data.existing
           ? "Webhook already active for your callback URL."
-          : "Auto-sync enabled. New Strava activities will sync in the background."
+          : "Auto-sync enabled. New Strava activities will sync in the background.",
       );
       await loadSubs();
     } catch {
@@ -70,18 +70,15 @@ export function StravaWebhookCard({ apiConnected }: { apiConnected: boolean }) {
       </CardHeader>
       <CardContent className="space-y-4 text-sm text-zinc-400">
         <p>
-          Push subscriptions notify this app when you create, update, or delete
-          an activity on Strava. Requires a public HTTPS callback URL (e.g. ngrok
-          in dev, your production domain in prod).
+          Push subscriptions notify this app when you create, update, or delete an activity on
+          Strava. Requires a public HTTPS callback URL (e.g. ngrok in dev, your production domain in
+          prod).
         </p>
         <p className="text-xs text-zinc-600">
-          Set{" "}
-          <code className="text-zinc-400">STRAVA_WEBHOOK_CALLBACK_URL</code> to{" "}
-          <code className="text-zinc-400">
-            https://your-host/api/webhooks/strava
-          </code>{" "}
-          and <code className="text-zinc-400">STRAVA_WEBHOOK_VERIFY_TOKEN</code>{" "}
-          in <code className="text-zinc-400">.env.local</code>.
+          Set <code className="text-zinc-400">STRAVA_WEBHOOK_CALLBACK_URL</code> to{" "}
+          <code className="text-zinc-400">https://your-host/api/webhooks/strava</code> and{" "}
+          <code className="text-zinc-400">STRAVA_WEBHOOK_VERIFY_TOKEN</code> in{" "}
+          <code className="text-zinc-400">.env.local</code>.
         </p>
         {subs.length > 0 ? (
           <ul className="list-inside list-disc text-zinc-500">

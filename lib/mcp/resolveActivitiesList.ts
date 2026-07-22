@@ -16,7 +16,7 @@ export async function resolveActivitiesList(
     per_page?: number;
     after?: number;
     before?: number;
-  }
+  },
 ): Promise<unknown> {
   const sync = await getActivitiesSyncStatus(userId);
   const page = options.page ?? 1;
@@ -64,7 +64,7 @@ export async function resolveActivitiesListAll(
     after?: number;
     before?: number;
     max_pages?: number;
-  }
+  },
 ): Promise<unknown> {
   const sync = await getActivitiesSyncStatus(userId);
   const maxPages = options.max_pages ?? 10;

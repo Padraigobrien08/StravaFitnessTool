@@ -19,7 +19,7 @@ export type EvaluateForecastV2Options = {
 
 function buildObservability(
   forecast: RaceForecastV2,
-  rules: ForecastEvaluationReport["rules"]
+  rules: ForecastEvaluationReport["rules"],
 ): ForecastEvaluationObservability {
   const failedRules = rules.filter((r) => !r.passed);
   const passedRules = rules.filter((r) => r.passed);
@@ -29,9 +29,7 @@ function buildObservability(
     ...forecast.evidence
       .filter((e) => e.label === "Freshness" || e.label === "Execution")
       .map((e) => e.detail),
-    ...forecast.observability.componentBreakdown.map(
-      (c) => `${c.component}: ${c.explanation}`
-    ),
+    ...forecast.observability.componentBreakdown.map((c) => `${c.component}: ${c.explanation}`),
   ];
 
   return {
@@ -53,7 +51,7 @@ function buildObservability(
 
 export function evaluateForecastV2(
   input: RaceForecastInput,
-  options: EvaluateForecastV2Options = {}
+  options: EvaluateForecastV2Options = {},
 ): ForecastEvaluationReport {
   const forecast = options.forecast ?? buildRaceForecastV2(input);
 
@@ -63,7 +61,7 @@ export function evaluateForecastV2(
 
   const errorCount = rules.filter((r) => !r.passed && r.severity === "error").length;
   const warningCount = rules.filter(
-    (r) => !r.passed && (r.severity === "warning" || r.severity === "error")
+    (r) => !r.passed && (r.severity === "warning" || r.severity === "error"),
   ).length;
 
   const observability = buildObservability(forecast, rules);
@@ -82,11 +80,7 @@ export function evaluateForecastV2(
   if (fixtureId) {
     const profile = FORECAST_FIXTURE_BY_ID[fixtureId];
     if (profile) {
-      report.fixtureExpectation = evaluateFixtureExpectations(
-        profile,
-        forecast,
-        report
-      );
+      report.fixtureExpectation = evaluateFixtureExpectations(profile, forecast, report);
       if (!report.fixtureExpectation.met) {
         report.passed = false;
       }
@@ -96,9 +90,7 @@ export function evaluateForecastV2(
   return report;
 }
 
-export function evaluateForecastFixture(
-  profile: ForecastFixtureProfile
-): ForecastEvaluationReport {
+export function evaluateForecastFixture(profile: ForecastFixtureProfile): ForecastEvaluationReport {
   return evaluateForecastV2(profile.input, { fixtureId: profile.id });
 }
 
@@ -113,7 +105,7 @@ export function evaluateAllForecastFixtures(): {
     (r) =>
       r.errorCount === 0 &&
       (r.fixtureExpectation?.met ?? true) &&
-      r.rules.filter((x) => !x.passed && x.severity === "error").length === 0
+      r.rules.filter((x) => !x.passed && x.severity === "error").length === 0,
   );
   return { profiles, reports, productionReady };
 }

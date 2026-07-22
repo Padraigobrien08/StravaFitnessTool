@@ -5,10 +5,7 @@ import { useState } from "react";
 import type { CoachWorkspaceState } from "@/lib/coach/types";
 import type { IntelligenceSignal } from "@/lib/intelligence/athleteState";
 import type { StateEvolutionItem } from "@/lib/intelligence/presentation";
-import {
-  primaryActionBullets,
-  prioritizeSignals,
-} from "@/lib/intelligence/presentation";
+import { primaryActionBullets, prioritizeSignals } from "@/lib/intelligence/presentation";
 import {
   formatTrajectoryDisplay,
   groupMemoryItems,
@@ -39,52 +36,41 @@ const COACH_INVESTIGATIONS: {
   {
     topic: "readiness-change",
     label: "Why did readiness change?",
-    hypothesis:
-      "Freshness shifted with taper, volume, and load balance.",
+    hypothesis: "Freshness shifted with taper, volume, and load balance.",
     query: "Why did my readiness change this week?",
   },
   {
     topic: "cross-training-interference",
     label: "Is cross-training interfering?",
-    hypothesis:
-      "Strength and hard non-run work may compress recovery before key sessions.",
+    hypothesis: "Strength and hard non-run work may compress recovery before key sessions.",
     query: "Is my gym work helping or hurting my running?",
   },
   {
     topic: "strongest-block",
     label: "Compare to strongest block",
-    hypothesis:
-      "Current load may mirror your best historical volume phase.",
+    hypothesis: "Current load may mirror your best historical volume phase.",
     query: "Compare this training block to my strongest historical block.",
   },
   {
     topic: "pace-improvement",
     label: "What improves my pace historically?",
-    hypothesis:
-      "Aerobic efficiency is often the strongest adaptation signal.",
+    hypothesis: "Aerobic efficiency is often the strongest adaptation signal.",
     query: "What training patterns historically improve my pace?",
   },
   {
     topic: "race-prep",
     label: "Race prep execution",
-    hypothesis:
-      "Taper specificity and freshness alignment matter most now.",
+    hypothesis: "Taper specificity and freshness alignment matter most now.",
     query: "How should I execute race week given my current state?",
   },
 ];
 
-export function IntelligenceStateEvolution({
-  items,
-}: {
-  items: StateEvolutionItem[];
-}) {
+export function IntelligenceStateEvolution({ items }: { items: StateEvolutionItem[] }) {
   if (items.length === 0) return null;
 
   return (
     <section className="intelligence-evolution rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2.5">
-      <p className="mb-2 text-[11px] font-medium text-zinc-500">
-        How your state is moving
-      </p>
+      <p className="mb-2 text-[11px] font-medium text-zinc-500">How your state is moving</p>
       <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
         {items.map((item) => {
           const display = formatTrajectoryDisplay(item);
@@ -100,9 +86,7 @@ export function IntelligenceStateEvolution({
               <p className="mt-0.5 text-[12px] font-medium leading-tight text-zinc-200">
                 {display.headline}
               </p>
-              {display.sub ? (
-                <p className="text-[10px] text-zinc-600">{display.sub}</p>
-              ) : null}
+              {display.sub ? <p className="text-[10px] text-zinc-600">{display.sub}</p> : null}
             </div>
           );
         })}
@@ -113,26 +97,18 @@ export function IntelligenceStateEvolution({
 
 function TrendGlyph({ trend }: { trend: "up" | "down" | "flat" }) {
   if (trend === "up") return <TrendingUp className="h-3 w-3 text-zinc-500" />;
-  if (trend === "down")
-    return <TrendingDown className="h-3 w-3 text-zinc-500" />;
+  if (trend === "down") return <TrendingDown className="h-3 w-3 text-zinc-500" />;
   return <span className="text-[10px] text-zinc-600">→</span>;
 }
 
 function SignalStatusIcon({ severity }: { severity: IntelligenceSignal["severity"] }) {
-  if (severity === "positive")
-    return <span className="text-teal-400/80">↑</span>;
-  if (severity === "warning")
-    return <span className="text-amber-400/80">!</span>;
-  if (severity === "opportunity")
-    return <span className="text-teal-300/70">◇</span>;
+  if (severity === "positive") return <span className="text-teal-400/80">↑</span>;
+  if (severity === "warning") return <span className="text-amber-400/80">!</span>;
+  if (severity === "opportunity") return <span className="text-teal-300/70">◇</span>;
   return <span className="text-zinc-500">~</span>;
 }
 
-function IntelligenceSignalFeed({
-  signals,
-}: {
-  signals: IntelligenceSignal[];
-}) {
+function IntelligenceSignalFeed({ signals }: { signals: IntelligenceSignal[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   if (signals.length === 0) return null;
 
@@ -144,9 +120,7 @@ function IntelligenceSignalFeed({
             <tr className="border-b border-white/[0.04] text-[10px] text-zinc-600">
               <th className="w-8 px-2 py-1.5 font-medium" />
               <th className="px-2 py-1.5 font-medium">Signal</th>
-              <th className="hidden px-2 py-1.5 font-medium sm:table-cell">
-                Implication
-              </th>
+              <th className="hidden px-2 py-1.5 font-medium sm:table-cell">Implication</th>
               <th className="w-20 px-2 py-1.5 font-medium">Confidence</th>
               <th className="w-16 px-2 py-1.5 font-medium text-right">Action</th>
             </tr>
@@ -191,9 +165,7 @@ function IntelligenceSignalFeed({
                       <button
                         type="button"
                         className="text-[10px] text-zinc-600 hover:text-zinc-400"
-                        onClick={() =>
-                          setExpandedId(open ? null : s.id)
-                        }
+                        onClick={() => setExpandedId(open ? null : s.id)}
                       >
                         Why
                       </button>
@@ -219,11 +191,10 @@ export function IntelligenceSignalBoard({
   const { primary, secondary, watchlist } = prioritizeSignals(signals);
   if (!primary && secondary.length === 0 && watchlist.length === 0) return null;
 
-  const all = [
-    ...(primary ? [primary] : []),
-    ...secondary,
-    ...watchlist,
-  ].slice(0, compact ? 5 : undefined);
+  const all = [...(primary ? [primary] : []), ...secondary, ...watchlist].slice(
+    0,
+    compact ? 5 : undefined,
+  );
 
   if (compact) {
     return <IntelligenceSignalFeed signals={all} />;
@@ -241,9 +212,7 @@ export function IntelligenceSignalBoard({
                 <p className="mt-1 text-[16px] font-medium leading-snug text-zinc-100">
                   {primary.headline}
                 </p>
-                <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">
-                  {primary.text}
-                </p>
+                <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">{primary.text}</p>
                 <SignalMeta signal={primary} className="mt-3" />
                 <Link
                   href={signalCoachLink(`Explain: ${primary.text}`)}
@@ -271,27 +240,18 @@ export function IntelligenceSignalBoard({
   );
 }
 
-function CompactSignalCard({
-  signal,
-  watch,
-}: {
-  signal: IntelligenceSignal;
-  watch?: boolean;
-}) {
+function CompactSignalCard({ signal, watch }: { signal: IntelligenceSignal; watch?: boolean }) {
   const Icon = watch ? AlertTriangle : Check;
   return (
     <div
       className={cn(
         "group rounded-lg px-3 py-2.5",
-        watch ? "bg-amber-500/[0.05]" : "bg-white/[0.025]"
+        watch ? "bg-amber-500/[0.05]" : "bg-white/[0.025]",
       )}
     >
       <div className="flex gap-2">
         <Icon
-          className={cn(
-            "mt-0.5 h-3 w-3 shrink-0",
-            watch ? "text-amber-400/70" : "text-zinc-500"
-          )}
+          className={cn("mt-0.5 h-3 w-3 shrink-0", watch ? "text-amber-400/70" : "text-zinc-500")}
         />
         <div className="min-w-0">
           <p className="text-[12px] font-medium text-zinc-300">{signal.headline}</p>
@@ -315,7 +275,7 @@ function SignalMeta({
     <div
       className={cn(
         "flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-zinc-600",
-        className
+        className,
       )}
     >
       {!compact ? (
@@ -340,10 +300,7 @@ export function IntelligenceDecisionSupport({
   const actionBullets = primaryActionBullets(recommendation);
 
   return (
-    <Section
-      title="Decision support"
-      subtitle="What should I do with this intelligence?"
-    >
+    <Section title="Decision support" subtitle="What should I do with this intelligence?">
       <div className="grid gap-2.5 lg:grid-cols-3">
         <DecisionColumn
           title="Risks"
@@ -363,10 +320,7 @@ export function IntelligenceDecisionSupport({
           <p className="text-[11px] font-medium text-zinc-400">Primary action</p>
           <ul className="mt-2.5 space-y-2">
             {actionBullets.map((line) => (
-              <li
-                key={line}
-                className="flex gap-2 text-[13px] leading-snug text-zinc-100"
-              >
+              <li key={line} className="flex gap-2 text-[13px] leading-snug text-zinc-100">
                 <span className="text-zinc-600">–</span>
                 <span>{line}</span>
               </li>
@@ -401,13 +355,13 @@ function DecisionColumn({
     <div
       className={cn(
         "rounded-xl p-3.5",
-        tone === "risk" ? "bg-amber-500/[0.05]" : "bg-teal-500/[0.05]"
+        tone === "risk" ? "bg-amber-500/[0.05]" : "bg-teal-500/[0.05]",
       )}
     >
       <p
         className={cn(
           "text-[11px] font-medium",
-          tone === "risk" ? "text-amber-200/55" : "text-teal-400/55"
+          tone === "risk" ? "text-amber-200/55" : "text-teal-400/55",
         )}
       >
         {title}
@@ -421,7 +375,7 @@ function DecisionColumn({
               key={t}
               className={cn(
                 "text-[12px] leading-snug",
-                tone === "risk" ? "text-amber-100/80" : "text-teal-100/85"
+                tone === "risk" ? "text-amber-100/80" : "text-teal-100/85",
               )}
             >
               {t}
@@ -446,9 +400,7 @@ export function IntelligenceMemoryTiles({
   memory: MemorySnippet[];
   beliefsById?: Map<string, AthleteBelief>;
 }) {
-  return (
-    <IntelligenceMemoryGrouped memory={memory} beliefsById={beliefsById} />
-  );
+  return <IntelligenceMemoryGrouped memory={memory} beliefsById={beliefsById} />;
 }
 
 export function IntelligenceMemoryGrouped({
@@ -482,18 +434,13 @@ export function IntelligenceMemoryGrouped({
           if (items.length === 0) return null;
           return (
             <div key={key} className="min-w-0">
-              <p className={cn("text-[10px] font-medium uppercase tracking-wide", tone)}>
-                {title}
-              </p>
+              <p className={cn("text-[10px] font-medium uppercase tracking-wide", tone)}>{title}</p>
               <ul className="mt-1.5 space-y-2">
                 {items.map((m) => (
                   <MemoryBeliefRow
                     key={m.id}
                     belief={m}
-                    evidence={
-                      beliefsById?.get(m.id)?.evidence[0] ??
-                      memoryEvidenceFallback(m)
-                    }
+                    evidence={beliefsById?.get(m.id)?.evidence[0] ?? memoryEvidenceFallback(m)}
                   />
                 ))}
               </ul>
@@ -515,19 +462,12 @@ export function IntelligenceMemoryGrouped({
   );
 }
 
-function MemoryBeliefRow({
-  belief,
-  evidence,
-}: {
-  belief: MemorySnippet;
-  evidence: string;
-}) {
+function MemoryBeliefRow({ belief, evidence }: { belief: MemorySnippet; evidence: string }) {
   return (
     <li className="group rounded-md bg-white/[0.02] px-2 py-2">
       <p className="text-[12px] leading-snug text-zinc-400">{belief.text}</p>
       <p className="mt-1 text-[10px] text-zinc-600">
-        Confidence:{" "}
-        <span className="capitalize text-zinc-500">{belief.confidence}</span>
+        Confidence: <span className="capitalize text-zinc-500">{belief.confidence}</span>
       </p>
       {evidence ? (
         <p className="mt-0.5 text-[10px] leading-snug text-zinc-700">
@@ -535,9 +475,7 @@ function MemoryBeliefRow({
         </p>
       ) : null}
       <Link
-        href={signalCoachLink(
-          `Explain this belief about me: ${belief.text}`
-        )}
+        href={signalCoachLink(`Explain this belief about me: ${belief.text}`)}
         className="mt-1 inline-block text-[10px] text-zinc-700 hover:text-zinc-400"
       >
         Ask Coach
@@ -587,9 +525,8 @@ export function IntelligenceEcosystemCompact({
   const body = (
     <>
       <p className="text-[13px] leading-relaxed text-zinc-400">
-        <span className="text-zinc-300">{ecosystem.archetypeLabel}</span> profile.
-        Running drives race performance; non-run work shapes fatigue, durability, and
-        recovery context.
+        <span className="text-zinc-300">{ecosystem.archetypeLabel}</span> profile. Running drives
+        race performance; non-run work shapes fatigue, durability, and recovery context.
       </p>
       <div className="mt-2.5 grid grid-cols-3 gap-1.5 sm:grid-cols-6">
         <EcoMetric label="Run volume" value={load.runKm} />
@@ -611,7 +548,7 @@ export function IntelligenceEcosystemCompact({
               key={i}
               className={cn(
                 "text-[12px] leading-snug",
-                s.warn ? "text-amber-200/65" : "text-zinc-500"
+                s.warn ? "text-amber-200/65" : "text-zinc-500",
               )}
             >
               {s.text}
@@ -627,11 +564,7 @@ export function IntelligenceEcosystemCompact({
             onClick={() => setFlagsOpen((o) => !o)}
             className="flex items-center gap-1 text-[11px] text-zinc-600 hover:text-zinc-400"
           >
-            {flagsOpen ? (
-              <ChevronDown className="h-3 w-3" />
-            ) : (
-              <ChevronRight className="h-3 w-3" />
-            )}
+            {flagsOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
             Show interference details
           </button>
           {flagsOpen ? (
@@ -649,7 +582,7 @@ export function IntelligenceEcosystemCompact({
       <Link
         href={topicCoachLink(
           "cross-training-interference",
-          "Is my cross-training helping or hurting my running?"
+          "Is my cross-training helping or hurting my running?",
         )}
         className="mt-3 inline-flex items-center gap-0.5 text-[11px] text-zinc-600 hover:text-zinc-400"
       >
@@ -676,22 +609,14 @@ export function IntelligenceEcosystemCompact({
   );
 }
 
-function EcoMetric({
-  label,
-  value,
-  warn,
-}: {
-  label: string;
-  value: string;
-  warn?: boolean;
-}) {
+function EcoMetric({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
     <div className="rounded-md bg-white/[0.025] px-2 py-1.5 text-center">
       <p className="text-[9px] text-zinc-600">{label}</p>
       <p
         className={cn(
           "text-[11px] font-medium tabular-nums text-zinc-400",
-          warn && "text-amber-200/75"
+          warn && "text-amber-200/75",
         )}
       >
         {value}
@@ -700,11 +625,7 @@ function EcoMetric({
   );
 }
 
-export function IntelligenceCoachEntries({
-  domains,
-}: {
-  domains: CoachWorkspaceState["domains"];
-}) {
+export function IntelligenceCoachEntries({ domains }: { domains: CoachWorkspaceState["domains"] }) {
   const [showMore, setShowMore] = useState(false);
   const domainCards = domains.slice(0, 2).map((d) => ({
     key: d.id,
@@ -736,9 +657,7 @@ export function IntelligenceCoachEntries({
             <p className="text-[12px] font-medium text-zinc-300 group-hover:text-zinc-100">
               {item.label}
             </p>
-            <p className="mt-0.5 text-[11px] leading-snug text-zinc-600">
-              {item.hypothesis}
-            </p>
+            <p className="mt-0.5 text-[11px] leading-snug text-zinc-600">{item.hypothesis}</p>
             <span className="mt-1.5 inline-flex items-center gap-0.5 text-[10px] text-zinc-600 group-hover:text-zinc-400">
               Open in Coach <ArrowRight className="h-3 w-3" />
             </span>
@@ -774,9 +693,7 @@ function Section({
     <section className={cn("intelligence-block", className)}>
       <div className="mb-2">
         <h2 className="text-[12px] font-medium text-zinc-500">{title}</h2>
-        {subtitle ? (
-          <p className="mt-0.5 text-[10px] text-zinc-700">{subtitle}</p>
-        ) : null}
+        {subtitle ? <p className="mt-0.5 text-[10px] text-zinc-700">{subtitle}</p> : null}
       </div>
       {children}
     </section>

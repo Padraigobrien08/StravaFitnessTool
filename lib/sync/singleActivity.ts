@@ -2,30 +2,25 @@ import { upsertActivities } from "@/lib/db/activities";
 import { upsertFitDetail } from "@/lib/db/activity-streams";
 import { getValidAccessToken } from "@/lib/db/strava-connection";
 import type { StravaActivity } from "@/lib/strava/api/types";
-import {
-  fetchActivityLaps,
-  fetchActivityStreams,
-} from "@/lib/strava/api/fetchStreams";
+import { fetchActivityLaps, fetchActivityStreams } from "@/lib/strava/api/fetchStreams";
 import { mapStravaStreamsToFitDetail } from "@/lib/strava/api/mapToFitDetail";
 import { stravaGet } from "@/lib/strava/api/client";
 
 export async function fetchActivityById(
   accessToken: string,
-  activityId: number
+  activityId: number,
 ): Promise<StravaActivity | null> {
   // Routed through the shared client so the request URL is validated against
   // Strava's origin (guards the bearer token against SSRF).
-  return stravaGet<StravaActivity>(
-    accessToken,
-    `/activities/${activityId}`,
-    undefined,
-    { allow404: true, context: `Strava activity ${activityId}` }
-  );
+  return stravaGet<StravaActivity>(accessToken, `/activities/${activityId}`, undefined, {
+    allow404: true,
+    context: `Strava activity ${activityId}`,
+  });
 }
 
 export async function syncSingleActivityForUser(
   userId: string,
-  activityId: number
+  activityId: number,
 ): Promise<{ ok: boolean; sport?: string }> {
   const { accessToken } = await getValidAccessToken(userId);
   const activity = await fetchActivityById(accessToken, activityId);
@@ -39,11 +34,7 @@ export async function syncSingleActivityForUser(
       fetchActivityStreams(accessToken, activityId),
       fetchActivityLaps(accessToken, activityId),
     ]);
-    const detail = mapStravaStreamsToFitDetail(
-      String(activityId),
-      streams,
-      laps
-    );
+    const detail = mapStravaStreamsToFitDetail(String(activityId), streams, laps);
     if (detail) {
       await upsertFitDetail(userId, activityId, detail);
     }
@@ -52,10 +43,7 @@ export async function syncSingleActivityForUser(
   return { ok: true, sport };
 }
 
-export async function deleteActivityForUser(
-  userId: string,
-  activityId: number
-): Promise<void> {
+export async function deleteActivityForUser(userId: string, activityId: number): Promise<void> {
   const sql = (await import("@/lib/db/client")).getSql();
   await sql`
     DELETE FROM activity_streams

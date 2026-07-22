@@ -28,7 +28,7 @@ function WorkoutRow({ w }: { w: PlannedWorkout }) {
         <span
           className={cn(
             "text-[11px] uppercase tracking-wide",
-            intensityStyles[w.intensity] ?? "text-zinc-500"
+            intensityStyles[w.intensity] ?? "text-zinc-500",
           )}
         >
           {w.intensity}
@@ -39,9 +39,7 @@ function WorkoutRow({ w }: { w: PlannedWorkout }) {
         {w.distanceKm != null ? ` · ${w.distanceKm} km` : ""}
         {w.durationMin != null ? ` · ${w.durationMin} min` : ""}
       </p>
-      <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400">
-        {w.purpose}
-      </p>
+      <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400">{w.purpose}</p>
       {w.constraintsApplied.length > 0 ? (
         <p className="mt-1 text-[10px] text-zinc-600">
           Constraints: {w.constraintsApplied.join("; ")}
@@ -87,9 +85,7 @@ export function AiWeeklyPlanPanel({
       <p className="text-[14px] leading-relaxed text-zinc-300">{plan.summary}</p>
 
       <div className="flex flex-wrap gap-3 text-[11px] text-zinc-500">
-        {plan.totalRunDistanceKm != null ? (
-          <span>~{plan.totalRunDistanceKm} km runs</span>
-        ) : null}
+        {plan.totalRunDistanceKm != null ? <span>~{plan.totalRunDistanceKm} km runs</span> : null}
         <span>{plan.hardSessionCount} hard session(s)</span>
         {source ? <span>Source: {source}</span> : null}
       </div>

@@ -20,8 +20,7 @@ export function DataQualityPanel({ report }: { report: ImportQualityReport }) {
             >
               <span className="text-zinc-500">{f.label}</span>
               <span className="tabular-nums text-zinc-300">
-                {f.count}/{f.total}{" "}
-                <span className="text-zinc-600">({f.level})</span>
+                {f.count}/{f.total} <span className="text-zinc-600">({f.level})</span>
               </span>
             </li>
           ))}

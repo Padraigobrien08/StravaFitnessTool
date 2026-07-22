@@ -8,9 +8,7 @@ export function OperationalDashboard({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn(ops.dashboard, className)}>{children}</div>
-  );
+  return <div className={cn(ops.dashboard, className)}>{children}</div>;
 }
 
 export function OpsWeekRow({

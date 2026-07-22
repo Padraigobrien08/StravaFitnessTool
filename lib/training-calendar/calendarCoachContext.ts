@@ -15,7 +15,7 @@ export interface CalendarCoachPayload {
 
 export function buildCalendarCoachPayload(
   saved: TrainingCalendarWeek | null,
-  preview: GenerateWeeklyPlanResult | null
+  preview: GenerateWeeklyPlanResult | null,
 ): CalendarCoachPayload {
   const unsavedGeneratedPlan = preview
     ? {
@@ -29,15 +29,15 @@ export function buildCalendarCoachPayload(
   const parts: string[] = [];
   if (saved) {
     parts.push(
-      `Saved training calendar for ${formatWeekRange(saved.weekStart, saved.weekEnd)}: ${saved.summary}`
+      `Saved training calendar for ${formatWeekRange(saved.weekStart, saved.weekEnd)}: ${saved.summary}`,
     );
     parts.push(
-      `Sessions: ${saved.workouts.filter((w) => w.modality !== "rest").length} planned, ${saved.workouts.filter((w) => w.status === "completed").length} completed.`
+      `Sessions: ${saved.workouts.filter((w) => w.modality !== "rest").length} planned, ${saved.workouts.filter((w) => w.status === "completed").length} completed.`,
     );
   }
   if (unsavedGeneratedPlan) {
     parts.push(
-      `Unsaved AI preview for w/c ${unsavedGeneratedPlan.weekStart} (${unsavedGeneratedPlan.source}): ${unsavedGeneratedPlan.summary}`
+      `Unsaved AI preview for w/c ${unsavedGeneratedPlan.weekStart} (${unsavedGeneratedPlan.source}): ${unsavedGeneratedPlan.summary}`,
     );
   }
   if (!saved && !unsavedGeneratedPlan) {
@@ -51,19 +51,17 @@ export function buildCalendarCoachPayload(
   };
 }
 
-export function calendarConstraintsForCoach(
-  payload: CalendarCoachPayload
-): string[] {
+export function calendarConstraintsForCoach(payload: CalendarCoachPayload): string[] {
   const notes: string[] = [];
   if (payload.savedCalendarWeek) {
     notes.push(payload.summaryText);
     notes.push(
-      "User may ask to modify the saved plan — return changes as an updated weekly plan preview; user must save to calendar."
+      "User may ask to modify the saved plan — return changes as an updated weekly plan preview; user must save to calendar.",
     );
   }
   if (payload.unsavedGeneratedPlan) {
     notes.push(
-      "An unsaved generated preview exists; prefer modifying that plan unless user asks to start fresh."
+      "An unsaved generated preview exists; prefer modifying that plan unless user asks to start fresh.",
     );
   }
   return notes;

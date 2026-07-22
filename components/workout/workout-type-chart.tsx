@@ -29,9 +29,7 @@ export function WorkoutTypeChart({ data }: { data: WorkoutTypeBucket[] }) {
   const chart = useTrainingChart();
 
   if (data.length === 0) {
-    return (
-      <p className="text-sm text-zinc-500">No runs in the last 8 weeks.</p>
-    );
+    return <p className="text-sm text-zinc-500">No runs in the last 8 weeks.</p>;
   }
 
   const chartData = data.map((d) => ({
@@ -51,10 +49,7 @@ export function WorkoutTypeChart({ data }: { data: WorkoutTypeBucket[] }) {
           contentStyle={chart.tooltip}
           formatter={(value, _name, props) => {
             const payload = props.payload as { runCount: number };
-            return [
-              `${value}% (${payload.runCount} runs)`,
-              "Share",
-            ];
+            return [`${value}% (${payload.runCount} runs)`, "Share"];
           }}
         />
         <Bar dataKey="pct" radius={[0, 4, 4, 0]} name="Share">

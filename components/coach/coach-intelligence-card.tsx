@@ -46,9 +46,7 @@ function Section({
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-2 text-left"
       >
-        {Icon ? (
-          <Icon className="h-3.5 w-3.5 shrink-0 text-teal-500/70" />
-        ) : null}
+        {Icon ? <Icon className="h-3.5 w-3.5 shrink-0 text-teal-500/70" /> : null}
         <span className={dash.label}>{title}</span>
         {open ? (
           <ChevronDown className="ml-auto h-3.5 w-3.5 text-zinc-600" />
@@ -65,10 +63,7 @@ function BulletList({ items }: { items: string[] }) {
   return (
     <ul className="space-y-2">
       {items.map((item, i) => (
-        <li
-          key={i}
-          className="flex gap-2 text-[13px] leading-relaxed text-zinc-300/95"
-        >
+        <li key={i} className="flex gap-2 text-[13px] leading-relaxed text-zinc-300/95">
           <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-teal-500/50" />
           <span>{item}</span>
         </li>
@@ -114,7 +109,7 @@ export function CoachIntelligenceCard({
     <article
       className={cn(
         "coach-intel-card rounded-xl border border-white/[0.06] bg-gradient-to-br from-[#0e1015] to-[#0a0b0e] p-4",
-        animate && "coach-card-enter"
+        animate && "coach-card-enter",
       )}
     >
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -122,9 +117,7 @@ export function CoachIntelligenceCard({
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-500/10 ring-1 ring-teal-500/20">
             <Brain className="h-3.5 w-3.5 text-teal-400/90" />
           </div>
-          <span className="font-display text-sm font-semibold text-white">
-            Analysis
-          </span>
+          <span className="font-display text-sm font-semibold text-white">Analysis</span>
         </div>
         {toolsUsed && toolsUsed.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
@@ -155,9 +148,7 @@ export function CoachIntelligenceCard({
 
         {showSection(2) && parsed.recommendation ? (
           <Section title="Recommendation" icon={Sparkles} defaultOpen>
-            <p className="text-[13px] leading-relaxed text-teal-100/85">
-              {parsed.recommendation}
-            </p>
+            <p className="text-[13px] leading-relaxed text-teal-100/85">{parsed.recommendation}</p>
           </Section>
         ) : null}
 
@@ -165,12 +156,7 @@ export function CoachIntelligenceCard({
           <div className="flex flex-wrap items-center gap-2 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2.5">
             <Gauge className="h-3.5 w-3.5 text-zinc-500" />
             <span className={dash.label}>Confidence</span>
-            <span
-              className={cn(
-                "text-sm font-medium",
-                confidenceTone(parsed.confidence)
-              )}
-            >
+            <span className={cn("text-sm font-medium", confidenceTone(parsed.confidence))}>
               {parsed.confidence}
             </span>
           </div>

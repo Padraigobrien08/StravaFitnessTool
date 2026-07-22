@@ -11,8 +11,7 @@ import postgres from "postgres";
 const url = process.env.DATABASE_URL;
 if (!url) {
   console.error(
-    "DATABASE_URL is not set.\n" +
-      "Run `npm run setup` first, then `docker compose up -d`."
+    "DATABASE_URL is not set.\n" + "Run `npm run setup` first, then `docker compose up -d`.",
   );
   process.exit(1);
 }
@@ -21,12 +20,7 @@ const reset = process.argv.includes("--reset");
 const requireSsl = /sslmode=require|ssl=true|neon\.tech/.test(url);
 const sql = postgres(url, { ssl: requireSsl ? "require" : false, max: 1 });
 
-const migrationsDir = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "db",
-  "migrations"
-);
+const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "db", "migrations");
 const files = readdirSync(migrationsDir)
   .filter((f) => f.endsWith(".sql"))
   .sort();
@@ -38,11 +32,9 @@ try {
   }
 
   await sql.unsafe(
-    "CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW())"
+    "CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW())",
   );
-  const applied = new Set(
-    (await sql`SELECT name FROM _migrations`).map((r) => r.name)
-  );
+  const applied = new Set((await sql`SELECT name FROM _migrations`).map((r) => r.name));
 
   let ran = 0;
   for (const file of files) {
@@ -58,9 +50,7 @@ try {
     ran++;
   }
 
-  console.log(
-    ran ? `\n✅ Applied ${ran} migration(s).` : "\n✅ Schema already up to date."
-  );
+  console.log(ran ? `\n✅ Applied ${ran} migration(s).` : "\n✅ Schema already up to date.");
 } catch (err) {
   console.error(`\n❌ Migration failed: ${err.message}`);
   process.exitCode = 1;

@@ -3,21 +3,17 @@ import type { Goal, RunActivity, StravaImport } from "@/lib/strava/types";
 /** Merge two imports: overlay runs replace base on same id; unique runs from both are kept. */
 export function mergeStravaImports(
   base: StravaImport | null,
-  overlay: StravaImport | null
+  overlay: StravaImport | null,
 ): StravaImport | null {
   if (!base) return overlay;
   if (!overlay) return base;
 
-  const runsById = new Map<string, RunActivity>(
-    base.runs.map((r) => [r.id, r])
-  );
+  const runsById = new Map<string, RunActivity>(base.runs.map((r) => [r.id, r]));
   for (const run of overlay.runs) {
     runsById.set(run.id, run);
   }
 
-  const activitiesById = new Map(
-    base.allActivities.map((a) => [a.id, a])
-  );
+  const activitiesById = new Map(base.allActivities.map((a) => [a.id, a]));
   for (const a of overlay.allActivities) {
     activitiesById.set(a.id, a);
   }
@@ -29,30 +25,25 @@ export function mergeStravaImports(
     goalsByKey.set(goalsKey(g), g);
   }
 
-  const fitRunIds = Array.from(
-    new Set([...(base.fitRunIds ?? []), ...(overlay.fitRunIds ?? [])])
-  );
+  const fitRunIds = Array.from(new Set([...(base.fitRunIds ?? []), ...(overlay.fitRunIds ?? [])]));
 
   const profile = {
     ...base.profile,
-    maxHeartRate:
-      overlay.profile.maxHeartRate ?? base.profile.maxHeartRate,
-    athleteType:
-      overlay.profile.athleteType ?? base.profile.athleteType,
+    maxHeartRate: overlay.profile.maxHeartRate ?? base.profile.maxHeartRate,
+    athleteType: overlay.profile.athleteType ?? base.profile.athleteType,
     ftp: overlay.profile.ftp ?? base.profile.ftp,
     measurementPreference:
-      overlay.profile.measurementPreference ??
-      base.profile.measurementPreference,
+      overlay.profile.measurementPreference ?? base.profile.measurementPreference,
   };
 
   return {
     runs: Array.from(runsById.values()).sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     ),
     profile,
     goals: Array.from(goalsByKey.values()),
     allActivities: Array.from(activitiesById.values()).sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     ),
     importedAt:
       new Date(overlay.importedAt) > new Date(base.importedAt)
@@ -63,10 +54,7 @@ export function mergeStravaImports(
   };
 }
 
-function mergeExportLabels(
-  a?: string,
-  b?: string
-): string | undefined {
+function mergeExportLabels(a?: string, b?: string): string | undefined {
   if (!a?.trim()) return b?.trim() || undefined;
   if (!b?.trim()) return a.trim();
   const left = a.trim();
@@ -79,13 +67,10 @@ function mergeExportLabels(
 
 export function enrichImportWithFitDetails(
   data: StravaImport,
-  fitDetails: { activityId: string }[]
+  fitDetails: { activityId: string }[],
 ): StravaImport {
   const fitRunIds = Array.from(
-    new Set([
-      ...(data.fitRunIds ?? []),
-      ...fitDetails.map((f) => f.activityId),
-    ])
+    new Set([...(data.fitRunIds ?? []), ...fitDetails.map((f) => f.activityId)]),
   );
   return { ...data, fitRunIds };
 }

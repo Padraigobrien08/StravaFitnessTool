@@ -16,9 +16,4 @@ export interface CausalExplanation {
 }
 
 export type CausalPhenomenon =
-  | "readiness"
-  | "fatigue"
-  | "forecast"
-  | "efficiency"
-  | "execution"
-  | "pacing";
+  "readiness" | "fatigue" | "forecast" | "efficiency" | "execution" | "pacing";

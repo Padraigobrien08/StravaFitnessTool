@@ -30,22 +30,16 @@ export function CoachThreadStarter({
   return (
     <div className="coach-thread-starter space-y-8 pb-4">
       <div className="space-y-2">
-        <p className="text-[15px] leading-relaxed text-zinc-300">
-          {state.currentFocus}
-        </p>
+        <p className="text-[15px] leading-relaxed text-zinc-300">{state.currentFocus}</p>
         {state.focusRationale ? (
-          <p className="text-[13px] leading-relaxed text-zinc-500">
-            {state.focusRationale}
-          </p>
+          <p className="text-[13px] leading-relaxed text-zinc-500">{state.focusRationale}</p>
         ) : null}
       </div>
 
       {signal ? (
         <div className="rounded-lg bg-white/[0.025] px-3.5 py-3">
           <p className="text-[11px] text-zinc-600">Recent signal</p>
-          <p className="mt-1 text-[13px] leading-relaxed text-zinc-400">
-            {signal}
-          </p>
+          <p className="mt-1 text-[13px] leading-relaxed text-zinc-400">{signal}</p>
         </div>
       ) : null}
 
@@ -60,7 +54,7 @@ export function CoachThreadStarter({
                 onClick={() => onSelect(q)}
                 className={cn(
                   "w-full rounded-lg px-3 py-2.5 text-left text-[14px] leading-snug text-zinc-300 transition-colors",
-                  "hover:bg-white/[0.04] disabled:opacity-40"
+                  "hover:bg-white/[0.04] disabled:opacity-40",
                 )}
               >
                 {q}

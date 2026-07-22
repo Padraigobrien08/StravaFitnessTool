@@ -1,11 +1,7 @@
 import type { CoachingContext } from "@/lib/coaching-context/types";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import { allBeliefs } from "./beliefUtils";
-import type {
-  AthleteBelief,
-  AthleteMemoryProfile,
-  RelevantMemorySelection,
-} from "./types";
+import type { AthleteBelief, AthleteMemoryProfile, RelevantMemorySelection } from "./types";
 
 function scoreBelief(
   belief: AthleteBelief,
@@ -14,7 +10,7 @@ function scoreBelief(
     fatigueHeavy: boolean;
     raceWeek: boolean;
     hybrid: boolean;
-  }
+  },
 ): number {
   let score = 0;
   if (belief.confidence === "high") score += 3;
@@ -42,13 +38,11 @@ export function selectRelevantBeliefs(
     coachingContext?: CoachingContext | null;
     maxBeliefs?: number;
     forPlanning?: boolean;
-  }
+  },
 ): RelevantMemorySelection {
   let days: number | undefined = opts?.coachingContext?.goal?.daysUntilRace;
   if (days == null && opts?.goal?.date) {
-    const d = Math.ceil(
-      (new Date(opts.goal.date).getTime() - Date.now()) / 86400000
-    );
+    const d = Math.ceil((new Date(opts.goal.date).getTime() - Date.now()) / 86400000);
     if (d >= 0) days = d;
   }
 
@@ -57,9 +51,7 @@ export function selectRelevantBeliefs(
     (opts?.coachingContext?.currentState.freshness != null &&
       opts.coachingContext.currentState.freshness < 45);
 
-  const raceWeek =
-    opts?.coachingContext?.constraints.raceWeek ||
-    (days != null && days <= 7);
+  const raceWeek = opts?.coachingContext?.constraints.raceWeek || (days != null && days <= 7);
 
   const hybrid =
     opts?.coachingContext?.modalityContext.athleteArchetype === "hybrid_runner" ||
@@ -80,14 +72,10 @@ export function selectRelevantBeliefs(
   if (opts?.forPlanning) {
     for (const b of beliefs) {
       if (b.category === "fatigue" && /hard|density|stack/i.test(b.statement)) {
-        planningNotes.push(
-          "Memory: avoid stacking hard sessions — " + b.recommendedUse
-        );
+        planningNotes.push("Memory: avoid stacking hard sessions — " + b.recommendedUse);
       }
       if (b.category === "modality" && /interference/i.test(b.statement)) {
-        planningNotes.push(
-          "Memory: separate hard cross-training from key runs"
-        );
+        planningNotes.push("Memory: separate hard cross-training from key runs");
       }
       if (b.category === "taper" && raceWeek) {
         planningNotes.push("Memory: prioritise taper/freshness — " + b.recommendedUse);
@@ -98,9 +86,6 @@ export function selectRelevantBeliefs(
   return { beliefs, planningNotes };
 }
 
-export function highestValueBeliefs(
-  profile: AthleteMemoryProfile,
-  max = 6
-): AthleteBelief[] {
+export function highestValueBeliefs(profile: AthleteMemoryProfile, max = 6): AthleteBelief[] {
   return selectRelevantBeliefs(profile, { maxBeliefs: max }).beliefs;
 }

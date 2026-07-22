@@ -15,7 +15,7 @@ const MEDICAL_PATTERNS = [
 const INVENTED = [/\bhrv\b/i, /\bvo2\s*max\s*=\s*\d+/i];
 
 export function evaluateRecommendation(
-  input: RecommendationIntegrityInput
+  input: RecommendationIntegrityInput,
 ): RecommendationIntegrityReport {
   const issues: RecommendationIssue[] = [];
   const text = input.text;
@@ -62,14 +62,13 @@ export function evaluateRecommendation(
   }
   score = Math.max(0, Math.min(100, score));
 
-  const severity =
-    issues.some((i) => i.severity === "high")
-      ? "high"
-      : issues.some((i) => i.severity === "medium")
-        ? "medium"
-        : issues.length
-          ? "low"
-          : "none";
+  const severity = issues.some((i) => i.severity === "high")
+    ? "high"
+    : issues.some((i) => i.severity === "medium")
+      ? "medium"
+      : issues.length
+        ? "low"
+        : "none";
 
   return {
     passed: !issues.some((i) => i.severity === "high") && score >= 60,

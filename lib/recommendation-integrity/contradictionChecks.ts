@@ -9,9 +9,7 @@ function planText(plan: WeeklyPlanIntegrityInput["plan"]): string {
   ].join("\n");
 }
 
-export function runContradictionChecks(
-  input: WeeklyPlanIntegrityInput
-): RecommendationIssue[] {
+export function runContradictionChecks(input: WeeklyPlanIntegrityInput): RecommendationIssue[] {
   const { plan, context, guardrails } = input;
   const issues: RecommendationIssue[] = [];
   const text = planText(plan);
@@ -21,23 +19,21 @@ export function runContradictionChecks(
     context.currentState.intensityBalance === "intensity_heavy" ||
     context.risks.some(
       (r) =>
-        /stack|density|hard/i.test(r.label) &&
-        (r.severity === "medium" || r.severity === "high")
+        /stack|density|hard/i.test(r.label) && (r.severity === "medium" || r.severity === "high"),
     );
 
   const hardRuns = plan.workouts.filter(
     (w) =>
       w.modality === "run" &&
       (w.intensity === "hard" ||
-        /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`))
+        /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`)),
   );
 
   if (stackingRisk && hardRuns.length > guardrails.maxHardSessions) {
     issues.push({
       type: "contradiction",
       severity: "high",
-      message:
-        "Plan adds hard runs while context flags elevated intensity stacking risk",
+      message: "Plan adds hard runs while context flags elevated intensity stacking risk",
       suggestedFix: `Cap at ${guardrails.maxHardSessions} hard run(s) and space with easy days`,
     });
   }
@@ -56,10 +52,7 @@ export function runContradictionChecks(
     });
   }
 
-  if (
-    guardrails.raceWeek &&
-    hardRuns.length > 1
-  ) {
+  if (guardrails.raceWeek && hardRuns.length > 1) {
     issues.push({
       type: "race_week_violation",
       severity: "high",
@@ -69,9 +62,7 @@ export function runContradictionChecks(
   }
 
   const strengthBenefit = /\bstrength\b.*\b(help|benefit|support)/i.test(text);
-  const strengthHarm = /\bstrength\b.*\b(interfer|hurt|compromise|fatigue)/i.test(
-    text
-  );
+  const strengthHarm = /\bstrength\b.*\b(interfer|hurt|compromise|fatigue)/i.test(text);
   const strengthBoth =
     strengthBenefit &&
     strengthHarm &&
@@ -81,8 +72,7 @@ export function runContradictionChecks(
     issues.push({
       type: "contradiction",
       severity: "medium",
-      message:
-        "Strength described as both beneficial and interfering without timing nuance",
+      message: "Strength described as both beneficial and interfering without timing nuance",
       suggestedFix:
         "Clarify: light strength supports durability; heavy strength should be separated from key runs",
     });
@@ -103,11 +93,7 @@ export function runContradictionChecks(
     });
   }
 
-  if (
-    plan.confidence === "high" &&
-    context.currentState.specificity === "low" &&
-    context.goal
-  ) {
+  if (plan.confidence === "high" && context.currentState.specificity === "low" && context.goal) {
     issues.push({
       type: "overconfidence",
       severity: "medium",

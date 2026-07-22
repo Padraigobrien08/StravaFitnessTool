@@ -9,14 +9,11 @@ import {
 import type { StravaActivity, StravaAthlete } from "@/lib/strava/api/types";
 import { getFitRunIdsForUser } from "@/lib/db/activity-streams";
 import { getStravaConnection } from "@/lib/db/strava-connection";
-import {
-  maxHrFromZones,
-  normalizeAthleteZones,
-} from "@/lib/strava/api/normalizeZones";
+import { maxHrFromZones, normalizeAthleteZones } from "@/lib/strava/api/normalizeZones";
 
 export async function upsertActivities(
   userId: string,
-  activities: StravaActivity[]
+  activities: StravaActivity[],
 ): Promise<number> {
   if (activities.length === 0) return 0;
   const sql = getSql();
@@ -47,7 +44,7 @@ export async function upsertActivities(
 
 export async function buildStravaImportFromDb(
   userId: string,
-  athlete: StravaAthlete | null
+  athlete: StravaAthlete | null,
 ): Promise<StravaImport> {
   const sql = getSql();
   const rows = await sql`
@@ -87,16 +84,16 @@ export async function buildStravaImportFromDb(
 
   const fitRunIds = await getFitRunIdsForUser(userId);
   const conn = await getStravaConnection(userId);
-  const zoneMaxHr = maxHrFromZones(
-    normalizeAthleteZones(conn?.athlete_zones_json)
-  );
+  const zoneMaxHr = maxHrFromZones(normalizeAthleteZones(conn?.athlete_zones_json));
 
-  const profile = athlete ? mapAthleteProfile(athlete) : {
-    maxHeartRate: null,
-    athleteType: null,
-    ftp: null,
-    measurementPreference: null,
-  };
+  const profile = athlete
+    ? mapAthleteProfile(athlete)
+    : {
+        maxHeartRate: null,
+        athleteType: null,
+        ftp: null,
+        measurementPreference: null,
+      };
   if (zoneMaxHr != null) {
     profile.maxHeartRate = zoneMaxHr;
   } else if (profile.maxHeartRate == null && athlete?.max_heartrate) {

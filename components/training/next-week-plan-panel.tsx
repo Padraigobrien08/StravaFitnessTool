@@ -55,7 +55,7 @@ export function NextWeekPlanPanel({
         return next;
       });
     },
-    [plan.weekStart, plan.sessions.length]
+    [plan.weekStart, plan.sessions.length],
   );
 
   return (
@@ -63,13 +63,11 @@ export function NextWeekPlanPanel({
       <CardHeader>
         <CardTitle>
           Recommended next week
-          <span className="ml-2 text-sm font-normal text-zinc-500">
-            {plan.weekLabel}
-          </span>
+          <span className="ml-2 text-sm font-normal text-zinc-500">{plan.weekLabel}</span>
         </CardTitle>
         <p className="text-xs text-zinc-500 capitalize">
-          Template: {plan.template.replace(/_/g, " ")} ·{" "}
-          {plan.totalKmRange[0]}–{plan.totalKmRange[1]} km
+          Template: {plan.template.replace(/_/g, " ")} · {plan.totalKmRange[0]}–
+          {plan.totalKmRange[1]} km
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -97,11 +95,7 @@ export function NextWeekPlanPanel({
               />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  {s.day && (
-                    <span className="text-xs font-medium text-zinc-500">
-                      {s.day}
-                    </span>
-                  )}
+                  {s.day && <span className="text-xs font-medium text-zinc-500">{s.day}</span>}
                   <WorkoutTypeBadge type={s.type} />
                   <span className="text-xs text-zinc-600">
                     {s.distanceKmRange[0]}–{s.distanceKmRange[1]} km
@@ -123,9 +117,9 @@ export function NextWeekPlanPanel({
 
         {!compact && (
           <WhatThisMeans>
-            Plan uses your freshness (TSB), intensity balance, race countdown,
-            and recent weekly volume. Hard sessions are limited when fatigue is
-            high; volume will not exceed ~15% vs last week without a warning.
+            Plan uses your freshness (TSB), intensity balance, race countdown, and recent weekly
+            volume. Hard sessions are limited when fatigue is high; volume will not exceed ~15% vs
+            last week without a warning.
           </WhatThisMeans>
         )}
       </CardContent>

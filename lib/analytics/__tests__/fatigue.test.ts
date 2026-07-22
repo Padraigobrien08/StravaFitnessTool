@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  acuteChronicLoad,
-  buildFatigueSnapshot,
-  weeklyLoadSeries,
-} from "../fatigue";
+import { acuteChronicLoad, buildFatigueSnapshot, weeklyLoadSeries } from "../fatigue";
 import type { RunActivity } from "@/lib/strava/types";
 import { format, subWeeks, startOfWeek } from "date-fns";
 

@@ -15,14 +15,11 @@ export interface StravaAthleteGear {
 }
 
 export async function fetchAthleteGear(
-  accessToken: string
+  accessToken: string,
 ): Promise<{ shoes: StravaGear[]; bikes: StravaGear[] }> {
-  const athlete = await stravaGet<StravaAthleteGear>(
-    accessToken,
-    "/athlete",
-    undefined,
-    { context: "athlete gear" }
-  );
+  const athlete = await stravaGet<StravaAthleteGear>(accessToken, "/athlete", undefined, {
+    context: "athlete gear",
+  });
   if (!athlete) return { shoes: [], bikes: [] };
   return {
     shoes: athlete.shoes ?? [],

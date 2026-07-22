@@ -16,34 +16,20 @@ function TrendBlock({
 }) {
   return (
     <div
-      className={cn(
-        "rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-3",
-        className
-      )}
+      className={cn("rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-3", className)}
     >
       <div className="flex items-baseline justify-between gap-2">
         <span className={dash.label}>{chart.label}</span>
         {chart.caption ? (
-          <span className="text-[10px] tabular-nums text-teal-400/80">
-            {chart.caption}
-          </span>
+          <span className="text-[10px] tabular-nums text-teal-400/80">{chart.caption}</span>
         ) : null}
       </div>
-      <TrendChart
-        data={chart.data}
-        positive={chart.positive}
-        height={44}
-        className="mt-2"
-      />
+      <TrendChart data={chart.data} positive={chart.positive} height={44} className="mt-2" />
     </div>
   );
 }
 
-export function ProgressionMomentumPanel({
-  data,
-}: {
-  data: ProgressionViewModel;
-}) {
+export function ProgressionMomentumPanel({ data }: { data: ProgressionViewModel }) {
   return (
     <PanelChrome
       title="Progression & momentum"
@@ -65,17 +51,12 @@ export function ProgressionMomentumPanel({
                     className={cn(
                       "flex items-start gap-2 py-2 transition-colors hover:bg-white/[0.02]",
                       i < Math.min(data.achievements.length, 4) - 1 &&
-                        "border-b border-white/[0.04]"
+                        "border-b border-white/[0.04]",
                     )}
                   >
-                    <Trophy
-                      className="mt-0.5 h-4 w-4 shrink-0 text-teal-400/70"
-                      aria-hidden
-                    />
+                    <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-teal-400/70" aria-hidden />
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-zinc-200">
-                        {a.title}
-                      </span>
+                      <span className="block text-sm font-medium text-zinc-200">{a.title}</span>
                       <span className={dash.muted}>{a.meta}</span>
                     </span>
                   </li>
@@ -103,9 +84,7 @@ export function ProgressionMomentumPanel({
           {data.bestBlock ? (
             <div className="rounded-lg border border-teal-500/15 bg-teal-500/[0.05] px-3 py-2.5">
               <p className={dash.label}>Best block</p>
-              <p className="mt-1 text-sm leading-snug text-zinc-300">
-                {data.bestBlock}
-              </p>
+              <p className="mt-1 text-sm leading-snug text-zinc-300">{data.bestBlock}</p>
             </div>
           ) : null}
         </div>
@@ -122,7 +101,7 @@ export function ProgressionMomentumPanel({
                       "text-[11px] font-medium tabular-nums",
                       c.positive === true && "text-teal-400/90",
                       c.positive === false && "text-amber-400/90",
-                      c.positive === null && "text-zinc-500"
+                      c.positive === null && "text-zinc-500",
                     )}
                   >
                     {c.label} {c.value}

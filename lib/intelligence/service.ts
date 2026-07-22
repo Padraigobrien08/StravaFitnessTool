@@ -16,7 +16,7 @@ import type {
 
 export async function resolveIntelligenceContext(
   userId: string,
-  overrides?: Partial<IntelligenceContext>
+  overrides?: Partial<IntelligenceContext>,
 ): Promise<{
   userId: string;
   raceGoal: IntelligenceContext["raceGoal"];
@@ -25,16 +25,10 @@ export async function resolveIntelligenceContext(
   const prefs = await getUserPreferences(userId);
   return {
     userId,
-    raceGoal:
-      overrides?.raceGoal !== undefined
-        ? overrides.raceGoal
-        : prefs.raceGoal,
+    raceGoal: overrides?.raceGoal !== undefined ? overrides.raceGoal : prefs.raceGoal,
     settings: {
-      defaultWeeklyRuns:
-        overrides?.settings?.defaultWeeklyRuns ??
-        prefs.settings.defaultWeeklyRuns,
-      maxWeeklyKm:
-        overrides?.settings?.maxWeeklyKm ?? prefs.settings.maxWeeklyKm,
+      defaultWeeklyRuns: overrides?.settings?.defaultWeeklyRuns ?? prefs.settings.defaultWeeklyRuns,
+      maxWeeklyKm: overrides?.settings?.maxWeeklyKm ?? prefs.settings.maxWeeklyKm,
     },
   };
 }
@@ -51,23 +45,18 @@ export async function loadAthleteDataset(userId: string) {
 }
 
 export async function computeAthleteIntelligence(
-  ctx: IntelligenceContext
+  ctx: IntelligenceContext,
 ): Promise<AthleteIntelligenceBundle> {
-  const { importData, fitDetails, quality } = await loadAthleteDataset(
-    ctx.userId
-  );
+  const { importData, fitDetails, quality } = await loadAthleteDataset(ctx.userId);
   const resolved = await resolveIntelligenceContext(ctx.userId, ctx);
-  const maxKm =
-    resolved.settings.maxWeeklyKm > 0
-      ? resolved.settings.maxWeeklyKm
-      : undefined;
+  const maxKm = resolved.settings.maxWeeklyKm > 0 ? resolved.settings.maxWeeklyKm : undefined;
 
   const analytics = computeInsights(
     importData,
     fitDetails,
     resolved.settings.defaultWeeklyRuns,
     resolved.raceGoal ?? null,
-    maxKm
+    maxKm,
   );
   const insights = generateInsights(analytics, quality);
 
@@ -76,12 +65,7 @@ export async function computeAthleteIntelligence(
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 30)
     .map((r) => {
-      const detail = buildRunCoachDetail(
-        r,
-        fitById.get(r.id) ?? null,
-        analytics,
-        importData.runs
-      );
+      const detail = buildRunCoachDetail(r, fitById.get(r.id) ?? null, analytics, importData.runs);
       return {
         runId: detail.runId,
         date: detail.date,
@@ -113,15 +97,13 @@ export async function computeAthleteIntelligence(
   };
 }
 
-export async function buildCoachBriefForUser(
-  ctx: IntelligenceContext
-): Promise<IntelligenceBrief> {
+export async function buildCoachBriefForUser(ctx: IntelligenceContext): Promise<IntelligenceBrief> {
   const bundle = await computeAthleteIntelligence(ctx);
   const resolved = await resolveIntelligenceContext(ctx.userId, ctx);
   return buildIntelligenceBrief(
     bundle.analytics,
     bundle.insights,
     bundle.quality,
-    resolved.raceGoal ?? null
+    resolved.raceGoal ?? null,
   );
 }

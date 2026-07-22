@@ -10,11 +10,7 @@ export type DurabilityLabel = "weak" | "moderate" | "strong" | "unknown";
 
 export type SpecificityLabel = "low" | "moderate" | "high" | "unknown";
 
-export type IntensityBalanceLabel =
-  | "easy_biased"
-  | "balanced"
-  | "intensity_heavy"
-  | "unknown";
+export type IntensityBalanceLabel = "easy_biased" | "balanced" | "intensity_heavy" | "unknown";
 
 export type CoverageLevel = "low" | "medium" | "high";
 

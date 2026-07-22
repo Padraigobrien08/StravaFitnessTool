@@ -11,7 +11,7 @@ export async function fetchSegmentLeaderboard(
     weight_class?: string;
     following?: boolean;
     club_id?: number;
-  }
+  },
 ): Promise<SegmentLeaderboard> {
   const data = await stravaGet<SegmentLeaderboard>(
     accessToken,
@@ -20,12 +20,10 @@ export async function fetchSegmentLeaderboard(
       ...(options?.gender ? { gender: options.gender } : {}),
       ...(options?.age_group ? { age_group: options.age_group } : {}),
       ...(options?.weight_class ? { weight_class: options.weight_class } : {}),
-      ...(options?.following != null
-        ? { following: options.following ? "true" : "false" }
-        : {}),
+      ...(options?.following != null ? { following: options.following ? "true" : "false" } : {}),
       ...(options?.club_id != null ? { club_id: options.club_id } : {}),
     },
-    { context: `segment leaderboard ${segmentId}` }
+    { context: `segment leaderboard ${segmentId}` },
   );
   if (!data) throw new Error(`Leaderboard for segment ${segmentId} not found`);
   return data;

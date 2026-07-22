@@ -16,7 +16,5 @@ export async function GET(request: NextRequest) {
     path: "/",
     maxAge: 600,
   });
-  return NextResponse.redirect(
-    buildStravaAuthorizeUrl(state, resolveRedirectUri(request))
-  );
+  return NextResponse.redirect(buildStravaAuthorizeUrl(state, resolveRedirectUri(request)));
 }

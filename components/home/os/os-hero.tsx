@@ -108,9 +108,7 @@ export function OsHero({
           </div>
         </div>
         <aside className="grid grid-cols-2 gap-1.5 lg:grid-cols-1">
-          {hero.raceName ? (
-            <StateChip label="Race" value={hero.raceName} accent />
-          ) : null}
+          {hero.raceName ? <StateChip label="Race" value={hero.raceName} accent /> : null}
           {hero.daysUntilRace != null ? (
             <StateChip
               label="Countdown"
@@ -131,22 +129,14 @@ export function OsHero({
   );
 }
 
-function StateChip({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
+function StateChip({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div
       className={cn(
         "rounded-lg px-2.5 py-2",
         accent
           ? "bg-teal-500/10 ring-1 ring-teal-500/20"
-          : "bg-[var(--surface)] ring-1 ring-[var(--border-subtle)]"
+          : "bg-[var(--surface)] ring-1 ring-[var(--border-subtle)]",
       )}
     >
       <p className="text-[9px] uppercase tracking-wide text-zinc-600">{label}</p>

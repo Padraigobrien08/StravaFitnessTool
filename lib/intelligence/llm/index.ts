@@ -7,7 +7,7 @@ export { COACH_SYSTEM, resolveCoachProvider, type ChatMessage } from "./types";
 
 export async function runCoachChat(
   ctx: IntelligenceContext,
-  messages: ChatMessage[]
+  messages: ChatMessage[],
 ): Promise<{ reply: string; toolsUsed: string[] }> {
   const { provider, apiKey } = resolveCoachProvider();
   if (provider === "openai") {

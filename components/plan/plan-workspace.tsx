@@ -19,10 +19,7 @@ import {
   matchPlannedVsActual,
 } from "@/lib/training-calendar";
 import type { TrainingCalendarWeek } from "@/lib/training-calendar";
-import {
-  historyCount,
-  revertCalendarWeek,
-} from "@/lib/training-calendar/calendarHistory";
+import { historyCount, revertCalendarWeek } from "@/lib/training-calendar/calendarHistory";
 import {
   buildWeekTelemetry,
   buildTodayInPlan,
@@ -43,11 +40,7 @@ import { PlanPlanningContext } from "./plan-planning-context";
 import { PlanWeekExecution } from "./plan-week-execution";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CalendarPlus, RefreshCw } from "lucide-react";
 
 export function PlanWorkspace() {
@@ -89,18 +82,15 @@ export function PlanWorkspace() {
   }, [preview]);
 
   const previewAppliesToView =
-    previewWeek?.weekStart === viewWeekStart ||
-    previewWeek?.weekStart === calendar.targetWeek;
+    previewWeek?.weekStart === viewWeekStart || previewWeek?.weekStart === calendar.targetWeek;
 
   const showingPreview = Boolean(
-    previewAppliesToView &&
-      previewWeek &&
-      (confirmReplace || !calendar.savedWeek)
+    previewAppliesToView && previewWeek && (confirmReplace || !calendar.savedWeek),
   );
 
   const displayWeek: TrainingCalendarWeek | null = useMemo(
     () => (showingPreview ? previewWeek : calendar.savedWeek),
-    [showingPreview, previewWeek, calendar.savedWeek]
+    [showingPreview, previewWeek, calendar.savedWeek],
   );
 
   const status: PlanHeaderStatus = useMemo(() => {
@@ -122,9 +112,7 @@ export function PlanWorkspace() {
       case "saved":
         return "Saved · your week";
       case "preview":
-        return preview?.source === "fallback"
-          ? "Unsaved preview (fallback)"
-          : "Unsaved preview";
+        return preview?.source === "fallback" ? "Unsaved preview (fallback)" : "Unsaved preview";
       case "saved_with_preview":
         return "Saved · new preview ready";
       case "modified":
@@ -136,10 +124,7 @@ export function PlanWorkspace() {
 
   const weekRange = displayWeek
     ? formatWeekRange(displayWeek.weekStart, displayWeek.weekEnd)
-    : formatWeekRange(
-        calendar.targetWeek,
-        weekEndFromStart(calendar.targetWeek)
-      );
+    : formatWeekRange(calendar.targetWeek, weekEndFromStart(calendar.targetWeek));
 
   const phaseLabel = displayWeek
     ? planPhaseLabel(displayWeek.planType)
@@ -149,13 +134,9 @@ export function PlanWorkspace() {
 
   const goalContext = goalContextLabel(raceGoal, analytics);
 
-  const telemetry = displayWeek
-    ? buildWeekTelemetry(displayWeek, analytics)
-    : null;
+  const telemetry = displayWeek ? buildWeekTelemetry(displayWeek, analytics) : null;
   const today = displayWeek ? buildTodayInPlan(displayWeek) : null;
-  const integrityItems = displayWeek
-    ? buildIntegrityItems(displayWeek, preview)
-    : [];
+  const integrityItems = displayWeek ? buildIntegrityItems(displayWeek, preview) : [];
   const explainLines = displayWeek ? sessionExplainability(displayWeek) : [];
 
   const runs = importData?.runs ?? [];
@@ -166,9 +147,7 @@ export function PlanWorkspace() {
   }, [calendar.savedWeek, runs, showingPreview]);
 
   const shiftViewWeek = useCallback((deltaWeeks: number) => {
-    setViewWeekStart((current) =>
-      format(addDays(parseISO(current), deltaWeeks * 7), "yyyy-MM-dd")
-    );
+    setViewWeekStart((current) => format(addDays(parseISO(current), deltaWeeks * 7), "yyyy-MM-dd"));
     setConfirmReplace(false);
     setHighlightIds([]);
   }, []);
@@ -176,7 +155,7 @@ export function PlanWorkspace() {
   const handleGenerate = useCallback(async () => {
     if (calendar.hasSaved && !confirmReplace) {
       const ok = window.confirm(
-        "Generate a new preview? Your saved week stays until you save over it."
+        "Generate a new preview? Your saved week stays until you save over it.",
       );
       if (!ok) return;
     }
@@ -191,15 +170,11 @@ export function PlanWorkspace() {
     if (!preview) return;
     setSaveError(null);
     const outcome = calendar.saveFromGenerated(preview, {
-      planningContext:
-        planningContext.trim() || lastPlanningContext || undefined,
+      planningContext: planningContext.trim() || lastPlanningContext || undefined,
     });
     if (!outcome.ok) {
       const high = outcome.validation.issues.filter((i) => i.severity === "high");
-      setSaveError(
-        high[0]?.message ??
-          "Cannot save — fix critical issues or regenerate."
-      );
+      setSaveError(high[0]?.message ?? "Cannot save — fix critical issues or regenerate.");
       return;
     }
     resetPreview();
@@ -208,9 +183,7 @@ export function PlanWorkspace() {
   }, [preview, calendar, resetPreview, planningContext, lastPlanningContext]);
 
   const handleClear = useCallback(() => {
-    if (
-      !window.confirm("Clear the saved calendar for this week? This cannot be undone.")
-    ) {
+    if (!window.confirm("Clear the saved calendar for this week? This cannot be undone.")) {
       return;
     }
     calendar.clearWeek();
@@ -230,10 +203,7 @@ export function PlanWorkspace() {
 
   const handleDuplicate = useCallback(() => {
     if (!calendar.savedWeek) return;
-    const nextStart = format(
-      addDays(parseISO(calendar.savedWeek.weekStart), 7),
-      "yyyy-MM-dd"
-    );
+    const nextStart = format(addDays(parseISO(calendar.savedWeek.weekStart), 7), "yyyy-MM-dd");
     const now = new Date().toISOString();
     const duplicated: TrainingCalendarWeek = {
       ...JSON.parse(JSON.stringify(calendar.savedWeek)),
@@ -265,9 +235,7 @@ export function PlanWorkspace() {
       : "Build my next week plan for Mon/Wed/Fri/Sun only",
   });
 
-  const histCount = calendar.savedWeek
-    ? historyCount(calendar.savedWeek.weekStart)
-    : 0;
+  const histCount = calendar.savedWeek ? historyCount(calendar.savedWeek.weekStart) : 0;
 
   return (
     <div className="plan-workspace mx-auto max-w-[1400px] space-y-3 pb-10">
@@ -344,17 +312,13 @@ export function PlanWorkspace() {
 
       {saveError ? (
         <Alert className="border-amber-500/25 bg-amber-500/[0.06] px-3 py-2 text-[12px] text-amber-200/90">
-          <AlertDescription className="text-[12px] text-amber-200/90">
-            {saveError}
-          </AlertDescription>
+          <AlertDescription className="text-[12px] text-amber-200/90">{saveError}</AlertDescription>
         </Alert>
       ) : null}
 
       {error ? (
         <Alert className="border-red-500/20 bg-red-500/5 px-3 py-2.5">
-          <AlertDescription className="text-sm text-red-300/90">
-            {error}
-          </AlertDescription>
+          <AlertDescription className="text-sm text-red-300/90">{error}</AlertDescription>
           <Button
             size="sm"
             variant="outline"
@@ -380,8 +344,8 @@ export function PlanWorkspace() {
             Your training week starts here
           </p>
           <p className="mx-auto mt-1 max-w-md text-[12px] text-zinc-600">
-            Generate a week, edit sessions on the board, then save — it becomes
-            your living plan on Home and Plan.
+            Generate a week, edit sessions on the board, then save — it becomes your living plan on
+            Home and Plan.
           </p>
           <Button className="mt-4 h-9 gap-1.5" onClick={() => void handleGenerate()}>
             <RefreshCw className="h-3.5 w-3.5" />
@@ -393,11 +357,7 @@ export function PlanWorkspace() {
       {!displayWeek && !loading && status !== "empty" ? (
         <div className="rounded-lg border border-dashed border-[var(--border-default)] px-4 py-6 text-center">
           <p className="text-[13px] text-zinc-500">No saved plan for this week.</p>
-          <Button
-            className="mt-3 h-8 gap-1.5"
-            size="sm"
-            onClick={() => void handleGenerate()}
-          >
+          <Button className="mt-3 h-8 gap-1.5" size="sm" onClick={() => void handleGenerate()}>
             <RefreshCw className="h-3.5 w-3.5" />
             Generate for this week
           </Button>
@@ -407,9 +367,7 @@ export function PlanWorkspace() {
       {displayWeek ? (
         <div className="grid gap-3 xl:grid-cols-[1fr_272px]">
           <div className="min-w-0 space-y-3">
-            {today ? (
-              <PlanTodayFocus today={today} sticky className="lg:hidden" />
-            ) : null}
+            {today ? <PlanTodayFocus today={today} sticky className="lg:hidden" /> : null}
 
             <PlanWeekNav
               weekRange={weekRange}
@@ -424,15 +382,9 @@ export function PlanWorkspace() {
                 editable={!showingPreview && Boolean(calendar.savedWeek)}
                 draggable={!showingPreview && Boolean(calendar.savedWeek)}
                 highlightWorkoutIds={highlightIds}
-                onPatchWorkout={
-                  !showingPreview ? calendar.patchWorkout : undefined
-                }
-                onDeleteWorkout={
-                  !showingPreview ? calendar.removeWorkout : undefined
-                }
-                onSwapWorkouts={
-                  !showingPreview ? calendar.swapWorkouts : undefined
-                }
+                onPatchWorkout={!showingPreview ? calendar.patchWorkout : undefined}
+                onDeleteWorkout={!showingPreview ? calendar.removeWorkout : undefined}
+                onSwapWorkouts={!showingPreview ? calendar.swapWorkouts : undefined}
                 onSwipePastStart={() => shiftViewWeek(-1)}
                 onSwipePastEnd={() => shiftViewWeek(1)}
               />
@@ -447,9 +399,7 @@ export function PlanWorkspace() {
 
             {telemetry ? <PlanWeekTelemetryStrip telemetry={telemetry} /> : null}
 
-            {today ? (
-              <PlanTodayFocus today={today} className="hidden lg:block" />
-            ) : null}
+            {today ? <PlanTodayFocus today={today} className="hidden lg:block" /> : null}
           </div>
 
           <PlanOperationalSidebar
@@ -472,7 +422,7 @@ export function PlanWorkspace() {
               {JSON.stringify(
                 { validation: preview.validation, integrity: preview.integrity },
                 null,
-                2
+                2,
               )}
             </pre>
           </CollapsibleContent>
@@ -481,9 +431,8 @@ export function PlanWorkspace() {
 
       {coachPlan ? (
         <p className="text-[10px] text-zinc-700">
-          Coach uses{" "}
-          {calendar.savedWeek ? "your saved calendar" : "the current preview"}.
-          Plans persist in this browser only.
+          Coach uses {calendar.savedWeek ? "your saved calendar" : "the current preview"}. Plans
+          persist in this browser only.
         </p>
       ) : null}
     </div>

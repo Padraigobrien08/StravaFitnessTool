@@ -22,10 +22,7 @@ export default function TrendsPage() {
               {insights.paceTrend.length < 3 ? (
                 <p className="text-sm text-zinc-500">Need more runs for pace trends.</p>
               ) : (
-                <PaceChart
-                  data={insights.paceTrend}
-                  rolling={insights.rollingPace}
-                />
+                <PaceChart data={insights.paceTrend} rolling={insights.rollingPace} />
               )}
             </CardContent>
           </Card>
@@ -67,7 +64,8 @@ export default function TrendsPage() {
                 <>
                   <FitnessChart data={insights.fitnessIndex} />
                   <p className="mt-3 text-xs text-zinc-600">
-                    Directional estimate from weekly training load — not identical to TrainingPeaks CTL.
+                    Directional estimate from weekly training load — not identical to TrainingPeaks
+                    CTL.
                   </p>
                 </>
               )}

@@ -24,25 +24,21 @@ export function buildCommandCenterView(
   insights: Insight[],
   state: CoachWorkspaceState | null,
   risksAndOpportunities: RiskOpportunity[],
-  savedPlan?: { summary: string } | null
+  savedPlan?: { summary: string } | null,
 ): CommandCenterViewModel {
   const nextAction = state
     ? getPrimaryRecommendation(state, analytics)
-    : analytics.intensityAdvice.recommendations[0] ??
-      "Review your week and keep easy days between quality sessions.";
+    : (analytics.intensityAdvice.recommendations[0] ??
+      "Review your week and keep easy days between quality sessions.");
 
   const currentBelief = state
     ? buildCurrentBelief(state, analytics)
     : buildBeliefFromAnalytics(analytics);
 
   const risks = risksAndOpportunities.filter((r) => r.kind === "risk");
-  const opportunities = risksAndOpportunities.filter(
-    (r) => r.kind === "opportunity"
-  );
+  const opportunities = risksAndOpportunities.filter((r) => r.kind === "opportunity");
 
-  const primaryRisk = risks[0]
-    ? { label: risks[0].domain, summary: risks[0].text }
-    : null;
+  const primaryRisk = risks[0] ? { label: risks[0].domain, summary: risks[0].text } : null;
   const primaryOpportunity = opportunities[0]
     ? { label: opportunities[0].domain, summary: opportunities[0].text }
     : null;
@@ -67,9 +63,7 @@ export function buildCommandCenterView(
     primaryRisk,
     primaryOpportunity,
     raceContext,
-    planHint: savedPlan
-      ? "Saved calendar plan ready"
-      : planHint,
+    planHint: savedPlan ? "Saved calendar plan ready" : planHint,
     focusLabel: state?.currentFocus ?? "Training rhythm",
     confidence: analytics.dataConfidence,
     hasSavedPlan: Boolean(savedPlan),

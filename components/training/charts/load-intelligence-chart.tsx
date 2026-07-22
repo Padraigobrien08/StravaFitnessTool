@@ -52,12 +52,7 @@ export function LoadIntelligenceChart({
           axisLine={false}
           tickLine={false}
         />
-        <YAxis
-          tick={chart.tick}
-          width={32}
-          axisLine={false}
-          tickLine={false}
-        />
+        <YAxis tick={chart.tick} width={32} axisLine={false} tickLine={false} />
         <Tooltip contentStyle={chart.tooltip} />
         <Area
           type="monotone"

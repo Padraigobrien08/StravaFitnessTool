@@ -17,9 +17,7 @@ export function weeklyRunStreak(runs: RunActivity[]): number {
   if (weeks.length === 0) return 0;
 
   let streak = 0;
-  const sorted = [...weeks].sort((a, b) =>
-    b.weekStart.localeCompare(a.weekStart)
-  );
+  const sorted = [...weeks].sort((a, b) => b.weekStart.localeCompare(a.weekStart));
   const now = startOfWeek(new Date(), { weekStartsOn: 1 });
   const currentKey = format(now, "yyyy-MM-dd");
 
@@ -31,9 +29,7 @@ export function weeklyRunStreak(runs: RunActivity[]): number {
   return Math.min(streak, 8);
 }
 
-export function volumeStabilityScore(
-  weeks: ReturnType<typeof weeklyVolume>
-): number {
+export function volumeStabilityScore(weeks: ReturnType<typeof weeklyVolume>): number {
   const recent = weeks.slice(-8);
   if (recent.length < 2) return 50;
 
@@ -41,15 +37,14 @@ export function volumeStabilityScore(
   const mean = kms.reduce((a, b) => a + b, 0) / kms.length;
   if (mean === 0) return 0;
 
-  const variance =
-    kms.reduce((s, k) => s + (k - mean) ** 2, 0) / kms.length;
+  const variance = kms.reduce((s, k) => s + (k - mean) ** 2, 0) / kms.length;
   const cv = Math.sqrt(variance) / mean;
   return Math.round(Math.max(0, 100 - Math.min(100, cv * 200)));
 }
 
 export function frequencyScore(
   weeks: ReturnType<typeof weeklyVolume>,
-  targetPerWeek: number
+  targetPerWeek: number,
 ): number {
   const recent = weeks.slice(-8);
   if (recent.length === 0) return 0;
@@ -60,7 +55,7 @@ export function frequencyScore(
 export function buildConsistencyScore(
   runs: RunActivity[],
   goalProgress: GoalProgress | null,
-  defaultWeeklyRuns = 3
+  defaultWeeklyRuns = 3,
 ): ConsistencyScore {
   const weeks = weeklyVolume(runs);
   const target = goalProgress?.targetPerWeek ?? defaultWeeklyRuns;
@@ -69,9 +64,7 @@ export function buildConsistencyScore(
   const streakWeeks = weeklyRunStreak(runs);
   const streakComponent = Math.min(100, Math.round(streakWeeks * 12.5));
 
-  const overall = Math.round(
-    frequency * 0.4 + volumeStability * 0.3 + streakComponent * 0.3
-  );
+  const overall = Math.round(frequency * 0.4 + volumeStability * 0.3 + streakComponent * 0.3);
 
   let label = "Irregular";
   if (overall >= 75) label = "Steady";

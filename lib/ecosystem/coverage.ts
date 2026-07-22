@@ -18,9 +18,7 @@ export interface ModalityCoverageRow {
   count: number;
 }
 
-export function modalityCoverageRows(
-  coverage: ModalityCoverage
-): ModalityCoverageRow[] {
+export function modalityCoverageRows(coverage: ModalityCoverage): ModalityCoverageRow[] {
   const rows: ModalityCoverageRow[] = [
     { id: "running", label: "Running", count: coverage.running },
     { id: "cycling", label: "Cycling", count: coverage.cycling },

@@ -174,7 +174,7 @@ function roundPct(n: number): number {
 
 function significanceScoreFromMarkers(
   markers: RunMarker[],
-  workout: WorkoutClassification
+  workout: WorkoutClassification,
 ): number {
   let score = 10;
   if (markers.includes("pr")) score = 100;
@@ -196,7 +196,7 @@ function tierFromScore(score: number): SignificanceLevel | "routine" {
 
 function executionFromMarkers(
   markers: RunMarker[],
-  workout: WorkoutClassification
+  workout: WorkoutClassification,
 ): { label: string; rank: number } {
   if (markers.includes("pr") || markers.includes("efficient")) {
     return { label: "Excellent", rank: 4 };
@@ -213,10 +213,7 @@ function executionFromMarkers(
   return { label: "Moderate", rank: 2 };
 }
 
-function adaptationTagsFor(
-  workout: WorkoutClassification,
-  markers: RunMarker[]
-): string[] {
+function adaptationTagsFor(workout: WorkoutClassification, markers: RunMarker[]): string[] {
   const tags: string[] = [];
   if (markers.includes("pr")) tags.push("Speed");
   if (markers.includes("efficient")) tags.push("Aerobic efficiency");
@@ -235,7 +232,7 @@ function buildMarkers(
   prByRun: Map<string, PersonalRecord>,
   maxLoad: number,
   maxDist56: number,
-  efficientRunIds: Set<string>
+  efficientRunIds: Set<string>,
 ): RunMarker[] {
   const markers: RunMarker[] = [];
   if (prByRun.has(run.id)) markers.push("pr");
@@ -259,18 +256,16 @@ function buildNotableSessions(
   runs: RunActivity[],
   analytics: DashboardInsights,
   workoutMap: Map<string, WorkoutClassification>,
-  _prByRun: Map<string, PersonalRecord>
+  _prByRun: Map<string, PersonalRecord>,
 ): NotableSessionView[] {
   const sessions: NotableSessionView[] = [];
-  const sorted = [...runs].sort(
-    (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
-  );
+  const sorted = [...runs].sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
   const goalHint = analytics.raceReadiness
     ? `${analytics.raceReadiness.distanceLabel} prep`
     : "current fitness block";
 
   for (const pr of analytics.personalRecords.filter((p) =>
-    ["5k", "10k", "hm"].includes(p.bucket)
+    ["5k", "10k", "hm"].includes(p.bucket),
   )) {
     sessions.push({
       id: `pr-${pr.bucket}`,
@@ -364,23 +359,19 @@ function buildNotableSessions(
     });
   }
 
-  return [...sessions]
-    .sort((a, b) => b.rank - a.rank)
-    .slice(0, 6);
+  return [...sessions].sort((a, b) => b.rank - a.rank).slice(0, 6);
 }
 
 function buildPatterns(
   analytics: DashboardInsights,
-  labels: RunWorkoutLabel[]
+  labels: RunWorkoutLabel[],
 ): PatternInsightView[] {
   const patterns: PatternInsightView[] = [];
   const mix = analytics.workoutTypeMix;
   const top = [...mix].sort((a, b) => b.runCount - a.runCount)[0];
   const hardPct =
     mix
-      .filter((m) =>
-        ["tempo", "interval", "race"].includes(m.type)
-      )
+      .filter((m) => ["tempo", "interval", "race"].includes(m.type))
       .reduce((s, m) => s + m.pct, 0) ?? 0;
 
   if (top && top.pct >= 35) {
@@ -506,9 +497,10 @@ function buildHistorical(analytics: DashboardInsights): HistoricalContextView {
   return { items };
 }
 
-function classificationConfidenceNote(
-  labels: RunWorkoutLabel[]
-): { note: string; byType: { type: string; level: string }[] } {
+function classificationConfidenceNote(labels: RunWorkoutLabel[]): {
+  note: string;
+  byType: { type: string; level: string }[];
+} {
   const recent = labels.slice(-40);
   const high = recent.filter((l) => l.classification.confidence === "high").length;
   const ratio = recent.length > 0 ? high / recent.length : 0;
@@ -526,12 +518,7 @@ function classificationConfidenceNote(
     .filter(([, v]) => v.total >= 2)
     .map(([type, v]) => ({
       type: WORKOUT_TYPE_LABELS[type],
-      level:
-        v.high / v.total >= 0.6
-          ? "High"
-          : v.high / v.total >= 0.35
-            ? "Medium"
-            : "Low",
+      level: v.high / v.total >= 0.6 ? "High" : v.high / v.total >= 0.35 ? "Medium" : "Low",
     }))
     .slice(0, 4);
 
@@ -547,22 +534,16 @@ export function buildRunsPageView(
   runs: RunActivity[],
   analytics: DashboardInsights,
   fitRunIds: string[],
-  quality: ImportQualityReport | null
+  quality: ImportQualityReport | null,
 ): RunsPageView {
-  const workoutMap = new Map(
-    analytics.workoutLabels.map((l) => [l.runId, l.classification])
-  );
+  const workoutMap = new Map(analytics.workoutLabels.map((l) => [l.runId, l.classification]));
   const prByRun = prBuckets(analytics.personalRecords);
   const recent = recentRuns(runs);
-  const recentLabels = analytics.workoutLabels.filter((l) =>
-    recent.some((r) => r.id === l.runId)
-  );
+  const recentLabels = analytics.workoutLabels.filter((l) => recent.some((r) => r.id === l.runId));
 
   const totalKm = runs.reduce((s, r) => s + r.distanceM, 0) / 1000;
 
-  const topMix = [...analytics.workoutTypeMix].sort(
-    (a, b) => b.runCount - a.runCount
-  )[0];
+  const topMix = [...analytics.workoutTypeMix].sort((a, b) => b.runCount - a.runCount)[0];
 
   const hardPct = analytics.workoutTypeMix
     .filter((m) => ["tempo", "interval", "race"].includes(m.type))
@@ -591,9 +572,7 @@ export function buildRunsPageView(
   }
   if (signals.length === 0) signals.push("Building session history");
 
-  const interval4w = recentLabels.filter(
-    (l) => l.classification.type === "interval"
-  ).length;
+  const interval4w = recentLabels.filter((l) => l.classification.type === "interval").length;
 
   const recentBehavior = topMix
     ? `${roundPct(topMix.pct)}% ${topMix.label.toLowerCase()} share · ${analytics.intensityAdvice.hardRunsLast14d} hard sessions in 14d`
@@ -606,8 +585,7 @@ export function buildRunsPageView(
     trainingEmphasis = "Threshold support + recovery spacing";
   }
 
-  const readinessScore =
-    analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score;
+  const readinessScore = analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score;
   const volTrend =
     analytics.weeklyVolume.length >= 2 &&
     (analytics.weeklyVolume.at(-1)?.distanceKm ?? 0) >=
@@ -655,18 +633,8 @@ export function buildRunsPageView(
     modalityLine: "Running-led · see Training for cross-training",
     intensityLine: mixParts || "Mixed intensity",
     frequencyLine: `${Math.round(recent.length / 8) || recent.length} sessions/wk · ${recent.length} in 56d`,
-    longRunRhythm:
-      longRuns4w >= 2
-        ? "Stable"
-        : longRuns4w === 1
-          ? "Single anchor"
-          : "Gap emerging",
-    intervalDensity:
-      interval4w >= 2
-        ? "Regular stimulus"
-        : interval4w === 1
-          ? "Light"
-          : "Low",
+    longRunRhythm: longRuns4w >= 2 ? "Stable" : longRuns4w === 1 ? "Single anchor" : "Gap emerging",
+    intervalDensity: interval4w >= 2 ? "Regular stimulus" : interval4w === 1 ? "Light" : "Low",
     consistencyLine:
       analytics.consistencyScore.streakWeeks >= 3
         ? "Improving"
@@ -677,18 +645,11 @@ export function buildRunsPageView(
 
   const activityState: ActivityStateSummaryView = {
     headline: trainingIdentity,
-    bullets: [
-      ...signals.map((s) => s),
-      recentBehavior,
-      `Emphasis: ${trainingEmphasis}`,
-    ],
+    bullets: [...signals.map((s) => s), recentBehavior, `Emphasis: ${trainingEmphasis}`],
   };
 
   const recent56 = recentRuns(runs);
-  const maxLoad = Math.max(
-    ...recent56.map((r) => r.trainingLoad ?? (r.distanceM / 1000) * 10),
-    1
-  );
+  const maxLoad = Math.max(...recent56.map((r) => r.trainingLoad ?? (r.distanceM / 1000) * 10), 1);
   const maxDist56 = Math.max(...recent56.map((r) => r.distanceM / 1000), 0);
 
   const efficientIds = new Set(
@@ -700,7 +661,7 @@ export function buildRunsPageView(
         const match = runs.find((r) => r.name === e.runName);
         return match?.id;
       })
-      .filter((id): id is string => !!id)
+      .filter((id): id is string => !!id),
   );
 
   const explorerRows: RunExplorerRow[] = [...runs]
@@ -711,14 +672,7 @@ export function buildRunsPageView(
         confidence: "low" as const,
         signals: [],
       };
-      const markers = buildMarkers(
-        run,
-        workout,
-        prByRun,
-        maxLoad,
-        maxDist56,
-        efficientIds
-      );
+      const markers = buildMarkers(run, workout, prByRun, maxLoad, maxDist56, efficientIds);
       const pace = paceSecPerKm(run);
       const km = run.distanceM / 1000;
       const score = significanceScoreFromMarkers(markers, workout);
@@ -739,10 +693,7 @@ export function buildRunsPageView(
         paceDisplay: pace ? formatPace(pace) : "—",
         paceSec: pace ?? 99999,
         hrDisplay: run.avgHr != null ? `${Math.round(run.avgHr)} bpm` : "—",
-        loadDisplay:
-          run.trainingLoad != null
-            ? String(Math.round(run.trainingLoad))
-            : null,
+        loadDisplay: run.trainingLoad != null ? String(Math.round(run.trainingLoad)) : null,
         loadValue: run.trainingLoad ?? null,
         hasFit: fitRunIds.includes(run.id),
         significanceScore: score,
@@ -756,16 +707,9 @@ export function buildRunsPageView(
     });
 
   const classConf = classificationConfidenceNote(analytics.workoutLabels);
-  const hrField = quality?.fieldCoverage.find((f) =>
-    f.label.toLowerCase().includes("heart")
-  );
+  const hrField = quality?.fieldCoverage.find((f) => f.label.toLowerCase().includes("heart"));
 
-  const notableSessions = buildNotableSessions(
-    runs,
-    analytics,
-    workoutMap,
-    prByRun
-  );
+  const notableSessions = buildNotableSessions(runs, analytics, workoutMap, prByRun);
 
   return {
     activityState,
@@ -778,10 +722,7 @@ export function buildRunsPageView(
     quality: {
       hrCoveragePct: hrField
         ? Math.round((hrField.count / hrField.total) * 100)
-        : Math.round(
-            (runs.filter((r) => r.avgHr != null).length / Math.max(runs.length, 1)) *
-              100
-          ),
+        : Math.round((runs.filter((r) => r.avgHr != null).length / Math.max(runs.length, 1)) * 100),
       fitCount: fitRunIds.length,
       classificationNote: classConf.note,
       confidenceByType: classConf.byType,

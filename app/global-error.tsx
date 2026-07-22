@@ -29,8 +29,7 @@ export default function GlobalError({
             alignItems: "center",
             justifyContent: "center",
             padding: "1rem",
-            fontFamily:
-              "ui-sans-serif, system-ui, -apple-system, sans-serif",
+            fontFamily: "ui-sans-serif, system-ui, -apple-system, sans-serif",
           }}
         >
           <div
@@ -54,8 +53,7 @@ export default function GlobalError({
                 color: "#a1a1aa",
               }}
             >
-              An unexpected error stopped the app from starting. Try again, or
-              reload the page.
+              An unexpected error stopped the app from starting. Try again, or reload the page.
             </p>
             <button
               onClick={() => unstable_retry()}

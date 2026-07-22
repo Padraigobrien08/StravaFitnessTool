@@ -14,14 +14,8 @@ import { useWeeklyPlan } from "@/hooks/use-weekly-plan";
 import { useTrainingCalendar } from "@/hooks/use-training-calendar";
 
 export default function HomePage() {
-  const {
-    apiConnected,
-    dataSourceLabel,
-    refreshFromStravaApi,
-    loading,
-  } = useStrava();
-  const { analytics, insights, loading: intelLoading } =
-    useTrainingIntelligence();
+  const { apiConnected, dataSourceLabel, refreshFromStravaApi, loading } = useStrava();
+  const { analytics, insights, loading: intelLoading } = useTrainingIntelligence();
   const intel = useAthleteIntelligence();
   const { generate, loading: planLoading } = useWeeklyPlan();
   const calendar = useTrainingCalendar();
@@ -66,9 +60,7 @@ export default function HomePage() {
   }
 
   const readinessScore =
-    analytics?.raceReadiness?.score ??
-    analytics?.halfMarathonReadiness.score ??
-    0;
+    analytics?.raceReadiness?.score ?? analytics?.halfMarathonReadiness.score ?? 0;
 
   return (
     <RequireData>
@@ -98,17 +90,11 @@ export default function HomePage() {
           <p className="border-t border-[var(--border-subtle)] pt-3 text-[10px] text-zinc-600">
             {dataSourceLabel ? `${dataSourceLabel} · ` : ""}
             Deep analytics →{" "}
-            <Link
-              href="/intelligence"
-              className="text-zinc-500 hover:text-zinc-400"
-            >
+            <Link href="/intelligence" className="text-zinc-500 hover:text-zinc-400">
               Intelligence
             </Link>
             {" · "}
-            <Link
-              href="/performance"
-              className="text-zinc-500 hover:text-zinc-400"
-            >
+            <Link href="/performance" className="text-zinc-500 hover:text-zinc-400">
               Performance
             </Link>
           </p>

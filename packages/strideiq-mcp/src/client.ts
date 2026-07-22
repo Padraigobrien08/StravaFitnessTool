@@ -17,7 +17,7 @@ function headers(): HeadersInit {
 
 export async function fetchIntelligence(
   section: string,
-  query?: Record<string, string>
+  query?: Record<string, string>,
 ): Promise<unknown> {
   const url = new URL("/api/me/intelligence", BASE);
   url.searchParams.set("section", section);
@@ -32,7 +32,7 @@ export async function fetchIntelligence(
     throw new Error(
       typeof data === "object" && data && "error" in data
         ? String((data as { error: string }).error)
-        : `HTTP ${res.status}`
+        : `HTTP ${res.status}`,
     );
   }
   return data;
@@ -40,7 +40,7 @@ export async function fetchIntelligence(
 
 export async function fetchStravaApi(
   action: string,
-  query?: Record<string, string>
+  query?: Record<string, string>,
 ): Promise<unknown> {
   const url = new URL("/api/me/strava", BASE);
   url.searchParams.set("action", action);
@@ -55,7 +55,7 @@ export async function fetchStravaApi(
     throw new Error(
       typeof data === "object" && data && "error" in data
         ? String((data as { error: string }).error)
-        : `HTTP ${res.status}`
+        : `HTTP ${res.status}`,
     );
   }
   return data;
@@ -63,7 +63,7 @@ export async function fetchStravaApi(
 
 export async function postStravaApi(
   action: string,
-  body: Record<string, unknown>
+  body: Record<string, unknown>,
 ): Promise<unknown> {
   const url = new URL("/api/me/strava", BASE);
   const res = await fetch(url.toString(), {
@@ -79,7 +79,7 @@ export async function postStravaApi(
     throw new Error(
       typeof data === "object" && data && "error" in data
         ? String((data as { error: string }).error)
-        : `HTTP ${res.status}`
+        : `HTTP ${res.status}`,
     );
   }
   return data;
@@ -87,7 +87,7 @@ export async function postStravaApi(
 
 export async function fetchCompositeCoach(
   action: string,
-  query?: Record<string, string>
+  query?: Record<string, string>,
 ): Promise<unknown> {
   const url = new URL("/api/me/coach-composite", BASE);
   url.searchParams.set("action", action);
@@ -102,15 +102,13 @@ export async function fetchCompositeCoach(
     throw new Error(
       typeof data === "object" && data && "error" in data
         ? String((data as { error: string }).error)
-        : `HTTP ${res.status}`
+        : `HTTP ${res.status}`,
     );
   }
   return data;
 }
 
-export function stravaQuery(
-  entries: Record<string, string | undefined>
-): Record<string, string> {
+export function stravaQuery(entries: Record<string, string | undefined>): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(entries)) {
     if (v != null && v !== "") out[k] = v;

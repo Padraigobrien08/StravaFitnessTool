@@ -45,8 +45,7 @@ function formatRunCoachDetail(d: RunCoachDetail): string {
     .filter(Boolean)
     .join(" · ");
 
-  const exec =
-    `Execution: ${d.executionQuality} (${d.executionScore}/100) · fatigue ${d.fatigueCost} · goal fit ${d.goalAlignment}`;
+  const exec = `Execution: ${d.executionQuality} (${d.executionScore}/100) · fatigue ${d.fatigueCost} · goal fit ${d.goalAlignment}`;
   const streams = `Data: ${d.streams}`;
   const metrics = [
     d.hrDriftPct != null ? `HR drift +${d.hrDriftPct}%` : null,
@@ -65,13 +64,9 @@ function formatRunCoachDetail(d: RunCoachDetail): string {
     d.hrAssessment ? `HR: ${d.hrAssessment}` : "",
     d.historicalComparison ? `Vs history: ${d.historicalComparison}` : "",
     d.lapSummary ? `Laps: ${d.lapSummary}` : "",
-    d.likelyAdaptations.length
-      ? `Adaptation: ${d.likelyAdaptations.join("; ")}`
-      : "",
+    d.likelyAdaptations.length ? `Adaptation: ${d.likelyAdaptations.join("; ")}` : "",
     d.narrative,
-    d.evidence.length
-      ? `Evidence: ${d.evidence.join("; ")}`
-      : "",
+    d.evidence.length ? `Evidence: ${d.evidence.join("; ")}` : "",
     `runId: ${d.runId}`,
   ];
   return lines.filter((l) => l.trim().length > 0).join("\n");
@@ -83,7 +78,7 @@ function formatRunCoachDetail(d: RunCoachDetail): string {
  */
 export function serializeCoachingContextForLLM(
   context: CoachingContext,
-  opts?: SerializeOptions
+  opts?: SerializeOptions,
 ): string {
   const maxChars = opts?.maxChars ?? DEFAULT_MAX_CHARS;
   const lines: string[] = [];
@@ -98,7 +93,7 @@ export function serializeCoachingContextForLLM(
             .map((p) => `- ${p.label}: ${p.summary} (${p.confidence})`)
             .join("\n")
         : "",
-    ])
+    ]),
   );
 
   if (context.goal) {
@@ -108,11 +103,9 @@ export function serializeCoachingContextForLLM(
         `${g.raceType} (${(g.distanceMeters / 1000).toFixed(1)} km)`,
         g.raceDate ? `Race date: ${g.raceDate}` : "",
         g.daysUntilRace != null ? `Days until race: ${g.daysUntilRace}` : "",
-        g.targetTimeSec
-          ? `Target: ${formatSec(g.targetTimeSec)}`
-          : "",
+        g.targetTimeSec ? `Target: ${formatSec(g.targetTimeSec)}` : "",
         `Priority: ${g.priority}`,
-      ])
+      ]),
     );
   }
 
@@ -124,7 +117,7 @@ export function serializeCoachingContextForLLM(
       `Fatigue: ${s.fatigueState} · Durability: ${s.durability} · Specificity: ${s.specificity} · Intensity balance: ${s.intensityBalance}`,
       s.readiness != null ? `Readiness score: ${s.readiness}` : "",
       s.freshness != null ? `Freshness: ${s.freshness}` : "",
-    ])
+    ]),
   );
 
   const rt = context.recentTraining;
@@ -132,9 +125,7 @@ export function serializeCoachingContextForLLM(
     section("Recent training", [
       rt.summary,
       `Window: ${rt.windowDays} days`,
-      rt.keyChanges.length
-        ? "Key changes:\n" + rt.keyChanges.map((c) => `- ${c}`).join("\n")
-        : "",
+      rt.keyChanges.length ? "Key changes:\n" + rt.keyChanges.map((c) => `- ${c}`).join("\n") : "",
       "Weekly rollup:",
       ...rt.weeks.map(weekLine),
       rt.notableSessions.length
@@ -145,11 +136,11 @@ export function serializeCoachingContextForLLM(
                 `- ${n.date} ${n.label}` +
                 (n.distanceKm != null ? ` ${n.distanceKm} km` : "") +
                 (n.durationMin != null ? ` ${n.durationMin} min` : "") +
-                ` — ${n.note}`
+                ` — ${n.note}`,
             )
             .join("\n")
         : "",
-    ])
+    ]),
   );
 
   if (context.recentSessionDetails.length > 0) {
@@ -157,7 +148,7 @@ export function serializeCoachingContextForLLM(
       section("Recent run details", [
         "Per-run execution, HR, pacing, and lap detail (use get_run_detail for a single run deep dive):",
         ...context.recentSessionDetails.map(formatRunCoachDetail),
-      ])
+      ]),
     );
   }
 
@@ -165,26 +156,22 @@ export function serializeCoachingContextForLLM(
     const f = context.forecast;
     lines.push(
       section("Forecast", [
-        f.mostLikelyTimeSec
-          ? `Most likely: ${formatSec(f.mostLikelyTimeSec)}`
-          : "",
+        f.mostLikelyTimeSec ? `Most likely: ${formatSec(f.mostLikelyTimeSec)}` : "",
         f.realisticRangeSec
           ? `Range: ${formatSec(f.realisticRangeSec.low)}–${formatSec(f.realisticRangeSec.high)}`
           : "",
         `Confidence: ${f.confidence}`,
         f.positiveContributors.length
-          ? "Supports:\n" +
-            f.positiveContributors.map((c) => `- ${c}`).join("\n")
+          ? "Supports:\n" + f.positiveContributors.map((c) => `- ${c}`).join("\n")
           : "",
         f.negativeContributors.length
           ? "Limits:\n" + f.negativeContributors.map((c) => `- ${c}`).join("\n")
           : "",
         f.uncertaintyDrivers.length
-          ? "Uncertainty:\n" +
-            f.uncertaintyDrivers.map((c) => `- ${c}`).join("\n")
+          ? "Uncertainty:\n" + f.uncertaintyDrivers.map((c) => `- ${c}`).join("\n")
           : "",
         f.recommendation ? `Recommendation: ${f.recommendation}` : "",
-      ])
+      ]),
     );
   }
 
@@ -196,17 +183,14 @@ export function serializeCoachingContextForLLM(
         m.strengthSummary,
         m.mobilitySummary,
         m.interferenceRisks.length
-          ? "Interference risks:\n" +
-            m.interferenceRisks.map((r) => `- ${r}`).join("\n")
+          ? "Interference risks:\n" + m.interferenceRisks.map((r) => `- ${r}`).join("\n")
           : "",
-      ])
+      ]),
     );
   }
 
   if (context.risks.length) {
-    lines.push(
-      section("Risks", context.risks.map(formatRisk))
-    );
+    lines.push(section("Risks", context.risks.map(formatRisk)));
   }
 
   if (context.opportunities.length) {
@@ -214,29 +198,22 @@ export function serializeCoachingContextForLLM(
       section(
         "Opportunities",
         context.opportunities.map(
-          (o) =>
-            `- ${o.label} (${o.confidence})\n  Evidence: ${o.evidence.join("; ")}`
-        )
-      )
+          (o) => `- ${o.label} (${o.confidence})\n  Evidence: ${o.evidence.join("; ")}`,
+        ),
+      ),
     );
   }
 
   const c = context.constraints;
   lines.push(
     section("Constraints", [
-      c.maxWeeklyVolumeKm != null
-        ? `Max weekly volume: ${c.maxWeeklyVolumeKm} km`
-        : "",
-      c.maxHardSessions != null
-        ? `Max hard sessions: ${c.maxHardSessions}`
-        : "",
+      c.maxWeeklyVolumeKm != null ? `Max weekly volume: ${c.maxWeeklyVolumeKm} km` : "",
+      c.maxHardSessions != null ? `Max hard sessions: ${c.maxHardSessions}` : "",
       c.raceWeek ? "Race week: yes" : "",
       c.tapering ? "Tapering: yes" : "",
-      c.avoidIntensityStacking
-        ? "Avoid intensity stacking on adjacent days"
-        : "",
+      c.avoidIntensityStacking ? "Avoid intensity stacking on adjacent days" : "",
       c.notes.length ? c.notes.map((n) => `- ${n}`).join("\n") : "",
-    ])
+    ]),
   );
 
   const dq = context.dataQuality;
@@ -247,7 +224,7 @@ export function serializeCoachingContextForLLM(
         ? dq.confidenceLimitations.map((l) => `- ${l}`).join("\n")
         : "No major limitations flagged.",
       `Context generated: ${context.generatedAt}`,
-    ])
+    ]),
   );
 
   let out = lines.filter(Boolean).join("\n").trim();
@@ -260,10 +237,7 @@ export function serializeCoachingContextForLLM(
 }
 
 function formatRisk(r: CoachingContext["risks"][0]): string {
-  return (
-    `- ${r.label} [${r.severity}, ${r.confidence}]\n` +
-    `  Evidence: ${r.evidence.join("; ")}`
-  );
+  return `- ${r.label} [${r.severity}, ${r.confidence}]\n` + `  Evidence: ${r.evidence.join("; ")}`;
 }
 
 export function estimateCoachingContextTokens(text: string): number {

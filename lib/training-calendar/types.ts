@@ -1,25 +1,9 @@
 export type CalendarModality =
-  | "run"
-  | "bike"
-  | "swim"
-  | "strength"
-  | "mobility"
-  | "recovery"
-  | "rest"
-  | "cross_training";
+  "run" | "bike" | "swim" | "strength" | "mobility" | "recovery" | "rest" | "cross_training";
 
-export type CalendarIntensity =
-  | "easy"
-  | "moderate"
-  | "hard"
-  | "recovery"
-  | "rest";
+export type CalendarIntensity = "easy" | "moderate" | "hard" | "recovery" | "rest";
 
-export type CalendarWorkoutStatus =
-  | "planned"
-  | "completed"
-  | "skipped"
-  | "modified";
+export type CalendarWorkoutStatus = "planned" | "completed" | "skipped" | "modified";
 
 export type CalendarWeekSource = "ai_generated" | "fallback" | "manual";
 

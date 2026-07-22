@@ -16,7 +16,7 @@ const OAUTH_HANDLED_KEY = "strideiq_oauth_connected_handled";
 
 export function useStravaConnection(
   stravaQuery: string | null | undefined,
-  onSynced?: () => void | Promise<void>
+  onSynced?: () => void | Promise<void>,
 ) {
   const router = useRouter();
   const [status, setStatus] = useState<MeStatus | null>(null);
@@ -37,10 +37,7 @@ export function useStravaConnection(
 
   useEffect(() => {
     if (stravaQuery === "connected") {
-      if (
-        handledOAuthReturn.current ||
-        sessionStorage.getItem(OAUTH_HANDLED_KEY)
-      ) {
+      if (handledOAuthReturn.current || sessionStorage.getItem(OAUTH_HANDLED_KEY)) {
         router.replace("/import");
         return;
       }
@@ -79,9 +76,7 @@ export function useStravaConnection(
       const missing = statusNow.runsMissingStreams ?? 0;
 
       if (missing > 0) {
-        setMessage(
-          `Step 2/2 — syncing streams for up to 40 runs (${missing} pending)…`
-        );
+        setMessage(`Step 2/2 — syncing streams for up to 40 runs (${missing} pending)…`);
         const streamRes = await fetch("/api/sync/strava/streams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -93,9 +88,7 @@ export function useStravaConnection(
         }
         setMessage(
           `Synced ${body.synced} activities · ${streamBody.streamsSynced} stream sets` +
-            (streamBody.remaining > 0
-              ? ` · ${streamBody.remaining} still pending`
-              : "")
+            (streamBody.remaining > 0 ? ` · ${streamBody.remaining} still pending` : ""),
         );
       } else {
         setMessage(`Synced ${body.synced} activities · streams up to date.`);

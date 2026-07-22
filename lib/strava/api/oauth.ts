@@ -1,15 +1,7 @@
-import {
-  STRAVA_AUTH_URL,
-  STRAVA_SCOPES,
-  STRAVA_TOKEN_URL,
-  stravaConfig,
-} from "./config";
+import { STRAVA_AUTH_URL, STRAVA_SCOPES, STRAVA_TOKEN_URL, stravaConfig } from "./config";
 import type { StravaTokenResponse } from "./types";
 
-export function buildStravaAuthorizeUrl(
-  state: string,
-  redirectUri: string
-): string {
+export function buildStravaAuthorizeUrl(state: string, redirectUri: string): string {
   const { clientId } = stravaConfig();
   const params = new URLSearchParams({
     client_id: clientId,
@@ -24,7 +16,7 @@ export function buildStravaAuthorizeUrl(
 
 export async function exchangeCodeForTokens(
   code: string,
-  redirectUri: string
+  redirectUri: string,
 ): Promise<StravaTokenResponse> {
   const { clientId, clientSecret } = stravaConfig();
   const res = await fetch(STRAVA_TOKEN_URL, {
@@ -45,9 +37,7 @@ export async function exchangeCodeForTokens(
   return res.json() as Promise<StravaTokenResponse>;
 }
 
-export async function refreshAccessToken(
-  refreshToken: string
-): Promise<StravaTokenResponse> {
+export async function refreshAccessToken(refreshToken: string): Promise<StravaTokenResponse> {
   const { clientId, clientSecret } = stravaConfig();
   const res = await fetch(STRAVA_TOKEN_URL, {
     method: "POST",

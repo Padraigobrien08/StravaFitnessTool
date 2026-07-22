@@ -73,7 +73,7 @@ function runById(runs: RunActivity[], id: string) {
 export function collectEffortPoints(
   runs: RunActivity[],
   fitDetails: FitRunDetail[],
-  personalRecords: PersonalRecord[]
+  personalRecords: PersonalRecord[],
 ): EffortPoint[] {
   const points: EffortPoint[] = [];
   const seen = new Set<string>();
@@ -111,11 +111,7 @@ export function collectEffortPoints(
       runName: pr.runName,
       date: pr.date,
       source:
-        pr.source === "full_run"
-          ? "Full run"
-          : pr.source === "laps"
-            ? "Lap block"
-            : "Best effort",
+        pr.source === "full_run" ? "Full run" : pr.source === "laps" ? "Lap block" : "Best effort",
     });
   }
 
@@ -138,22 +134,14 @@ export function collectEffortPoints(
 }
 
 /** Cameron: T2 = T1 * (D2/D1) * (2 - D1/D2) — better for extrapolating up in distance */
-export function predictCameron(
-  distanceM1: number,
-  timeSec1: number,
-  distanceM2: number
-): number {
+export function predictCameron(distanceM1: number, timeSec1: number, distanceM2: number): number {
   const ratio = distanceM2 / distanceM1;
   return timeSec1 * ratio * (2 - distanceM1 / distanceM2);
 }
 
 /** Fit T = k * D^b in log space via least squares */
-export function fitPowerLawRegression(
-  efforts: EffortPoint[]
-): RegressionFit | null {
-  const usable = efforts.filter(
-    (e) => e.distanceKm >= 3 && e.distanceKm <= 30 && e.timeSec > 0
-  );
+export function fitPowerLawRegression(efforts: EffortPoint[]): RegressionFit | null {
+  const usable = efforts.filter((e) => e.distanceKm >= 3 && e.distanceKm <= 30 && e.timeSec > 0);
   if (usable.length < 3) return null;
 
   const xs = usable.map((e) => Math.log(e.distanceKm));
@@ -196,9 +184,7 @@ export function fitPowerLawRegression(
 }
 
 function pickAnchor(efforts: EffortPoint[]): EffortPoint | null {
-  const candidates = efforts.filter(
-    (e) => e.distanceKm >= 4 && e.distanceKm <= 15
-  );
+  const candidates = efforts.filter((e) => e.distanceKm >= 4 && e.distanceKm <= 15);
   if (candidates.length === 0) return efforts[0] ?? null;
   return [...candidates].sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm)[0];
 }
@@ -206,7 +192,7 @@ function pickAnchor(efforts: EffortPoint[]): EffortPoint | null {
 function predictFromAnchor(
   anchor: EffortPoint,
   model: "riegel" | "cameron",
-  exponent?: number
+  exponent?: number,
 ): ModelPrediction[] {
   const d1 = anchor.distanceKm * 1000;
   return RACE_TARGETS.map((t) => {
@@ -247,7 +233,7 @@ function predictMultiAnchor(efforts: EffortPoint[]): ModelPrediction[] {
 
   return RACE_TARGETS.map((t) => {
     const times = anchors.map((a) =>
-      predictRaceTime(a.distanceKm * 1000, a.timeSec, t.distanceKm * 1000)
+      predictRaceTime(a.distanceKm * 1000, a.timeSec, t.distanceKm * 1000),
     );
     const avg = times.reduce((s, x) => s + x, 0) / times.length;
     return { label: t.label, distanceKm: t.distanceKm, timeSec: avg };
@@ -256,7 +242,7 @@ function predictMultiAnchor(efforts: EffortPoint[]): ModelPrediction[] {
 
 export function buildRacePredictionAnalysis(
   runs: RunActivity[],
-  fitDetails: FitRunDetail[] = []
+  fitDetails: FitRunDetail[] = [],
 ): RacePredictionAnalysis {
   const personalRecords = findPersonalRecords(runs, fitDetails);
   const efforts = collectEffortPoints(runs, fitDetails, personalRecords);
@@ -272,7 +258,7 @@ export function buildRacePredictionAnalysis(
       description:
         "Classic endurance scaling — assumes performance decays predictably as distance grows.",
       formula: "T₂ = T₁ × (D₂/D₁)^1.06",
-      anchorLabel: `${anchor.runName} (${(anchor.distanceKm).toFixed(1)} km, ${formatShortTime(anchor.timeSec)})`,
+      anchorLabel: `${anchor.runName} (${anchor.distanceKm.toFixed(1)} km, ${formatShortTime(anchor.timeSec)})`,
       exponent: 1.06,
       predictions: predictFromAnchor(anchor, "riegel"),
     });

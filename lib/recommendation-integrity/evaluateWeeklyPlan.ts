@@ -19,7 +19,7 @@ function scoreFromIssues(issues: RecommendationIssue[]): number {
 }
 
 function aggregateSeverity(
-  issues: RecommendationIssue[]
+  issues: RecommendationIssue[],
 ): RecommendationIntegrityReport["severity"] {
   if (issues.some((i) => i.severity === "high")) return "high";
   if (issues.some((i) => i.severity === "medium")) return "medium";
@@ -27,9 +27,7 @@ function aggregateSeverity(
   return "none";
 }
 
-export function evaluateWeeklyPlan(
-  input: WeeklyPlanIntegrityInput
-): RecommendationIntegrityReport {
+export function evaluateWeeklyPlan(input: WeeklyPlanIntegrityInput): RecommendationIntegrityReport {
   const issues: RecommendationIssue[] = [
     ...runEvidenceChecks(input),
     ...runContradictionChecks(input),
@@ -46,9 +44,7 @@ export function evaluateWeeklyPlan(
     .filter((i) => i.severity === "high" || i.severity === "medium")
     .map((i) => i.suggestedFix);
 
-  const warnings = issues
-    .filter((i) => i.severity === "low")
-    .map((i) => i.message);
+  const warnings = issues.filter((i) => i.severity === "low").map((i) => i.message);
 
   return {
     passed,

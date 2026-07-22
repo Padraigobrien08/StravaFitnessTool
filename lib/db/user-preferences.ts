@@ -13,9 +13,7 @@ const DEFAULTS: UserPreferences = {
   raceGoal: null,
 };
 
-export async function getUserPreferences(
-  userId: string
-): Promise<UserPreferences> {
+export async function getUserPreferences(userId: string): Promise<UserPreferences> {
   try {
     const sql = getSql();
     const settingsRows = await sql`
@@ -32,8 +30,7 @@ export async function getUserPreferences(
     `;
 
     const settingsRow = settingsRows[0] as
-      | { default_weekly_runs: number; max_weekly_km: number }
-      | undefined;
+      { default_weekly_runs: number; max_weekly_km: number } | undefined;
     const goalRow = goalRows[0] as
       | {
           distance: RaceDistance;
@@ -54,9 +51,7 @@ export async function getUserPreferences(
             typeof goalRow.race_date === "string"
               ? goalRow.race_date.slice(0, 10)
               : new Date(goalRow.race_date).toISOString().slice(0, 10),
-          ...(goalRow.target_time_sec
-            ? { targetTimeSec: goalRow.target_time_sec }
-            : {}),
+          ...(goalRow.target_time_sec ? { targetTimeSec: goalRow.target_time_sec } : {}),
         }
       : null;
 
@@ -68,7 +63,7 @@ export async function getUserPreferences(
 
 export async function upsertUserSettings(
   userId: string,
-  settings: Partial<IntelligenceSettings>
+  settings: Partial<IntelligenceSettings>,
 ): Promise<void> {
   await ensureCoachSchema();
   const sql = getSql();
@@ -89,10 +84,7 @@ export async function upsertUserSettings(
   `;
 }
 
-export async function upsertUserRaceGoal(
-  userId: string,
-  goal: RaceGoal | null
-): Promise<void> {
+export async function upsertUserRaceGoal(userId: string, goal: RaceGoal | null): Promise<void> {
   await ensureCoachSchema();
   const sql = getSql();
   if (!goal) {

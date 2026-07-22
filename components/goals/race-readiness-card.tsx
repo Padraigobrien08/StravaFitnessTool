@@ -31,9 +31,7 @@ export function RaceReadinessCard({
               <span className="text-lg text-zinc-500"> / 100</span>
             </p>
             <p className="mt-1 text-zinc-400">{readiness.label}</p>
-            <p className="mt-1 text-sm text-zinc-500">
-              {readiness.probabilityBand}
-            </p>
+            <p className="mt-1 text-sm text-zinc-500">{readiness.probabilityBand}</p>
           </div>
           <div className="text-sm text-zinc-400">
             <p>
@@ -66,7 +64,7 @@ export function RaceReadinessCard({
             <p className="text-zinc-200">
               {formatLongRunVsRace(
                 readiness.longestRunKm,
-                RACE_READINESS_CONFIG[readiness.distance].raceDistanceKm
+                RACE_READINESS_CONFIG[readiness.distance].raceDistanceKm,
               )}
             </p>
           </div>

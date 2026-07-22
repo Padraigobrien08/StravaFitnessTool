@@ -22,7 +22,7 @@ async function tokenFor(userId: string) {
 export async function handleCompositeCoachAction(
   ctx: IntelligenceContext,
   action: CompositeCoachAction,
-  params: Record<string, string>
+  params: Record<string, string>,
 ): Promise<unknown> {
   const accessToken = await tokenFor(ctx.userId);
 
@@ -114,17 +114,14 @@ export async function handleCompositeCoachAction(
       };
       const sessions = plan.payload?.sessions ?? [];
       const longRun = sessions.find(
-        (s) =>
-          s.type === "long" ||
-          /\blong\b/i.test(`${s.description ?? ""} ${s.type ?? ""}`)
+        (s) => s.type === "long" || /\blong\b/i.test(`${s.description ?? ""} ${s.type ?? ""}`),
       );
       const targetKm = longRun?.distanceKmRange
         ? (longRun.distanceKmRange[0] + longRun.distanceKmRange[1]) / 2
         : 15;
 
       const routeList =
-        (routes as { routes?: { id?: number; name?: string; distance?: number }[] })
-          .routes ?? [];
+        (routes as { routes?: { id?: number; name?: string; distance?: number }[] }).routes ?? [];
 
       const suggestions = routeList
         .map((r) => {

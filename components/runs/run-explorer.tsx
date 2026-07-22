@@ -74,10 +74,7 @@ function Th({
   );
 }
 
-const markerConfig: Record<
-  RunMarker,
-  { label: string; icon: typeof Trophy; className: string }
-> = {
+const markerConfig: Record<RunMarker, { label: string; icon: typeof Trophy; className: string }> = {
   pr: { label: "PR", icon: Trophy, className: "text-teal-400" },
   long: { label: "Long", icon: Mountain, className: "text-blue-400/90" },
   key: { label: "Key", icon: Zap, className: "text-amber-400/90" },
@@ -99,28 +96,19 @@ export function RunExplorer({
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<ExplorerSortKey>("date");
   const [sortAsc, setSortAsc] = useState(false);
-  const [typeFilter, setTypeFilter] = useState<WorkoutType | typeof ALL_TYPES>(
-    ALL_TYPES
-  );
+  const [typeFilter, setTypeFilter] = useState<WorkoutType | typeof ALL_TYPES>(ALL_TYPES);
   const [significance] = useState<string>("all");
-  const [effortFilter] = useState<"all" | "easy" | "hard">(
-    "all"
-  );
+  const [effortFilter] = useState<"all" | "easy" | "hard">("all");
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(25);
   const [groupByMonth, setGroupByMonth] = useState(true);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
-    () => new Set()
-  );
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => new Set());
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const intelCache = useRef(new Map<string, SessionIntelligence>());
   const tableTopRef = useRef<HTMLDivElement>(null);
 
-  const runsById = useMemo(
-    () => new Map(runs.map((r) => [r.id, r])),
-    [runs]
-  );
+  const runsById = useMemo(() => new Map(runs.map((r) => [r.id, r])), [runs]);
 
   const filtered = useMemo(() => {
     const sem = semanticSearchTokens(search);
@@ -136,20 +124,11 @@ export function RunExplorer({
       list = list.filter((r) => sem.types.includes(r.workout.type));
     }
     return sortExplorerRows(list, sortKey, sortAsc);
-  }, [
-    rows,
-    search,
-    sortKey,
-    sortAsc,
-    typeFilter,
-    significance,
-    effortFilter,
-    quickFilter,
-  ]);
+  }, [rows, search, sortKey, sortAsc, typeFilter, significance, effortFilter, quickFilter]);
 
   const { pageRows, totalPages, total } = useMemo(
     () => paginateRows(filtered, page, pageSize),
-    [filtered, page, pageSize]
+    [filtered, page, pageSize],
   );
 
   const pageGroups = useMemo(() => {
@@ -165,16 +144,14 @@ export function RunExplorer({
       if (cached) return cached;
       const run = runsById.get(row.runId);
       if (!run) return null;
-      const intel = evaluateSessionExecution(
-        run,
-        getFitForRun(row.runId) ?? null,
-        row.workout,
-        { analytics, historicalRuns: runs }
-      );
+      const intel = evaluateSessionExecution(run, getFitForRun(row.runId) ?? null, row.workout, {
+        analytics,
+        historicalRuns: runs,
+      });
       intelCache.current.set(row.runId, intel);
       return intel;
     },
-    [runsById, getFitForRun, analytics, runs]
+    [runsById, getFitForRun, analytics, runs],
   );
 
   function toggleSort(key: ExplorerSortKey) {
@@ -196,9 +173,7 @@ export function RunExplorer({
     <section ref={tableTopRef} className="rounded-xl border border-white/[0.06] bg-[#0a0b0e]/60">
       <div className="border-b border-white/[0.04] px-3 py-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-[12px] font-medium text-zinc-400">
-            Activity explorer
-          </h2>
+          <h2 className="text-[12px] font-medium text-zinc-400">Activity explorer</h2>
           <span className="text-[10px] text-zinc-600">
             {total} sessions · page {page + 1}/{totalPages}
           </span>
@@ -243,9 +218,10 @@ export function RunExplorer({
             }}
             options={[
               [ALL_TYPES, "All types"],
-              ...(Object.keys(WORKOUT_TYPE_LABELS) as WorkoutType[]).map(
-                (t): [string, string] => [t, WORKOUT_TYPE_LABELS[t]]
-              ),
+              ...(Object.keys(WORKOUT_TYPE_LABELS) as WorkoutType[]).map((t): [string, string] => [
+                t,
+                WORKOUT_TYPE_LABELS[t],
+              ]),
             ]}
           />
           <FilterSelect
@@ -264,7 +240,7 @@ export function RunExplorer({
               "h-auto px-2 py-1.5 text-[10px]",
               groupByMonth
                 ? "bg-teal-500/15 text-teal-300 hover:bg-teal-500/20"
-                : "border-white/[0.06] bg-white/[0.03] text-zinc-500"
+                : "border-white/[0.06] bg-white/[0.03] text-zinc-500",
             )}
             onClick={() => setGroupByMonth((v) => !v)}
           >
@@ -283,16 +259,30 @@ export function RunExplorer({
               <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">
                 Session
               </th>
-              <Th label="Sig" col="significance" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
-              <Th label="Exec" col="execution" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
-              <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">
-                Tags
-              </th>
-              <Th label="Dist" col="distance" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <Th
+                label="Sig"
+                col="significance"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
+              <Th
+                label="Exec"
+                col="execution"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
+              <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">Tags</th>
+              <Th
+                label="Dist"
+                col="distance"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
               <Th label="Pace" col="pace" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
-              <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">
-                HR
-              </th>
+              <th className="pb-1 pr-2 text-[9px] font-semibold uppercase text-zinc-600">HR</th>
             </tr>
           </thead>
           <tbody>
@@ -316,15 +306,10 @@ export function RunExplorer({
                         }}
                       >
                         <ChevronDown
-                          className={cn(
-                            "h-3 w-3",
-                            collapsedGroups.has(group.key) && "-rotate-90"
-                          )}
+                          className={cn("h-3 w-3", collapsedGroups.has(group.key) && "-rotate-90")}
                         />
                         {group.label}
-                        <span className="text-zinc-600">
-                          ({group.rows.length})
-                        </span>
+                        <span className="text-zinc-600">({group.rows.length})</span>
                       </Button>
                     </td>
                   </tr>
@@ -335,14 +320,8 @@ export function RunExplorer({
                         key={row.runId}
                         row={row}
                         expanded={expandedId === row.runId}
-                        onToggle={() =>
-                          setExpandedId(
-                            expandedId === row.runId ? null : row.runId
-                          )
-                        }
-                        intel={
-                          expandedId === row.runId ? getIntel(row) : null
-                        }
+                        onToggle={() => setExpandedId(expandedId === row.runId ? null : row.runId)}
+                        intel={expandedId === row.runId ? getIntel(row) : null}
                       />
                     ))
                   : null}
@@ -370,8 +349,7 @@ export function RunExplorer({
           <ChevronLeft className="h-3.5 w-3.5" /> Prev
         </Button>
         <span className="text-[10px] text-zinc-600">
-          Showing {page * pageSize + 1}–
-          {Math.min((page + 1) * pageSize, total)} of {total}
+          Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, total)} of {total}
         </span>
         <Button
           type="button"
@@ -427,25 +405,20 @@ function ExplorerRow({
   onToggle: () => void;
   intel: SessionIntelligence | null;
 }) {
-  const isNotable =
-    row.significanceTier === "critical" ||
-    row.significanceTier === "meaningful";
+  const isNotable = row.significanceTier === "critical" || row.significanceTier === "meaningful";
 
   return (
     <>
       <tr
         className={cn(
           "border-b border-white/[0.03] cursor-pointer transition-colors hover:bg-white/[0.03]",
-          isNotable && "bg-teal-500/[0.02]"
+          isNotable && "bg-teal-500/[0.02]",
         )}
         onClick={onToggle}
       >
         <td className="px-2 py-1.5 align-middle">
           <ChevronDown
-            className={cn(
-              "h-3 w-3 text-zinc-600 transition-transform",
-              expanded && "rotate-180"
-            )}
+            className={cn("h-3 w-3 text-zinc-600 transition-transform", expanded && "rotate-180")}
           />
         </td>
         <td className="px-1 py-1.5 align-middle">
@@ -473,19 +446,12 @@ function ExplorerRow({
             {row.formattedTitle.primary}
           </Link>
         </td>
-        <td className="py-1.5 pr-2 text-[10px] capitalize text-zinc-500">
-          {row.significanceTier}
-        </td>
-        <td className="py-1.5 pr-2 text-[10px] text-zinc-400">
-          {row.executionLabel}
-        </td>
+        <td className="py-1.5 pr-2 text-[10px] capitalize text-zinc-500">{row.significanceTier}</td>
+        <td className="py-1.5 pr-2 text-[10px] text-zinc-400">{row.executionLabel}</td>
         <td className="max-w-[100px] py-1.5 pr-2">
           <div className="flex flex-wrap gap-0.5">
             {row.adaptationTags.slice(0, 2).map((t) => (
-              <span
-                key={t}
-                className="rounded bg-white/[0.04] px-1 text-[9px] text-zinc-600"
-              >
+              <span key={t} className="rounded bg-white/[0.04] px-1 text-[9px] text-zinc-600">
                 {t}
               </span>
             ))}
@@ -494,24 +460,16 @@ function ExplorerRow({
         <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-400">
           {row.distanceDisplay}
         </td>
-        <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-400">
-          {row.paceDisplay}
-        </td>
-        <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-500">
-          {row.hrDisplay}
-        </td>
+        <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-400">{row.paceDisplay}</td>
+        <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-500">{row.hrDisplay}</td>
       </tr>
       {expanded && intel ? (
         <tr className="border-b border-white/[0.04] bg-white/[0.02]">
           <td colSpan={10} className="px-4 py-3">
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <p className="text-[10px] font-medium text-zinc-600">
-                  Session intelligence
-                </p>
-                <p className="mt-1 text-[12px] leading-relaxed text-zinc-400">
-                  {intel.narrative}
-                </p>
+                <p className="text-[10px] font-medium text-zinc-600">Session intelligence</p>
+                <p className="mt-1 text-[12px] leading-relaxed text-zinc-400">{intel.narrative}</p>
               </div>
               <div className="space-y-1.5 text-[11px] text-zinc-500">
                 <p>

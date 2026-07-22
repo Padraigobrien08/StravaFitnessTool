@@ -24,11 +24,7 @@ const MODEL_COLORS: Record<string, string> = {
   multi: "#f472b6",
 };
 
-export function PredictionChart({
-  analysis,
-}: {
-  analysis: RacePredictionAnalysis;
-}) {
+export function PredictionChart({ analysis }: { analysis: RacePredictionAnalysis }) {
   const chart = useTrainingChart();
   const effortScatter = analysis.efforts.map((e) => ({
     distanceKm: e.distanceKm,
@@ -41,19 +37,17 @@ export function PredictionChart({
   const cameron = analysis.models.find((m) => m.id === "cameron");
   const reg = analysis.regression;
 
-  const distances = reg?.curve.map((c) => c.distanceKm) ?? 
-    Array.from({ length: 82 }, (_, i) => 3 + i * 0.5);
+  const distances =
+    reg?.curve.map((c) => c.distanceKm) ?? Array.from({ length: 82 }, (_, i) => 3 + i * 0.5);
   const merged = distances.map((d) => {
     const row: Record<string, number> = { distanceKm: d };
     if (riegel && analysis.primaryAnchor) {
       const a = analysis.primaryAnchor;
-      row.riegel =
-        (predictRiegel(a.distanceKm * 1000, a.timeSec, d * 1000) / 60);
+      row.riegel = predictRiegel(a.distanceKm * 1000, a.timeSec, d * 1000) / 60;
     }
     if (cameron && analysis.primaryAnchor) {
       const a = analysis.primaryAnchor;
-      row.cameron =
-        (predictCameron(a.distanceKm * 1000, a.timeSec, d * 1000) / 60);
+      row.cameron = predictCameron(a.distanceKm * 1000, a.timeSec, d * 1000) / 60;
     }
     if (reg) {
       row.regression = (reg.coefficient * Math.pow(d, reg.exponent)) / 60;
@@ -100,12 +94,7 @@ export function PredictionChart({
           }}
         />
         <Legend wrapperStyle={{ fontSize: 11 }} />
-        <Scatter
-          name="Your efforts"
-          data={effortScatter}
-          dataKey="timeMin"
-          fill="#10b981"
-        />
+        <Scatter name="Your efforts" data={effortScatter} dataKey="timeMin" fill="#10b981" />
         {riegel && (
           <Line
             data={merged}
@@ -141,12 +130,7 @@ export function PredictionChart({
           />
         )}
         {[5, 10, 21.0975, 42.195].map((d) => (
-          <ReferenceLine
-            key={d}
-            x={d}
-            stroke="var(--chart-grid)"
-            strokeDasharray="2 4"
-          />
+          <ReferenceLine key={d} x={d} stroke="var(--chart-grid)" strokeDasharray="2 4" />
         ))}
       </ComposedChart>
     </ResponsiveContainer>

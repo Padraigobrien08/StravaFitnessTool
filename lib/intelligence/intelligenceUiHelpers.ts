@@ -6,7 +6,7 @@ import type { StateEvolutionItem } from "./presentation";
 
 export function buildHeroSupportingReasons(
   state: CoachWorkspaceState,
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): string[] {
   const reasons: string[] = [];
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
@@ -35,9 +35,10 @@ export function buildHeroSupportingReasons(
   return reasons.slice(0, 4);
 }
 
-export function buildSystemConfidenceSummary(
-  analytics: DashboardInsights
-): { level: string; reason: string } {
+export function buildSystemConfidenceSummary(analytics: DashboardInsights): {
+  level: string;
+  reason: string;
+} {
   const level =
     analytics.dataConfidence === "high"
       ? "High"
@@ -100,11 +101,7 @@ export function formatTrajectoryDisplay(item: StateEvolutionItem): {
   }
   if (item.id === "volume") {
     const volSub =
-      item.trend === "down"
-        ? "taper effect"
-        : item.trend === "up"
-          ? "build phase"
-          : sub;
+      item.trend === "down" ? "taper effect" : item.trend === "up" ? "build phase" : sub;
     return {
       headline: `${item.direction} this week`,
       sub: volSub || "weekly load",
@@ -122,9 +119,7 @@ export function formatTrajectoryDisplay(item: StateEvolutionItem): {
 
 export type MemoryGroup = "stable" | "emerging" | "watchlist";
 
-export function groupMemoryItems(
-  items: MemorySnippet[]
-): Record<MemoryGroup, MemorySnippet[]> {
+export function groupMemoryItems(items: MemorySnippet[]): Record<MemoryGroup, MemorySnippet[]> {
   const stable: MemorySnippet[] = [];
   const emerging: MemorySnippet[] = [];
   const watchlist: MemorySnippet[] = [];
@@ -139,8 +134,7 @@ export function groupMemoryItems(
       /interfer|stack|sensitive|density/i.test(text);
 
     const isStable =
-      m.stability === "stable" ||
-      (m.confidence === "high" && m.stability !== "emerging");
+      m.stability === "stable" || (m.confidence === "high" && m.stability !== "emerging");
 
     if (isWatch) watchlist.push(m);
     else if (isStable) stable.push(m);

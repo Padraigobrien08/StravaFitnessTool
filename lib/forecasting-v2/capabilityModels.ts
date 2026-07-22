@@ -7,11 +7,7 @@ import {
 import { predictRaceTime, findPersonalRecords } from "@/lib/analytics/records";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
-import type {
-  ForecastModelEstimate,
-  RaceForecastInput,
-  RaceQualityEffort,
-} from "./forecastTypes";
+import type { ForecastModelEstimate, RaceForecastInput, RaceQualityEffort } from "./forecastTypes";
 
 function effortToPoint(e: RaceQualityEffort): EffortPoint {
   return {
@@ -30,10 +26,7 @@ function recencyWeight(date: string, halfLifeDays = 90): number {
 }
 
 /** How relevant an anchor distance is to the race distance */
-export function distanceRelevanceWeight(
-  anchorKm: number,
-  targetKm: number
-): number {
+export function distanceRelevanceWeight(anchorKm: number, targetKm: number): number {
   if (targetKm <= 0 || anchorKm <= 0) return 0;
   const ratio = anchorKm / targetKm;
   if (ratio >= 0.85 && ratio <= 1.15) return 1;
@@ -44,32 +37,20 @@ export function distanceRelevanceWeight(
   return 0.4;
 }
 
-function pickBestAnchor(
-  efforts: RaceQualityEffort[],
-  targetKm: number
-): RaceQualityEffort | null {
+function pickBestAnchor(efforts: RaceQualityEffort[], targetKm: number): RaceQualityEffort | null {
   const maxKm = Math.min(30, Math.max(15, targetKm * 1.08));
-  const c = efforts.filter(
-    (e) => e.distanceKm >= 4 && e.distanceKm <= maxKm
-  );
+  const c = efforts.filter((e) => e.distanceKm >= 4 && e.distanceKm <= maxKm);
   if (c.length === 0) return efforts[0] ?? null;
   return [...c].sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm)[0];
 }
 
-function predictRiegel(
-  anchor: RaceQualityEffort,
-  targetM: number
-): number {
-  return predictRaceTime(
-    anchor.distanceKm * 1000,
-    anchor.timeSec,
-    targetM
-  );
+function predictRiegel(anchor: RaceQualityEffort, targetM: number): number {
+  return predictRaceTime(anchor.distanceKm * 1000, anchor.timeSec, targetM);
 }
 
 function predictPowerLaw(
   efforts: RaceQualityEffort[],
-  targetKm: number
+  targetKm: number,
 ): { timeSec: number; r2: number; n: number } | null {
   const reg = fitPowerLawRegression(efforts.map(effortToPoint));
   if (!reg) return null;
@@ -83,7 +64,7 @@ function predictPowerLaw(
 function predictMultiEffort(
   efforts: RaceQualityEffort[],
   targetM: number,
-  targetKm: number
+  targetKm: number,
 ): number | null {
   const maxKm = Math.min(30, Math.max(21, targetKm * 1.08));
   const anchors = [...efforts]
@@ -98,7 +79,7 @@ function predictMultiEffort(
 function predictRecentBestAnchor(
   efforts: RaceQualityEffort[],
   targetM: number,
-  targetKm: number
+  targetKm: number,
 ): { timeSec: number; anchor: RaceQualityEffort } | null {
   let best: { e: RaceQualityEffort; w: number } | null = null;
   for (const e of efforts) {
@@ -116,9 +97,7 @@ function predictRecentBestAnchor(
   };
 }
 
-export function buildCapabilityModelEstimates(
-  input: RaceForecastInput
-): ForecastModelEstimate[] {
+export function buildCapabilityModelEstimates(input: RaceForecastInput): ForecastModelEstimate[] {
   const { efforts, goal } = input;
   const targetM = goal.distanceMeters;
   const targetKm = targetM / 1000;
@@ -141,10 +120,7 @@ export function buildCapabilityModelEstimates(
 
   const pl = predictPowerLaw(efforts, targetKm);
   if (pl && pl.r2 >= 0.35) {
-    const confidence = Math.max(
-      0.4,
-      Math.min(0.92, 0.55 + pl.r2 * 0.35)
-    );
+    const confidence = Math.max(0.4, Math.min(0.92, 0.55 + pl.r2 * 0.35));
     estimates.push({
       modelName: "Personalized power-law",
       predictedTimeSec: Math.round(pl.timeSec),
@@ -188,7 +164,7 @@ export function buildCapabilityModelEstimates(
 /** Assign weights and compute weighted capability time */
 export function computeWeightedCapability(
   input: RaceForecastInput,
-  estimates: ForecastModelEstimate[]
+  estimates: ForecastModelEstimate[],
 ): {
   baseTimeSec: number;
   weightedEstimates: ForecastModelEstimate[];
@@ -197,13 +173,8 @@ export function computeWeightedCapability(
   const targetKm = input.goal.distanceMeters / 1000;
   const anchor = pickBestAnchor(input.efforts, targetKm);
 
-  const modelTimes = estimates
-    .map((e) => e.predictedTimeSec)
-    .filter((t) => t > 0);
-  const spreadSec =
-    modelTimes.length >= 2
-      ? Math.max(...modelTimes) - Math.min(...modelTimes)
-      : 0;
+  const modelTimes = estimates.map((e) => e.predictedTimeSec).filter((t) => t > 0);
+  const spreadSec = modelTimes.length >= 2 ? Math.max(...modelTimes) - Math.min(...modelTimes) : 0;
 
   const withWeights = estimates.map((est) => {
     let w = Math.max(0.1, est.confidence);
@@ -225,8 +196,7 @@ export function computeWeightedCapability(
   const totalW = positive.reduce((s, e) => s + e.weight, 0);
 
   if (totalW <= 0 || positive.length === 0) {
-    const fallback =
-      pickBestAnchor(input.efforts, targetKm) ?? input.efforts[0];
+    const fallback = pickBestAnchor(input.efforts, targetKm) ?? input.efforts[0];
     const baseTimeSec = fallback
       ? Math.round(predictRiegel(fallback, input.goal.distanceMeters))
       : 0;
@@ -235,18 +205,12 @@ export function computeWeightedCapability(
   }
 
   const baseTimeSec = Math.round(
-    positive.reduce(
-      (s, e) => s + e.predictedTimeSec * (e.weight / totalW),
-      0
-    )
+    positive.reduce((s, e) => s + e.predictedTimeSec * (e.weight / totalW), 0),
   );
 
   const normalized = withWeights.map((e) => ({
     ...e,
-    weight:
-      e.weight > 0
-        ? Math.round((e.weight / totalW) * 1000) / 1000
-        : 0,
+    weight: e.weight > 0 ? Math.round((e.weight / totalW) * 1000) / 1000 : 0,
   }));
 
   return { baseTimeSec, weightedEstimates: normalized, spreadSec };
@@ -255,7 +219,7 @@ export function computeWeightedCapability(
 /** Build efforts from runs + optional fit (for adapter) */
 export function effortsFromRuns(
   runs: RunActivity[],
-  fitDetails: FitRunDetail[] = []
+  fitDetails: FitRunDetail[] = [],
 ): RaceQualityEffort[] {
   const prs = findPersonalRecords(runs, fitDetails);
   return collectEffortPoints(runs, fitDetails, prs).map((e) => ({

@@ -2,23 +2,23 @@
 
 ## Positioning
 
-| | |
-|---|---|
-| **Was** | Strava export viewer (tabs of charts) |
-| **Is** | Private training intelligence dashboard for runners |
+|               |                                                                            |
+| ------------- | -------------------------------------------------------------------------- |
+| **Was**       | Strava export viewer (tabs of charts)                                      |
+| **Is**        | Private training intelligence dashboard for runners                        |
 | **Principle** | Every screen answers one user question — not an open-ended chart warehouse |
 
 ## User questions → surfaces
 
-| Question | Surface |
-|----------|---------|
-| Am I improving? | Home insights, Trends, Performance, Records |
-| Am I training correctly? | Training, Effort, intensity insights |
-| Am I ready for my goal? | Goals, Readiness, Race predictions |
-| What should I do next? | Home recommendations, Goals |
-| What changed recently? | Home, Reports |
-| What does the system believe about me? | **Intelligence** (`/intelligence`) |
-| Why / compare / investigate? | **Coach** (`/coach`) |
+| Question                               | Surface                                     |
+| -------------------------------------- | ------------------------------------------- |
+| Am I improving?                        | Home insights, Trends, Performance, Records |
+| Am I training correctly?               | Training, Effort, intensity insights        |
+| Am I ready for my goal?                | Goals, Readiness, Race predictions          |
+| What should I do next?                 | Home recommendations, Goals                 |
+| What changed recently?                 | Home, Reports                               |
+| What does the system believe about me? | **Intelligence** (`/intelligence`)          |
+| Why / compare / investigate?           | **Coach** (`/coach`)                        |
 
 See [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md).
 

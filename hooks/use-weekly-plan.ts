@@ -13,17 +13,12 @@ export function useWeeklyPlan() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<GenerateWeeklyPlanResult | null>(null);
-  const [lastPlanningContext, setLastPlanningContext] = useState<string | null>(
-    null
-  );
+  const [lastPlanningContext, setLastPlanningContext] = useState<string | null>(null);
 
   const generate = useCallback(async (opts?: GenerateWeeklyPlanRequest) => {
     setLoading(true);
     setError(null);
-    const planningContext = opts?.planningContext?.trim().slice(
-      0,
-      PLAN_CONTEXT_MAX_CHARS
-    );
+    const planningContext = opts?.planningContext?.trim().slice(0, PLAN_CONTEXT_MAX_CHARS);
     if (planningContext) {
       setLastPlanningContext(planningContext);
     }

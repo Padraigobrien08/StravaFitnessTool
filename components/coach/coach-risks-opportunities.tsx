@@ -4,11 +4,7 @@ import type { RiskOpportunity } from "@/lib/coach/types";
 import { cn } from "@/lib/utils";
 import { ShieldAlert, Sparkles } from "lucide-react";
 
-export function CoachRisksOpportunities({
-  items,
-}: {
-  items: RiskOpportunity[];
-}) {
+export function CoachRisksOpportunities({ items }: { items: RiskOpportunity[] }) {
   if (items.length === 0) return null;
 
   const risks = items.filter((i) => i.kind === "risk");
@@ -55,7 +51,7 @@ export function CoachRisksOpportunities({
                 <li
                   key={o.id}
                   className={cn(
-                    "rounded-lg border border-teal-500/15 bg-teal-500/[0.05] px-3 py-2 text-xs leading-snug text-teal-100/85"
+                    "rounded-lg border border-teal-500/15 bg-teal-500/[0.05] px-3 py-2 text-xs leading-snug text-teal-100/85",
                   )}
                 >
                   <span className="text-[10px] text-teal-500/50">{o.domain}</span>

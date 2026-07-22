@@ -8,7 +8,7 @@ import type { ActivitySource, NormalizedActivity } from "./types";
 const HARD_RUN_TYPES = new Set(["tempo", "interval", "race"]);
 
 function activityConfidence(
-  a: Pick<NormalizedActivity, "avgHr" | "hasStreams" | "modality">
+  a: Pick<NormalizedActivity, "avgHr" | "hasStreams" | "modality">,
 ): "low" | "medium" | "high" {
   if (a.hasStreams && a.avgHr != null) return "high";
   if (a.avgHr != null || a.modality === "run") return "medium";
@@ -20,7 +20,7 @@ function summaryToNormalized(
   source: ActivitySource,
   hasStreams: boolean,
   athleteMaxHr: number,
-  isHardRun?: boolean
+  isHardRun?: boolean,
 ): NormalizedActivity {
   const sportType = normalizeSportType(a.type);
   const modality = classifyActivityModality(sportType);
@@ -52,8 +52,7 @@ function summaryToNormalized(
     confidence: "low",
   };
   base.intensity = inferActivityIntensity(base, athleteMaxHr);
-  base.perceivedIntensity =
-    base.intensity.level === "unknown" ? "moderate" : base.intensity.level;
+  base.perceivedIntensity = base.intensity.level === "unknown" ? "moderate" : base.intensity.level;
   base.inferredPurpose = inferActivityPurpose(base);
   base.confidence = activityConfidence(base);
   return base;
@@ -65,7 +64,7 @@ function runToNormalized(
   source: ActivitySource,
   hasStreams: boolean,
   athleteMaxHr: number,
-  sportType = "Run"
+  sportType = "Run",
 ): NormalizedActivity {
   const isHard = label ? HARD_RUN_TYPES.has(label.classification.type) : false;
   const isLong = (r.distanceM ?? 0) / 1000 >= 16;
@@ -92,8 +91,7 @@ function runToNormalized(
     confidence: "medium",
   };
   base.intensity = inferActivityIntensity(base, athleteMaxHr);
-  base.perceivedIntensity =
-    base.intensity.level === "unknown" ? "moderate" : base.intensity.level;
+  base.perceivedIntensity = base.intensity.level === "unknown" ? "moderate" : base.intensity.level;
   base.inferredPurpose = inferActivityPurpose(base);
   base.confidence = activityConfidence(base);
   return base;
@@ -103,7 +101,7 @@ export function normalizeActivitiesFromImport(
   data: StravaImport,
   workoutLabels: RunWorkoutLabel[],
   fitRunIds: string[] = [],
-  source: ActivitySource = "strava_export"
+  source: ActivitySource = "strava_export",
 ): NormalizedActivity[] {
   const athleteMaxHr = data.profile.maxHeartRate ?? 190;
   const labelById = new Map(workoutLabels.map((l) => [l.runId, l]));
@@ -113,17 +111,9 @@ export function normalizeActivitiesFromImport(
   const out: NormalizedActivity[] = [];
 
   for (const r of data.runs) {
-    const sport =
-      data.allActivities.find((a) => a.id === r.id)?.type ?? "Run";
+    const sport = data.allActivities.find((a) => a.id === r.id)?.type ?? "Run";
     out.push(
-      runToNormalized(
-        r,
-        labelById.get(r.id),
-        source,
-        fitSet.has(r.id),
-        athleteMaxHr,
-        sport
-      )
+      runToNormalized(r, labelById.get(r.id), source, fitSet.has(r.id), athleteMaxHr, sport),
     );
   }
 
@@ -134,7 +124,5 @@ export function normalizeActivitiesFromImport(
     out.push(summaryToNormalized(a, source, false, athleteMaxHr));
   }
 
-  return out.sort(
-    (x, y) => new Date(x.startDate).getTime() - new Date(y.startDate).getTime()
-  );
+  return out.sort((x, y) => new Date(x.startDate).getTime() - new Date(y.startDate).getTime());
 }

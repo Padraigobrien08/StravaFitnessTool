@@ -7,11 +7,7 @@ import {
   updateCalendarWorkout,
   deleteCalendarWeek,
 } from "../calendarStorage";
-import {
-  fillWeekWorkouts,
-  weeklyPlanToCalendarWeek,
-  targetPlanWeekStart,
-} from "../planToCalendar";
+import { fillWeekWorkouts, weeklyPlanToCalendarWeek, targetPlanWeekStart } from "../planToCalendar";
 import { validateCalendarWeek } from "../calendarValidation";
 import type { TrainingCalendarWeek } from "../types";
 
@@ -124,9 +120,7 @@ describe("training-calendar", () => {
     const updated = updateCalendarWorkout(week.weekStart, mon.id, {
       status: "completed",
     });
-    expect(updated?.workouts.find((w) => w.id === mon.id)?.status).toBe(
-      "completed"
-    );
+    expect(updated?.workouts.find((w) => w.id === mon.id)?.status).toBe("completed");
   });
 
   it("blocks save validation on duplicate ids", () => {
@@ -153,7 +147,10 @@ describe("training-calendar", () => {
 
   it("fillWeekWorkouts preserves sessions", () => {
     const week = makeWeek();
-    const filled = fillWeekWorkouts(week.weekStart, week.workouts.filter((w) => w.modality !== "rest"));
+    const filled = fillWeekWorkouts(
+      week.weekStart,
+      week.workouts.filter((w) => w.modality !== "rest"),
+    );
     expect(filled.some((w) => w.title === "Tempo")).toBe(true);
     expect(filled).toHaveLength(7);
   });

@@ -8,13 +8,13 @@ const MAX_ALL_PAGES = 10;
 
 export async function fetchActivity(
   accessToken: string,
-  activityId: number
+  activityId: number,
 ): Promise<StravaActivityDetail> {
   const data = await stravaGet<StravaActivityDetail>(
     accessToken,
     `/activities/${activityId}`,
     undefined,
-    { context: `activity ${activityId}` }
+    { context: `activity ${activityId}` },
   );
   if (!data) throw new Error(`Activity ${activityId} not found`);
   return data;
@@ -27,7 +27,7 @@ export async function fetchAthleteActivitiesPage(
     per_page?: number;
     after?: number;
     before?: number;
-  }
+  },
 ): Promise<StravaActivity[]> {
   const data = await stravaGet<StravaActivity[]>(
     accessToken,
@@ -38,7 +38,7 @@ export async function fetchAthleteActivitiesPage(
       ...(options?.after ? { after: options.after } : {}),
       ...(options?.before ? { before: options.before } : {}),
     },
-    { context: "athlete activities" }
+    { context: "athlete activities" },
   );
   return data ?? [];
 }
@@ -50,7 +50,7 @@ export async function fetchAllAthleteActivities(
     before?: number;
     per_page?: number;
     max_pages?: number;
-  }
+  },
 ): Promise<{ activities: StravaActivity[]; pagesFetched: number }> {
   const per_page = Math.min(options?.per_page ?? 100, 200);
   const max_pages = Math.min(options?.max_pages ?? MAX_ALL_PAGES, MAX_ALL_PAGES);

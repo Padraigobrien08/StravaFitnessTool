@@ -31,10 +31,7 @@ export async function GET() {
     const prefs = await getUserPreferences(userId);
     return NextResponse.json(prefs);
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 500 });
   }
 }
 
@@ -58,23 +55,18 @@ export async function POST(req: NextRequest) {
         error: "Validation failed",
         details: parsed.error.flatten(),
       },
-      { status: 422 }
+      { status: 422 },
     );
   }
 
   try {
     const body = parsed.data;
-    if (
-      body.defaultWeeklyRuns !== undefined ||
-      body.maxWeeklyKm !== undefined
-    ) {
+    if (body.defaultWeeklyRuns !== undefined || body.maxWeeklyKm !== undefined) {
       await upsertUserSettings(userId, {
         ...(body.defaultWeeklyRuns !== undefined
           ? { defaultWeeklyRuns: body.defaultWeeklyRuns }
           : {}),
-        ...(body.maxWeeklyKm !== undefined
-          ? { maxWeeklyKm: body.maxWeeklyKm }
-          : {}),
+        ...(body.maxWeeklyKm !== undefined ? { maxWeeklyKm: body.maxWeeklyKm } : {}),
       });
     }
     if (body.raceGoal !== undefined) {
@@ -88,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Failed to save preferences" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

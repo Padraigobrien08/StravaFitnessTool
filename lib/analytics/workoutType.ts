@@ -2,14 +2,7 @@ import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail, FitLap } from "@/lib/strava/fitTypes";
 import { parseISO, subDays } from "date-fns";
 
-export type WorkoutType =
-  | "easy"
-  | "recovery"
-  | "tempo"
-  | "interval"
-  | "long"
-  | "race"
-  | "unknown";
+export type WorkoutType = "easy" | "recovery" | "tempo" | "interval" | "long" | "race" | "unknown";
 
 export interface WorkoutClassification {
   type: WorkoutType;
@@ -63,14 +56,11 @@ function nameHint(name: string): { type: WorkoutType; signal: string } | null {
 }
 
 function lapPaceCv(laps: FitLap[]): number | null {
-  const paces = laps
-    .map((l) => l.avgPaceSecPerKm)
-    .filter((p): p is number => p !== null && p > 0);
+  const paces = laps.map((l) => l.avgPaceSecPerKm).filter((p): p is number => p !== null && p > 0);
   if (paces.length < 4) return null;
   const mean = paces.reduce((a, b) => a + b, 0) / paces.length;
   if (mean === 0) return null;
-  const variance =
-    paces.reduce((s, p) => s + (p - mean) ** 2, 0) / paces.length;
+  const variance = paces.reduce((s, p) => s + (p - mean) ** 2, 0) / paces.length;
   return Math.sqrt(variance) / mean;
 }
 
@@ -83,7 +73,7 @@ export function classifyRun(
   run: RunActivity,
   athleteMaxHr: number,
   fit: FitRunDetail | undefined,
-  previousRunWasHard: boolean
+  previousRunWasHard: boolean,
 ): WorkoutClassification {
   const signals: string[] = [];
   const km = run.distanceM / 1000;
@@ -91,10 +81,7 @@ export function classifyRun(
 
   if (hint) signals.push(hint.signal);
 
-  const hrPct =
-    run.avgHr !== null && athleteMaxHr > 0
-      ? run.avgHr / athleteMaxHr
-      : null;
+  const hrPct = run.avgHr !== null && athleteMaxHr > 0 ? run.avgHr / athleteMaxHr : null;
 
   if (hrPct !== null) {
     signals.push(`Avg HR ${Math.round(hrPct * 100)}% of max`);
@@ -110,9 +97,7 @@ export function classifyRun(
 
   // FIT lap interval pattern
   if (fit && fit.laps.length >= 4 && isIntervalFromLaps(fit.laps)) {
-    signals.push(
-      `Lap pace variability (CV ${((lapPaceCv(fit.laps) ?? 0) * 100).toFixed(0)}%)`
-    );
+    signals.push(`Lap pace variability (CV ${((lapPaceCv(fit.laps) ?? 0) * 100).toFixed(0)}%)`);
     return { type: "interval", confidence: "high", signals };
   }
 
@@ -129,12 +114,7 @@ export function classifyRun(
   }
 
   // Recovery: short + easy after hard day
-  if (
-    km < 6 &&
-    hrPct !== null &&
-    hrPct < 0.75 &&
-    previousRunWasHard
-  ) {
+  if (km < 6 && hrPct !== null && hrPct < 0.75 && previousRunWasHard) {
     signals.push("Short easy run after a hard session");
     return { type: "recovery", confidence: "medium", signals };
   }
@@ -182,12 +162,10 @@ export function classifyRun(
 export function classifyAllRuns(
   runs: RunActivity[],
   fitDetails: FitRunDetail[],
-  athleteMaxHr: number
+  athleteMaxHr: number,
 ): RunWorkoutLabel[] {
   const fitById = new Map(fitDetails.map((f) => [f.activityId, f]));
-  const sorted = [...runs].sort(
-    (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()
-  );
+  const sorted = [...runs].sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
 
   const labels: RunWorkoutLabel[] = [];
   let prevHard = false;
@@ -201,10 +179,7 @@ export function classifyAllRuns(
       runName: run.name,
       classification,
     });
-    const hrPct =
-      run.avgHr !== null && athleteMaxHr > 0
-        ? run.avgHr / athleteMaxHr
-        : null;
+    const hrPct = run.avgHr !== null && athleteMaxHr > 0 ? run.avgHr / athleteMaxHr : null;
     prevHard =
       classification.type === "interval" ||
       classification.type === "tempo" ||
@@ -217,7 +192,7 @@ export function classifyAllRuns(
 
 export function workoutTypeDistribution(
   labels: RunWorkoutLabel[],
-  withinDays = 56
+  withinDays = 56,
 ): WorkoutTypeBucket[] {
   const cutoff = subDays(new Date(), withinDays);
   const recent = labels.filter((l) => parseISO(l.date) >= cutoff);
@@ -225,21 +200,10 @@ export function workoutTypeDistribution(
   const counts = new Map<WorkoutType, number>();
 
   for (const l of recent) {
-    counts.set(
-      l.classification.type,
-      (counts.get(l.classification.type) ?? 0) + 1
-    );
+    counts.set(l.classification.type, (counts.get(l.classification.type) ?? 0) + 1);
   }
 
-  const order: WorkoutType[] = [
-    "easy",
-    "recovery",
-    "long",
-    "tempo",
-    "interval",
-    "race",
-    "unknown",
-  ];
+  const order: WorkoutType[] = ["easy", "recovery", "long", "tempo", "interval", "race", "unknown"];
 
   return order
     .filter((t) => (counts.get(t) ?? 0) > 0)
@@ -255,7 +219,7 @@ export function workoutTypeDistribution(
 }
 
 export function workoutLabelsByRunId(
-  labels: RunWorkoutLabel[]
+  labels: RunWorkoutLabel[],
 ): Map<string, WorkoutClassification> {
   return new Map(labels.map((l) => [l.runId, l.classification]));
 }

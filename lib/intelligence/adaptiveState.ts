@@ -8,14 +8,14 @@ export function buildAdaptiveSnapshotFromBundle(
   bundle: AthleteIntelligenceBundle,
   raceGoal: RaceGoal | null,
   insights: Insight[] = [],
-  athleteKey?: string
+  athleteKey?: string,
 ): AdaptiveIntelligenceSnapshot {
   return buildAdaptiveIntelligence(
     bundle,
     raceGoal,
     insights,
     athleteKey ?? bundle.analytics.summary.runCount.toString(),
-    { trackPrimaryRecommendation: false }
+    { trackPrimaryRecommendation: false },
   );
 }
 
@@ -24,7 +24,7 @@ export function buildAdaptiveSnapshotFromAnalytics(
     AthleteIntelligenceBundle,
     "analytics" | "insights" | "quality" | "runs" | "fitDetails"
   >,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): AdaptiveIntelligenceSnapshot {
   return buildAdaptiveSnapshotFromBundle(
     {
@@ -32,6 +32,6 @@ export function buildAdaptiveSnapshotFromAnalytics(
       recentRuns: [],
     },
     raceGoal,
-    bundle.insights
+    bundle.insights,
   );
 }

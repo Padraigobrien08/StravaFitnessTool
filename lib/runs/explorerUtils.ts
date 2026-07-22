@@ -2,22 +2,10 @@ import { format, parseISO } from "date-fns";
 import type { RunExplorerRow } from "./viewModels";
 
 export type ExplorerSortKey =
-  | "date"
-  | "significance"
-  | "distance"
-  | "pace"
-  | "type"
-  | "load"
-  | "execution";
+  "date" | "significance" | "distance" | "pace" | "type" | "load" | "execution";
 
 export type QuickFilter =
-  | "all"
-  | "threshold"
-  | "long"
-  | "recovery"
-  | "best_execution"
-  | "high_fatigue"
-  | "race_specific";
+  "all" | "threshold" | "long" | "recovery" | "best_execution" | "high_fatigue" | "race_specific";
 
 export interface ExplorerGroup {
   key: string;
@@ -28,7 +16,7 @@ export interface ExplorerGroup {
 export function paginateRows<T>(
   rows: T[],
   page: number,
-  pageSize: number
+  pageSize: number,
 ): { pageRows: T[]; totalPages: number; total: number } {
   const total = rows.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -49,7 +37,7 @@ export function filterExplorerRows(
     quickFilter: QuickFilter;
     significanceFilter: string;
     effortFilter: "all" | "easy" | "hard";
-  }
+  },
 ): RunExplorerRow[] {
   const q = opts.search.trim().toLowerCase();
   let list = rows;
@@ -61,7 +49,7 @@ export function filterExplorerRows(
         r.formattedTitle.primary.toLowerCase().includes(q) ||
         r.purpose.toLowerCase().includes(q) ||
         r.adaptationTags.some((t) => t.toLowerCase().includes(q)) ||
-        r.dateDisplay.toLowerCase().includes(q)
+        r.dateDisplay.toLowerCase().includes(q),
     );
   }
 
@@ -74,44 +62,34 @@ export function filterExplorerRows(
   }
 
   if (opts.effortFilter === "easy") {
-    list = list.filter((r) =>
-      ["easy", "recovery", "long"].includes(r.workout.type)
-    );
+    list = list.filter((r) => ["easy", "recovery", "long"].includes(r.workout.type));
   } else if (opts.effortFilter === "hard") {
-    list = list.filter((r) =>
-      ["tempo", "interval", "race"].includes(r.workout.type)
-    );
+    list = list.filter((r) => ["tempo", "interval", "race"].includes(r.workout.type));
   }
 
   switch (opts.quickFilter) {
     case "threshold":
-      list = list.filter((r) =>
-        ["tempo", "interval"].includes(r.workout.type)
-      );
+      list = list.filter((r) => ["tempo", "interval"].includes(r.workout.type));
       break;
     case "long":
       list = list.filter((r) => r.markers.includes("long"));
       break;
     case "recovery":
-      list = list.filter((r) =>
-        ["easy", "recovery"].includes(r.workout.type)
-      );
+      list = list.filter((r) => ["easy", "recovery"].includes(r.workout.type));
       break;
     case "best_execution":
       list = list.filter(
         (r) =>
           r.markers.includes("efficient") ||
           r.executionLabel === "Excellent" ||
-          r.executionLabel === "Strong"
+          r.executionLabel === "Strong",
       );
       break;
     case "high_fatigue":
       list = list.filter((r) => r.markers.includes("high_load"));
       break;
     case "race_specific":
-      list = list.filter((r) =>
-        ["race", "tempo", "long"].includes(r.workout.type)
-      );
+      list = list.filter((r) => ["race", "tempo", "long"].includes(r.workout.type));
       break;
     default:
       break;
@@ -123,7 +101,7 @@ export function filterExplorerRows(
 export function sortExplorerRows(
   rows: RunExplorerRow[],
   sortKey: ExplorerSortKey,
-  asc: boolean
+  asc: boolean,
 ): RunExplorerRow[] {
   const list = [...rows];
   list.sort((a, b) => {
@@ -156,10 +134,7 @@ export function sortExplorerRows(
   return list;
 }
 
-export function groupExplorerRows(
-  rows: RunExplorerRow[],
-  mode: "month" | "none"
-): ExplorerGroup[] {
+export function groupExplorerRows(rows: RunExplorerRow[], mode: "month" | "none"): ExplorerGroup[] {
   if (mode === "none") {
     return [{ key: "all", label: "All sessions", rows }];
   }

@@ -25,17 +25,14 @@ export function WorkoutIntelligenceHero({ hero }: { hero: WorkoutHeroView }) {
       className={cn(
         "border-l-[3px]",
         gradeBorder[hero.executionGrade],
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_55%_at_100%_0%,rgba(45,212,191,0.06),transparent_55%)]"
+        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_55%_at_100%_0%,rgba(45,212,191,0.06),transparent_55%)]",
       )}
     >
       <div className="relative grid gap-5 lg:grid-cols-[1fr_minmax(220px,280px)] lg:gap-8">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className={dash.labelAccent}>Session intelligence</span>
-            <WorkoutTypeBadge
-              type={hero.workoutType}
-              confidence={hero.confidence}
-            />
+            <WorkoutTypeBadge type={hero.workoutType} confidence={hero.confidence} />
             <ConfidenceBadge level={hero.confidence} />
           </div>
 
@@ -66,8 +63,7 @@ export function WorkoutIntelligenceHero({ hero }: { hero: WorkoutHeroView }) {
 
           <div className="flex flex-wrap gap-2">
             <span className="rounded-md bg-white/[0.04] px-2.5 py-1 text-xs text-zinc-400 ring-1 ring-inset ring-white/[0.06]">
-              Execution ·{" "}
-              <strong className="text-zinc-200">{hero.executionLabel}</strong>
+              Execution · <strong className="text-zinc-200">{hero.executionLabel}</strong>
             </span>
             <span className="rounded-md bg-teal-500/[0.08] px-2.5 py-1 text-xs text-teal-300/90 ring-1 ring-inset ring-teal-500/20">
               {hero.primaryAdaptation}
@@ -107,9 +103,7 @@ export function WorkoutIntelligenceHero({ hero }: { hero: WorkoutHeroView }) {
             <div>
               <dt className={dash.label}>Efficiency</dt>
               <dd className="mt-0.5 font-semibold text-zinc-200">
-                {hero.efficiencyScore != null
-                  ? hero.efficiencyScore.toFixed(3)
-                  : "—"}
+                {hero.efficiencyScore != null ? hero.efficiencyScore.toFixed(3) : "—"}
               </dd>
             </div>
             <div>

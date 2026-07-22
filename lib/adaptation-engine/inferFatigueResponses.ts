@@ -1,9 +1,7 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { AdaptationSignal } from "./types";
 
-export function inferFatigueResponses(
-  analytics: DashboardInsights
-): AdaptationSignal[] {
+export function inferFatigueResponses(analytics: DashboardInsights): AdaptationSignal[] {
   const out: AdaptationSignal[] = [];
 
   if (analytics.fatigue.tsb < -15) {
@@ -12,10 +10,7 @@ export function inferFatigueResponses(
       category: "freshness",
       statement: "Deep negative TSB suggests accumulated fatigue may suppress quality",
       confidence: "medium",
-      supportingEvidence: [
-        `TSB ${Math.round(analytics.fatigue.tsb)}`,
-        analytics.fatigue.label,
-      ],
+      supportingEvidence: [`TSB ${Math.round(analytics.fatigue.tsb)}`, analytics.fatigue.label],
       contradictoryEvidence: [],
       stability: "emerging",
     });

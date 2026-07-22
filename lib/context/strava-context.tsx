@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { computeInsights, type DashboardInsights } from "@/lib/analytics";
 import {
   buildDataSourceLabel,
@@ -30,11 +23,7 @@ import { FitRunDetailSchema } from "@/lib/strava/fitTypes";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useGoalStore } from "@/stores/goal-store";
-import {
-  buildDemoImport,
-  demoRaceGoal,
-  DEMO_EXPORT_LABEL,
-} from "@/lib/demo/generateDemoData";
+import { buildDemoImport, demoRaceGoal, DEMO_EXPORT_LABEL } from "@/lib/demo/generateDemoData";
 
 interface FitImportStatus {
   parsing: boolean;
@@ -100,7 +89,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         setDataSources((prev) => ({ ...prev, ...sourcePatch }));
       }
     },
-    []
+    [],
   );
 
   const refreshFitDetails = useCallback(async () => {
@@ -155,9 +144,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
       await loadApiFitDetails();
       await refreshFitDetails();
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Failed to load Strava API data"
-      );
+      setError(e instanceof Error ? e.message : "Failed to load Strava API data");
     } finally {
       setLoading(false);
     }
@@ -197,9 +184,8 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const effectiveImport = useMemo(
-    () =>
-      importData ? enrichImportWithFitDetails(importData, fitDetails) : null,
-    [importData, fitDetails]
+    () => (importData ? enrichImportWithFitDetails(importData, fitDetails) : null),
+    [importData, fitDetails],
   );
 
   const fitRunIds = effectiveImport?.fitRunIds ?? [];
@@ -210,34 +196,25 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
   const maxWeeklyKm = useSettingsStore((s) => s.maxWeeklyKm);
   const raceGoal = useGoalStore((s) => s.raceGoal);
 
-  const insights = useMemo(
-    () => {
-      if (!effectiveImport) return null;
-      // This runs during the provider's render, which is ABOVE every error
-      // boundary — an uncaught throw here white-screens the whole app on every
-      // route. Guard it so a bad analytics input degrades to "no insights"
-      // instead of taking the app down.
-      try {
-        return computeInsights(
-          effectiveImport,
-          fitDetails,
-          defaultWeeklyRuns,
-          raceGoal,
-          maxWeeklyKm > 0 ? maxWeeklyKm : undefined
-        );
-      } catch (err) {
-        console.error("computeInsights failed:", err);
-        return null;
-      }
-    },
-    [
-      effectiveImport,
-      fitDetails,
-      defaultWeeklyRuns,
-      raceGoal,
-      maxWeeklyKm,
-    ]
-  );
+  const insights = useMemo(() => {
+    if (!effectiveImport) return null;
+    // This runs during the provider's render, which is ABOVE every error
+    // boundary — an uncaught throw here white-screens the whole app on every
+    // route. Guard it so a bad analytics input degrades to "no insights"
+    // instead of taking the app down.
+    try {
+      return computeInsights(
+        effectiveImport,
+        fitDetails,
+        defaultWeeklyRuns,
+        raceGoal,
+        maxWeeklyKm > 0 ? maxWeeklyKm : undefined,
+      );
+    } catch (err) {
+      console.error("computeInsights failed:", err);
+      return null;
+    }
+  }, [effectiveImport, fitDetails, defaultWeeklyRuns, raceGoal, maxWeeklyKm]);
 
   const importFitFiles = useCallback(
     async (files: File[]) => {
@@ -250,22 +227,18 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
       setFitSuccess(null);
       setFitStatus((s) => ({ ...s, parsing: true, done: 0, total: 0 }));
       try {
-        const result = await importFitFilesOnly(
-          files,
-          importData,
-          (done, total) => {
-            setFitStatus((s) => ({
-              ...s,
-              parsing: true,
-              done,
-              total,
-            }));
-          }
-        );
+        const result = await importFitFilesOnly(files, importData, (done, total) => {
+          setFitStatus((s) => ({
+            ...s,
+            parsing: true,
+            done,
+            total,
+          }));
+        });
         const details = await refreshFitDetails();
         const updated = enrichImportWithFitDetails(
           { ...importData, fitRunIds: result.fitRunIds },
-          details
+          details,
         );
         commitImport(updated, { localExport: true });
         setFitStatus({
@@ -279,7 +252,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
           `Parsed ${result.parsed} runs from FIT files` +
             (result.unmatched > 0
               ? ` (${result.unmatched} files had no matching run).`
-              : ". Open Runs to view stream charts.")
+              : ". Open Runs to view stream charts."),
         );
       } catch (e) {
         setFitError(e instanceof Error ? e.message : "FIT import failed");
@@ -288,7 +261,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         setFitStatus((s) => ({ ...s, parsing: false }));
       }
     },
-    [importData, commitImport, refreshFitDetails]
+    [importData, commitImport, refreshFitDetails],
   );
 
   const importFiles = useCallback(
@@ -301,12 +274,14 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
       try {
         const folderName =
           label ??
-          (files[0] as File & { webkitRelativePath?: string })
-            .webkitRelativePath?.split("/")[0];
-        const { data: exportData, fitParsed, fitAvailable } =
-          await importFromFiles(files, folderName, (done, total) => {
-            setFitStatus((s) => ({ ...s, parsing: true, done, total }));
-          });
+          (files[0] as File & { webkitRelativePath?: string }).webkitRelativePath?.split("/")[0];
+        const {
+          data: exportData,
+          fitParsed,
+          fitAvailable,
+        } = await importFromFiles(files, folderName, (done, total) => {
+          setFitStatus((s) => ({ ...s, parsing: true, done, total }));
+        });
 
         const merged = mergeStravaImports(importData, exportData);
         commitImport(merged, { localExport: true });
@@ -322,11 +297,11 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         });
         if (fitParsed > 0 && stale === fitParsed) {
           setFitError(
-            "FIT files imported but contained no stream data. Try Step 2 again with the activities folder."
+            "FIT files imported but contained no stream data. Try Step 2 again with the activities folder.",
           );
         } else if (fitParsed > 0) {
           setFitSuccess(
-            `Parsed ${fitParsed} runs with stream data. Records now include best efforts inside longer runs.`
+            `Parsed ${fitParsed} runs with stream data. Records now include best efforts inside longer runs.`,
           );
         }
 
@@ -340,13 +315,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     },
-    [
-      importData,
-      apiConnected,
-      commitImport,
-      refreshFitDetails,
-      loadFromStravaApi,
-    ]
+    [importData, apiConnected, commitImport, refreshFitDetails, loadFromStravaApi],
   );
 
   const loadDemo = useCallback(() => {
@@ -380,12 +349,12 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
 
   const getRunById = useCallback(
     (id: string) => importData?.runs.find((r) => r.id === id),
-    [importData]
+    [importData],
   );
 
   const getFitDetailForRun = useCallback(
     (id: string) => fitDetails.find((f) => f.activityId === id),
-    [fitDetails]
+    [fitDetails],
   );
 
   return (

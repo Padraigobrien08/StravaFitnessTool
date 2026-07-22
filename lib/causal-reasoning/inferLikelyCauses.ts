@@ -1,16 +1,14 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { CausalDriver, CausalExplanation, CausalPhenomenon } from "./types";
 
-function driver(
-  partial: Omit<CausalDriver, "evidence"> & { evidence: string[] }
-): CausalDriver {
+function driver(partial: Omit<CausalDriver, "evidence"> & { evidence: string[] }): CausalDriver {
   return partial;
 }
 
 export function inferLikelyCauses(
   analytics: DashboardInsights,
   phenomenon: CausalPhenomenon,
-  opts?: { priorReadiness?: number; priorFreshness?: number }
+  opts?: { priorReadiness?: number; priorFreshness?: number },
 ): CausalExplanation {
   const drivers: CausalDriver[] = [];
   const uncertainties: string[] = [];
@@ -26,8 +24,7 @@ export function inferLikelyCauses(
     case "readiness": {
       const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
       const daysUntil = analytics.raceReadiness?.daysUntilRace;
-      const delta =
-        opts?.priorReadiness != null ? r.score - opts.priorReadiness : null;
+      const delta = opts?.priorReadiness != null ? r.score - opts.priorReadiness : null;
 
       if (analytics.fatigue.freshness >= 60) {
         drivers.push(
@@ -39,7 +36,7 @@ export function inferLikelyCauses(
               `Freshness ${Math.round(analytics.fatigue.freshness)}`,
               analytics.fatigue.label,
             ],
-          })
+          }),
         );
       }
       if (daysUntil != null && daysUntil <= 14) {
@@ -49,7 +46,7 @@ export function inferLikelyCauses(
             impact: "moderate",
             confidence: "low",
             evidence: [`${daysUntil} days to race`, "Volume likely reduced"],
-          })
+          }),
         );
       }
       if (analytics.efficiencySummary.trend === "improving") {
@@ -59,7 +56,7 @@ export function inferLikelyCauses(
             impact: "small",
             confidence: "low",
             evidence: ["Efficiency trend improving"],
-          })
+          }),
         );
       }
       if (analytics.intensityAdvice.status === "too_hard") {
@@ -68,10 +65,8 @@ export function inferLikelyCauses(
             driver: "Intensity stacking",
             impact: "moderate",
             confidence: "medium",
-            evidence: [
-              `${analytics.intensityAdvice.hardRunsLast14d} hard runs / 14d`,
-            ],
-          })
+            evidence: [`${analytics.intensityAdvice.hardRunsLast14d} hard runs / 14d`],
+          }),
         );
         uncertainties.push("Stacking may suppress readiness if maintained");
       }
@@ -88,7 +83,7 @@ export function inferLikelyCauses(
           drivers,
           delta != null
             ? `appears ${delta >= 0 ? "higher" : "lower"} (${delta >= 0 ? "+" : ""}${delta} pts)`
-            : `is ${r.label.toLowerCase()} (${r.score}/100)`
+            : `is ${r.label.toLowerCase()} (${r.score}/100)`,
         ),
       };
     }
@@ -101,7 +96,7 @@ export function inferLikelyCauses(
             impact: "large",
             confidence: "medium",
             evidence: [`TSB ${Math.round(analytics.fatigue.tsb)}`],
-          })
+          }),
         );
       }
       if (analytics.intensityAdvice.hardRunsLast14d >= 3) {
@@ -110,10 +105,8 @@ export function inferLikelyCauses(
             driver: "Hard-session density",
             impact: "moderate",
             confidence: "medium",
-            evidence: [
-              `${analytics.intensityAdvice.hardRunsLast14d} hard runs in 14 days`,
-            ],
-          })
+            evidence: [`${analytics.intensityAdvice.hardRunsLast14d} hard runs in 14 days`],
+          }),
         );
       }
       return {
@@ -123,7 +116,7 @@ export function inferLikelyCauses(
         summary: buildSummary(
           "Freshness",
           drivers,
-          `appears ${analytics.fatigue.label.toLowerCase()} (${Math.round(analytics.fatigue.freshness)})`
+          `appears ${analytics.fatigue.label.toLowerCase()} (${Math.round(analytics.fatigue.freshness)})`,
         ),
       };
     }
@@ -140,7 +133,7 @@ export function inferLikelyCauses(
               analytics.consistencyScore.label,
               `Easy ${Math.round(analytics.intensityAdvice.currentEasyPct)}%`,
             ],
-          })
+          }),
         );
       } else if (trend === "declining") {
         drivers.push(
@@ -148,11 +141,8 @@ export function inferLikelyCauses(
             driver: "Fatigue masking aerobic signal",
             impact: "moderate",
             confidence: "low",
-            evidence: [
-              `TSB ${Math.round(analytics.fatigue.tsb)}`,
-              analytics.fatigue.label,
-            ],
-          })
+            evidence: [`TSB ${Math.round(analytics.fatigue.tsb)}`, analytics.fatigue.label],
+          }),
         );
       }
       return {
@@ -176,7 +166,7 @@ export function inferLikelyCauses(
             impact: "moderate",
             confidence: "medium",
             evidence: ["Low overall data confidence for projections"],
-          })
+          }),
         );
       }
       return {
@@ -199,11 +189,7 @@ export function inferLikelyCauses(
   }
 }
 
-function buildSummary(
-  label: string,
-  drivers: CausalDriver[],
-  statePhrase: string
-): string {
+function buildSummary(label: string, drivers: CausalDriver[], statePhrase: string): string {
   if (drivers.length === 0) {
     return `${label} ${statePhrase} — no dominant driver identified from current evidence.`;
   }

@@ -21,8 +21,7 @@ export function ProjectionCurvePanel({
     return (
       <PanelChrome title="Performance projection curve" subdued>
         <p className="text-sm text-zinc-500">
-          Quality efforts between 4–15 km unlock the performance curve and
-          realistic zone shading.
+          Quality efforts between 4–15 km unlock the performance curve and realistic zone shading.
         </p>
       </PanelChrome>
     );
@@ -33,9 +32,8 @@ export function ProjectionCurvePanel({
   return (
     <PanelChrome title="Performance projection curve" elevated>
       <p className={`${dash.muted} mb-3`}>
-        Your efforts mapped to distance — shaded region is the best-fit corridor
-        for {targetDistanceLabel}. Outliers are recent hard sessions, not
-        necessarily race pace.
+        Your efforts mapped to distance — shaded region is the best-fit corridor for{" "}
+        {targetDistanceLabel}. Outliers are recent hard sessions, not necessarily race pace.
       </p>
 
       {primary ? (
@@ -56,9 +54,7 @@ export function ProjectionCurvePanel({
         aria-expanded={open}
       >
         Curve & effort scatter
-        <ChevronDown
-          className={cn("h-4 w-4 transition-transform", open && "rotate-180")}
-        />
+        <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
       </button>
 
       {open ? (

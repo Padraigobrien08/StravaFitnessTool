@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 
 export default function ReportPage() {
-  const { analytics, insights, quality, dataset, loading } =
-    useTrainingIntelligence();
+  const { analytics, insights, quality, dataset, loading } = useTrainingIntelligence();
   const raceGoal = useGoalStore((s) => s.raceGoal);
 
   const recentRuns = useMemo(() => {
@@ -29,13 +28,7 @@ export default function ReportPage() {
 
   const view = useMemo(() => {
     if (!analytics) return null;
-    return buildReportPageView(
-      analytics,
-      insights,
-      quality,
-      recentRuns,
-      raceGoal
-    );
+    return buildReportPageView(analytics, insights, quality, recentRuns, raceGoal);
   }, [analytics, insights, quality, recentRuns, raceGoal]);
 
   if (loading && !view) {

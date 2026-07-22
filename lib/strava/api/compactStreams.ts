@@ -22,9 +22,7 @@ export interface CompactActivityStreams {
   laps?: StravaLap[];
 }
 
-function seriesData(
-  series: StravaStreamSet[string]
-): number[] | [number, number][] {
+function seriesData(series: StravaStreamSet[string]): number[] | [number, number][] {
   const d = series.data;
   if (d.length > 0 && Array.isArray(d[0])) {
     return d as unknown as [number, number][];
@@ -36,7 +34,7 @@ function seriesData(
 export function compactActivityStreams(
   activityId: number,
   streams: StravaStreamSet | null,
-  laps?: StravaLap[]
+  laps?: StravaLap[],
 ): CompactActivityStreams | null {
   if (!streams || Object.keys(streams).length === 0) return null;
 
@@ -48,11 +46,10 @@ export function compactActivityStreams(
     if (!series?.data?.length) continue;
     out[key] = seriesData(series);
     pointCount = Math.max(pointCount, out[key].length);
-    meta[key] =
-      STREAM_META[key] ?? {
-        unit: "unknown",
-        description: `Strava stream: ${key}`,
-      };
+    meta[key] = STREAM_META[key] ?? {
+      unit: "unknown",
+      description: `Strava stream: ${key}`,
+    };
   }
 
   if (pointCount === 0) return null;
@@ -69,7 +66,7 @@ export function compactActivityStreams(
 /** Downsample numeric streams (and latlng pairs) to max N points. */
 export function downsampleCompactStreams(
   payload: CompactActivityStreams,
-  maxPoints: number
+  maxPoints: number,
 ): CompactActivityStreams {
   if (maxPoints <= 0 || payload.pointCount <= maxPoints) return payload;
 

@@ -20,7 +20,7 @@ export function buildContributors(
     uncertainty: UncertaintyAssessment;
     modelAgreementLabel: string;
     modelSpreadSec: number;
-  }
+  },
 ): {
   positive: ForecastContributor[];
   negative: ForecastContributor[];
@@ -32,8 +32,7 @@ export function buildContributors(
 
   const targetKm = input.goal.distanceMeters / 1000;
   const longest = input.recentBlocks[input.recentBlocks.length - 1]?.longestRunKm ?? 0;
-  const longestPct =
-    targetKm > 0 ? Math.round((longest / targetKm) * 100) : 0;
+  const longestPct = targetKm > 0 ? Math.round((longest / targetKm) * 100) : 0;
 
   if (longestPct >= 85) {
     positive.push({

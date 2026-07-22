@@ -43,9 +43,9 @@ describe("handleStravaMcpAction", () => {
 
   it("rejects when not connected", async () => {
     vi.mocked(getStravaConnection).mockResolvedValue(null);
-    await expect(
-      handleStravaMcpAction("u1", "athlete", {})
-    ).rejects.toThrow(/No Strava connection/);
+    await expect(handleStravaMcpAction("u1", "athlete", {})).rejects.toThrow(
+      /No Strava connection/,
+    );
   });
 
   it("routes athlete action", async () => {

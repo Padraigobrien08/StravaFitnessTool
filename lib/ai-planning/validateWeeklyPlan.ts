@@ -37,8 +37,7 @@ function isHardRun(w: PlannedWorkout): boolean {
   if (w.modality !== "run") return false;
   if (w.type === "race") return w.intensity === "hard";
   return (
-    w.intensity === "hard" ||
-    /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`)
+    w.intensity === "hard" || /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`)
   );
 }
 
@@ -103,7 +102,7 @@ function scanUnsupportedClaims(plan: WeeklyTrainingPlan): ValidationIssue[] {
 export function validateWeeklyPlan(
   plan: WeeklyTrainingPlan,
   context: CoachingContext,
-  guardrails: WeeklyPlanGuardrails
+  guardrails: WeeklyPlanGuardrails,
 ): ValidationResult {
   const issues: ValidationIssue[] = [];
 
@@ -164,11 +163,7 @@ export function validateWeeklyPlan(
       severity: "error",
     });
   }
-  if (
-    guardrails.daysUntilRace != null &&
-    guardrails.daysUntilRace <= 10 &&
-    hardCount > 1
-  ) {
+  if (guardrails.daysUntilRace != null && guardrails.daysUntilRace <= 10 && hardCount > 1) {
     issues.push({
       code: "race_taper_hard",
       message: "Too many hard sessions within 10 days of race",
@@ -192,7 +187,7 @@ export function validateWeeklyPlan(
       (w) =>
         w.modality === "strength" &&
         HARD_INTENSITY.has(w.intensity) &&
-        /\b(hard|heavy|max)\b/i.test(w.title + w.type)
+        /\b(hard|heavy|max)\b/i.test(w.title + w.type),
     );
     if (hardStrength.length > 0) {
       issues.push({
@@ -220,7 +215,7 @@ export function validateWeeklyPlan(
   }
 
   const restDays = plan.workouts.filter(
-    (w) => w.modality === "rest" || w.intensity === "rest"
+    (w) => w.modality === "rest" || w.intensity === "rest",
   ).length;
   if (restDays < guardrails.minRestDays && plan.planType !== "build") {
     issues.push({
@@ -250,7 +245,7 @@ export function validateWeeklyPlan(
   const hardCross = plan.workouts.filter(
     (w) =>
       w.modality === "cross_training" &&
-      (w.intensity === "hard" || /\bhiit|crossfit\b/i.test(w.type))
+      (w.intensity === "hard" || /\bhiit|crossfit\b/i.test(w.type)),
   );
   if (guardrails.avoidIntensityStacking && hardCross.length > 0 && hardCount >= 1) {
     issues.push({

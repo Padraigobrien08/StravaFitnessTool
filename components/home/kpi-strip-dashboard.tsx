@@ -31,11 +31,7 @@ function KpiTile({ kpi }: { kpi: KpiViewModel }) {
             </div>
           ) : null}
         </div>
-        <Sparkline
-          data={kpi.sparkline}
-          height={26}
-          positive={kpi.sparkPositive}
-        />
+        <Sparkline data={kpi.sparkline} height={26} positive={kpi.sparkPositive} />
       </div>
     </DashboardPanel>
   );

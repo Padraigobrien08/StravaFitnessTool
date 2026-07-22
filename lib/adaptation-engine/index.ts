@@ -22,7 +22,7 @@ import { inferTaperResponse } from "./inferTaperResponse";
 
 export function buildAdaptationSignals(
   analytics: DashboardInsights,
-  outcomes: TrackedRecommendationOutcome[] = []
+  outcomes: TrackedRecommendationOutcome[] = [],
 ): AdaptationSignal[] {
   const merged = [
     ...inferAdaptationSignals(analytics, outcomes),

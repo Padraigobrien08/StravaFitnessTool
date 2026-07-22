@@ -10,20 +10,14 @@ import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 
 export function AdaptationSignalsPanel({ data }: { data: AdaptationSignalView }) {
   const TrendIcon =
-    data.trend === "improving"
-      ? TrendingUp
-      : data.trend === "declining"
-        ? TrendingDown
-        : Minus;
+    data.trend === "improving" ? TrendingUp : data.trend === "declining" ? TrendingDown : Minus;
 
   return (
     <PanelChrome title="Adaptation signals" href="/performance" accent>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(220px,320px)] lg:items-start">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-display text-lg font-semibold text-zinc-50">
-              {data.headline}
-            </h3>
+            <h3 className="font-display text-lg font-semibold text-zinc-50">{data.headline}</h3>
             <span
               className={cn(
                 "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-inset",
@@ -31,7 +25,7 @@ export function AdaptationSignalsPanel({ data }: { data: AdaptationSignalView })
                   ? "bg-teal-500/10 text-teal-300 ring-teal-500/20"
                   : data.trend === "declining"
                     ? "bg-amber-500/10 text-amber-300 ring-amber-500/20"
-                    : "bg-white/[0.04] text-zinc-500 ring-white/10"
+                    : "bg-white/[0.04] text-zinc-500 ring-white/10",
               )}
             >
               <TrendIcon className="h-3 w-3" />
@@ -51,7 +45,7 @@ export function AdaptationSignalsPanel({ data }: { data: AdaptationSignalView })
                 <p
                   className={cn(
                     "mt-0.5 font-semibold tabular-nums",
-                    data.deltaPct > 0 ? "text-teal-400" : "text-amber-400"
+                    data.deltaPct > 0 ? "text-teal-400" : "text-amber-400",
                   )}
                 >
                   {data.deltaPct > 0 ? "+" : ""}
@@ -77,10 +71,7 @@ export function AdaptationSignalsPanel({ data }: { data: AdaptationSignalView })
 
         <div className="rounded-lg bg-white/[0.02] px-2 py-2 ring-1 ring-inset ring-white/[0.04]">
           <p className={cn(dash.label, "px-1 pb-1")}>Supporting trend</p>
-          <EfficiencySignalChart
-            data={data.chartData}
-            positive={data.trend !== "declining"}
-          />
+          <EfficiencySignalChart data={data.chartData} positive={data.trend !== "declining"} />
         </div>
       </div>
     </PanelChrome>

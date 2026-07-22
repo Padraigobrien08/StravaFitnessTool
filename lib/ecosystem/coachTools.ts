@@ -7,9 +7,7 @@ import type { RollingWindowDays, TrainingEcosystemAnalysis } from "./types";
 
 export type EcosystemWindow = RollingWindowDays;
 
-export function parseEcosystemWindow(
-  args?: { window?: number }
-): EcosystemWindow {
+export function parseEcosystemWindow(args?: { window?: number }): EcosystemWindow {
   const w = args?.window ?? 28;
   if (w <= 7) return 7;
   if (w <= 14) return 14;
@@ -24,7 +22,7 @@ function eco(analytics: DashboardInsights): TrainingEcosystemAnalysis {
 
 export function getTrainingEcosystemSummary(
   analytics: DashboardInsights,
-  window: EcosystemWindow = 28
+  window: EcosystemWindow = 28,
 ) {
   const e = eco(analytics);
   const snap = e.rolling[window];
@@ -44,7 +42,7 @@ export function getTrainingEcosystemSummary(
 
 export function getModalityDistribution(
   analytics: DashboardInsights,
-  window: EcosystemWindow = 28
+  window: EcosystemWindow = 28,
 ) {
   const e = eco(analytics);
   const snap = e.rolling[window];
@@ -66,7 +64,7 @@ export function getModalityDistribution(
 
 export function getCrossTrainingSupport(
   analytics: DashboardInsights,
-  window: EcosystemWindow = 28
+  window: EcosystemWindow = 28,
 ) {
   const e = eco(analytics);
   const snap = e.rolling[window];
@@ -87,22 +85,15 @@ export function getCrossTrainingSupport(
   };
 }
 
-export function getInterferenceRisks(
-  analytics: DashboardInsights,
-  window: EcosystemWindow = 28
-) {
+export function getInterferenceRisks(analytics: DashboardInsights, window: EcosystemWindow = 28) {
   const e = eco(analytics);
-  const flags = e.interferenceFlags.filter((f) =>
-    inWindow(f.nonRunDate, window)
-  );
+  const flags = e.interferenceFlags.filter((f) => inWindow(f.nonRunDate, window));
   return {
     windowDays: window,
     interferenceRiskScore: e.scores.interferenceRisk,
     flags: flags.slice(0, 10),
     raceWeekWarnings: e.raceWeekWarnings,
-    limitations: [
-      "Language: may interfere / could increase fatigue — not medical certainty.",
-    ],
+    limitations: ["Language: may interfere / could increase fatigue — not medical certainty."],
     confidence: flags.some((f) => f.severity === "high") ? "medium" : "low",
   };
 }
@@ -120,7 +111,7 @@ export function getAthleteArchetypePayload(analytics: DashboardInsights) {
 export function compareModalityBlocks(
   analytics: DashboardInsights,
   blockADays = 28,
-  blockBDays = 28
+  blockBDays = 28,
 ) {
   const e = eco(analytics);
   const now = new Date();
@@ -134,8 +125,7 @@ export function compareModalityBlocks(
     return t >= end - blockBDays * 86400000 && t < end;
   });
 
-  const count = (acts: typeof blockA, mod: string) =>
-    acts.filter((a) => a.modality === mod).length;
+  const count = (acts: typeof blockA, mod: string) => acts.filter((a) => a.modality === mod).length;
 
   return {
     blockA: { days: blockADays, sessions: blockA.length, run: count(blockA, "run") },
@@ -154,10 +144,7 @@ export function compareModalityBlocks(
   };
 }
 
-export function getRaceWeekInterferenceCheck(
-  analytics: DashboardInsights,
-  _goalId?: string
-) {
+export function getRaceWeekInterferenceCheck(analytics: DashboardInsights, _goalId?: string) {
   const e = eco(analytics);
   return {
     warnings: e.raceWeekWarnings,
@@ -173,7 +160,7 @@ export function getRaceWeekInterferenceCheck(
 
 export function getStrengthMobilitySupport(
   analytics: DashboardInsights,
-  window: EcosystemWindow = 14
+  window: EcosystemWindow = 14,
 ) {
   const e = eco(analytics);
   const snap = e.rolling[window];
@@ -184,7 +171,7 @@ export function getStrengthMobilitySupport(
     strengthSessions: snap?.strengthSessions ?? 0,
     mobilitySessions: snap?.mobilitySessions ?? 0,
     signals: e.supportSignals.filter(
-      (s) => s.dimension === "strength" || s.dimension === "mobility"
+      (s) => s.dimension === "strength" || s.dimension === "mobility",
     ),
     shouldDoStrengthThisWeek:
       e.scores.strengthSupport >= 50 && e.scores.interferenceRisk < 55
@@ -192,16 +179,14 @@ export function getStrengthMobilitySupport(
         : e.scores.interferenceRisk >= 55
           ? "Defer heavy strength until interference risk eases."
           : "Consider 1–2 strength sessions for durability if run load is rising.",
-    limitations: [
-      "No set/rep/load from Strava — timing and duration only.",
-    ],
+    limitations: ["No set/rep/load from Strava — timing and duration only."],
     confidence: e.confidence,
   };
 }
 
 export function buildFullEcosystemCoachPayload(
   analytics: DashboardInsights,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ) {
   const window = 28;
   return {

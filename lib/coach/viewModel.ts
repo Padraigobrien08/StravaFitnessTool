@@ -6,7 +6,7 @@ import type { CoachContextSnapshot } from "./types";
 
 export function buildCoachContextSnapshot(
   analytics: DashboardInsights | null,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): CoachContextSnapshot {
   if (!analytics) {
     return {

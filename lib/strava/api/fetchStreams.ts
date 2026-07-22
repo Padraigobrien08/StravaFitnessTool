@@ -6,13 +6,13 @@ export const STREAM_KEYS =
 
 export async function fetchActivityLaps(
   accessToken: string,
-  activityId: number
+  activityId: number,
 ): Promise<StravaLap[]> {
   const data = await stravaGet<StravaLap[]>(
     accessToken,
     `/activities/${activityId}/laps`,
     undefined,
-    { allow404: true, context: `laps ${activityId}` }
+    { allow404: true, context: `laps ${activityId}` },
   );
   return data ?? [];
 }
@@ -20,13 +20,13 @@ export async function fetchActivityLaps(
 export async function fetchActivityStreams(
   accessToken: string,
   activityId: number,
-  keys: string = STREAM_KEYS
+  keys: string = STREAM_KEYS,
 ): Promise<StravaStreamSet | null> {
   const data = await stravaGet<StravaStreamSet>(
     accessToken,
     `/activities/${activityId}/streams`,
     { keys, key_by_type: "true" },
-    { allow404: true, context: `streams ${activityId}` }
+    { allow404: true, context: `streams ${activityId}` },
   );
   return data;
 }

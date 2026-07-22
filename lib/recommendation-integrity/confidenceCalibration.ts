@@ -8,16 +8,11 @@ const CONFIDENCE_RANK: Record<PlanConfidence, number> = {
   high: 3,
 };
 
-function maxAllowedConfidence(
-  context: WeeklyPlanIntegrityInput["context"]
-): PlanConfidence {
+function maxAllowedConfidence(context: WeeklyPlanIntegrityInput["context"]): PlanConfidence {
   const { dataQuality, currentState, goal } = context;
   let cap: PlanConfidence = "high";
 
-  if (
-    dataQuality.hrCoverage === "low" ||
-    dataQuality.activityCount < 6
-  ) {
+  if (dataQuality.hrCoverage === "low" || dataQuality.activityCount < 6) {
     cap = "low";
   } else if (
     dataQuality.streamCoverage === "low" ||
@@ -41,9 +36,7 @@ function maxAllowedConfidence(
   return cap;
 }
 
-export function runConfidenceCalibration(
-  input: WeeklyPlanIntegrityInput
-): RecommendationIssue[] {
+export function runConfidenceCalibration(input: WeeklyPlanIntegrityInput): RecommendationIssue[] {
   const { plan, context } = input;
   const issues: RecommendationIssue[] = [];
   const cap = maxAllowedConfidence(context);
@@ -57,10 +50,7 @@ export function runConfidenceCalibration(
     });
   }
 
-  if (
-    plan.confidence === "high" &&
-    !plan.limitations.some((l) => l.length > 12)
-  ) {
+  if (plan.confidence === "high" && !plan.limitations.some((l) => l.length > 12)) {
     issues.push({
       type: "overconfidence",
       severity: "low",

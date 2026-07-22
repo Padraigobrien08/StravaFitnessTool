@@ -1,11 +1,7 @@
 "use client";
 
 import type { ParsedCoachResponse } from "@/lib/coach/parseResponse";
-import {
-  confidenceLevel,
-  inferGroundedIn,
-  primaryLimitation,
-} from "@/lib/coach/groundingMeta";
+import { confidenceLevel, inferGroundedIn, primaryLimitation } from "@/lib/coach/groundingMeta";
 import { formatCoachText } from "@/lib/coach/formatText";
 import { cn } from "@/lib/utils";
 
@@ -33,9 +29,7 @@ export function CoachResponseMeta({
       {level ? (
         <span>
           <span className="text-zinc-600">Confidence </span>
-          <span className={cn("font-medium", confidenceClass(level))}>
-            {level}
-          </span>
+          <span className={cn("font-medium", confidenceClass(level))}>{level}</span>
         </span>
       ) : null}
       {grounded.length > 0 ? (

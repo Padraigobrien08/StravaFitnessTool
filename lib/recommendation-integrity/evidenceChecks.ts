@@ -1,9 +1,6 @@
 import type { RecommendationIssue } from "./types";
 import type { WeeklyPlanIntegrityInput } from "./types";
-import {
-  buildAllowedEvidenceTokens,
-  evidenceItemGrounded,
-} from "./contextEvidence";
+import { buildAllowedEvidenceTokens, evidenceItemGrounded } from "./contextEvidence";
 
 const INVENTED_METRIC_PATTERNS = [
   /\bhrv\b/i,
@@ -37,9 +34,7 @@ function collectPlanText(plan: WeeklyPlanIntegrityInput["plan"]): string {
   ].join("\n");
 }
 
-export function runEvidenceChecks(
-  input: WeeklyPlanIntegrityInput
-): RecommendationIssue[] {
+export function runEvidenceChecks(input: WeeklyPlanIntegrityInput): RecommendationIssue[] {
   const { plan, context } = input;
   const issues: RecommendationIssue[] = [];
   const allowed = buildAllowedEvidenceTokens(context);
@@ -102,7 +97,8 @@ export function runEvidenceChecks(
           type: "unsupported_claim",
           severity: "high",
           message: "Plan references HRV or metrics not present in coaching context",
-          suggestedFix: "Remove invented biometrics; use freshness, TSB label, or load narrative only",
+          suggestedFix:
+            "Remove invented biometrics; use freshness, TSB label, or load narrative only",
         });
         break;
       }
@@ -119,8 +115,7 @@ export function runEvidenceChecks(
   }
 
   const genericSummary =
-    plan.summary.length < 40 ||
-    /^(build|maintain|train|work hard|get fit)/i.test(plan.summary);
+    plan.summary.length < 40 || /^(build|maintain|train|work hard|get fit)/i.test(plan.summary);
   if (genericSummary && context.dataQuality.activityCount >= 8) {
     issues.push({
       type: "missing_evidence",

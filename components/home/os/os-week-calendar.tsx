@@ -20,9 +20,7 @@ export function OsWeekCalendar({
   hydrated: boolean;
   onPatchWorkout?: (
     id: string,
-    patch: Partial<
-      Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">
-    >
+    patch: Partial<Pick<CalendarWorkout, "title" | "distanceKm" | "durationMin" | "status">>,
   ) => void;
   onGeneratePlan?: () => void;
   planLoading?: boolean;
@@ -36,10 +34,7 @@ export function OsWeekCalendar({
       id="current-week"
       title="Current week"
       action={
-        <Link
-          href="/plan"
-          className="text-[10px] text-zinc-600 hover:text-zinc-400"
-        >
+        <Link href="/plan" className="text-[10px] text-zinc-600 hover:text-zinc-400">
           Full planner →
         </Link>
       }
@@ -50,9 +45,7 @@ export function OsWeekCalendar({
         <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface)]/50 p-2 sm:p-3">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-1">
             <p className="text-[12px] text-zinc-400">{weekLabel}</p>
-            <p className="text-[10px] text-zinc-600 line-clamp-1">
-              {savedWeek.summary}
-            </p>
+            <p className="text-[10px] text-zinc-600 line-clamp-1">{savedWeek.summary}</p>
           </div>
           <PlanWeekBoard
             week={savedWeek}
@@ -65,12 +58,10 @@ export function OsWeekCalendar({
       ) : (
         <div className="flex flex-col items-start gap-3 rounded-lg border border-dashed border-[var(--border-default)] bg-[var(--surface)]/40 px-4 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[13px] font-medium text-zinc-300">
-              No saved week plan yet
-            </p>
+            <p className="text-[13px] font-medium text-zinc-300">No saved week plan yet</p>
             <p className="mt-1 max-w-md text-[12px] text-zinc-600">
-              Generate and save a plan to anchor your week here — you won&apos;t
-              need to live on the Plan page.
+              Generate and save a plan to anchor your week here — you won&apos;t need to live on the
+              Plan page.
             </p>
           </div>
           {onGeneratePlan ? (

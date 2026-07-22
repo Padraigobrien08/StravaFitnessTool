@@ -16,7 +16,7 @@ const openaiTools = INTELLIGENCE_TOOL_DEFINITIONS.map((t) => ({
 export async function runOpenAICoachChat(
   ctx: IntelligenceContext,
   messages: ChatMessage[],
-  apiKey: string
+  apiKey: string,
 ): Promise<{ reply: string; toolsUsed: string[] }> {
   const toolsUsed: string[] = [];
   const systemPrompt = await buildCoachSystemWithContext(ctx);

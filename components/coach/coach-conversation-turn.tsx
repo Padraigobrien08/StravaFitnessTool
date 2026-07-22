@@ -35,12 +35,7 @@ export function CoachConversationTurn({
   const moreEvidence = parsed.evidence.slice(3);
 
   return (
-    <article
-      className={cn(
-        "coach-conversation-turn",
-        animate && "coach-turn-enter"
-      )}
-    >
+    <article className={cn("coach-conversation-turn", animate && "coach-turn-enter")}>
       <div className="space-y-3.5">
         {parsed.summary ? (
           <p className="text-[15px] leading-[1.62] text-zinc-200">
@@ -127,21 +122,13 @@ export function CoachConversationTurn({
   );
 }
 
-export function CoachUserTurn({
-  content,
-  isOpening,
-}: {
-  content: string;
-  isOpening?: boolean;
-}) {
+export function CoachUserTurn({ content, isOpening }: { content: string; isOpening?: boolean }) {
   if (isOpening) return null;
 
   return (
     <div className={cn("coach-user-turn flex justify-end coach-turn-enter")}>
       <div className="max-w-[min(100%,28rem)] rounded-xl bg-white/[0.05] px-3.5 py-2.5">
-        <p className="text-[14px] leading-[1.45] text-zinc-200">
-          {formatCoachText(content)}
-        </p>
+        <p className="text-[14px] leading-[1.45] text-zinc-200">{formatCoachText(content)}</p>
       </div>
     </div>
   );

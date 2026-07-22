@@ -8,10 +8,7 @@ import type {
   ReasoningResult,
 } from "./types";
 
-function rankBlocks(
-  blocks: PhaseBlockMetrics[],
-  metric: BestPhaseMetric
-): PhaseBlockMetrics[] {
+function rankBlocks(blocks: PhaseBlockMetrics[], metric: BestPhaseMetric): PhaseBlockMetrics[] {
   const copy = [...blocks];
   switch (metric) {
     case "volume":
@@ -32,7 +29,7 @@ function rankBlocks(
 
 export function findBestPhase(
   ctx: ReasoningContext,
-  args: FindBestPhaseArgs = {}
+  args: FindBestPhaseArgs = {},
 ): ReasoningResult<{
   metric: BestPhaseMetric;
   best: PhaseBlockMetrics;

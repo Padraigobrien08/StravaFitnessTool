@@ -24,8 +24,7 @@ export function useCoachPlanRequest() {
     }): Promise<CoachPlanApiResponse> => {
       const saved = getCalendarWeek(targetPlanWeekStart());
       const previousPlan =
-        params.previousPlan ??
-        (saved ? calendarWeekToWeeklyPlan(saved) : undefined);
+        params.previousPlan ?? (saved ? calendarWeekToWeeklyPlan(saved) : undefined);
       const calendarPayload = buildCalendarCoachPayload(saved, null);
 
       const res = await fetch("/api/me/coach/plan", {
@@ -44,7 +43,7 @@ export function useCoachPlanRequest() {
       }
       return data as CoachPlanApiResponse;
     },
-    []
+    [],
   );
 
   return { requestPlan };

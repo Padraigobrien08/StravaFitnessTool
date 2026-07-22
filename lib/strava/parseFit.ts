@@ -18,7 +18,7 @@ export function fitPathBasename(path: string): string {
 
 export function matchFitFileToActivityId(
   fitPath: string,
-  fitFilenameById: Map<string, string>
+  fitFilenameById: Map<string, string>,
 ): string | null {
   const base = fitPathBasename(fitPath).toLowerCase();
   for (const [activityId, filename] of fitFilenameById) {
@@ -77,10 +77,7 @@ function computeHrDrift(hrStream: { elapsedSec: number; hr: number }[]): number 
   return Math.round(((avg2 - avg1) / avg1) * 1000) / 10;
 }
 
-export async function parseFitFile(
-  buffer: ArrayBuffer,
-  activityId: string
-): Promise<FitRunDetail> {
+export async function parseFitFile(buffer: ArrayBuffer, activityId: string): Promise<FitRunDetail> {
   const bytes = decompressFitBuffer(buffer);
   const data = await parseFitBuffer(bytes);
 
@@ -110,9 +107,7 @@ export async function parseFitFile(
       hrStream.push({ elapsedSec: elapsed, hr });
     }
 
-    const speed =
-      (rec.enhanced_speed as number | undefined) ??
-      (rec.speed as number | undefined);
+    const speed = (rec.enhanced_speed as number | undefined) ?? (rec.speed as number | undefined);
     const pace = speed !== undefined ? speedToPaceSecPerKm(speed) : null;
     if (pace !== null) {
       paceStream.push({ elapsedSec: elapsed, paceSecPerKm: pace });
@@ -126,19 +121,14 @@ export async function parseFitFile(
     }
 
     const latRaw =
-      (rec.position_lat as number | undefined) ??
-      (rec.enhanced_latitude as number | undefined);
+      (rec.position_lat as number | undefined) ?? (rec.enhanced_latitude as number | undefined);
     const lonRaw =
-      (rec.position_long as number | undefined) ??
-      (rec.enhanced_longitude as number | undefined);
+      (rec.position_long as number | undefined) ?? (rec.enhanced_longitude as number | undefined);
     if (latRaw != null && lonRaw != null) {
-      const lat =
-        Math.abs(latRaw) > 90 ? semicirclesToDegrees(latRaw) : latRaw;
-      const lon =
-        Math.abs(lonRaw) > 180 ? semicirclesToDegrees(lonRaw) : lonRaw;
+      const lat = Math.abs(latRaw) > 90 ? semicirclesToDegrees(latRaw) : latRaw;
+      const lon = Math.abs(lonRaw) > 180 ? semicirclesToDegrees(lonRaw) : lonRaw;
       const alt =
-        (rec.altitude as number | undefined) ??
-        (rec.enhanced_altitude as number | undefined);
+        (rec.altitude as number | undefined) ?? (rec.enhanced_altitude as number | undefined);
       if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) {
         gpsStream.push({
           elapsedSec: elapsed,
@@ -157,8 +147,7 @@ export async function parseFitFile(
       (lap.total_elapsed_time as number | undefined);
     const avgHr = lap.avg_heart_rate as number | undefined;
     const avgSpeed =
-      (lap.enhanced_avg_speed as number | undefined) ??
-      (lap.avg_speed as number | undefined);
+      (lap.enhanced_avg_speed as number | undefined) ?? (lap.avg_speed as number | undefined);
     return {
       index: index + 1,
       distanceM: dist ?? null,
@@ -198,21 +187,17 @@ export interface FitParseBatchResult {
 export async function parseFitFilesFromUpload(
   files: File[],
   fitFilenameById: Map<string, string>,
-  onProgress?: (done: number, total: number) => void
+  onProgress?: (done: number, total: number) => void,
 ): Promise<FitParseBatchResult> {
   const fitFiles = files.filter((f) => {
-    const path =
-      (f as File & { webkitRelativePath?: string }).webkitRelativePath ??
-      f.name;
+    const path = (f as File & { webkitRelativePath?: string }).webkitRelativePath ?? f.name;
     return /\.fit(\.gz)?$/i.test(path);
   });
 
   const matched: { file: File; activityId: string }[] = [];
   let unmatched = 0;
   for (const file of fitFiles) {
-    const path =
-      (file as File & { webkitRelativePath?: string }).webkitRelativePath ??
-      file.name;
+    const path = (file as File & { webkitRelativePath?: string }).webkitRelativePath ?? file.name;
     const activityId = matchFitFileToActivityId(path, fitFilenameById);
     if (activityId) matched.push({ file, activityId });
     else unmatched += 1;

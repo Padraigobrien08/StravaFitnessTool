@@ -1,13 +1,7 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import { buildOutcomeEvidenceFromAnalytics } from "./buildOutcomeEvidence";
-import {
-  confidenceToScore,
-  evaluateRecommendationOutcome,
-} from "./evaluateRecommendationOutcome";
-import type {
-  OutcomeTrackingInput,
-  TrackedRecommendationOutcome,
-} from "./types";
+import { confidenceToScore, evaluateRecommendationOutcome } from "./evaluateRecommendationOutcome";
+import type { OutcomeTrackingInput, TrackedRecommendationOutcome } from "./types";
 
 const MAX_STORED = 40;
 
@@ -16,7 +10,7 @@ const outcomeStore = new Map<string, TrackedRecommendationOutcome[]>();
 
 export function trackRecommendationOutcome(
   athleteKey: string,
-  input: OutcomeTrackingInput
+  input: OutcomeTrackingInput,
 ): TrackedRecommendationOutcome {
   const pending: TrackedRecommendationOutcome = {
     recommendationId: input.recommendationId,
@@ -25,8 +19,7 @@ export function trackRecommendationOutcome(
     expectedOutcome: input.expectedOutcome,
     observedSignals: [],
     evaluation: "inconclusive",
-    confidenceBefore:
-      input.confidenceBefore ?? confidenceToScore("medium"),
+    confidenceBefore: input.confidenceBefore ?? confidenceToScore("medium"),
     evidence: [],
   };
 
@@ -44,7 +37,7 @@ export function getTrackedOutcomes(athleteKey: string): TrackedRecommendationOut
 export function evaluatePendingOutcomes(
   athleteKey: string,
   analytics: DashboardInsights,
-  priorSnapshot?: { freshness?: number; tsb?: number; readiness?: number }
+  priorSnapshot?: { freshness?: number; tsb?: number; readiness?: number },
 ): TrackedRecommendationOutcome[] {
   const list = outcomeStore.get(athleteKey) ?? [];
   const evidence = buildOutcomeEvidenceFromAnalytics(analytics, priorSnapshot);
@@ -59,9 +52,7 @@ export function evaluatePendingOutcomes(
       outcome: withSignals,
       freshness: analytics.fatigue.freshness,
       tsb: analytics.fatigue.tsb,
-      readinessScore:
-        analytics.raceReadiness?.score ??
-        analytics.halfMarathonReadiness.score,
+      readinessScore: analytics.raceReadiness?.score ?? analytics.halfMarathonReadiness.score,
       efficiencyTrend: analytics.efficiencySummary.trend,
       hardRuns14d: analytics.intensityAdvice.hardRunsLast14d,
     });

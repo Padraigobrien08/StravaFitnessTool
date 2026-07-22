@@ -5,7 +5,7 @@ import { paceSecPerKm } from "@/lib/analytics/pace";
 export function compareToHistoricalSessions(
   run: RunActivity,
   workout: WorkoutClassification,
-  peers: RunActivity[]
+  peers: RunActivity[],
 ): string | undefined {
   const sameType = peers.filter((r) => {
     if (r.id === run.id) return false;
@@ -17,9 +17,7 @@ export function compareToHistoricalSessions(
   const pace = paceSecPerKm(run);
   if (pace == null) return undefined;
 
-  const peerPaces = sameType
-    .map((r) => paceSecPerKm(r))
-    .filter((p): p is number => p != null);
+  const peerPaces = sameType.map((r) => paceSecPerKm(r)).filter((p): p is number => p != null);
   if (peerPaces.length < 2) return undefined;
 
   const avg = peerPaces.reduce((a, b) => a + b, 0) / peerPaces.length;

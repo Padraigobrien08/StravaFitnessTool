@@ -75,7 +75,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
                 ? "bg-teal-500/12 text-teal-300 hover:bg-teal-500/12 hover:text-teal-300"
                 : legacyActive
                   ? "bg-white/[0.06] text-zinc-300 hover:bg-white/[0.06] hover:text-zinc-300"
-                  : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200"
+                  : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
             )}
           />
         }
@@ -99,9 +99,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
                 href={href}
                 className={cn(
                   "flex w-full items-center gap-2",
-                  isActive(pathname, href)
-                    ? "text-teal-300"
-                    : "text-zinc-300"
+                  isActive(pathname, href) ? "text-teal-300" : "text-zinc-300",
                 )}
               />
             }
@@ -123,7 +121,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
                 href={href}
                 className={cn(
                   "block w-full",
-                  pathname === href ? "text-zinc-200" : "text-zinc-400"
+                  pathname === href ? "text-zinc-200" : "text-zinc-400",
                 )}
               />
             }
@@ -158,22 +156,15 @@ export function Nav({
           : "bg-teal-500/12 text-teal-300"
         : prominent
           ? "text-zinc-300 hover:bg-white/[0.04] hover:text-zinc-100"
-          : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200"
+          : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
     );
 
   if (isApp) {
     return (
-      <nav
-        className={cn("flex min-w-0 flex-1 items-center gap-1", className)}
-        aria-label="Main"
-      >
+      <nav className={cn("flex min-w-0 flex-1 items-center gap-1", className)} aria-label="Main">
         <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto scrollbar-none">
           {primaryLinks.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={linkClass(href, href === "/plan")}
-            >
+            <Link key={href} href={href} className={linkClass(href, href === "/plan")}>
               <Icon className="h-3.5 w-3.5" />
               <span className="hidden md:inline">{label}</span>
             </Link>
@@ -195,7 +186,7 @@ export function Nav({
               "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive(pathname, href)
                 ? "bg-emerald-500/15 text-emerald-300"
-                : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200",
             )}
           >
             <Icon className="h-4 w-4" />

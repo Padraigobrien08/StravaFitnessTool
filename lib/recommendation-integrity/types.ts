@@ -1,8 +1,5 @@
 import type { CoachingContext } from "@/lib/coaching-context";
-import type {
-  WeeklyPlanGuardrails,
-  WeeklyTrainingPlan,
-} from "@/lib/ai-planning/types";
+import type { WeeklyPlanGuardrails, WeeklyTrainingPlan } from "@/lib/ai-planning/types";
 
 export type RecommendationIssueType =
   | "missing_evidence"

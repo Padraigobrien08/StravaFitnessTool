@@ -1,10 +1,7 @@
 import { simulateRaceStrategy, type StrategyMode } from "@/lib/analytics/raceStrategy";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import { formatDuration, formatPace } from "@/lib/utils";
-import {
-  countRunsMissingStreams,
-  countStreamsForUser,
-} from "@/lib/db/activity-streams";
+import { countRunsMissingStreams, countStreamsForUser } from "@/lib/db/activity-streams";
 import { buildGoalsPageView } from "@/lib/goals/viewModels";
 import { buildTrainingPageView } from "@/lib/training/viewModels";
 import {
@@ -33,14 +30,8 @@ import {
   findBestPhase,
   prContext,
 } from "@/lib/reasoning";
-import {
-  buildAthleteMemoryProfile,
-  serializeMemoryForCoachAnswer,
-} from "@/lib/athlete-memory";
-import {
-  executeGenerateNextWeekTrainingPlan,
-  planToolPayload,
-} from "@/lib/ai-planning/planTool";
+import { buildAthleteMemoryProfile, serializeMemoryForCoachAnswer } from "@/lib/athlete-memory";
+import { executeGenerateNextWeekTrainingPlan, planToolPayload } from "@/lib/ai-planning/planTool";
 import { buildRunCoachDetail } from "@/lib/coaching-context";
 import { buildIntelligenceBrief } from "./brief";
 import { wrapIntelligence, wrapReasoning } from "./envelope";
@@ -72,11 +63,7 @@ const CACHE_MS = 60_000;
 
 async function getBundle(ctx: IntelligenceContext): Promise<AthleteIntelligenceBundle> {
   const key = `${ctx.userId}:${ctx.raceGoal?.date ?? ""}:${ctx.raceGoal?.distance ?? ""}`;
-  if (
-    bundleCache &&
-    bundleCache.key === key &&
-    Date.now() - bundleCache.at < CACHE_MS
-  ) {
+  if (bundleCache && bundleCache.key === key && Date.now() - bundleCache.at < CACHE_MS) {
     return bundleCache.bundle;
   }
   const bundle = await computeAthleteIntelligence(ctx);
@@ -84,10 +71,7 @@ async function getBundle(ctx: IntelligenceContext): Promise<AthleteIntelligenceB
   return bundle;
 }
 
-export async function executeIntelligenceTool(
-  ctx: IntelligenceContext,
-  call: ToolCallInput
-) {
+export async function executeIntelligenceTool(ctx: IntelligenceContext, call: ToolCallInput) {
   const bundle = await getBundle(ctx);
   const resolved = await resolveIntelligenceContext(ctx.userId, ctx);
   const { analytics, insights, quality } = bundle;
@@ -109,18 +93,17 @@ export async function executeIntelligenceTool(
           distanceLabel: goals.targetDistanceLabel,
           daysUntilRace: analytics.raceReadiness?.daysUntilRace ?? null,
           probabilityBand: analytics.raceReadiness?.probabilityBand ?? null,
-          gaps:
-            analytics.raceReadiness?.gaps?.length
-              ? analytics.raceReadiness.gaps
-              : goals.risks.slice(0, 3).map((x) => ({
-                  metric: x.title,
-                  current: x.evidence,
-                  target: x.mitigation,
-                })),
+          gaps: analytics.raceReadiness?.gaps?.length
+            ? analytics.raceReadiness.gaps
+            : goals.risks.slice(0, 3).map((x) => ({
+                metric: x.title,
+                current: x.evidence,
+                target: x.mitigation,
+              })),
           strongestSignal: goals.hero.strongestSignal,
           largestRisk: goals.hero.biggestLimiter,
         },
-        quality
+        quality,
       );
     }
 
@@ -147,7 +130,7 @@ export async function executeIntelligenceTool(
             pace: formatPace(c.timeSec / c.distanceKm),
           })),
         },
-        quality
+        quality,
       );
     }
 
@@ -170,19 +153,22 @@ export async function executeIntelligenceTool(
           })),
         },
         quality,
-        [analytics.raceReadiness ? `Race in ${analytics.raceReadiness.daysUntilRace} days` : "No race goal on server"]
+        [
+          analytics.raceReadiness
+            ? `Race in ${analytics.raceReadiness.daysUntilRace} days`
+            : "No race goal on server",
+        ],
       );
     }
 
     case "get_race_strategy": {
-      const mode = ((call.arguments as GetRaceStrategyArgs)?.mode ??
-        "even") as StrategyMode;
+      const mode = ((call.arguments as GetRaceStrategyArgs)?.mode ?? "even") as StrategyMode;
       if (!raceGoal) {
         return wrapIntelligence(
           { error: "No race goal set — set goal on Goals page or sync preferences." },
           quality,
           [],
-          ["Race strategy requires a race goal with date and distance."]
+          ["Race strategy requires a race goal with date and distance."],
         );
       }
       const strategy = simulateRaceStrategy(
@@ -190,12 +176,12 @@ export async function executeIntelligenceTool(
         analytics.racePredictionAnalysis,
         analytics.fatigue,
         analytics.raceReadiness,
-        mode
+        mode,
       );
       if (!strategy) {
         return wrapIntelligence(
           { error: "Could not build strategy — need predictions for this distance." },
-          quality
+          quality,
         );
       }
       return wrapIntelligence(
@@ -211,7 +197,7 @@ export async function executeIntelligenceTool(
             cumulative: formatDuration(s.cumulativeSec),
           })),
         },
-        quality
+        quality,
       );
     }
 
@@ -228,15 +214,12 @@ export async function executeIntelligenceTool(
           interpretation: training.load.interpretation,
           recentLoad: analytics.loadHistory.slice(-6),
         },
-        quality
+        quality,
       );
     }
 
     case "list_recent_runs": {
-      const limit = Math.min(
-        20,
-        Math.max(1, (call.arguments as ListRecentRunsArgs)?.limit ?? 10)
-      );
+      const limit = Math.min(20, Math.max(1, (call.arguments as ListRecentRunsArgs)?.limit ?? 10));
       const runs = bundle.recentRuns.slice(0, limit).map((r) => ({
         ...r,
         typeLabel: WORKOUT_TYPE_LABELS[r.type as keyof typeof WORKOUT_TYPE_LABELS] ?? r.type,
@@ -247,10 +230,7 @@ export async function executeIntelligenceTool(
     case "get_run_detail": {
       const args = (call.arguments ?? {}) as GetRunDetailArgs;
       const fitById = new Map(bundle.fitDetails.map((f) => [f.activityId, f]));
-      let run =
-        args.runId != null
-          ? bundle.runs.find((r) => r.id === args.runId)
-          : undefined;
+      let run = args.runId != null ? bundle.runs.find((r) => r.id === args.runId) : undefined;
       if (!run && args.date) {
         const day = args.date.slice(0, 10);
         run = bundle.runs.find((r) => r.date.slice(0, 10) === day);
@@ -258,20 +238,14 @@ export async function executeIntelligenceTool(
       if (!run) {
         return wrapIntelligence(
           {
-            error:
-              "Run not found — pass runId from list_recent_runs or a YYYY-MM-DD date.",
+            error: "Run not found — pass runId from list_recent_runs or a YYYY-MM-DD date.",
           },
           quality,
           [],
-          ["Use list_recent_runs to see available runId values."]
+          ["Use list_recent_runs to see available runId values."],
         );
       }
-      const detail = buildRunCoachDetail(
-        run,
-        fitById.get(run.id) ?? null,
-        analytics,
-        bundle.runs
-      );
+      const detail = buildRunCoachDetail(run, fitById.get(run.id) ?? null, analytics, bundle.runs);
       return wrapIntelligence({ run: detail }, quality);
     }
 
@@ -286,7 +260,7 @@ export async function executeIntelligenceTool(
           warnings: quality.warnings,
           overallConfidence: quality.overallConfidence,
         },
-        quality
+        quality,
       );
     }
 
@@ -300,77 +274,53 @@ export async function executeIntelligenceTool(
           streams,
           runsMissingStreams: missing,
         },
-        quality
+        quality,
       );
     }
 
     case "compare_sessions": {
       const rctx = buildReasoningContext(bundle, raceGoal);
       const args = (call.arguments ?? {}) as CompareSessionsToolArgs;
-      return wrapReasoning(
-        compareSessions(rctx, { type: args.type, n: args.n }),
-        quality
-      );
+      return wrapReasoning(compareSessions(rctx, { type: args.type, n: args.n }), quality);
     }
 
     case "explain_readiness_delta": {
       const rctx = buildReasoningContext(bundle, raceGoal);
       const args = (call.arguments ?? {}) as ExplainReadinessDeltaToolArgs;
-      return wrapReasoning(
-        explainReadinessDelta(rctx, { weeks: args.weeks }),
-        quality
-      );
+      return wrapReasoning(explainReadinessDelta(rctx, { weeks: args.weeks }), quality);
     }
 
     case "find_best_phase": {
       const rctx = buildReasoningContext(bundle, raceGoal);
       const args = (call.arguments ?? {}) as FindBestPhaseToolArgs;
-      return wrapReasoning(
-        findBestPhase(rctx, { metric: args.metric }),
-        quality
-      );
+      return wrapReasoning(findBestPhase(rctx, { metric: args.metric }), quality);
     }
 
     case "attribute_improvement": {
       const rctx = buildReasoningContext(bundle, raceGoal);
       const args = (call.arguments ?? {}) as AttributeImprovementToolArgs;
-      return wrapReasoning(
-        attributeImprovement(rctx, { metric: args.metric }),
-        quality
-      );
+      return wrapReasoning(attributeImprovement(rctx, { metric: args.metric }), quality);
     }
 
     case "analyze_fade_pattern": {
       const rctx = buildReasoningContext(bundle, raceGoal);
       const args = (call.arguments ?? {}) as AnalyzeFadePatternToolArgs;
-      return wrapReasoning(
-        analyzeFadePattern(rctx, { distanceKm: args.distanceKm }),
-        quality
-      );
+      return wrapReasoning(analyzeFadePattern(rctx, { distanceKm: args.distanceKm }), quality);
     }
 
     case "pr_context": {
       const rctx = buildReasoningContext(bundle, raceGoal);
       const args = (call.arguments ?? {}) as PrContextToolArgs;
-      return wrapReasoning(
-        prContext(rctx, { bucket: args.bucket, runId: args.runId }),
-        quality
-      );
+      return wrapReasoning(prContext(rctx, { bucket: args.bucket, runId: args.runId }), quality);
     }
 
     case "get_training_ecosystem": {
-      return wrapIntelligence(
-        buildFullEcosystemCoachPayload(analytics, raceGoal),
-        quality
-      );
+      return wrapIntelligence(buildFullEcosystemCoachPayload(analytics, raceGoal), quality);
     }
 
     case "get_training_ecosystem_summary": {
       const w = parseEcosystemWindow(call.arguments as EcosystemWindowArgs);
-      return wrapIntelligence(
-        getTrainingEcosystemSummary(analytics, w),
-        quality
-      );
+      return wrapIntelligence(getTrainingEcosystemSummary(analytics, w), quality);
     }
 
     case "get_modality_distribution": {
@@ -395,29 +345,19 @@ export async function executeIntelligenceTool(
     case "compare_modality_blocks": {
       const args = (call.arguments ?? {}) as CompareModalityBlocksArgs;
       return wrapIntelligence(
-        compareModalityBlocks(
-          analytics,
-          args.blockADays ?? 28,
-          args.blockBDays ?? 28
-        ),
-        quality
+        compareModalityBlocks(analytics, args.blockADays ?? 28, args.blockBDays ?? 28),
+        quality,
       );
     }
 
     case "get_race_week_interference_check": {
       const args = (call.arguments ?? {}) as RaceWeekInterferenceArgs;
-      return wrapIntelligence(
-        getRaceWeekInterferenceCheck(analytics, args.goalId),
-        quality
-      );
+      return wrapIntelligence(getRaceWeekInterferenceCheck(analytics, args.goalId), quality);
     }
 
     case "get_strength_mobility_support": {
       const w = parseEcosystemWindow(call.arguments as EcosystemWindowArgs);
-      return wrapIntelligence(
-        getStrengthMobilitySupport(analytics, w <= 14 ? 14 : 28),
-        quality
-      );
+      return wrapIntelligence(getStrengthMobilitySupport(analytics, w <= 14 ? 14 : 28), quality);
     }
 
     case "get_athlete_memory": {
@@ -431,7 +371,7 @@ export async function executeIntelligenceTool(
           topic === "taper" ||
           topic === "modality"
           ? topic
-          : "all"
+          : "all",
       );
       return wrapIntelligence(
         {
@@ -442,7 +382,7 @@ export async function executeIntelligenceTool(
             profile.pacingPatterns.length,
           generatedAt: profile.generatedAt,
         },
-        quality
+        quality,
       );
     }
 
@@ -460,7 +400,7 @@ export async function executeIntelligenceTool(
         planToolPayload(result),
         quality,
         result.plan.rationale.evidenceUsed,
-        result.plan.limitations
+        result.plan.limitations,
       );
     }
 
@@ -493,7 +433,8 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   },
   {
     name: "get_race_strategy",
-    description: "Pacing strategy splits for the race goal. mode: even, negative, conservative, aggressive.",
+    description:
+      "Pacing strategy splits for the race goal. mode: even, negative, conservative, aggressive.",
     input_schema: {
       type: "object",
       properties: {
@@ -603,8 +544,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   },
   {
     name: "analyze_fade_pattern",
-    description:
-      "Analyze late-session pace fade on long runs at or above a distance threshold.",
+    description: "Analyze late-session pace fade on long runs at or above a distance threshold.",
     input_schema: {
       type: "object",
       properties: {
@@ -655,7 +595,8 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   },
   {
     name: "get_cross_training_support",
-    description: "Bike/swim/aerobic cross-training support scores and evidence (not run-equivalent miles).",
+    description:
+      "Bike/swim/aerobic cross-training support scores and evidence (not run-equivalent miles).",
     input_schema: {
       type: "object",
       properties: { window: { type: "number" } },
@@ -673,7 +614,8 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   },
   {
     name: "get_athlete_archetype",
-    description: "Infer runner/hybrid/triathlete/cyclist/strength-endurance/multisport from 8–12 week modality mix.",
+    description:
+      "Infer runner/hybrid/triathlete/cyclist/strength-endurance/multisport from 8–12 week modality mix.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -699,7 +641,8 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   },
   {
     name: "get_strength_mobility_support",
-    description: "Strength and mobility consistency, scores, and whether to schedule strength this week.",
+    description:
+      "Strength and mobility consistency, scores, and whether to schedule strength this week.",
     input_schema: {
       type: "object",
       properties: { window: { type: "number" } },

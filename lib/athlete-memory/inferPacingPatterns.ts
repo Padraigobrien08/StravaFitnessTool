@@ -3,13 +3,10 @@ import { RACE_READINESS_CONFIG } from "@/lib/analytics/readiness";
 import { createBelief } from "./beliefUtils";
 import type { AthleteBelief } from "./types";
 
-export function inferPacingPatterns(
-  analytics: DashboardInsights
-): AthleteBelief[] {
+export function inferPacingPatterns(analytics: DashboardInsights): AthleteBelief[] {
   const out: AthleteBelief[] = [];
   const longest =
-    analytics.raceReadiness?.longestRunKm ??
-    analytics.halfMarathonReadiness.longestRunKm;
+    analytics.raceReadiness?.longestRunKm ?? analytics.halfMarathonReadiness.longestRunKm;
 
   if (analytics.summary.runCount >= 8 && longest > 0 && longest < 18) {
     out.push(
@@ -23,11 +20,10 @@ export function inferPacingPatterns(
           `${analytics.summary.runCount} runs in history`,
         ],
         confidence: "medium",
-        counterEvidence:
-          longest >= 18 ? ["Recent long runs exceed 18 km"] : [],
+        counterEvidence: longest >= 18 ? ["Recent long runs exceed 18 km"] : [],
         recommendedUse:
           "In race prep, prioritise even early pacing and regular long-run touchpoints.",
-      })
+      }),
     );
   }
 
@@ -44,13 +40,9 @@ export function inferPacingPatterns(
           `${consensus.label} anchor: ${consensus.distanceKm} km effort`,
           `Prediction confidence: ${analytics.racePredictionAnalysis.confidence}`,
         ],
-        confidence:
-          analytics.racePredictionAnalysis.confidence === "high"
-            ? "medium"
-            : "low",
-        recommendedUse:
-          `Target even effort for ${dist.label}; adjust by freshness on race week.`,
-      })
+        confidence: analytics.racePredictionAnalysis.confidence === "high" ? "medium" : "low",
+        recommendedUse: `Target even effort for ${dist.label}; adjust by freshness on race week.`,
+      }),
     );
   }
 
@@ -66,9 +58,8 @@ export function inferPacingPatterns(
           `Score ${analytics.consistencyScore.overall}/100`,
         ],
         confidence: "low",
-        recommendedUse:
-          "Maintain regular run frequency before chasing pace breakthroughs.",
-      })
+        recommendedUse: "Maintain regular run frequency before chasing pace breakthroughs.",
+      }),
     );
   }
 

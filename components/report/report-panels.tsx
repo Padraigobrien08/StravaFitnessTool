@@ -55,9 +55,7 @@ export function ReportTrainingState({
       ) : null}
       <div className="grid gap-2 sm:grid-cols-2">
         <MetricChip label="This week" value={currentWeek} />
-        {previousWeek ? (
-          <MetricChip label="Prior week" value={previousWeek} />
-        ) : null}
+        {previousWeek ? <MetricChip label="Prior week" value={previousWeek} /> : null}
         <MetricChip label="Consistency" value={consistency} />
         <MetricChip label="Intensity" value={intensity} />
       </div>
@@ -68,9 +66,7 @@ export function ReportTrainingState({
 function MetricChip({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg bg-zinc-50 px-3 py-2.5 ring-1 ring-inset ring-zinc-200/80 print:bg-zinc-50">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-        {label}
-      </p>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{label}</p>
       <p className="mt-0.5 text-sm text-zinc-800">{value}</p>
     </div>
   );
@@ -84,7 +80,7 @@ export function ReportKeySignals({ signals }: { signals: SynthesizedSignalView[]
           key={i}
           className={cn(
             "rounded-lg border border-zinc-200/80 border-l-[3px] bg-white px-4 py-3.5 print:break-inside-avoid",
-            toneBorder[s.tone]
+            toneBorder[s.tone],
           )}
         >
           <p className="text-sm font-medium text-zinc-900">{s.text}</p>
@@ -141,9 +137,7 @@ export function ReportRaceBriefing({ data }: { data: RaceReadinessBriefingView }
         ) : null}
         {data.daysUntilRace != null ? (
           <p className="text-xs text-zinc-500">
-            {data.daysUntilRace === 0
-              ? "Race day"
-              : `${data.daysUntilRace} days remaining`}
+            {data.daysUntilRace === 0 ? "Race day" : `${data.daysUntilRace} days remaining`}
           </p>
         ) : null}
       </div>
@@ -165,9 +159,7 @@ export function ReportRaceBriefing({ data }: { data: RaceReadinessBriefingView }
             <dt className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
               Projected finish
             </dt>
-            <dd className="mt-1 font-semibold tabular-nums text-zinc-900">
-              {data.projectedRange}
-            </dd>
+            <dd className="mt-1 font-semibold tabular-nums text-zinc-900">{data.projectedRange}</dd>
           </div>
         ) : null}
         {data.pacingGuidance ? (
@@ -190,9 +182,7 @@ export function ReportCoaching({ data }: { data: CoachingRecommendationView }) {
         <p className="text-[10px] font-semibold uppercase tracking-wider text-teal-800">
           Primary focus
         </p>
-        <p className="mt-2 text-base font-medium leading-snug text-zinc-900">
-          {data.primaryFocus}
-        </p>
+        <p className="mt-2 text-base font-medium leading-snug text-zinc-900">{data.primaryFocus}</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
@@ -396,19 +386,13 @@ export function ReportTrainingEcosystem({ data }: { data: ReportEcosystemView })
         <MetricChip label="Bike (28d)" value={data.bikeHours} />
         <MetricChip label="Swim (28d)" value={data.swimHours} />
         <MetricChip label="Other cross-train" value={data.crossTrainingHours} />
-        <MetricChip
-          label="Strength sessions"
-          value={String(data.strengthSessions)}
-        />
-        <MetricChip
-          label="Mobility sessions"
-          value={String(data.mobilitySessions)}
-        />
+        <MetricChip label="Strength sessions" value={String(data.strengthSessions)} />
+        <MetricChip label="Mobility sessions" value={String(data.mobilitySessions)} />
       </div>
       {data.interferenceCount > 0 ? (
         <p className="text-sm text-amber-800">
-          {data.interferenceCount} interference flag(s) — hard non-run sessions
-          within 24–48h of quality runs.
+          {data.interferenceCount} interference flag(s) — hard non-run sessions within 24–48h of
+          quality runs.
         </p>
       ) : (
         <p className="text-sm text-zinc-700">

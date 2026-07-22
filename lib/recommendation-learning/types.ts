@@ -1,8 +1,5 @@
 export type OutcomeEvaluation =
-  | "supported"
-  | "partially_supported"
-  | "contradicted"
-  | "inconclusive";
+  "supported" | "partially_supported" | "contradicted" | "inconclusive";
 
 export interface TrackedRecommendationOutcome {
   recommendationId: string;

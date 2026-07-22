@@ -42,9 +42,7 @@ export function assessImportQuality(data: StravaImport): ImportQualityReport {
   const withFitRef = runs.filter((r) => r.fitFilename).length;
   const fitParsed = data.fitRunIds?.length ?? 0;
 
-  const sportSet = new Set(
-    data.allActivities.map((a) => a.type).filter(Boolean)
-  );
+  const sportSet = new Set(data.allActivities.map((a) => a.type).filter(Boolean));
 
   const fieldCoverage: FieldCoverage[] = [
     {
@@ -81,9 +79,7 @@ export function assessImportQuality(data: StravaImport): ImportQualityReport {
       label: "FIT streams",
       count: fitParsed,
       total: withFitRef || total,
-      level: coverageLevel(
-        withFitRef ? fitParsed / withFitRef : fitParsed / (total || 1)
-      ),
+      level: coverageLevel(withFitRef ? fitParsed / withFitRef : fitParsed / (total || 1)),
     },
   ];
 
@@ -93,7 +89,7 @@ export function assessImportQuality(data: StravaImport): ImportQualityReport {
   }
   if (withFitRef > 0 && fitParsed < withFitRef * 0.5) {
     warnings.push(
-      `${withFitRef - fitParsed} runs reference FIT files not yet imported. Use Step 2 on Import.`
+      `${withFitRef - fitParsed} runs reference FIT files not yet imported. Use Step 2 on Import.`,
     );
   }
   if (total < 15) {

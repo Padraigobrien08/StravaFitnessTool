@@ -12,20 +12,13 @@ import { buildConstraints } from "./buildConstraints";
 import { buildDataQualityContext } from "./buildDataQuality";
 import { buildForecastContext } from "./buildForecastContext";
 import { buildGoalContext } from "./buildGoalContext";
-import {
-  buildAthleteProfileSummary,
-  buildMemoryPatterns,
-} from "./buildMemoryContext";
+import { buildAthleteProfileSummary, buildMemoryPatterns } from "./buildMemoryContext";
 import { buildModalityContext } from "./buildModalityContext";
 import { buildRecentTrainingBlock } from "./buildRecentTrainingBlock";
 import { buildRecentSessionDetails } from "./buildRecentSessionDetails";
 import { buildRecommendationContext } from "./buildRecommendationContext";
 import { buildRiskContext } from "./buildRiskContext";
-import type {
-  CoachingContext,
-  CoachingContextOptions,
-  NotableSession,
-} from "./types";
+import type { CoachingContext, CoachingContextOptions, NotableSession } from "./types";
 
 export interface BuildCoachingContextParams {
   analytics: DashboardInsights;
@@ -38,18 +31,14 @@ export interface BuildCoachingContextParams {
   options?: CoachingContextOptions;
 }
 
-export function buildCoachingContext(
-  params: BuildCoachingContextParams
-): CoachingContext {
+export function buildCoachingContext(params: BuildCoachingContextParams): CoachingContext {
   const opts = params.options ?? {};
   const windowDays = opts.windowDays ?? 28;
   const includeModality = opts.includeModality !== false;
   const includeForecast = opts.includeForecast !== false;
   const includeMemory = opts.includeMemory !== false;
 
-  const activities =
-    params.normalizedActivities ??
-    params.analytics.trainingEcosystem.activities;
+  const activities = params.normalizedActivities ?? params.analytics.trainingEcosystem.activities;
 
   const recentTraining = buildRecentTrainingBlock({
     runs: params.runs,
@@ -62,18 +51,12 @@ export function buildCoachingContext(
     recentTraining.notableSessions = appendRawSessions(
       recentTraining.notableSessions,
       params.runs,
-      8
+      8,
     );
   }
 
-  const observations = buildActiveObservations(
-    params.analytics,
-    []
-  );
-  const { risks, opportunities } = buildRiskContext(
-    params.analytics,
-    observations
-  );
+  const observations = buildActiveObservations(params.analytics, []);
+  const { risks, opportunities } = buildRiskContext(params.analytics, observations);
 
   let forecast = undefined;
   if (includeForecast && params.raceGoal) {
@@ -133,11 +116,7 @@ export function buildCoachingContext(
       recentRecommendations: opts.recentRecommendations,
       observedOutcomes: opts.observedOutcomes,
     }),
-    dataQuality: buildDataQualityContext(
-      params.analytics,
-      params.quality,
-      params.runs
-    ),
+    dataQuality: buildDataQualityContext(params.analytics, params.quality, params.runs),
   };
 }
 
@@ -145,7 +124,7 @@ export function buildCoachingContextFromBundle(
   bundle: AthleteIntelligenceBundle,
   raceGoal: RaceGoal | null,
   maxWeeklyKm?: number,
-  options?: CoachingContextOptions
+  options?: CoachingContextOptions,
 ): CoachingContext {
   return buildCoachingContext({
     analytics: bundle.analytics,
@@ -161,7 +140,7 @@ export function buildCoachingContextFromBundle(
 function appendRawSessions(
   existing: NotableSession[],
   runs: RunActivity[],
-  max: number
+  max: number,
 ): NotableSession[] {
   const extra = [...runs]
     .sort((a, b) => b.date.localeCompare(a.date))
@@ -177,6 +156,6 @@ function appendRawSessions(
   const seen = new Set(existing.map((s) => `${s.date}-${s.label}`));
   return [...existing, ...extra.filter((s) => !seen.has(`${s.date}-${s.label}`))].slice(
     0,
-    max + existing.length
+    max + existing.length,
   );
 }

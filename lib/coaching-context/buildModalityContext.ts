@@ -2,16 +2,12 @@ import type { DashboardInsights } from "@/lib/analytics";
 import { archetypeDisplayLabel } from "@/lib/ecosystem";
 import type { CoachingModalityContext } from "./types";
 
-export function buildModalityContext(
-  insights: DashboardInsights
-): CoachingModalityContext {
+export function buildModalityContext(insights: DashboardInsights): CoachingModalityContext {
   const eco = insights.trainingEcosystem;
   const archetype = eco.archetype.archetype;
   const dist: Record<string, number> = {};
   const modDist =
-    eco.rolling[28]?.modalityDistribution ??
-    eco.currentWeek.modalityDistribution ??
-    {};
+    eco.rolling[28]?.modalityDistribution ?? eco.currentWeek.modalityDistribution ?? {};
   for (const [k, v] of Object.entries(modDist)) {
     if (v != null) dist[k] = v;
   }

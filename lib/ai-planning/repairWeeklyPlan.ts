@@ -1,21 +1,16 @@
-import type {
-  WeeklyPlanGuardrails,
-  WeeklyTrainingPlan,
-  PlannedWorkout,
-} from "./types";
+import type { WeeklyPlanGuardrails, WeeklyTrainingPlan, PlannedWorkout } from "./types";
 
 function isHardRun(w: PlannedWorkout): boolean {
   if (w.modality !== "run") return false;
   if (w.type === "race") return w.intensity === "hard";
   return (
-    w.intensity === "hard" ||
-    /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`)
+    w.intensity === "hard" || /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`)
   );
 }
 
 export function repairWeeklyPlan(
   plan: WeeklyTrainingPlan,
-  guardrails: WeeklyPlanGuardrails
+  guardrails: WeeklyPlanGuardrails,
 ): WeeklyTrainingPlan {
   let workouts = [...plan.workouts];
 
@@ -23,17 +18,11 @@ export function repairWeeklyPlan(
     plan = { ...plan, weekStart: guardrails.weekStart };
   }
 
-  if (
-    guardrails.raceWeek &&
-    plan.planType !== "race_week" &&
-    plan.planType !== "taper"
-  ) {
+  if (guardrails.raceWeek && plan.planType !== "race_week" && plan.planType !== "taper") {
     plan = { ...plan, planType: "race_week" };
   }
 
-  const hardIndices = workouts
-    .map((w, i) => (isHardRun(w) ? i : -1))
-    .filter((i) => i >= 0);
+  const hardIndices = workouts.map((w, i) => (isHardRun(w) ? i : -1)).filter((i) => i >= 0);
 
   if (hardIndices.length > guardrails.maxHardSessions) {
     const keep = hardIndices.slice(0, guardrails.maxHardSessions);
@@ -56,10 +45,7 @@ export function repairWeeklyPlan(
   }
 
   workouts = workouts.map((w) => {
-    if (
-      w.modality === "run" &&
-      (w.distanceKm ?? 0) > guardrails.longRunMaxKm + 0.5
-    ) {
+    if (w.modality === "run" && (w.distanceKm ?? 0) > guardrails.longRunMaxKm + 0.5) {
       return {
         ...w,
         distanceKm: guardrails.longRunMaxKm,
@@ -69,20 +55,13 @@ export function repairWeeklyPlan(
         ],
       };
     }
-    if (
-      guardrails.raceWeek &&
-      w.modality === "strength" &&
-      /\b(hard|heavy|max)\b/i.test(w.title)
-    ) {
+    if (guardrails.raceWeek && w.modality === "strength" && /\b(hard|heavy|max)\b/i.test(w.title)) {
       return {
         ...w,
         intensity: "easy" as const,
         type: "mobility",
         title: "Light mobility / activation",
-        constraintsApplied: [
-          ...w.constraintsApplied,
-          "No heavy strength in race week",
-        ],
+        constraintsApplied: [...w.constraintsApplied, "No heavy strength in race week"],
       };
     }
     return w;
@@ -100,12 +79,9 @@ export function repairWeeklyPlan(
         ? {
             ...w,
             distanceKm: Math.round(w.distanceKm * scale * 10) / 10,
-            constraintsApplied: [
-              ...w.constraintsApplied,
-              "Volume scaled to weekly cap",
-            ],
+            constraintsApplied: [...w.constraintsApplied, "Volume scaled to weekly cap"],
           }
-        : w
+        : w,
     );
   }
 
@@ -122,17 +98,13 @@ export function repairWeeklyPlan(
     hardSessionCount,
     totalRunDistanceKm:
       Math.round(
-        scaled
-          .filter((w) => w.modality === "run")
-          .reduce((s, w) => s + (w.distanceKm ?? 0), 0) * 10
+        scaled.filter((w) => w.modality === "run").reduce((s, w) => s + (w.distanceKm ?? 0), 0) *
+          10,
       ) / 10,
     limitations: [...new Set(limitations)].slice(0, 8),
     rationale: {
       ...plan.rationale,
-      risksManaged: [
-        ...plan.rationale.risksManaged,
-        "Guardrail repair applied where needed",
-      ],
+      risksManaged: [...plan.rationale.risksManaged, "Guardrail repair applied where needed"],
     },
   };
 }

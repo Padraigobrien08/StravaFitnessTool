@@ -49,7 +49,7 @@ describe("buildWeeklyNarrative", () => {
         },
         efficiencySummary: { latest: 0.03, trend: null },
       },
-      0
+      0,
     );
     expect(narrative.paragraphs.length).toBeGreaterThan(0);
     expect(narrative.bullets.some((b) => b.includes("runs"))).toBe(true);

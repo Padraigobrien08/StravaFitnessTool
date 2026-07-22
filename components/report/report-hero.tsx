@@ -4,22 +4,14 @@ import { Sparkline } from "@/components/home/primitives/sparkline";
 import type { ReportHeroView } from "@/lib/report/viewModels";
 
 function ReportReadinessDial({ score }: { score: number }) {
-  const color =
-    score >= 70 ? "#0f766e" : score >= 50 ? "#b45309" : "#b91c1c";
+  const color = score >= 70 ? "#0f766e" : score >= 50 ? "#b45309" : "#b91c1c";
   const r = 40;
   const c = 2 * Math.PI * r;
   const offset = c - (score / 100) * c;
   return (
     <div className="relative inline-flex h-[96px] w-[96px] items-center justify-center">
       <svg width={96} height={96} className="-rotate-90">
-        <circle
-          cx={48}
-          cy={48}
-          r={r}
-          fill="none"
-          stroke="#e4e4e7"
-          strokeWidth={7}
-        />
+        <circle cx={48} cy={48} r={r} fill="none" stroke="#e4e4e7" strokeWidth={7} />
         <circle
           cx={48}
           cy={48}
@@ -33,9 +25,7 @@ function ReportReadinessDial({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="font-display text-2xl font-bold tabular-nums text-zinc-900">
-          {score}
-        </span>
+        <span className="font-display text-2xl font-bold tabular-nums text-zinc-900">{score}</span>
         <span className="text-[9px] font-semibold uppercase tracking-widest text-zinc-500">
           ready
         </span>
@@ -92,9 +82,7 @@ export function ReportHero({ hero }: { hero: ReportHeroView }) {
         </div>
         {hero.daysUntilRace != null ? (
           <p className="text-center text-xs text-zinc-600">
-            {hero.daysUntilRace === 0
-              ? "Race day"
-              : `${hero.daysUntilRace} days to race`}
+            {hero.daysUntilRace === 0 ? "Race day" : `${hero.daysUntilRace} days to race`}
           </p>
         ) : null}
       </aside>

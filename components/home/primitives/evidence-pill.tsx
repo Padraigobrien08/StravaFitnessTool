@@ -14,7 +14,7 @@ export function EvidencePill({
         tone === "risk" && "bg-red-500/10 text-red-300/90",
         tone === "caution" && "bg-amber-500/10 text-amber-300/90",
         tone === "positive" && "bg-teal-500/10 text-teal-300/90",
-        tone === "neutral" && "bg-white/[0.05] text-zinc-500"
+        tone === "neutral" && "bg-white/[0.05] text-zinc-500",
       )}
     >
       {children}

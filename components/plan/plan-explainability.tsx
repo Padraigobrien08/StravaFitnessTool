@@ -15,9 +15,7 @@ export function PlanExplainability({ lines }: { lines: string[] }) {
         className="flex w-full items-center justify-between gap-2 text-left"
         onClick={() => setOpen((v) => !v)}
       >
-        <span className="text-[11px] font-medium text-zinc-500">
-          Why these sessions?
-        </span>
+        <span className="text-[11px] font-medium text-zinc-500">Why these sessions?</span>
         <ChevronDown className={cn("h-3.5 w-3.5 text-zinc-600", open && "rotate-180")} />
       </button>
       {open ? (

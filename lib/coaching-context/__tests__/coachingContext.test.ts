@@ -14,7 +14,10 @@ import {
   taperWeek,
 } from "./fixtures";
 
-function build(fixture: typeof lowData, opts?: Parameters<typeof buildCoachingContext>[0]["options"]) {
+function build(
+  fixture: typeof lowData,
+  opts?: Parameters<typeof buildCoachingContext>[0]["options"],
+) {
   return buildCoachingContext({
     analytics: fixture.analytics,
     quality: fixture.quality,
@@ -86,7 +89,7 @@ describe("coaching context layer", () => {
       },
     });
     expect(ctx.goal?.priority).toBe("low");
-    expect((ctx.goal?.daysUntilRace ?? 0)).toBeGreaterThan(56);
+    expect(ctx.goal?.daysUntilRace ?? 0).toBeGreaterThan(56);
   });
 
   it("surfaces overload risks with evidence", () => {
@@ -111,7 +114,7 @@ describe("coaching context layer", () => {
     });
     expect(
       ctx.constraints.tapering ||
-        ctx.recentTraining.keyChanges.some((c) => /taper|down|fewer/i.test(c))
+        ctx.recentTraining.keyChanges.some((c) => /taper|down|fewer/i.test(c)),
     ).toBe(true);
   });
 

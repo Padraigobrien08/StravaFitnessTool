@@ -6,31 +6,14 @@ import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 import { AreaChart, Area, XAxis, Tooltip } from "recharts";
 import { ChartContainer } from "@/components/charts/chart-container";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Target,
-  AlertTriangle,
-  TrendingUp,
-  Layers,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Target, AlertTriangle, TrendingUp, Layers } from "lucide-react";
 import Link from "next/link";
 
-function Metric({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
+function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div>
       <p className={dash.label}>{label}</p>
-      <p className="font-display text-lg font-bold tabular-nums text-white">
-        {value}
-      </p>
+      <p className="font-display text-lg font-bold tabular-nums text-white">{value}</p>
       {sub ? <p className="text-[11px] text-zinc-600">{sub}</p> : null}
     </div>
   );
@@ -91,9 +74,7 @@ export function CoachContextRail({
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         <div className="rounded-lg border border-teal-500/15 bg-teal-500/[0.04] px-3 py-3">
-          <p className="text-[10px] uppercase tracking-wider text-teal-500/80">
-            Current focus
-          </p>
+          <p className="text-[10px] uppercase tracking-wider text-teal-500/80">Current focus</p>
           <p className="mt-1 font-display text-sm font-semibold text-white">
             {snapshot.currentFocus}
           </p>
@@ -105,22 +86,15 @@ export function CoachContextRail({
             <p
               className={cn(
                 "mt-1 flex items-center gap-1 text-xs font-medium",
-                adaptColors[snapshot.adaptationTrend]
+                adaptColors[snapshot.adaptationTrend],
               )}
             >
               <TrendingUp className="h-3 w-3" />
               {snapshot.adaptationLabel}
             </p>
           </div>
-          <div
-            className={cn(
-              "rounded-lg border p-2.5",
-              riskColors[snapshot.riskLevel]
-            )}
-          >
-            <p className="text-[10px] uppercase tracking-wider opacity-70">
-              Risk
-            </p>
+          <div className={cn("rounded-lg border p-2.5", riskColors[snapshot.riskLevel])}>
+            <p className="text-[10px] uppercase tracking-wider opacity-70">Risk</p>
             <p className="mt-1 flex items-center gap-1 text-xs font-medium">
               <AlertTriangle className="h-3 w-3" />
               {snapshot.riskLabel}
@@ -131,31 +105,21 @@ export function CoachContextRail({
         <div className="grid grid-cols-2 gap-4">
           <Metric
             label="Readiness"
-            value={
-              snapshot.readinessScore != null
-                ? String(snapshot.readinessScore)
-                : "—"
-            }
+            value={snapshot.readinessScore != null ? String(snapshot.readinessScore) : "—"}
             sub={snapshot.readinessLabel ?? undefined}
           />
           <Metric
             label="Freshness"
-            value={
-              snapshot.freshness != null ? String(snapshot.freshness) : "—"
-            }
+            value={snapshot.freshness != null ? String(snapshot.freshness) : "—"}
             sub={
-              snapshot.tsb != null
-                ? `TSB ${snapshot.tsb}`
-                : snapshot.fatigueLabel ?? undefined
+              snapshot.tsb != null ? `TSB ${snapshot.tsb}` : (snapshot.fatigueLabel ?? undefined)
             }
           />
         </div>
 
         <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2.5 text-xs text-zinc-500">
           <span className={dash.label}>Recommendation confidence</span>
-          <p className="mt-1 capitalize text-zinc-300">
-            {snapshot.recommendationConfidence}
-          </p>
+          <p className="mt-1 capitalize text-zinc-300">{snapshot.recommendationConfidence}</p>
         </div>
 
         {snapshot.blockSummary ? (
@@ -168,9 +132,7 @@ export function CoachContextRail({
         {snapshot.archetypeLabel ? (
           <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-3">
             <p className={dash.label}>Modality profile</p>
-            <p className="mt-1 text-sm font-medium text-zinc-300">
-              {snapshot.archetypeLabel}
-            </p>
+            <p className="mt-1 text-sm font-medium text-zinc-300">{snapshot.archetypeLabel}</p>
             {snapshot.modalityHeadline ? (
               <p className="mt-1.5 text-[11px] leading-snug text-zinc-600">
                 {snapshot.modalityHeadline}
@@ -191,15 +153,11 @@ export function CoachContextRail({
             {snapshot.daysToRace != null ? (
               <p className="text-xs text-zinc-500">
                 {snapshot.daysToRace} days out
-                {snapshot.projectedFinish
-                  ? ` · ~${snapshot.projectedFinish}`
-                  : ""}
+                {snapshot.projectedFinish ? ` · ~${snapshot.projectedFinish}` : ""}
               </p>
             ) : null}
             {snapshot.weekLabel ? (
-              <p className="mt-1 text-[11px] text-zinc-600">
-                This week: {snapshot.weekLabel}
-              </p>
+              <p className="mt-1 text-[11px] text-zinc-600">This week: {snapshot.weekLabel}</p>
             ) : null}
             <Link
               href="/goals"
@@ -259,9 +217,7 @@ export function CoachContextRail({
 
         <p className="text-xs text-zinc-600">
           {snapshot.runCount} runs · {snapshot.last7Km} km last 7d
-          {snapshot.dataConfidence
-            ? ` · ${snapshot.dataConfidence} confidence`
-            : ""}
+          {snapshot.dataConfidence ? ` · ${snapshot.dataConfidence} confidence` : ""}
         </p>
 
         {memory.length > 0 ? (

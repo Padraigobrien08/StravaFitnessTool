@@ -9,7 +9,7 @@ export function evaluateRecentSessions(
   fitById: Map<string, FitRunDetail>,
   labelById: Map<string, import("@/lib/analytics/workoutType").WorkoutClassification>,
   analytics: DashboardInsights | null,
-  limit = 5
+  limit = 5,
 ): SessionIntelligence[] {
   const sorted = [...runs].sort((a, b) => b.date.localeCompare(a.date));
   const recent = sorted.slice(0, limit);
@@ -28,28 +28,24 @@ export function evaluateRecentSessions(
   });
 }
 
-export function sessionEffectivenessSummary(
-  sessions: SessionIntelligence[]
-): string[] {
+export function sessionEffectivenessSummary(sessions: SessionIntelligence[]): string[] {
   const out: string[] = [];
   const strong = sessions.filter(
-    (s) => s.executionQuality === "strong" || s.executionQuality === "excellent"
+    (s) => s.executionQuality === "strong" || s.executionQuality === "excellent",
   );
   const highFatigue = sessions.filter((s) => s.fatigueCost === "high");
 
   if (strong.length >= 2) {
     out.push(
-      `Recent execution quality appears strong in ${strong.length} of ${sessions.length} evaluated sessions`
+      `Recent execution quality appears strong in ${strong.length} of ${sessions.length} evaluated sessions`,
     );
   }
   if (highFatigue.length >= 2) {
-    out.push(
-      "Multiple recent sessions carry high fatigue cost — recovery spacing may help"
-    );
+    out.push("Multiple recent sessions carry high fatigue cost — recovery spacing may help");
   }
 
   const threshold = sessions.filter((s) =>
-    s.likelyAdaptations.some((a) => /threshold|HM-specific/i.test(a))
+    s.likelyAdaptations.some((a) => /threshold|HM-specific/i.test(a)),
   );
   if (threshold.length >= 2) {
     out.push("Threshold-style work appears to be landing with reasonable execution");

@@ -20,9 +20,7 @@ export function RouteReplayWorkspace({
   backHref: string;
 }) {
   const duration =
-    session.geometry?.durationSec ??
-    session.timeline[session.timeline.length - 1]?.elapsedSec ??
-    1;
+    session.geometry?.durationSec ?? session.timeline[session.timeline.length - 1]?.elapsedSec ?? 1;
 
   const { state, setTime, togglePlay, setSpeed, pause } = useRouteReplay(duration);
 
@@ -50,13 +48,10 @@ export function RouteReplayWorkspace({
     return (
       <div className="route-terminal rounded-xl border border-white/[0.06] p-8 text-center">
         <MapPin className="mx-auto h-10 w-10 text-zinc-600" />
-        <h2 className="mt-4 font-display text-lg font-bold text-white">
-          No GPS route data
-        </h2>
+        <h2 className="mt-4 font-display text-lg font-bold text-white">No GPS route data</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500">
-          Spatial replay requires latitude/longitude streams. Re-sync this run
-          from Strava (streams include latlng) or re-import the FIT file with GPS
-          records.
+          Spatial replay requires latitude/longitude streams. Re-sync this run from Strava (streams
+          include latlng) or re-import the FIT file with GPS records.
         </p>
         <Link
           href={backHref}

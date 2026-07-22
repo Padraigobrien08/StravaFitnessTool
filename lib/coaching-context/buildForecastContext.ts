@@ -1,9 +1,7 @@
 import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
 import type { CoachingForecastContext } from "./types";
 
-function mapConfidence(
-  label: string
-): CoachingForecastContext["confidence"] {
+function mapConfidence(label: string): CoachingForecastContext["confidence"] {
   const n = label.toLowerCase().replace(/\s+/g, "_");
   if (n === "medium-high" || n === "medium_high") return "medium_high";
   if (n === "high") return "high";
@@ -12,7 +10,7 @@ function mapConfidence(
 }
 
 export function buildForecastContext(
-  view: ForecastV2View | null | undefined
+  view: ForecastV2View | null | undefined,
 ): CoachingForecastContext | undefined {
   if (!view?.enabled) return undefined;
 

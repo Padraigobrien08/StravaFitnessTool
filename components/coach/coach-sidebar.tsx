@@ -72,9 +72,7 @@ export function CoachSidebar({
 
       <nav className="flex-1 overflow-y-auto px-2 pb-3">
         {threads.length === 0 ? (
-          <p className="px-2 py-4 text-[11px] text-zinc-600">
-            Past coaching sessions appear here.
-          </p>
+          <p className="px-2 py-4 text-[11px] text-zinc-600">Past coaching sessions appear here.</p>
         ) : (
           <ul className="space-y-0.5">
             {threads.map((t) => (
@@ -82,7 +80,7 @@ export function CoachSidebar({
                 <div
                   className={cn(
                     "group flex items-center gap-1 rounded-lg pr-1",
-                    activeId === t.id && "bg-white/[0.05]"
+                    activeId === t.id && "bg-white/[0.05]",
                   )}
                 >
                   <button
@@ -90,9 +88,7 @@ export function CoachSidebar({
                     onClick={() => onSelectThread(t.id)}
                     className="min-w-0 flex-1 px-2.5 py-2 text-left"
                   >
-                    <p className="truncate text-xs font-medium text-zinc-300">
-                      {t.title}
-                    </p>
+                    <p className="truncate text-xs font-medium text-zinc-300">{t.title}</p>
                     <p className="text-[10px] text-zinc-600">
                       {new Date(t.updatedAt).toLocaleDateString(undefined, {
                         month: "short",

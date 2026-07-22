@@ -1,14 +1,10 @@
 import { confidenceFromRuns } from "@/lib/intelligence/envelope";
 import { computeLateFadePct } from "./executionScore";
-import type {
-  AnalyzeFadePatternArgs,
-  ReasoningContext,
-  ReasoningResult,
-} from "./types";
+import type { AnalyzeFadePatternArgs, ReasoningContext, ReasoningResult } from "./types";
 
 export function analyzeFadePattern(
   ctx: ReasoningContext,
-  args: AnalyzeFadePatternArgs = {}
+  args: AnalyzeFadePatternArgs = {},
 ): ReasoningResult<{
   distanceKmThreshold: number;
   runsAnalyzed: number;
@@ -43,30 +39,20 @@ export function analyzeFadePattern(
   if (longRuns.length === 0) {
     limitations.push(`No runs at or above ${threshold} km in your history.`);
   } else if (withFade.length === 0) {
-    limitations.push(
-      "Long runs found but no FIT pace streams — sync streams or import FIT files."
-    );
+    limitations.push("Long runs found but no FIT pace streams — sync streams or import FIT files.");
   }
 
   const fades = withFade.map((w) => w.fade).sort((a, b) => a - b);
-  const medianLateFadePct =
-    fades.length > 0
-      ? fades[Math.floor(fades.length / 2)]
-      : null;
+  const medianLateFadePct = fades.length > 0 ? fades[Math.floor(fades.length / 2)] : null;
   const significant = withFade.filter((w) => w.fade > 6).length;
   const pctRunsWithSignificantFade =
-    withFade.length > 0
-      ? Math.round((significant / withFade.length) * 100)
-      : 0;
+    withFade.length > 0 ? Math.round((significant / withFade.length) * 100) : 0;
 
   const fadingRuns = withFade.filter((w) => w.fade > 6 && w.drift != null);
   const hrDriftWhenFading =
     fadingRuns.length > 0
-      ? Math.round(
-          (fadingRuns.reduce((s, w) => s + (w.drift ?? 0), 0) /
-            fadingRuns.length) *
-            10
-        ) / 10
+      ? Math.round((fadingRuns.reduce((s, w) => s + (w.drift ?? 0), 0) / fadingRuns.length) * 10) /
+        10
       : null;
 
   const examples = [...withFade]
@@ -88,26 +74,21 @@ export function analyzeFadePattern(
   }
 
   const evidence = examples.map(
-    (e) => `${e.name} (${e.date}): ${e.distanceKm} km, fade ${e.lateFadePct}%`
+    (e) => `${e.name} (${e.date}): ${e.distanceKm} km, fade ${e.lateFadePct}%`,
   );
 
   return {
     payload: {
       distanceKmThreshold: threshold,
       runsAnalyzed: withFade.length,
-      medianLateFadePct:
-        medianLateFadePct != null
-          ? Math.round(medianLateFadePct * 10) / 10
-          : null,
+      medianLateFadePct: medianLateFadePct != null ? Math.round(medianLateFadePct * 10) / 10 : null,
       pctRunsWithSignificantFade,
       hrDriftWhenFading,
       examples,
       narrative,
     },
     evidence,
-    assumptions: [
-      "Fade = pace slowdown comparing first third vs last third of FIT pace stream.",
-    ],
+    assumptions: ["Fade = pace slowdown comparing first third vs last third of FIT pace stream."],
     limitations,
     confidence: confidenceFromRuns(withFade.length),
   };

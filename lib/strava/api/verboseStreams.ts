@@ -14,15 +14,17 @@ export interface VerboseStreamPoint {
 
 export function verboseActivityStreams(
   streams: StravaStreamSet | null,
-  laps?: StravaLap[]
+  laps?: StravaLap[],
 ): { points: VerboseStreamPoint[]; laps?: StravaLap[]; pointCount: number } {
   if (!streams) return { points: [], pointCount: 0, ...(laps?.length ? { laps } : {}) };
 
   const time = streams.time?.data as number[] | undefined;
-  const len = time?.length ?? Math.max(
-    0,
-    ...Object.values(streams).map((s) => (s?.data as unknown[] | undefined)?.length ?? 0)
-  );
+  const len =
+    time?.length ??
+    Math.max(
+      0,
+      ...Object.values(streams).map((s) => (s?.data as unknown[] | undefined)?.length ?? 0),
+    );
 
   const points: VerboseStreamPoint[] = [];
   for (let i = 0; i < len; i++) {

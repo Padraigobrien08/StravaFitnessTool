@@ -16,10 +16,12 @@ export async function GET() {
     WHERE user_id = ${userId}::uuid
     LIMIT 1
   `;
-  const row = rows[0] as {
-    athlete_stats_json: StravaActivityStats | null;
-    athlete_zones_json: unknown;
-  } | undefined;
+  const row = rows[0] as
+    | {
+        athlete_stats_json: StravaActivityStats | null;
+        athlete_zones_json: unknown;
+      }
+    | undefined;
 
   if (!row?.athlete_stats_json) {
     return NextResponse.json({ stats: null });

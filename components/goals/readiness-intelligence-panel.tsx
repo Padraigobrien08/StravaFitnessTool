@@ -27,16 +27,12 @@ export function ReadinessIntelligencePanel({
         </p>
       ) : (
         <p className={`${dash.muted} mb-4`}>
-          General half-marathon readiness — set a race goal for distance-specific
-          scoring.
+          General half-marathon readiness — set a race goal for distance-specific scoring.
         </p>
       )}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {dimensions.map((d) => (
-          <div
-            key={d.id}
-            className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-3.5"
-          >
+          <div key={d.id} className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-3.5">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-semibold text-zinc-300">{d.label}</span>
               <span className="text-xs capitalize text-zinc-600">{d.level}</span>

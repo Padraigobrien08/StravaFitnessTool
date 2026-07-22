@@ -3,7 +3,7 @@ import type { TrackedRecommendationOutcome } from "./types";
 
 export function buildOutcomeEvidenceFromAnalytics(
   analytics: DashboardInsights,
-  prior?: { freshness?: number; tsb?: number; readiness?: number }
+  prior?: { freshness?: number; tsb?: number; readiness?: number },
 ): string[] {
   const evidence: string[] = [];
   const f = analytics.fatigue.freshness;
@@ -16,7 +16,7 @@ export function buildOutcomeEvidenceFromAnalytics(
   if (prior?.freshness != null) {
     const delta = f - prior.freshness;
     evidence.push(
-      `Freshness change ${delta >= 0 ? "+" : ""}${Math.round(delta)} vs prior snapshot`
+      `Freshness change ${delta >= 0 ? "+" : ""}${Math.round(delta)} vs prior snapshot`,
     );
   }
   if (prior?.readiness != null) {
@@ -30,7 +30,7 @@ export function buildOutcomeEvidenceFromAnalytics(
   }
 
   evidence.push(
-    `${analytics.intensityAdvice.hardRunsLast14d} hard runs / 14d · ${analytics.intensityAdvice.status}`
+    `${analytics.intensityAdvice.hardRunsLast14d} hard runs / 14d · ${analytics.intensityAdvice.status}`,
   );
 
   return evidence;
@@ -38,7 +38,7 @@ export function buildOutcomeEvidenceFromAnalytics(
 
 export function mergeOutcomeEvidence(
   outcome: TrackedRecommendationOutcome,
-  additional: string[]
+  additional: string[],
 ): TrackedRecommendationOutcome {
   const seen = new Set<string>();
   const evidence: string[] = [];

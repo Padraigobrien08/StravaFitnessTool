@@ -27,7 +27,7 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
       className={cn(
         "border-l-[3px]",
         severityBorder[hero.severity],
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_50%)]"
+        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_50%)]",
       )}
     >
       <div className="relative grid gap-5 lg:grid-cols-[1fr_minmax(240px,300px)] lg:gap-8">
@@ -42,9 +42,7 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
 
           <div className="max-w-4xl space-y-2">
             <h1 className={dash.h1}>{hero.title}</h1>
-            <p className={cn(dash.lead, "text-zinc-300/90")}>
-              {hero.interpretation}
-            </p>
+            <p className={cn(dash.lead, "text-zinc-300/90")}>{hero.interpretation}</p>
           </div>
 
           <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] px-4 py-3">
@@ -102,11 +100,7 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
           ) : null}
 
           <div className="flex items-center gap-4">
-            <ReadinessRing
-              score={hero.trajectoryScore}
-              size={88}
-              showGlow
-            />
+            <ReadinessRing score={hero.trajectoryScore} size={88} showGlow />
             <div className="min-w-0 flex-1">
               <p className="text-sm text-zinc-400">{hero.trajectoryLabel}</p>
               <p className="mt-0.5 text-xs text-zinc-600">

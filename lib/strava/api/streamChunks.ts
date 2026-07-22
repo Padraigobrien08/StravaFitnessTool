@@ -10,9 +10,7 @@ export interface StreamChunk {
 }
 
 /** Split compact stream payload into ~50KB JSON chunks for MCP / serverless limits. */
-export function chunkCompactStreams(
-  payload: CompactActivityStreams
-): StreamChunk[] {
+export function chunkCompactStreams(payload: CompactActivityStreams): StreamChunk[] {
   const full = JSON.stringify(payload);
   if (full.length <= TARGET_CHUNK_BYTES) {
     return [
@@ -39,7 +37,10 @@ export function chunkCompactStreams(
   for (const key of keys) {
     const series = payload.streams[key];
     const piece = JSON.stringify({ [key]: series });
-    if (currentSize + piece.length > TARGET_CHUNK_BYTES && Object.keys(current.streams).length > 0) {
+    if (
+      currentSize + piece.length > TARGET_CHUNK_BYTES &&
+      Object.keys(current.streams).length > 0
+    ) {
       chunks.push(wrapChunk(payload.activityId, chunks.length, current));
       current = {
         activityId: payload.activityId,
@@ -66,17 +67,13 @@ export function chunkCompactStreams(
   return chunks.map((c, i) => ({ ...c, chunkIndex: i, chunkCount: total }));
 }
 
-function wrapChunk(
-  activityId: number,
-  index: number,
-  data: CompactActivityStreams
-): StreamChunk {
+function wrapChunk(activityId: number, index: number, data: CompactActivityStreams): StreamChunk {
   return { chunkIndex: index, chunkCount: 0, activityId, data };
 }
 
 export function selectStreamChunk(
   chunks: StreamChunk[],
-  chunkParam: string | undefined
+  chunkParam: string | undefined,
 ): StreamChunk | StreamChunk[] {
   if (!chunkParam || chunkParam === "all") return chunks;
   const idx = parseInt(chunkParam, 10);

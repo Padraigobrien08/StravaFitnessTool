@@ -39,10 +39,7 @@ describe("capability models", () => {
 
   it("weights models without blind average", () => {
     const estimates = buildCapabilityModelEstimates(hmReadyRunner);
-    const { baseTimeSec, weightedEstimates } = computeWeightedCapability(
-      hmReadyRunner,
-      estimates
-    );
+    const { baseTimeSec, weightedEstimates } = computeWeightedCapability(hmReadyRunner, estimates);
     expect(baseTimeSec).toBeGreaterThan(5000);
     expect(weightedEstimates.length).toBeGreaterThan(0);
     expect(weightedEstimates.some((e) => e.weight > 0)).toBe(true);
@@ -93,9 +90,9 @@ describe("uncertainty", () => {
   it("widens interval for low data", () => {
     const forecast = buildRaceForecastV2(lowDataRunner);
     expect(forecast.confidence).toMatch(/low|medium/);
-    expect(
-      forecast.predictionIntervalSec.p90 - forecast.predictionIntervalSec.p10
-    ).toBeGreaterThan(120);
+    expect(forecast.predictionIntervalSec.p90 - forecast.predictionIntervalSec.p10).toBeGreaterThan(
+      120,
+    );
   });
 
   it("builds percentile interval", () => {

@@ -12,12 +12,8 @@ export async function GET() {
   const configured = {
     database: Boolean(process.env.DATABASE_URL),
     session_secret: Boolean(process.env.SESSION_SECRET),
-    strava_oauth: Boolean(
-      process.env.STRAVA_CLIENT_ID && process.env.STRAVA_CLIENT_SECRET
-    ),
-    coach_llm: Boolean(
-      process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY
-    ),
+    strava_oauth: Boolean(process.env.STRAVA_CLIENT_ID && process.env.STRAVA_CLIENT_SECRET),
+    coach_llm: Boolean(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY),
   };
 
   let database: { reachable: boolean; error?: string } = { reachable: false };

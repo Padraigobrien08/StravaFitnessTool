@@ -2,12 +2,7 @@ import { describe, expect, it } from "vitest";
 import { swapWorkoutSlots } from "../swapWorkoutDays";
 import type { CalendarWorkout } from "../types";
 
-function workout(
-  id: string,
-  day: string,
-  date: string,
-  title: string
-): CalendarWorkout {
+function workout(id: string, day: string, date: string, title: string): CalendarWorkout {
   return {
     id,
     day,

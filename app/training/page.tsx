@@ -63,10 +63,7 @@ export default function TrainingPage() {
           <TrainingStateHero hero={view.hero} />
           <div className="grid gap-4 lg:grid-cols-2">
             <LoadIntelligencePanel data={view.load} className={cn(ops.intelMain)} />
-            <CoachingExplainability
-              data={view.explain}
-              className={cn(ops.intelSide)}
-            />
+            <CoachingExplainability data={view.explain} className={cn(ops.intelSide)} />
           </div>
           <AdaptationSignalsPanel data={view.adaptation} />
           <TrainingEcosystemPanel data={view.ecosystem} />

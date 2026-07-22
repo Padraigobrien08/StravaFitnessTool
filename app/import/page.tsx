@@ -8,10 +8,7 @@ import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useStravaConnection } from "@/hooks/use-strava-connection";
 import { assessImportQuality } from "@/lib/quality/assessImport";
 import { buildImportPageView } from "@/lib/import/viewModels";
-import {
-  ImportWorkspace,
-  ImportIntelRow,
-} from "@/components/import/import-workspace";
+import { ImportWorkspace, ImportIntelRow } from "@/components/import/import-workspace";
 import { DataIntelligenceHero } from "@/components/import/data-intelligence-hero";
 import { ConnectedSourcesPanel } from "@/components/import/connected-sources-panel";
 import {
@@ -32,12 +29,10 @@ function DemoCallout() {
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-teal-400/25 bg-teal-400/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="text-sm font-semibold text-teal-200">
-          No Strava export handy? Try the demo.
-        </p>
+        <p className="text-sm font-semibold text-teal-200">No Strava export handy? Try the demo.</p>
         <p className="mt-0.5 text-xs text-zinc-400">
-          Loads a full 12-month sample athlete so you can explore every insight
-          instantly — no account, database, or API key required.
+          Loads a full 12-month sample athlete so you can explore every insight instantly — no
+          account, database, or API key required.
         </p>
       </div>
       <button
@@ -152,10 +147,7 @@ function ImportPageContent() {
 
       <ImportIntelRow>
         <div className="lg:col-span-7">
-          <DataConfidencePanel
-            coverage={view.coverage}
-            warnings={report?.warnings ?? []}
-          />
+          <DataConfidencePanel coverage={view.coverage} warnings={report?.warnings ?? []} />
         </div>
         <div className="lg:col-span-5">
           <CapabilitiesMatrixPanel capabilities={view.capabilities} />
@@ -179,9 +171,7 @@ function ImportPageContent() {
             error={fitError}
             success={fitSuccess}
             fitProgress={
-              fitStatus.parsing
-                ? { done: fitStatus.done, total: fitStatus.total }
-                : undefined
+              fitStatus.parsing ? { done: fitStatus.done, total: fitStatus.total } : undefined
             }
             runsWithFit={fitRunIds.length}
             totalRuns={importData?.runs.length ?? 0}
@@ -191,11 +181,7 @@ function ImportPageContent() {
 
       <MissingDataGuidancePanel items={view.missingGuidance} />
 
-      <ProcessingTrustPanel
-        steps={view.processingSteps}
-        message={null}
-        topics={view.trustTopics}
-      />
+      <ProcessingTrustPanel steps={view.processingSteps} message={null} topics={view.trustTopics} />
     </ImportWorkspace>
   );
 }

@@ -27,28 +27,22 @@ server.tool(
   "get_coach_brief",
   "Compact training intelligence: readiness, week plan, predictions, fatigue, data quality.",
   {},
-  async () => textResult(await fetchIntelligence("brief"))
+  async () => textResult(await fetchIntelligence("brief")),
 );
 
 server.tool(
   "get_readiness",
   "Race or half-marathon readiness score, gaps, and risks.",
   {},
-  async () => textResult(await fetchIntelligence("readiness"))
+  async () => textResult(await fetchIntelligence("readiness")),
 );
 
-server.tool(
-  "get_predictions",
-  "Consensus race time predictions with confidence.",
-  {},
-  async () => textResult(await fetchIntelligence("predictions"))
+server.tool("get_predictions", "Consensus race time predictions with confidence.", {}, async () =>
+  textResult(await fetchIntelligence("predictions")),
 );
 
-server.tool(
-  "get_week_plan",
-  "Recommended next week sessions from the plan engine.",
-  {},
-  async () => textResult(await fetchIntelligence("plan"))
+server.tool("get_week_plan", "Recommended next week sessions from the plan engine.", {}, async () =>
+  textResult(await fetchIntelligence("plan")),
 );
 
 server.tool(
@@ -61,16 +55,11 @@ server.tool(
       .describe("Strategy mode"),
   },
   async ({ mode }) =>
-    textResult(
-      await fetchIntelligence("strategy", mode ? { strategyMode: mode } : undefined)
-    )
+    textResult(await fetchIntelligence("strategy", mode ? { strategyMode: mode } : undefined)),
 );
 
-server.tool(
-  "get_fatigue_load",
-  "Freshness, TSB, CTL/ATL, load interpretation.",
-  {},
-  async () => textResult(await fetchIntelligence("fatigue"))
+server.tool("get_fatigue_load", "Freshness, TSB, CTL/ATL, load interpretation.", {}, async () =>
+  textResult(await fetchIntelligence("fatigue")),
 );
 
 server.tool(
@@ -81,32 +70,23 @@ server.tool(
     textResult(
       await fetchIntelligence("runs", {
         limit: limit ? String(limit) : "10",
-      })
-    )
+      }),
+    ),
 );
 
-server.tool(
-  "get_data_quality",
-  "Import field coverage and warnings.",
-  {},
-  async () => textResult(await fetchIntelligence("quality"))
+server.tool("get_data_quality", "Import field coverage and warnings.", {}, async () =>
+  textResult(await fetchIntelligence("quality")),
 );
 
-server.tool(
-  "get_connection_status",
-  "Strava connection and stream sync status.",
-  {},
-  async () => textResult(await fetchIntelligence("status"))
+server.tool("get_connection_status", "Strava connection and stream sync status.", {}, async () =>
+  textResult(await fetchIntelligence("status")),
 );
 
 server.tool(
   "compare_sessions",
   "Compare recent sessions by type (tempo, interval, long, race) with execution scores.",
   {
-    type: z
-      .enum(["tempo", "interval", "long", "race"])
-      .optional()
-      .describe("Workout type"),
+    type: z.enum(["tempo", "interval", "long", "race"]).optional().describe("Workout type"),
     n: z.number().optional().describe("Number of sessions (default 3)"),
   },
   async ({ type, n }) =>
@@ -114,8 +94,8 @@ server.tool(
       await fetchIntelligence("compare_sessions", {
         ...(type ? { type } : {}),
         ...(n != null ? { n: String(n) } : {}),
-      })
-    )
+      }),
+    ),
 );
 
 server.tool(
@@ -126,24 +106,22 @@ server.tool(
     textResult(
       await fetchIntelligence("readiness_delta", {
         ...(weeks != null ? { weeks: String(weeks) } : {}),
-      })
-    )
+      }),
+    ),
 );
 
 server.tool(
   "find_best_phase",
   "Strongest historical 4-week phase (aerobic, volume, consistency, efficiency).",
   {
-    metric: z
-      .enum(["aerobic", "volume", "consistency", "efficiency"])
-      .optional(),
+    metric: z.enum(["aerobic", "volume", "consistency", "efficiency"]).optional(),
   },
   async ({ metric }) =>
     textResult(
       await fetchIntelligence("best_phase", {
         ...(metric ? { metric } : {}),
-      })
-    )
+      }),
+    ),
 );
 
 server.tool(
@@ -156,8 +134,8 @@ server.tool(
     textResult(
       await fetchIntelligence("attribute", {
         ...(metric ? { metric } : {}),
-      })
-    )
+      }),
+    ),
 );
 
 server.tool(
@@ -168,8 +146,8 @@ server.tool(
     textResult(
       await fetchIntelligence("fade", {
         ...(distanceKm != null ? { distanceKm: String(distanceKm) } : {}),
-      })
-    )
+      }),
+    ),
 );
 
 server.tool(
@@ -184,8 +162,8 @@ server.tool(
       await fetchIntelligence("pr_context", {
         ...(bucket ? { bucket } : {}),
         ...(runId ? { runId } : {}),
-      })
-    )
+      }),
+    ),
 );
 
 registerStravaTools(server, textResult);

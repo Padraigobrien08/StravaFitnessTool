@@ -25,7 +25,7 @@ export function UploadZone({
       if (!fileList?.length) return;
       onFiles(Array.from(fileList));
     },
-    [onFiles]
+    [onFiles],
   );
 
   return (
@@ -36,7 +36,7 @@ export function UploadZone({
           compact ? "min-h-[140px] px-4 py-6" : "min-h-[220px] rounded-2xl",
           dragOver
             ? "border-teal-400/50 bg-teal-500/10"
-            : "border-white/[0.08] bg-white/[0.02] hover:border-teal-500/35 hover:bg-white/[0.04]"
+            : "border-white/[0.08] bg-white/[0.02] hover:border-teal-500/35 hover:bg-white/[0.04]",
         )}
         onDragOver={(e) => {
           e.preventDefault();

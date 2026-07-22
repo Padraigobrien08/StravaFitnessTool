@@ -3,11 +3,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type {
-  RouteGeometry,
-  OverlaySegment,
-  TimelinePoint,
-} from "@/lib/route-intelligence/types";
+import type { RouteGeometry, OverlaySegment, TimelinePoint } from "@/lib/route-intelligence/types";
 import { positionAtTime } from "@/lib/route-intelligence/geometry";
 import { useThemeStore } from "@/stores/theme-store";
 
@@ -169,26 +165,16 @@ export function RouteMap({
   }, [overlays, geometry]);
 
   return (
-    <div
-      ref={containerRef}
-      className={className ?? "h-full min-h-[280px] w-full rounded-xl"}
-    />
+    <div ref={containerRef} className={className ?? "h-full min-h-[280px] w-full rounded-xl"} />
   );
 }
 
 function sliceCoordsForOverlay(
   geometry: RouteGeometry,
-  overlay: OverlaySegment
+  overlay: OverlaySegment,
 ): [number, number][] {
   const n = geometry.coordinates.length;
-  const startIdx = Math.floor(
-    (overlay.startSec / geometry.durationSec) * (n - 1)
-  );
-  const endIdx = Math.ceil(
-    (overlay.endSec / geometry.durationSec) * (n - 1)
-  );
-  return geometry.coordinates.slice(
-    Math.max(0, startIdx),
-    Math.min(n, endIdx + 1)
-  );
+  const startIdx = Math.floor((overlay.startSec / geometry.durationSec) * (n - 1));
+  const endIdx = Math.ceil((overlay.endSec / geometry.durationSec) * (n - 1));
+  return geometry.coordinates.slice(Math.max(0, startIdx), Math.min(n, endIdx + 1));
 }

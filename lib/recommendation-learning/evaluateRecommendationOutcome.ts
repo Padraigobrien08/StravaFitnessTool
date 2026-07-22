@@ -6,7 +6,7 @@ import type {
 
 function textMatchesExpectation(
   expected: string[],
-  signals: string[]
+  signals: string[],
 ): { hits: number; misses: number } {
   const blob = signals.join(" ").toLowerCase();
   let hits = 0;
@@ -24,7 +24,7 @@ function textMatchesExpectation(
 }
 
 export function evaluateRecommendationOutcome(
-  input: EvaluateOutcomeInput
+  input: EvaluateOutcomeInput,
 ): TrackedRecommendationOutcome {
   const { outcome } = input;
   const signals = [...outcome.observedSignals];
@@ -41,7 +41,7 @@ export function evaluateRecommendationOutcome(
   }
   if (input.readinessDelta != null && Math.abs(input.readinessDelta) >= 3) {
     signals.push(
-      `Readiness ${input.readinessDelta > 0 ? "improved" : "declined"} ${Math.abs(input.readinessDelta)} pts`
+      `Readiness ${input.readinessDelta > 0 ? "improved" : "declined"} ${Math.abs(input.readinessDelta)} pts`,
     );
   }
   if (input.efficiencyTrend === "improving") {
@@ -61,19 +61,12 @@ export function evaluateRecommendationOutcome(
   let evaluation: OutcomeEvaluation = "inconclusive";
   let confidenceAfter = outcome.confidenceBefore;
 
-  const { hits, misses } = textMatchesExpectation(
-    outcome.expectedOutcome,
-    signals
-  );
+  const { hits, misses } = textMatchesExpectation(outcome.expectedOutcome, signals);
 
   const freshnessRecovered =
-    /fresh|recovery|easy|taper/i.test(rec) &&
-    input.freshness != null &&
-    input.freshness >= 55;
+    /fresh|recovery|easy|taper/i.test(rec) && input.freshness != null && input.freshness >= 55;
   const freshnessSuppressed =
-    /fresh|recovery|easy/i.test(rec) &&
-    input.freshness != null &&
-    input.freshness < 42;
+    /fresh|recovery|easy/i.test(rec) && input.freshness != null && input.freshness < 42;
   const intensityReduced =
     /intensity|hard|stack/i.test(rec) &&
     input.hardRuns14d != null &&

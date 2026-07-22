@@ -2,7 +2,7 @@ import type { PlanPreference, WeeklyPlanGuardrails } from "./types";
 
 export function applyPlanPreferenceToGuardrails(
   guardrails: WeeklyPlanGuardrails,
-  preference?: PlanPreference
+  preference?: PlanPreference,
 ): WeeklyPlanGuardrails {
   if (!preference || preference === "balanced") return guardrails;
 
@@ -22,10 +22,7 @@ export function applyPlanPreferenceToGuardrails(
 
   return {
     ...guardrails,
-    maxHardSessions: Math.min(
-      guardrails.maxHardSessions + 1,
-      guardrails.raceWeek ? 1 : 2
-    ),
+    maxHardSessions: Math.min(guardrails.maxHardSessions + 1, guardrails.raceWeek ? 1 : 2),
     maxWeeklyRunKm: Math.round(guardrails.maxWeeklyRunKm * 1.05 * 10) / 10,
     maxVolumeIncreasePct: Math.min(guardrails.maxVolumeIncreasePct + 5, 15),
     constraintNotes: [

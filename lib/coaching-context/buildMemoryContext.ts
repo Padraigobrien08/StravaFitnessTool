@@ -1,14 +1,11 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RaceGoal } from "@/lib/analytics/readiness";
-import {
-  buildAthleteMemoryProfile,
-  selectRelevantBeliefs,
-} from "@/lib/athlete-memory";
+import { buildAthleteMemoryProfile, selectRelevantBeliefs } from "@/lib/athlete-memory";
 import type { AthletePattern } from "./types";
 
 export function buildMemoryPatterns(
   insights: DashboardInsights,
-  raceGoal?: RaceGoal | null
+  raceGoal?: RaceGoal | null,
 ): AthletePattern[] {
   const profile = buildAthleteMemoryProfile(insights);
   const { beliefs } = selectRelevantBeliefs(profile, {
@@ -26,15 +23,13 @@ export function buildMemoryPatterns(
 
 export function buildAthleteMemoryForContext(
   insights: DashboardInsights,
-  raceGoal?: RaceGoal | null
+  raceGoal?: RaceGoal | null,
 ) {
   const profile = buildAthleteMemoryProfile(insights);
   return selectRelevantBeliefs(profile, { goal: raceGoal ?? null, maxBeliefs: 6 });
 }
 
-export function buildAthleteProfileSummary(
-  insights: DashboardInsights
-): string {
+export function buildAthleteProfileSummary(insights: DashboardInsights): string {
   const eco = insights.trainingEcosystem;
   const archetype = eco.archetype;
   const parts = [
