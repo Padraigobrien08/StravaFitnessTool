@@ -7,7 +7,7 @@ import {
   formatLongRunVsRace,
   type RaceReadiness,
 } from "@/lib/analytics/readiness";
-import { formatDuration } from "@/lib/utils";
+import { formatDuration, formatKm } from "@/lib/utils";
 import type { InsightConfidence } from "@/lib/insights/types";
 
 export function RaceReadinessCard({
@@ -71,7 +71,7 @@ export function RaceReadinessCard({
           <div className="rounded-lg bg-white/[0.03] px-3 py-2">
             <p className="text-zinc-500">4-week volume</p>
             <p className="text-zinc-200">
-              {readiness.fourWeekVolumeKm} km ({readiness.volumePct}% of target)
+              {formatKm(readiness.fourWeekVolumeKm)} ({readiness.volumePct}% of target)
             </p>
           </div>
         </div>

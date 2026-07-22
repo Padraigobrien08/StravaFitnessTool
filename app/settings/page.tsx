@@ -193,7 +193,7 @@ export default function SettingsPage() {
             </Select>
           </div>
           <p className="text-xs text-zinc-600">
-            Unit conversion on charts is coming in the next release; preference is saved now.
+            Applied across distances and paces app-wide. Changes take effect as you navigate.
           </p>
         </CardContent>
       </Card>

@@ -15,6 +15,8 @@ import {
 } from "recharts";
 
 import { useTrainingChart } from "@/components/training/charts/chart-theme";
+import { useUnitFormat } from "@/hooks/use-unit-format";
+import { KM_PER_MILE, distanceValueIn } from "@/lib/units";
 
 const chartTick = { fontSize: 11, fill: "var(--chart-tick-fill)" };
 const CHART_GRID = "var(--chart-grid)";
@@ -29,14 +31,21 @@ export function VolumeChart({
   data: { label: string; distanceKm: number; runCount: number }[];
 }) {
   const tooltipStyle = useChartTooltip();
+  const { distanceUnit, distanceLabel } = useUnitFormat();
+  const chartData = data.map((d) => ({ ...d, dist: distanceValueIn(d.distanceKm, distanceUnit) }));
   return (
     <ResponsiveContainer width="100%" height={280}>
-      <BarChart data={data}>
+      <BarChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
         <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
-        <YAxis tick={chartTick} unit=" km" />
+        <YAxis tick={chartTick} unit={` ${distanceLabel}`} />
         <Tooltip contentStyle={tooltipStyle} />
-        <Bar dataKey="distanceKm" fill="#10b981" radius={[4, 4, 0, 0]} name="Distance (km)" />
+        <Bar
+          dataKey="dist"
+          fill="#10b981"
+          radius={[4, 4, 0, 0]}
+          name={`Distance (${distanceLabel})`}
+        />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -49,6 +58,9 @@ export function PaceChart({
   data: { label: string; paceSecPerKm: number; date?: string }[];
   rolling?: { label: string; rollingPaceSecPerKm: number; date: string }[];
 }) {
+  const { paceUnit, paceLabel } = useUnitFormat();
+  const toDisplayPace = (secPerKm: number) =>
+    paceUnit === "min/mi" ? secPerKm * KM_PER_MILE : secPerKm;
   const formatPaceTick = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = Math.round(sec % 60);
@@ -58,11 +70,14 @@ export function PaceChart({
   const rollingByDate = new Map((rolling ?? []).map((r) => [r.date, r.rollingPaceSecPerKm]));
 
   const tooltipStyle = useChartTooltip();
-  const chartData = data.map((d) => ({
-    label: d.label,
-    pace: d.paceSecPerKm,
-    rolling: d.date ? rollingByDate.get(d.date) : undefined,
-  }));
+  const chartData = data.map((d) => {
+    const roll = d.date ? rollingByDate.get(d.date) : undefined;
+    return {
+      label: d.label,
+      pace: toDisplayPace(d.paceSecPerKm),
+      rolling: roll != null ? toDisplayPace(roll) : undefined,
+    };
+  });
 
   return (
     <ResponsiveContainer width="100%" height={280}>
@@ -72,7 +87,7 @@ export function PaceChart({
         <YAxis tick={chartTick} reversed domain={["auto", "auto"]} tickFormatter={formatPaceTick} />
         <Tooltip
           contentStyle={tooltipStyle}
-          formatter={(v) => [typeof v === "number" ? formatPaceTick(v) + "/km" : "—", "Pace"]}
+          formatter={(v) => [typeof v === "number" ? formatPaceTick(v) + paceLabel : "—", "Pace"]}
         />
         <Line
           type="monotone"

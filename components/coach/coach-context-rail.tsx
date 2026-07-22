@@ -4,6 +4,8 @@ import type { CoachContextSnapshot } from "@/lib/coach/types";
 import type { MemorySnippet } from "@/lib/coach/memorySnippets";
 import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
+import { useUnitFormat } from "@/hooks/use-unit-format";
+import { distanceValueIn } from "@/lib/units";
 import { AreaChart, Area, XAxis, Tooltip } from "recharts";
 import { ChartContainer } from "@/components/charts/chart-container";
 import { ChevronLeft, ChevronRight, Target, AlertTriangle, TrendingUp, Layers } from "lucide-react";
@@ -45,6 +47,12 @@ export function CoachContextRail({
   collapsed: boolean;
   onToggleCollapse: () => void;
 }) {
+  const { distance, distanceUnit, distanceLabel } = useUnitFormat();
+  const sparkData = volumeSparkline.map((d) => ({
+    ...d,
+    dist: distanceValueIn(d.km, distanceUnit),
+  }));
+
   if (collapsed) {
     return (
       <button
@@ -180,7 +188,7 @@ export function CoachContextRail({
             <p className={cn(dash.label, "mb-2")}>Weekly volume</p>
             <ChartContainer height={88} className="w-full">
               {({ width, height }) => (
-                <AreaChart width={width} height={height} data={volumeSparkline}>
+                <AreaChart width={width} height={height} data={sparkData}>
                   <defs>
                     <linearGradient id="coachVol" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="rgb(16,185,129)" stopOpacity={0.35} />
@@ -200,11 +208,11 @@ export function CoachContextRail({
                       borderRadius: 8,
                       fontSize: 11,
                     }}
-                    formatter={(v) => [`${v ?? 0} km`, "Volume"]}
+                    formatter={(v) => [`${v ?? 0} ${distanceLabel}`, "Volume"]}
                   />
                   <Area
                     type="monotone"
-                    dataKey="km"
+                    dataKey="dist"
                     stroke="rgb(45,212,191)"
                     strokeWidth={1.5}
                     fill="url(#coachVol)"
@@ -216,7 +224,7 @@ export function CoachContextRail({
         ) : null}
 
         <p className="text-xs text-zinc-600">
-          {snapshot.runCount} runs · {snapshot.last7Km} km last 7d
+          {snapshot.runCount} runs · {distance(snapshot.last7Km)} last 7d
           {snapshot.dataConfidence ? ` · ${snapshot.dataConfidence} confidence` : ""}
         </p>
 

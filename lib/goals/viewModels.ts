@@ -214,7 +214,7 @@ function buildDimensions(
       score: endurance,
       level: levelFromScore(endurance),
       note: r
-        ? `${r.fourWeekVolumeKm} km / 4 wk (${r.volumePct}% of target)`
+        ? `${formatKm(r.fourWeekVolumeKm)} / 4 wk (${r.volumePct}% of target)`
         : `${formatKm(analytics.halfMarathonReadiness.fourWeekVolumeKm)} recent volume`,
     },
     {

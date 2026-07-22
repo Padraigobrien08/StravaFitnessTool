@@ -1,11 +1,12 @@
 "use client";
 
 import type { PlanWeekTelemetry } from "@/lib/plan/planWorkspaceView";
+import { formatKm } from "@/lib/utils";
 
 export function PlanWeekTelemetryStrip({ telemetry }: { telemetry: PlanWeekTelemetry }) {
   const chips = [
     telemetry.volumeKm != null
-      ? { label: "Volume", value: `${telemetry.volumeKm} km planned` }
+      ? { label: "Volume", value: `${formatKm(telemetry.volumeKm)} planned` }
       : null,
     {
       label: "Intensity",

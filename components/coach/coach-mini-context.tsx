@@ -1,7 +1,7 @@
 "use client";
 
 import type { CoachWorkspaceState } from "@/lib/coach/types";
-import { cn } from "@/lib/utils";
+import { cn, formatKm } from "@/lib/utils";
 import { ChevronRight, Target } from "lucide-react";
 
 function ContextRow({
@@ -123,7 +123,7 @@ export function CoachMiniContext({
         {snapshot.weekLabel ? (
           <p className={cn("mt-3 text-[11px] text-zinc-600")}>
             {snapshot.weekLabel}
-            {snapshot.last7Km > 0 ? ` · ${snapshot.last7Km.toFixed(0)} km (7d)` : ""}
+            {snapshot.last7Km > 0 ? ` · ${formatKm(snapshot.last7Km)} (7d)` : ""}
           </p>
         ) : null}
       </div>

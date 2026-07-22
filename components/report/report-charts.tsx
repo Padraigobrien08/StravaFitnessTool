@@ -17,6 +17,8 @@ import {
 import type { DashboardInsights } from "@/lib/analytics";
 import type { ReportChartSpec } from "@/lib/report/viewModels";
 import { PredictionTrendChart } from "@/components/progression/prediction-trend-chart";
+import { useUnitFormat } from "@/hooks/use-unit-format";
+import { distanceValueIn } from "@/lib/units";
 
 const printTick = { fontSize: 9, fill: "#52525b" };
 const printGrid = "rgba(0,0,0,0.08)";
@@ -36,6 +38,7 @@ export function ReportChartBlock({
   spec: ReportChartSpec;
   analytics: DashboardInsights;
 }) {
+  const { distanceUnit, distanceLabel } = useUnitFormat();
   let chart: React.ReactNode = null;
 
   if (spec.id === "load" && analytics.loadHistory.length >= 3) {
@@ -94,7 +97,7 @@ export function ReportChartBlock({
   if (spec.id === "volume") {
     const data = analytics.weeklyVolume.slice(-10).map((w) => ({
       label: w.label,
-      km: Math.round(w.distanceKm * 10) / 10,
+      dist: Math.round(distanceValueIn(w.distanceKm, distanceUnit) * 10) / 10,
     }));
     chart = (
       <ResponsiveContainer width="100%" height={160}>
@@ -102,8 +105,8 @@ export function ReportChartBlock({
           <CartesianGrid stroke={printGrid} vertical={false} />
           <XAxis dataKey="label" tick={printTick} axisLine={false} tickLine={false} />
           <YAxis tick={printTick} axisLine={false} tickLine={false} width={32} />
-          <Tooltip contentStyle={printTooltip} formatter={(v) => `${v} km`} />
-          <Bar dataKey="km" fill="#0f766e" radius={[3, 3, 0, 0]} />
+          <Tooltip contentStyle={printTooltip} formatter={(v) => `${v} ${distanceLabel}`} />
+          <Bar dataKey="dist" fill="#0f766e" radius={[3, 3, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     );
