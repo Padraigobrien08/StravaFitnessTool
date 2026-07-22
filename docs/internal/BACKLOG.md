@@ -30,22 +30,23 @@ The 17 `react-hooks/set-state-in-effect` warnings are intentional lifecycle patt
 
 ## Features — ranked by value ÷ effort
 
-| #      | Item                                                                                                                               | Size     | Value    | Notes                                                                                              |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | -------- | -------------------------------------------------------------------------------------------------- |
-| ~~F1~~ | ✅ "What should I run today?" — single-session recommender — **done** (#36)                                                        | S–M      | High     | Coach tool `recommend_today_session` + engine + 9 tests. Follow-ups: Home "Today" card, MCP parity |
-| F2     | Apply unit preferences app-wide — `distanceUnit`/`paceUnit` saved but only read in Settings                                        | S–M      | High     | Mile users see km labels everywhere; latent bug + polish                                           |
-| F3     | Persist the weekly Plan to the DB — currently localStorage-only, lost across devices                                               | M        | Med–high | `/api/me/weekly-plan` generates but never stores                                                   |
-| F4     | Adaptive goal-scenario engine — "1:45 needs +12% volume + 2 threshold sessions (prob X)"                                           | M–L      | High     | Named moat feature; no `GoalScenario`/`get_goal_scenarios` yet                                     |
-| F5     | Workout-quality v2 — interval repeatability, aerobic decoupling, threshold control                                                 | M        | Med–high | Blocks "compare my last 3 thresholds"                                                              |
-| F6     | Risk-pattern matching · monthly/pre-race narratives · phase-catalog UI · recommendation-outcome tracking · persisted AthleteMemory | M–L each | Med      | Longer-horizon differentiation depth                                                               |
+| #      | Item                                                                                                                               | Size     | Value    | Notes                                                                                                                                                  |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ~~F1~~ | ✅ "What should I run today?" — single-session recommender — **done** (#36)                                                        | S–M      | High     | Coach tool `recommend_today_session` + engine + 9 tests. Follow-ups: Home "Today" card, MCP parity                                                     |
+| ~~F2~~ | ✅ Apply unit preferences app-wide — **done** (#41)                                                                                | S–M      | High     | `lib/units.ts` core + `useUnitFormat`; formatters read the saved unit. Follow-ups: race-strategy/execution split charts + plan-engine text stay metric |
+| F3     | Persist the weekly Plan to the DB — currently localStorage-only, lost across devices                                               | M        | Med–high | `/api/me/weekly-plan` generates but never stores                                                                                                       |
+| F4     | Adaptive goal-scenario engine — "1:45 needs +12% volume + 2 threshold sessions (prob X)"                                           | M–L      | High     | Named moat feature; no `GoalScenario`/`get_goal_scenarios` yet                                                                                         |
+| F5     | Workout-quality v2 — interval repeatability, aerobic decoupling, threshold control                                                 | M        | Med–high | Blocks "compare my last 3 thresholds"                                                                                                                  |
+| F6     | Risk-pattern matching · monthly/pre-race narratives · phase-catalog UI · recommendation-outcome tracking · persisted AthleteMemory | M–L each | Med      | Longer-horizon differentiation depth                                                                                                                   |
 
 ## Progress
 
 - ✅ **Q1–Q6** — polish + prune pass (#34–#35)
 - ✅ **F1** — today's-session recommender (#36)
 - ✅ **C1–C3** — Dependabot majors closed (#37–#38) + coverage (#39)
+- ✅ **F2** — unit preferences app-wide (#41)
 
-**Remaining:** C4 (low urgency) and the feature track **F2–F6**. Suggested next: **F2** (apply unit preferences app-wide) — high value, fixes a latent bug where mile users see km labels everywhere.
+**Remaining:** C4 (low urgency) and features **F3–F6**. Suggested next: **F3** (persist the weekly Plan to the DB) or **F4** (adaptive goal-scenario engine — the named moat feature).
 
 ## Confirmed solid — no action
 

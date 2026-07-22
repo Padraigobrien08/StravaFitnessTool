@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { useTrainingChart } from "./charts/chart-theme";
+import { useUnitFormat } from "@/hooks/use-unit-format";
 import type { SupportingAnalyticsView } from "@/lib/training/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
@@ -55,6 +56,7 @@ export function SupportingAnalytics({
 }) {
   const [open, setOpen] = useState(!defaultCollapsed);
   const chart = useTrainingChart();
+  const { distanceLabel } = useUnitFormat();
 
   return (
     <PanelChrome title="Supporting analytics" subdued>
@@ -134,9 +136,13 @@ export function SupportingAnalytics({
                       )}
                     >
                       <td className="py-2">{b.label}</td>
-                      <td className="py-2 text-right tabular-nums">{b.distanceKm} km</td>
+                      <td className="py-2 text-right tabular-nums">
+                        {b.distanceKm} {distanceLabel}
+                      </td>
                       <td className="py-2 text-right tabular-nums">{b.runCount}</td>
-                      <td className="py-2 text-right tabular-nums">{b.longestRunKm} km</td>
+                      <td className="py-2 text-right tabular-nums">
+                        {b.longestRunKm} {distanceLabel}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

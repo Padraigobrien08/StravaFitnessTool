@@ -1,44 +1,66 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { DistanceUnit, PaceUnit } from "@/stores/settings-store";
+import { useSettingsStore } from "@/stores/settings-store";
+import {
+  formatDistance,
+  formatDistanceFromMeters,
+  formatDistanceRange,
+  formatDistanceValue,
+  formatPaceInUnit,
+} from "@/lib/units";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPace(secPerKm: number): string {
-  if (!Number.isFinite(secPerKm) || secPerKm <= 0) return "—";
-  const m = Math.floor(secPerKm / 60);
-  const s = Math.round(secPerKm % 60);
-  return `${m}:${s.toString().padStart(2, "0")}/km`;
+/**
+ * Current saved units, read non-reactively. In the browser this is the athlete's
+ * persisted preference; on the server (LLM/coach context, GPX export) the store
+ * is never hydrated, so it returns the metric default — which is what those
+ * paths want. Formatters read this by default; pass an explicit unit to override
+ * (e.g. `useUnitFormat`, which subscribes reactively).
+ */
+function displayDistanceUnit(): DistanceUnit {
+  return useSettingsStore.getState().distanceUnit;
 }
 
-export function formatDistanceKm(meters: number): string {
-  if (!Number.isFinite(meters)) return "—";
-  return formatKm(meters / 1000);
+function displayPaceUnit(): PaceUnit {
+  return useSettingsStore.getState().paceUnit;
 }
 
-/** Display km without floating-point noise (e.g. 412.3 km not 412.3000000001). */
-export function formatKm(km: number): string {
-  if (!Number.isFinite(km)) return "—";
-  const rounded = Math.round(km * 10) / 10;
-  const text =
-    Math.abs(rounded - Math.round(rounded)) < 0.05
-      ? String(Math.round(rounded))
-      : rounded.toFixed(1);
-  return `${text} km`;
+/**
+ * Distance/pace formatters. All input is metric (km, sec-per-km). The unit
+ * defaults to the saved preference (metric on the server); memoized view-model
+ * strings pick up a changed unit on the next render/navigation.
+ */
+export function formatPace(secPerKm: number, unit: PaceUnit = displayPaceUnit()): string {
+  return formatPaceInUnit(secPerKm, unit);
 }
 
-/** Compact km number for ranges and chips (no unit suffix). */
-export function formatKmValue(km: number): string {
-  if (!Number.isFinite(km)) return "—";
-  const rounded = Math.round(km * 10) / 10;
-  return Math.abs(rounded - Math.round(rounded)) < 0.05
-    ? String(Math.round(rounded))
-    : rounded.toFixed(1);
+export function formatDistanceKm(
+  meters: number,
+  unit: DistanceUnit = displayDistanceUnit(),
+): string {
+  return formatDistanceFromMeters(meters, unit);
 }
 
-export function formatKmRange(lo: number, hi: number): string {
-  return `${formatKmValue(lo)}–${formatKmValue(hi)} km`;
+/** Display distance with unit suffix, without floating-point noise. */
+export function formatKm(km: number, unit: DistanceUnit = displayDistanceUnit()): string {
+  return formatDistance(km, unit);
+}
+
+/** Compact distance number for ranges and chips (no unit suffix). */
+export function formatKmValue(km: number, unit: DistanceUnit = displayDistanceUnit()): string {
+  return formatDistanceValue(km, unit);
+}
+
+export function formatKmRange(
+  lo: number,
+  hi: number,
+  unit: DistanceUnit = displayDistanceUnit(),
+): string {
+  return formatDistanceRange(lo, hi, unit);
 }
 
 export function formatDuration(seconds: number): string {
