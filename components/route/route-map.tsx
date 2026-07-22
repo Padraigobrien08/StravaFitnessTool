@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { RouteGeometry, OverlaySegment, TimelinePoint } from "@/lib/route-intelligence/types";
 import { positionAtTime } from "@/lib/route-intelligence/geometry";
