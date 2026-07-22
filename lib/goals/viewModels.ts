@@ -10,6 +10,8 @@ import type { Insight } from "@/lib/insights/types";
 import type { RaceProjectionView } from "@/lib/performance/viewModels";
 import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
 import { buildForecastV2View } from "@/lib/goals/forecastV2ViewModel";
+import type { GoalScenarioResult } from "@/lib/goals/goalScenarios";
+import { buildGoalScenariosView } from "@/lib/goals/goalScenarios";
 import { buildGoalsRaceBrief, type GoalsRaceBriefView } from "@/lib/goals/goalsRaceBrief";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
@@ -70,6 +72,7 @@ export interface GoalsPageView {
   dimensions: ReadinessDimensionView[];
   projection: RaceProjectionView;
   forecastV2: ForecastV2View | null;
+  scenarios: GoalScenarioResult | null;
   risks: GoalRiskView[];
   consensus: ModelConsensusRow[];
   explain: GoalsExplainView;
@@ -525,6 +528,12 @@ export function buildGoalsPageView(
     dimensions: buildDimensions(analytics, readiness),
     projection,
     forecastV2,
+    scenarios: buildGoalScenariosView({
+      analytics,
+      goal,
+      runs: opts?.runs,
+      fitDetails: opts?.fitDetails,
+    }),
     risks: buildRisks(analytics, readiness, projection),
     consensus: buildConsensus(analytics.racePredictionAnalysis),
     explain,

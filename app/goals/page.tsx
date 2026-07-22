@@ -20,6 +20,7 @@ import { GoalRisksPanel } from "@/components/goals/goal-risks-panel";
 import { GoalsExplainability } from "@/components/goals/goals-explainability";
 import { HistoricalReadinessPanel } from "@/components/goals/historical-readiness-panel";
 import { ForecastV2Panel } from "@/components/goals/forecast-v2-panel";
+import { GoalScenariosPanel } from "@/components/goals/goal-scenarios-panel";
 import { GoalsRaceBrief } from "@/components/goals/goals-race-brief";
 import { GoalsEvidenceDrawer } from "@/components/goals/goals-evidence-drawer";
 import { GenerateWeekPlanButton } from "@/components/planning/generate-week-plan-button";
@@ -82,6 +83,7 @@ export default function GoalsPage() {
           {useBriefLayout && view.raceBrief && view.forecastV2 ? (
             <>
               <GoalsRaceBrief brief={view.raceBrief} />
+              {view.scenarios ? <GoalScenariosPanel scenarios={view.scenarios} /> : null}
               <GoalsEvidenceDrawer
                 forecast={view.forecastV2}
                 showLegacy={showLegacyV1}
@@ -103,6 +105,7 @@ export default function GoalsPage() {
             <>
               <RaceMissionHero hero={view.hero} />
               {view.forecastV2 ? <ForecastV2Panel forecast={view.forecastV2} /> : null}
+              {view.scenarios ? <GoalScenariosPanel scenarios={view.scenarios} /> : null}
               <GoalsIntelRow>
                 <div className="lg:col-span-7">
                   <PredictionIntegrityPanel projection={view.projection} />

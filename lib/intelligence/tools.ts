@@ -5,6 +5,8 @@ import { countRunsMissingStreams, countStreamsForUser } from "@/lib/db/activity-
 import { buildGoalsPageView } from "@/lib/goals/viewModels";
 import { buildTrainingPageView } from "@/lib/training/viewModels";
 import { recommendTodaySession, buildTodaySessionInput } from "@/lib/training/todaySession";
+import { computeGoalScenarios } from "@/lib/goals/goalScenarios";
+import { buildRaceForecastInput } from "@/lib/forecasting-v2/buildInput";
 import {
   buildFullEcosystemCoachPayload,
   compareModalityBlocks,
@@ -177,6 +179,51 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         },
         quality,
         rec.evidence,
+      );
+    }
+
+    case "get_goal_scenarios": {
+      if (!raceGoal) {
+        return wrapIntelligence(
+          { error: "No race goal set — set a goal on the Goals page or sync preferences." },
+          quality,
+          [],
+          ["Goal scenarios require a race goal with a distance (and ideally a target time)."],
+        );
+      }
+      const forecastInput = buildRaceForecastInput({
+        analytics,
+        goal: raceGoal,
+        runs: bundle.runs,
+        fitDetails: bundle.fitDetails,
+      });
+      if (!forecastInput || forecastInput.efforts.length === 0) {
+        return wrapIntelligence(
+          { error: "Not enough race-quality efforts to project goal scenarios yet." },
+          quality,
+          [],
+          ["Goal scenarios need at least one race-quality effort on record."],
+        );
+      }
+      const result = computeGoalScenarios(forecastInput);
+      return wrapIntelligence(
+        {
+          target: result.targetLabel,
+          baselineProjection: formatDuration(result.baselineTimeSec),
+          baselineProbabilityPct: result.baselineProbabilityPct,
+          recommendation: result.recommendation,
+          scenarios: result.scenarios.map((s) => ({
+            label: s.label,
+            change: s.leverSummary,
+            projectedTime: s.projectedTimeLabel,
+            probabilityPct: s.probabilityPct,
+            meetsTarget: s.meetsTarget,
+            why: s.rationale,
+          })),
+        },
+        quality,
+        result.evidence,
+        result.limitations,
       );
     }
 
@@ -454,6 +501,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "recommend_today_session",
     description:
       "Recommend a single session for today (rest, recovery, easy, long, tempo, or interval) from current fatigue, recent intensity balance, time since the last quality/long run, and race proximity. Use for 'what should I run today?'.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_goal_scenarios",
+    description:
+      "Adaptive goal scenarios: the probability of hitting the target race time under different training changes (maintain, build volume, add quality, full block), each with its projected time. Use for 'what would it take to hit my goal?', 'can I run <time>?', or 'how do I get faster for my race?'.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

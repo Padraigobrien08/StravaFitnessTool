@@ -1,0 +1,99 @@
+"use client";
+
+import { PanelChrome } from "@/components/home/primitives/panel-chrome";
+import { dash } from "@/components/home/primitives/tokens";
+import type { GoalScenarioResult } from "@/lib/goals/goalScenarios";
+import { cn } from "@/lib/utils";
+
+function probColor(pct: number | null): string {
+  if (pct == null) return "text-zinc-500";
+  if (pct >= 70) return "text-teal-400/90";
+  if (pct >= 45) return "text-amber-400/85";
+  return "text-rose-400/85";
+}
+
+export function GoalScenariosPanel({ scenarios }: { scenarios: GoalScenarioResult }) {
+  return (
+    <div className="space-y-4">
+      <PanelChrome title="What would it take?" accent>
+        <p className="text-sm leading-relaxed text-zinc-300">{scenarios.recommendation}</p>
+        {scenarios.hasTarget ? (
+          <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-zinc-500">
+            <span>
+              Target <span className="font-medium text-zinc-300">{scenarios.targetLabel}</span>
+            </span>
+            <span>
+              Current projection{" "}
+              <span className="font-medium text-zinc-300">
+                {/* baselineTimeSec formatted upstream via the maintain scenario */}
+                {scenarios.scenarios.find((s) => s.id === "maintain")?.projectedTimeLabel}
+              </span>
+            </span>
+            {scenarios.baselineProbabilityPct != null ? (
+              <span>
+                Baseline chance{" "}
+                <span className={cn("font-medium", probColor(scenarios.baselineProbabilityPct))}>
+                  {scenarios.baselineProbabilityPct}%
+                </span>
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+      </PanelChrome>
+
+      <PanelChrome title="Training scenarios" subdued>
+        <div className="space-y-2.5">
+          {scenarios.scenarios.map((s) => (
+            <div
+              key={s.id}
+              className={cn(
+                "rounded-lg border p-3",
+                s.meetsTarget
+                  ? "border-teal-500/25 bg-teal-500/[0.04]"
+                  : "border-white/[0.06] bg-white/[0.01]",
+              )}
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-sm font-medium text-zinc-200">{s.label}</p>
+                <div className="flex items-baseline gap-3 tabular-nums">
+                  <span className="text-sm text-zinc-400">{s.projectedTimeLabel}</span>
+                  {s.probabilityPct != null ? (
+                    <span className={cn("text-sm font-semibold", probColor(s.probabilityPct))}>
+                      {s.probabilityPct}%
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+              <p className="mt-0.5 text-xs text-zinc-500">{s.leverSummary}</p>
+              {s.rationale.length > 0 ? (
+                <p className="mt-1 text-xs text-zinc-600">{s.rationale[0]}</p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </PanelChrome>
+
+      {(scenarios.evidence.length > 0 || scenarios.limitations.length > 0) && (
+        <PanelChrome title="Basis" subdued>
+          {scenarios.evidence.length > 0 ? (
+            <ul className="space-y-1 text-xs text-zinc-500">
+              {scenarios.evidence.map((e, i) => (
+                <li key={i}>· {e}</li>
+              ))}
+            </ul>
+          ) : null}
+          {scenarios.limitations.length > 0 ? (
+            <>
+              <p className={cn(dash.label, "mt-3")}>Caveats</p>
+              <ul className="mt-1 space-y-1 text-xs text-zinc-600">
+                {scenarios.limitations.map((l, i) => (
+                  <li key={i}>· {l}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </PanelChrome>
+      )}
+    </div>
+  );
+}
