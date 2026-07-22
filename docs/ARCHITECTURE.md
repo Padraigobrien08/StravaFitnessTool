@@ -88,21 +88,22 @@ See [COACH_AND_INTELLIGENCE.md](COACH_AND_INTELLIGENCE.md).
 
 ## API overview
 
-| Method   | Path                         | Auth                | Purpose                         |
-| -------- | ---------------------------- | ------------------- | ------------------------------- |
-| GET      | `/api/auth/strava/authorize` | —                   | Start OAuth                     |
-| GET      | `/api/auth/strava/callback`  | —                   | OAuth callback + initial sync   |
-| POST     | `/api/auth/logout`           | session             | Sign out                        |
-| POST     | `/api/sync/strava`           | session             | Manual re-sync                  |
-| POST     | `/api/sync/strava/streams`   | session             | Batch stream/lap sync           |
-| GET      | `/api/me/import`             | session             | Activity bundle for client      |
-| GET      | `/api/me/status`             | session             | Connection + counts             |
-| GET      | `/api/me/fit-details`        | session             | Stream/lap payloads             |
-| GET/POST | `/api/me/preferences`        | session             | Race goal + coach settings      |
-| GET      | `/api/me/intelligence`       | session or API key  | Tool execution / brief sections |
-| POST     | `/api/chat`                  | session             | Coach LLM + tool loop           |
-| GET/POST | `/api/webhooks/strava`       | Strava verify token | Push events                     |
-| GET      | `/api/health`                | —                   | Health check                    |
+| Method          | Path                         | Auth                | Purpose                          |
+| --------------- | ---------------------------- | ------------------- | -------------------------------- |
+| GET             | `/api/auth/strava/authorize` | —                   | Start OAuth                      |
+| GET             | `/api/auth/strava/callback`  | —                   | OAuth callback + initial sync    |
+| POST            | `/api/auth/logout`           | session             | Sign out                         |
+| POST            | `/api/sync/strava`           | session             | Manual re-sync                   |
+| POST            | `/api/sync/strava/streams`   | session             | Batch stream/lap sync            |
+| GET             | `/api/me/import`             | session             | Activity bundle for client       |
+| GET             | `/api/me/status`             | session             | Connection + counts              |
+| GET             | `/api/me/fit-details`        | session             | Stream/lap payloads              |
+| GET/POST        | `/api/me/preferences`        | session             | Race goal + coach settings       |
+| GET/POST/DELETE | `/api/me/training-calendar`  | session             | Persisted weekly plan (calendar) |
+| GET             | `/api/me/intelligence`       | session or API key  | Tool execution / brief sections  |
+| POST            | `/api/chat`                  | session             | Coach LLM + tool loop            |
+| GET/POST        | `/api/webhooks/strava`       | Strava verify token | Push events                      |
+| GET             | `/api/health`                | —                   | Health check                     |
 
 ## Intelligence tools (deterministic)
 
@@ -121,8 +122,9 @@ Apply in order on Neon:
 1. `001_initial.sql` — users, activities, streams
 2. `002_coach.sql` — preferences, race goals
 3. `003_route_geometry.sql` — route/GPS storage (PostGIS-ready)
+4. `004_training_calendar.sql` — saved weekly plan (calendar week) per user
 
-Coach preferences auto-ensure via `lib/db/ensure-coach-schema.ts` when missing.
+Coach preferences and the training calendar auto-ensure via `lib/db/ensure-coach-schema.ts` and `lib/db/training-calendar.ts` when their tables are missing.
 
 ## Frontend conventions
 

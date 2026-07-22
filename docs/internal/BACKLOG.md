@@ -30,14 +30,14 @@ The 17 `react-hooks/set-state-in-effect` warnings are intentional lifecycle patt
 
 ## Features — ranked by value ÷ effort
 
-| #      | Item                                                                                                                               | Size     | Value    | Notes                                                                                                                                                  |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ~~F1~~ | ✅ "What should I run today?" — single-session recommender — **done** (#36)                                                        | S–M      | High     | Coach tool `recommend_today_session` + engine + 9 tests. Follow-ups: Home "Today" card, MCP parity                                                     |
-| ~~F2~~ | ✅ Apply unit preferences app-wide — **done** (#41)                                                                                | S–M      | High     | `lib/units.ts` core + `useUnitFormat`; formatters read the saved unit. Follow-ups: race-strategy/execution split charts + plan-engine text stay metric |
-| F3     | Persist the weekly Plan to the DB — currently localStorage-only, lost across devices                                               | M        | Med–high | `/api/me/weekly-plan` generates but never stores                                                                                                       |
-| ~~F4~~ | ✅ Adaptive goal-scenario engine — **done** (#42)                                                                                  | M–L      | High     | `lib/goals/goalScenarios.ts` + `get_goal_scenarios` tool + Goals panel; probability reuses the v2 forecast prediction interval (no invented numbers)   |
-| F5     | Workout-quality v2 — interval repeatability, aerobic decoupling, threshold control                                                 | M        | Med–high | Blocks "compare my last 3 thresholds"                                                                                                                  |
-| F6     | Risk-pattern matching · monthly/pre-race narratives · phase-catalog UI · recommendation-outcome tracking · persisted AthleteMemory | M–L each | Med      | Longer-horizon differentiation depth                                                                                                                   |
+| #      | Item                                                                                                                               | Size     | Value    | Notes                                                                                                                                                                            |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~F1~~ | ✅ "What should I run today?" — single-session recommender — **done** (#36)                                                        | S–M      | High     | Coach tool `recommend_today_session` + engine + 9 tests. Follow-ups: Home "Today" card, MCP parity                                                                               |
+| ~~F2~~ | ✅ Apply unit preferences app-wide — **done** (#41)                                                                                | S–M      | High     | `lib/units.ts` core + `useUnitFormat`; formatters read the saved unit. Follow-ups: race-strategy/execution split charts + plan-engine text stay metric                           |
+| ~~F3~~ | ✅ Persist the weekly Plan to the DB — **done** (#43)                                                                              | M        | Med–high | `training_calendar_weeks` table + `/api/me/training-calendar` (GET/POST/DELETE); `useTrainingCalendar` hydrates from server + debounced sync; localStorage kept as offline cache |
+| ~~F4~~ | ✅ Adaptive goal-scenario engine — **done** (#42)                                                                                  | M–L      | High     | `lib/goals/goalScenarios.ts` + `get_goal_scenarios` tool + Goals panel; probability reuses the v2 forecast prediction interval (no invented numbers)                             |
+| F5     | Workout-quality v2 — interval repeatability, aerobic decoupling, threshold control                                                 | M        | Med–high | Blocks "compare my last 3 thresholds"                                                                                                                                            |
+| F6     | Risk-pattern matching · monthly/pre-race narratives · phase-catalog UI · recommendation-outcome tracking · persisted AthleteMemory | M–L each | Med      | Longer-horizon differentiation depth                                                                                                                                             |
 
 ## Progress
 
@@ -46,8 +46,9 @@ The 17 `react-hooks/set-state-in-effect` warnings are intentional lifecycle patt
 - ✅ **C1–C3** — Dependabot majors closed (#37–#38) + coverage (#39)
 - ✅ **F2** — unit preferences app-wide (#41)
 - ✅ **F4** — adaptive goal-scenario engine (#42)
+- ✅ **F3** — persist weekly plan to DB (#43)
 
-**Remaining:** C4 (low urgency) and features **F3, F5, F6**. Suggested next: **F3** (persist the weekly Plan to the DB) or **F5** (workout-quality v2).
+**Remaining:** C4 (low urgency) and features **F5, F6**. Suggested next: **F5** (workout-quality v2 — interval repeatability, aerobic decoupling, threshold control).
 
 ## Confirmed solid — no action
 

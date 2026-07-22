@@ -11,6 +11,7 @@ export type {
 export {
   saveCalendarWeek,
   getCalendarWeek,
+  mergeServerWeeks,
   listCalendarWeeks,
   updateCalendarWorkout,
   deleteCalendarWorkout,
