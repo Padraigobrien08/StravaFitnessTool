@@ -4,7 +4,7 @@ import type { StravaStreamSet } from "./types";
 export function buildActivityGpx(
   activityId: number,
   activityName: string,
-  streams: StravaStreamSet | null
+  streams: StravaStreamSet | null,
 ): string {
   const latlng = streams?.latlng?.data as [number, number][] | undefined;
   const time = streams?.time?.data as number[] | undefined;
@@ -19,10 +19,7 @@ export function buildActivityGpx(
         (streams?.altitude?.data as number[] | undefined)?.[i] != null
           ? `<ele>${(streams!.altitude!.data as number[])[i]}</ele>`
           : "";
-      const t =
-        time?.[i] != null
-          ? `<time>${new Date(time[i]! * 1000).toISOString()}</time>`
-          : "";
+      const t = time?.[i] != null ? `<time>${new Date(time[i]! * 1000).toISOString()}</time>` : "";
       return `<trkpt lat="${ll[0]}" lon="${ll[1]}">${ele}${t}</trkpt>`;
     })
     .join("");
@@ -44,7 +41,7 @@ function escapeXml(s: string): string {
 export function activityGpxExport(
   activityId: number,
   activityName: string,
-  streams: StravaStreamSet | null
+  streams: StravaStreamSet | null,
 ): { filename: string; contentBase64: string; mimeType: string } {
   const gpx = buildActivityGpx(activityId, activityName, streams);
   return {

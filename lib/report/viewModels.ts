@@ -5,7 +5,10 @@ import type { ImportQualityReport } from "@/lib/quality/assessImport";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import { buildGoalsPageView } from "@/lib/goals/viewModels";
 import { buildTrainingPageView } from "@/lib/training/viewModels";
-import { buildReportEcosystemView, type ReportEcosystemView } from "@/lib/training/ecosystemViewModel";
+import {
+  buildReportEcosystemView,
+  type ReportEcosystemView,
+} from "@/lib/training/ecosystemViewModel";
 import { formatDuration, formatKm, formatPace } from "@/lib/utils";
 import { RACE_DISTANCE_LABELS } from "@/lib/analytics/readiness";
 
@@ -134,7 +137,7 @@ export interface ReportPageView {
 
 function synthesizeSignals(
   analytics: DashboardInsights,
-  insights: Insight[]
+  insights: Insight[],
 ): SynthesizedSignalView[] {
   const signals: SynthesizedSignalView[] = [];
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
@@ -222,7 +225,7 @@ function synthesizeSignals(
 function buildExecutive(
   analytics: DashboardInsights,
   training: ReturnType<typeof buildTrainingPageView>,
-  goals: ReturnType<typeof buildGoalsPageView>
+  goals: ReturnType<typeof buildGoalsPageView>,
 ): ExecutiveSummaryView {
   const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const dist = analytics.raceReadiness?.distanceLabel ?? "half-marathon";
@@ -262,7 +265,7 @@ function buildExecutive(
 
 function buildRaceBriefing(
   analytics: DashboardInsights,
-  goals: ReturnType<typeof buildGoalsPageView>
+  goals: ReturnType<typeof buildGoalsPageView>,
 ): RaceReadinessBriefingView {
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const primary = goals.projection.primary;
@@ -280,16 +283,14 @@ function buildRaceBriefing(
       ? `${goals.risks[0].title} — ${goals.risks[0].evidence}`
       : goals.hero.biggestLimiter,
     pacingGuidance: goals.projection.pacingNote,
-    projectedRange: primary
-      ? `${primary.timeDisplay} ${primary.spreadDisplay}`
-      : null,
+    projectedRange: primary ? `${primary.timeDisplay} ${primary.spreadDisplay}` : null,
     probabilityBand: analytics.raceReadiness?.probabilityBand ?? null,
     daysUntilRace: analytics.raceReadiness?.daysUntilRace ?? null,
   };
 }
 
 function buildCoaching(
-  training: ReturnType<typeof buildTrainingPageView>
+  training: ReturnType<typeof buildTrainingPageView>,
 ): CoachingRecommendationView {
   const plan = training.plan;
   const focus =
@@ -301,18 +302,16 @@ function buildCoaching(
           ? "Maintain aerobic sharpness while reducing accumulated fatigue."
           : "Sustain progressive volume with one quality anchor.";
 
-  const expected = plan.isTaper || plan.isRaceWeek
-    ? "Improved freshness entering race week with stable fitness."
-    : plan.isRecovery
-      ? "Reduced acute fatigue and restored easy-day compliance."
-      : "Continued CTL growth without exceeding recovery capacity.";
+  const expected =
+    plan.isTaper || plan.isRaceWeek
+      ? "Improved freshness entering race week with stable fitness."
+      : plan.isRecovery
+        ? "Reduced acute fatigue and restored easy-day compliance."
+        : "Continued CTL growth without exceeding recovery capacity.";
 
   return {
     primaryFocus: focus,
-    rationale: [
-      ...plan.rationale.slice(0, 3),
-      training.explain.recommendationWhy,
-    ],
+    rationale: [...plan.rationale.slice(0, 3), training.explain.recommendationWhy],
     confidence: plan.confidence,
     confidenceLabel: training.explain.confidenceLabel,
     focusArea: plan.templateLabel,
@@ -376,8 +375,7 @@ function buildCharts(analytics: DashboardInsights): ReportChartSpec[] {
       id: "efficiency",
       title: "Aerobic efficiency",
       caption: "Lower index = faster pace at similar heart rate.",
-      whyItMatters:
-        "Improving efficiency suggests aerobic adaptation without extra intensity.",
+      whyItMatters: "Improving efficiency suggests aerobic adaptation without extra intensity.",
     });
   }
 
@@ -386,8 +384,7 @@ function buildCharts(analytics: DashboardInsights): ReportChartSpec[] {
       id: "prediction",
       title: "Prediction trajectory",
       caption: "Consensus race projections sampled over training blocks.",
-      whyItMatters:
-        "Direction of travel matters more than a single-week snapshot.",
+      whyItMatters: "Direction of travel matters more than a single-week snapshot.",
     });
   }
 
@@ -397,8 +394,7 @@ function buildCharts(analytics: DashboardInsights): ReportChartSpec[] {
       id: "volume",
       title: "Weekly volume rhythm",
       caption: "Distance consistency underpins endurance readiness.",
-      whyItMatters:
-        "Stable volume bands reduce injury risk and support long-run progression.",
+      whyItMatters: "Stable volume bands reduce injury risk and support long-run progression.",
     });
   }
 
@@ -409,8 +405,13 @@ export function buildReportPageView(
   analytics: DashboardInsights,
   insights: Insight[] = [],
   quality: ImportQualityReport | null = null,
-  recentRuns: { date: string; name: string; distanceM: number; paceSecPerKm?: number | null }[] = [],
-  raceGoal: RaceGoal | null = null
+  recentRuns: {
+    date: string;
+    name: string;
+    distanceM: number;
+    paceSecPerKm?: number | null;
+  }[] = [],
+  raceGoal: RaceGoal | null = null,
 ): ReportPageView {
   const training = buildTrainingPageView(analytics, insights);
   const goals = buildGoalsPageView(analytics, raceGoal, insights);
@@ -426,8 +427,7 @@ export function buildReportPageView(
 
   const progressionNote =
     analytics.predictionTimeline.length >= 2
-      ? goals.historical.find((h) => h.label === "Projection trajectory")?.value ??
-        null
+      ? (goals.historical.find((h) => h.label === "Projection trajectory")?.value ?? null)
       : null;
 
   const prHighlights = analytics.personalRecords.slice(0, 4).map((pr) => ({
@@ -508,10 +508,7 @@ export function buildReportPageView(
         ...goals.projection.confidenceDrivers.slice(0, 3),
         ...training.explain.basedOn.slice(0, 2),
       ],
-      missing: [
-        ...goals.projection.confidenceReducers.slice(0, 2),
-        ...training.explain.missing,
-      ],
+      missing: [...goals.projection.confidenceReducers.slice(0, 2), ...training.explain.missing],
       limitations: training.explain.limitations,
       fieldCoverage:
         quality?.fieldCoverage.map((f) => ({

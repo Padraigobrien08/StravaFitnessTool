@@ -15,11 +15,7 @@ const barColors: Record<WorkoutType, string> = {
   unknown: "bg-white/20",
 };
 
-export function TrainingDistributionSummary({
-  data,
-}: {
-  data: TrainingDistributionView;
-}) {
+export function TrainingDistributionSummary({ data }: { data: TrainingDistributionView }) {
   return (
     <section className="rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2.5">
       <p className="text-[10px] font-medium text-zinc-600">

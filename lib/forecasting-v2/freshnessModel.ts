@@ -45,9 +45,7 @@ export function assessFreshness(input: RaceForecastInput): FreshnessAssessment {
   }
 
   if (input.goal.raceDate) {
-    const days = Math.ceil(
-      (new Date(input.goal.raceDate).getTime() - Date.now()) / 86400000
-    );
+    const days = Math.ceil((new Date(input.goal.raceDate).getTime() - Date.now()) / 86400000);
     if (days > 0 && days <= 14) {
       evidence.push(`${days} days to race — freshness window matters.`);
     }

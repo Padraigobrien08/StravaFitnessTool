@@ -27,11 +27,7 @@ export function WeekOpsPanel({
         <p className={dash.muted}>
           {ops.runCount} sessions · {formatKm(ops.loadKm)}
           {ops.loadDeltaPct !== null ? (
-            <span
-              className={
-                ops.loadDeltaPct >= 0 ? " text-teal-500/80" : " text-amber-500/80"
-              }
-            >
+            <span className={ops.loadDeltaPct >= 0 ? " text-teal-500/80" : " text-amber-500/80"}>
               {" "}
               ({ops.loadDeltaPct >= 0 ? "+" : ""}
               {ops.loadDeltaPct}%)

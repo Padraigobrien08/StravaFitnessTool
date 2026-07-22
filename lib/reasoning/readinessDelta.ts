@@ -11,7 +11,7 @@ import type { ExplainReadinessDeltaArgs, ReasoningContext, ReasoningResult } fro
 
 export function explainReadinessDelta(
   ctx: ReasoningContext,
-  args: ExplainReadinessDeltaArgs = {}
+  args: ExplainReadinessDeltaArgs = {},
 ): ReasoningResult<{
   weeks: number;
   now: { score: number; label: string; longestRunKm: number; fourWeekVolumeKm: number };
@@ -34,7 +34,7 @@ export function explainReadinessDelta(
         runsNow,
         goal,
         ctx.analytics.personalRecords,
-        ctx.analytics.racePredictionAnalysis
+        ctx.analytics.racePredictionAnalysis,
       )
     : halfMarathonReadiness(runsNow);
 
@@ -43,7 +43,7 @@ export function explainReadinessDelta(
         runsThen,
         goal,
         ctx.analytics.personalRecords,
-        ctx.analytics.racePredictionAnalysis
+        ctx.analytics.racePredictionAnalysis,
       )
     : halfMarathonReadiness(runsThen);
 
@@ -97,9 +97,7 @@ export function explainReadinessDelta(
     });
 
   const recentVol = lastNDaysVolume(runsNow, weeks * 7);
-  const distanceLabel = useRace
-    ? RACE_READINESS_CONFIG[goal.distance].label
-    : "Half marathon";
+  const distanceLabel = useRace ? RACE_READINESS_CONFIG[goal.distance].label : "Half marathon";
 
   const narrative =
     scoreDelta === 0

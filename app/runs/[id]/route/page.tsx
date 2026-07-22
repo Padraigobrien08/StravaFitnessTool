@@ -21,9 +21,7 @@ export default function RouteReplayPage() {
   const id = params.id as string;
   const { getRunById, insights, getFitDetailForRun, apiConnected } = useStrava();
   const run = getRunById(id);
-  const [fit, setFit] = useState<FitRunDetail | null>(
-    () => getFitDetailForRun(id) ?? null
-  );
+  const [fit, setFit] = useState<FitRunDetail | null>(() => getFitDetailForRun(id) ?? null);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const autoLoadedRef = useRef(false);
@@ -61,15 +59,13 @@ export default function RouteReplayPage() {
           if (local) setFit(local);
           else if (fromCtx) setFit(fromCtx);
           setFetchError(
-            "GPS replay for local CSV imports requires matching FIT files with GPS records."
+            "GPS replay for local CSV imports requires matching FIT files with GPS records.",
           );
           return;
         }
 
         if (!apiConnected && !forceRefresh) {
-          setFetchError(
-            "Connect Strava and sync streams to load GPS for this activity."
-          );
+          setFetchError("Connect Strava and sync streams to load GPS for this activity.");
           return;
         }
 
@@ -77,8 +73,7 @@ export default function RouteReplayPage() {
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           setFetchError(
-            (body as { error?: string }).error ??
-              "Could not load activity streams from Strava."
+            (body as { error?: string }).error ?? "Could not load activity streams from Strava.",
           );
           return;
         }
@@ -86,15 +81,13 @@ export default function RouteReplayPage() {
         await mergeFitDetails([detail]);
         setFit(detail);
         if (!fitDetailHasGps(detail)) {
-          setFetchError(
-            "Strava returned no lat/lng for this activity (e.g. indoor or privacy)."
-          );
+          setFetchError("Strava returned no lat/lng for this activity (e.g. indoor or privacy).");
         }
       } finally {
         setLoading(false);
       }
     },
-    [id, getFitDetailForRun, apiConnected]
+    [id, getFitDetailForRun, apiConnected],
   );
 
   useEffect(() => {
@@ -145,10 +138,7 @@ export default function RouteReplayPage() {
           <RouteReplayWorkspace session={session} backHref={`/runs/${id}`} />
         ) : run && emptySession ? (
           <div className="space-y-3">
-            <RouteReplayWorkspace
-              session={emptySession}
-              backHref={`/runs/${id}`}
-            />
+            <RouteReplayWorkspace session={emptySession} backHref={`/runs/${id}`} />
             {apiConnected ? (
               <div className="flex flex-wrap gap-2">
                 <Button

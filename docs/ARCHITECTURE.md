@@ -45,64 +45,64 @@ Both paths converge on the same **in-memory analytics** shape (`DashboardInsight
 
 ## Layer map
 
-| Layer | Location | Responsibility |
-|-------|----------|----------------|
-| Ingest | `lib/strava/`, `lib/sync/`, `lib/fit/` | CSV, API, FIT → raw then domain |
-| Domain | `lib/domain/` | `RunActivity`, normalized fields |
-| Analytics | `lib/analytics/` | Volume, fatigue, readiness, predictions, efficiency |
-| Insights | `lib/insights/` | Question-tagged narrative cards |
-| Reasoning | `lib/reasoning/` | compare_sessions, readiness delta, best phase, fade, PR context |
-| Ecosystem | `lib/ecosystem/` | Multi-sport load, interference, archetype |
-| Intelligence service | `lib/intelligence/` | Server bundle, tools, chat loop, API auth |
-| Coach UI state | `lib/coach/`, `hooks/use-coach-thread.ts` | Workspace state, threads, response parsing |
-| Athlete model UI | `lib/intelligence/athleteState.ts`, `presentation.ts` | Shared selectors for `/intelligence` and Coach context |
-| View models | `lib/training/`, `lib/goals/`, `lib/report/` | Page-specific DTOs |
-| Route intelligence | `lib/route-intelligence/` | GPS replay timeline, overlays |
-| DB | `lib/db/`, `db/migrations/` | Neon schema, connections, preferences |
+| Layer                | Location                                              | Responsibility                                                  |
+| -------------------- | ----------------------------------------------------- | --------------------------------------------------------------- |
+| Ingest               | `lib/strava/`, `lib/sync/`, `lib/fit/`                | CSV, API, FIT → raw then domain                                 |
+| Domain               | `lib/domain/`                                         | `RunActivity`, normalized fields                                |
+| Analytics            | `lib/analytics/`                                      | Volume, fatigue, readiness, predictions, efficiency             |
+| Insights             | `lib/insights/`                                       | Question-tagged narrative cards                                 |
+| Reasoning            | `lib/reasoning/`                                      | compare_sessions, readiness delta, best phase, fade, PR context |
+| Ecosystem            | `lib/ecosystem/`                                      | Multi-sport load, interference, archetype                       |
+| Intelligence service | `lib/intelligence/`                                   | Server bundle, tools, chat loop, API auth                       |
+| Coach UI state       | `lib/coach/`, `hooks/use-coach-thread.ts`             | Workspace state, threads, response parsing                      |
+| Athlete model UI     | `lib/intelligence/athleteState.ts`, `presentation.ts` | Shared selectors for `/intelligence` and Coach context          |
+| View models          | `lib/training/`, `lib/goals/`, `lib/report/`          | Page-specific DTOs                                              |
+| Route intelligence   | `lib/route-intelligence/`                             | GPS replay timeline, overlays                                   |
+| DB                   | `lib/db/`, `db/migrations/`                           | Neon schema, connections, preferences                           |
 
 ## Application surfaces
 
 ### Training dashboard (question-led IA)
 
-| Route | Primary question |
-|-------|------------------|
-| `/home` | Summary across improving, training, ready, next, changed |
-| `/training` | Am I training correctly? |
-| `/performance` | Am I improving? |
-| `/goals` | Am I ready for my goal? |
-| `/runs`, `/runs/[id]` | Activity log and execution detail |
-| `/runs/[id]/route` | GPS replay (pace, HR, elevation) |
-| `/report` | What changed? (printable) |
-| `/import`, `/settings` | Data load and preferences |
+| Route                  | Primary question                                         |
+| ---------------------- | -------------------------------------------------------- |
+| `/home`                | Summary across improving, training, ready, next, changed |
+| `/training`            | Am I training correctly?                                 |
+| `/performance`         | Am I improving?                                          |
+| `/goals`               | Am I ready for my goal?                                  |
+| `/runs`, `/runs/[id]`  | Activity log and execution detail                        |
+| `/runs/[id]/route`     | GPS replay (pace, HR, elevation)                         |
+| `/report`              | What changed? (printable)                                |
+| `/import`, `/settings` | Data load and preferences                                |
 
 Legacy routes (`/dashboard`, `/trends`, `/effort`, `/records`, `/context`, `/activity-mix`) remain for bookmarks.
 
 ### Intelligence + Coach (reasoning layer)
 
-| Route | Role |
-|-------|------|
+| Route           | Role                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------- |
 | `/intelligence` | **Persistent athlete model** — curated belief, signals, risks, memory, ecosystem, trajectory |
-| `/coach` | **Investigation workspace** — threaded chat, tool-grounded answers, sidebar threads |
+| `/coach`        | **Investigation workspace** — threaded chat, tool-grounded answers, sidebar threads          |
 
 See [COACH_AND_INTELLIGENCE.md](COACH_AND_INTELLIGENCE.md).
 
 ## API overview
 
-| Method | Path | Auth | Purpose |
-|--------|------|------|---------|
-| GET | `/api/auth/strava/authorize` | — | Start OAuth |
-| GET | `/api/auth/strava/callback` | — | OAuth callback + initial sync |
-| POST | `/api/auth/logout` | session | Sign out |
-| POST | `/api/sync/strava` | session | Manual re-sync |
-| POST | `/api/sync/strava/streams` | session | Batch stream/lap sync |
-| GET | `/api/me/import` | session | Activity bundle for client |
-| GET | `/api/me/status` | session | Connection + counts |
-| GET | `/api/me/fit-details` | session | Stream/lap payloads |
-| GET/POST | `/api/me/preferences` | session | Race goal + coach settings |
-| GET | `/api/me/intelligence` | session or API key | Tool execution / brief sections |
-| POST | `/api/chat` | session | Coach LLM + tool loop |
-| GET/POST | `/api/webhooks/strava` | Strava verify token | Push events |
-| GET | `/api/health` | — | Health check |
+| Method   | Path                         | Auth                | Purpose                         |
+| -------- | ---------------------------- | ------------------- | ------------------------------- |
+| GET      | `/api/auth/strava/authorize` | —                   | Start OAuth                     |
+| GET      | `/api/auth/strava/callback`  | —                   | OAuth callback + initial sync   |
+| POST     | `/api/auth/logout`           | session             | Sign out                        |
+| POST     | `/api/sync/strava`           | session             | Manual re-sync                  |
+| POST     | `/api/sync/strava/streams`   | session             | Batch stream/lap sync           |
+| GET      | `/api/me/import`             | session             | Activity bundle for client      |
+| GET      | `/api/me/status`             | session             | Connection + counts             |
+| GET      | `/api/me/fit-details`        | session             | Stream/lap payloads             |
+| GET/POST | `/api/me/preferences`        | session             | Race goal + coach settings      |
+| GET      | `/api/me/intelligence`       | session or API key  | Tool execution / brief sections |
+| POST     | `/api/chat`                  | session             | Coach LLM + tool loop           |
+| GET/POST | `/api/webhooks/strava`       | Strava verify token | Push events                     |
+| GET      | `/api/health`                | —                   | Health check                    |
 
 ## Intelligence tools (deterministic)
 

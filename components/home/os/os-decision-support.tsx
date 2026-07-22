@@ -37,10 +37,7 @@ export function OsDecisionSupport({
           </p>
           <ul className="mt-2 space-y-1.5">
             {primaryActionBullets.map((line) => (
-              <li
-                key={line}
-                className="flex gap-1.5 text-[12px] leading-snug text-zinc-200"
-              >
+              <li key={line} className="flex gap-1.5 text-[12px] leading-snug text-zinc-200">
                 <span className="text-zinc-600">–</span>
                 <span>{line}</span>
               </li>
@@ -73,13 +70,13 @@ function DecisionCol({
     <div
       className={cn(
         "rounded-lg p-3",
-        tone === "risk" ? "bg-amber-500/[0.04]" : "bg-teal-500/[0.04]"
+        tone === "risk" ? "bg-amber-500/[0.04]" : "bg-teal-500/[0.04]",
       )}
     >
       <p
         className={cn(
           "text-[10px] font-semibold uppercase tracking-wide",
-          tone === "risk" ? "text-amber-400/60" : "text-teal-500/70"
+          tone === "risk" ? "text-amber-400/60" : "text-teal-500/70",
         )}
       >
         {title}
@@ -93,7 +90,7 @@ function DecisionCol({
               key={t}
               className={cn(
                 "text-[11px] leading-snug",
-                tone === "risk" ? "text-amber-100/75" : "text-teal-100/80"
+                tone === "risk" ? "text-amber-100/75" : "text-teal-100/80",
               )}
             >
               {t}

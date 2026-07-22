@@ -25,9 +25,8 @@ export function IntelligencePage() {
   const { dataSourceLabel, importData } = useStrava();
 
   const evolution = useMemo(
-    () =>
-      intel.analytics ? getStateEvolutionStrip(intel.analytics) : [],
-    [intel.analytics]
+    () => (intel.analytics ? getStateEvolutionStrip(intel.analytics) : []),
+    [intel.analytics],
   );
 
   const beliefsById = useMemo(() => {
@@ -69,16 +68,12 @@ export function IntelligencePage() {
       : intel.analytics.dataConfidence === "medium"
         ? "moderate confidence"
         : "low confidence";
-  const trustLine = [
-    `${runCount} runs`,
-    dataSourceLabel ?? "Strava API",
-    confidenceLabel,
-  ].join(" · ");
+  const trustLine = [`${runCount} runs`, dataSourceLabel ?? "Strava API", confidenceLabel].join(
+    " · ",
+  );
 
   const risks = intel.risksAndOpportunities.filter((r) => r.kind === "risk");
-  const opportunities = intel.risksAndOpportunities.filter(
-    (r) => r.kind === "opportunity"
-  );
+  const opportunities = intel.risksAndOpportunities.filter((r) => r.kind === "opportunity");
 
   return (
     <RequireData>
@@ -89,16 +84,10 @@ export function IntelligencePage() {
               What StrideIQ currently believes, what changed, and what to investigate
             </p>
             <div className="flex gap-3 text-[11px]">
-              <Link
-                href="/plan"
-                className="text-teal-500/90 hover:text-teal-300"
-              >
+              <Link href="/plan" className="text-teal-500/90 hover:text-teal-300">
                 Plan →
               </Link>
-              <Link
-                href={coachUrl()}
-                className="text-zinc-500 hover:text-zinc-300"
-              >
+              <Link href={coachUrl()} className="text-zinc-500 hover:text-zinc-300">
                 Coach →
               </Link>
             </div>
@@ -111,9 +100,7 @@ export function IntelligencePage() {
             trustLine={trustLine}
           />
 
-          {evolution.length > 0 ? (
-            <IntelligenceStateEvolution items={evolution} />
-          ) : null}
+          {evolution.length > 0 ? <IntelligenceStateEvolution items={evolution} /> : null}
 
           <IntelligenceDecisionSupport
             risks={risks}
@@ -126,16 +113,11 @@ export function IntelligencePage() {
             adaptationSignals={intel.adaptationSignals}
           />
 
-          <IntelligenceMemoryGrouped
-            memory={intel.memory}
-            beliefsById={beliefsById}
-          />
+          <IntelligenceMemoryGrouped memory={intel.memory} beliefsById={beliefsById} />
 
           <IntelligenceSignalBoard signals={intel.signals} compact />
 
-          {intel.ecosystem ? (
-            <IntelligenceEcosystemCompact ecosystem={intel.ecosystem} />
-          ) : null}
+          {intel.ecosystem ? <IntelligenceEcosystemCompact ecosystem={intel.ecosystem} /> : null}
 
           <IntelligenceCoachEntries domains={intel.state.domains} />
         </div>

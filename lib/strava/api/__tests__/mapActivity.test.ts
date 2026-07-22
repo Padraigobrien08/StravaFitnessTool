@@ -25,8 +25,6 @@ describe("mapStravaActivityToRun", () => {
   });
 
   it("returns null for non-run sports", () => {
-    expect(
-      mapStravaActivityToRun({ ...base, sport_type: "Ride", type: "Ride" })
-    ).toBeNull();
+    expect(mapStravaActivityToRun({ ...base, sport_type: "Ride", type: "Ride" })).toBeNull();
   });
 });

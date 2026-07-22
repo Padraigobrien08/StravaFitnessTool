@@ -16,8 +16,7 @@ export function GoalRisksPanel({ risks }: { risks: GoalRiskView[] }) {
   return (
     <PanelChrome title="What could prevent success?" accent>
       <p className={`${dash.muted} mb-4`}>
-        Risks ranked by training evidence — each includes a mitigation you can
-        act on this week.
+        Risks ranked by training evidence — each includes a mitigation you can act on this week.
       </p>
       <div className="space-y-3">
         {risks.map((risk, i) => (
@@ -25,7 +24,7 @@ export function GoalRisksPanel({ risks }: { risks: GoalRiskView[] }) {
             key={`${risk.title}-${i}`}
             className={cn(
               "rounded-xl border border-white/[0.05] border-l-[3px] px-4 py-3.5",
-              severityStyle[risk.severity]
+              severityStyle[risk.severity],
             )}
           >
             <div className="flex flex-wrap items-center justify-between gap-2">

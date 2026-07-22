@@ -14,11 +14,10 @@ export const useThemeStore = create<ThemeState>()(
     (set, get) => ({
       theme: "dark",
       setTheme: (theme) => set({ theme }),
-      toggleTheme: () =>
-        set({ theme: get().theme === "dark" ? "light" : "dark" }),
+      toggleTheme: () => set({ theme: get().theme === "dark" ? "light" : "dark" }),
     }),
-    { name: "strideiq-theme-v1" }
-  )
+    { name: "strideiq-theme-v1" },
+  ),
 );
 
 export function applyThemeClass(theme: Theme) {

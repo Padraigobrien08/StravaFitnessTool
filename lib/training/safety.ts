@@ -15,18 +15,13 @@ export function countHardSessions(plan: WeekPlan): number {
   return plan.sessions.filter((s) => HARD_TYPES.includes(s.type)).length;
 }
 
-export function validatePlan(
-  plan: WeekPlan,
-  lastWeekKm: number,
-  tsb: number
-): SafetyAdjustments {
+export function validatePlan(plan: WeekPlan, lastWeekKm: number, tsb: number): SafetyAdjustments {
   const warnings = [...plan.warnings];
   let sessions = [...plan.sessions];
   let totalKmRange: [number, number] = [...plan.totalKmRange];
   let adjusted = false;
 
-  const maxCap =
-    lastWeekKm > 0 ? Math.round(lastWeekKm * 1.15 * 10) / 10 : totalKmRange[1];
+  const maxCap = lastWeekKm > 0 ? Math.round(lastWeekKm * 1.15 * 10) / 10 : totalKmRange[1];
 
   if (lastWeekKm > 0 && totalKmRange[1] > maxCap) {
     const scale = maxCap / totalKmRange[1];
@@ -37,13 +32,8 @@ export function validatePlan(
         Math.round(s.distanceKmRange[1] * scale * 10) / 10,
       ] as [number, number],
     }));
-    totalKmRange = [
-      Math.round(totalKmRange[0] * scale * 10) / 10,
-      maxCap,
-    ];
-    warnings.push(
-      `Volume capped at ${maxCap} km (+15% vs last week's ${lastWeekKm} km).`
-    );
+    totalKmRange = [Math.round(totalKmRange[0] * scale * 10) / 10, maxCap];
+    warnings.push(`Volume capped at ${maxCap} km (+15% vs last week's ${lastWeekKm} km).`);
     adjusted = true;
   }
 
@@ -66,9 +56,7 @@ export function validatePlan(
       }
       return s;
     });
-    warnings.push(
-      "Reduced hard sessions to 2 while TSB is negative (fatigue elevated)."
-    );
+    warnings.push("Reduced hard sessions to 2 while TSB is negative (fatigue elevated).");
   }
 
   if (!warnings.includes(MEDICAL_DISCLAIMER)) {

@@ -58,7 +58,7 @@ export function GoalMissionControl({ goal }: { goal: GoalMissionViewModel }) {
                 className={cn(
                   "h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500",
                   goal.score < 50 && "from-amber-500 to-amber-600",
-                  goal.score < 35 && "from-red-500 to-red-600"
+                  goal.score < 35 && "from-red-500 to-red-600",
                 )}
                 style={{ width: `${goal.score}%` }}
               />
@@ -66,8 +66,7 @@ export function GoalMissionControl({ goal }: { goal: GoalMissionViewModel }) {
             <div className="mt-2 flex flex-wrap gap-x-3 text-xs text-zinc-500">
               {goal.targetFinish ? (
                 <span>
-                  Target{" "}
-                  <span className="text-zinc-300">{goal.targetFinish}</span>
+                  Target <span className="text-zinc-300">{goal.targetFinish}</span>
                 </span>
               ) : null}
               {goal.probability ? (
@@ -88,7 +87,7 @@ export function GoalMissionControl({ goal }: { goal: GoalMissionViewModel }) {
                 <div
                   className={cn(
                     "h-full rounded-full transition-all duration-500",
-                    segmentColors[s.id] ?? "bg-zinc-500"
+                    segmentColors[s.id] ?? "bg-zinc-500",
                   )}
                   style={{ width: `${s.score}%` }}
                 />

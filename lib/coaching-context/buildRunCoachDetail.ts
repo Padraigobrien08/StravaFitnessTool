@@ -3,10 +3,7 @@ import type { WorkoutClassification } from "@/lib/analytics/workoutType";
 import type { DashboardInsights } from "@/lib/analytics";
 import { paceSecPerKm } from "@/lib/analytics/pace";
 import { evaluateSessionExecution } from "@/lib/session-intelligence";
-import {
-  computeLateFadePct,
-  scoreSessionExecution,
-} from "@/lib/reasoning/executionScore";
+import { computeLateFadePct, scoreSessionExecution } from "@/lib/reasoning/executionScore";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitLap, FitRunDetail } from "@/lib/strava/fitTypes";
 import { formatPace } from "@/lib/utils";
@@ -18,25 +15,15 @@ const UNKNOWN_WORKOUT: WorkoutClassification = {
   signals: [],
 };
 
-function workoutForRun(
-  analytics: DashboardInsights,
-  runId: string
-): WorkoutClassification {
-  return (
-    analytics.workoutLabels.find((l) => l.runId === runId)?.classification ??
-    UNKNOWN_WORKOUT
-  );
+function workoutForRun(analytics: DashboardInsights, runId: string): WorkoutClassification {
+  return analytics.workoutLabels.find((l) => l.runId === runId)?.classification ?? UNKNOWN_WORKOUT;
 }
 
 function formatLapSummary(laps: FitLap[], max = 6): string | undefined {
   if (!laps.length) return undefined;
   const parts = laps.slice(0, max).map((lap, i) => {
-    const km =
-      lap.distanceM != null
-        ? `${(lap.distanceM / 1000).toFixed(2)}km`
-        : "?km";
-    const pace =
-      lap.avgPaceSecPerKm != null ? formatPace(lap.avgPaceSecPerKm) : "—";
+    const km = lap.distanceM != null ? `${(lap.distanceM / 1000).toFixed(2)}km` : "?km";
+    const pace = lap.avgPaceSecPerKm != null ? formatPace(lap.avgPaceSecPerKm) : "—";
     const hr = lap.avgHr != null ? ` HR${lap.avgHr}` : "";
     return `L${i + 1}:${km}@${pace}/km${hr}`;
   });
@@ -60,7 +47,7 @@ export function buildRunCoachDetail(
   run: RunActivity,
   fit: FitRunDetail | null,
   analytics: DashboardInsights,
-  historicalRuns: RunActivity[] = []
+  historicalRuns: RunActivity[] = [],
 ): RunCoachDetail {
   const workout = workoutForRun(analytics, run.id);
   const session = evaluateSessionExecution(run, fit, workout, {
@@ -76,8 +63,7 @@ export function buildRunCoachDetail(
     date: run.date.slice(0, 10),
     name: run.name,
     workoutType: workout.type,
-    workoutTypeLabel:
-      WORKOUT_TYPE_LABELS[workout.type] ?? workout.type,
+    workoutTypeLabel: WORKOUT_TYPE_LABELS[workout.type] ?? workout.type,
     distanceKm: Math.round((run.distanceM / 1000) * 10) / 10,
     durationMin: Math.round(run.movingSec / 60),
     pace: pace ? formatPace(pace) : null,
@@ -86,9 +72,7 @@ export function buildRunCoachDetail(
     elevationGainM: run.elevationGainM,
     trainingLoad: run.trainingLoad,
     gradeAdjustedPace:
-      run.gradeAdjustedPaceSecPerKm != null
-        ? formatPace(run.gradeAdjustedPaceSecPerKm)
-        : null,
+      run.gradeAdjustedPaceSecPerKm != null ? formatPace(run.gradeAdjustedPaceSecPerKm) : null,
     streams: streamFlags(fit),
     lapCount: fit?.laps.length ?? 0,
     lapSummary: fit?.laps.length ? formatLapSummary(fit.laps) : undefined,

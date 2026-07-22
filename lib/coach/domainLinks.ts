@@ -1,10 +1,6 @@
 import type { CoachingDomain } from "./types";
 
-export function coachUrl(params?: {
-  domain?: string;
-  q?: string;
-  investigate?: boolean;
-}): string {
+export function coachUrl(params?: { domain?: string; q?: string; investigate?: boolean }): string {
   const sp = new URLSearchParams();
   if (params?.domain) sp.set("domain", params.domain);
   if (params?.q) sp.set("q", params.q);

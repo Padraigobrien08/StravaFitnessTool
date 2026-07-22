@@ -6,7 +6,7 @@ const block = (
   label: string,
   distanceKm: number,
   longestRunKm: number,
-  runCount = 4
+  runCount = 4,
 ): TrainingBlock => ({
   weekStart: "2026-01-01",
   label,
@@ -21,7 +21,7 @@ function eff(
   runName: string,
   date: string,
   hasHr = false,
-  isRaceLike = false
+  isRaceLike = false,
 ): RaceQualityEffort {
   return {
     distanceKm,
@@ -75,10 +75,7 @@ export const hmReadyRunnerInput: RaceForecastInput = {
     eff(21.1, 6120, "HM practice", "2026-02-20", true, true),
     eff(5, 1200, "5K", "2026-01-10"),
   ],
-  recentBlocks: [
-    block("Prior", 130, 16, 4),
-    block("Current", 145, 20.5, 5),
-  ],
+  recentBlocks: [block("Prior", 130, 16, 4), block("Current", 145, 20.5, 5)],
   goal: {
     distanceMeters: 21097,
     distanceKey: "hm",
@@ -96,10 +93,7 @@ export const hmReadyRunnerInput: RaceForecastInput = {
 export const marathonUnderpreparedInput: RaceForecastInput = {
   activities: [],
   runs: [],
-  efforts: [
-    eff(10, 2580, "10K", "2026-04-01"),
-    eff(5, 1180, "5K", "2026-03-01"),
-  ],
+  efforts: [eff(10, 2580, "10K", "2026-04-01"), eff(5, 1180, "5K", "2026-03-01")],
   recentBlocks: [block("Block", 55, 20.5, 3)],
   goal: { distanceMeters: 42195, distanceKey: "marathon" },
   athleteContext: { freshnessScore: 55, tsb: 0, hardRunsLast14d: 3, easyPct: 50 },
@@ -108,10 +102,7 @@ export const marathonUnderpreparedInput: RaceForecastInput = {
 export const fatigueHeavyRunnerInput: RaceForecastInput = {
   activities: [],
   runs: [],
-  efforts: [
-    eff(10, 2700, "10K", "2026-04-05"),
-    eff(5, 1250, "5K", "2026-03-28"),
-  ],
+  efforts: [eff(10, 2700, "10K", "2026-04-05"), eff(5, 1250, "5K", "2026-03-28")],
   recentBlocks: [block("Block", 90, 14, 3)],
   goal: { distanceMeters: 21097, distanceKey: "hm", raceDate: "2026-05-25" },
   athleteContext: {
@@ -162,10 +153,7 @@ export const nearRaceEvidenceRunnerInput: RaceForecastInput = {
     eff(16.09, 4920, "10 mile race", "2026-03-28", true, true),
     eff(10, 2520, "10K", "2026-03-01"),
   ],
-  recentBlocks: [
-    block("Prior", 120, 16, 4),
-    block("Current", 145, 20.5, 5),
-  ],
+  recentBlocks: [block("Prior", 120, 16, 4), block("Current", 145, 20.5, 5)],
   goal: { distanceMeters: 21097, distanceKey: "hm", targetTimeSec: 7200 },
   athleteContext: {
     freshnessScore: 68,
@@ -246,11 +234,7 @@ export const FORECAST_FIXTURES: ForecastFixtureProfile[] = [
     input: fatigueHeavyRunnerInput,
     expectations: {
       freshnessLabel: "fatigued",
-      forbidRecommendationPhrases: [
-        "increase volume",
-        "add more volume",
-        "build volume",
-      ],
+      forbidRecommendationPhrases: ["increase volume", "add more volume", "build volume"],
       requireRecommendationPhrases: ["freshness", "hard"],
     },
   },
@@ -285,8 +269,7 @@ export const FORECAST_FIXTURES: ForecastFixtureProfile[] = [
   {
     id: "near_race_evidence",
     label: "Near-race evidence (20.5k + 10 mi)",
-    description:
-      "Recent 1:53 20.5k and 1:22 10-mile — HM forecast should be clearly under 2:00.",
+    description: "Recent 1:53 20.5k and 1:22 10-mile — HM forecast should be clearly under 2:00.",
     input: nearRaceEvidenceRunnerInput,
     expectations: {
       minConfidence: "medium",
@@ -302,18 +285,14 @@ export const FORECAST_FIXTURES: ForecastFixtureProfile[] = [
     input: raceWeekTaperAthleteInput,
     expectations: {
       freshnessLabel: "fatigued",
-      forbidRecommendationPhrases: [
-        "increase volume",
-        "add volume",
-        "build mileage",
-      ],
+      forbidRecommendationPhrases: ["increase volume", "add volume", "build mileage"],
       requireRecommendationPhrases: ["freshness"],
     },
   },
 ];
 
 export const FORECAST_FIXTURE_BY_ID = Object.fromEntries(
-  FORECAST_FIXTURES.map((f) => [f.id, f])
+  FORECAST_FIXTURES.map((f) => [f.id, f]),
 ) as Record<string, ForecastFixtureProfile>;
 
 /** @deprecated Use evaluation/fixtures — kept for legacy tests */

@@ -25,9 +25,7 @@ async function main() {
   const laps = (data.laps as unknown[]) ?? [];
   console.log("records:", records.length, "laps:", laps.length);
   if (records[0]) console.log("record[0] keys:", Object.keys(records[0]));
-  const withSpeed = records.filter(
-    (r) => r.enhanced_speed ?? r.speed
-  ).length;
+  const withSpeed = records.filter((r) => r.enhanced_speed ?? r.speed).length;
   const withHr = records.filter((r) => r.heart_rate).length;
   console.log("with speed:", withSpeed, "with hr:", withHr);
 

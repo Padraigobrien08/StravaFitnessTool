@@ -29,17 +29,8 @@ function mockRun(hr: number): RunActivity {
 describe("buildIntensityAdvice", () => {
   it("flags too_hard when mostly hard runs", () => {
     const maxHr = 190;
-    const runs = [
-      mockRun(170),
-      mockRun(175),
-      mockRun(168),
-      mockRun(172),
-    ];
-    const advice = buildIntensityAdvice(
-      runs,
-      maxHr,
-      { easy: 1, hard: 9, easyPct: 10 }
-    );
+    const runs = [mockRun(170), mockRun(175), mockRun(168), mockRun(172)];
+    const advice = buildIntensityAdvice(runs, maxHr, { easy: 1, hard: 9, easyPct: 10 });
     expect(advice.status).toBe("too_hard");
     expect(advice.recommendations.length).toBeGreaterThanOrEqual(2);
   });

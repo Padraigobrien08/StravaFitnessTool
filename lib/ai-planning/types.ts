@@ -1,28 +1,11 @@
 import type { CoachingContext } from "@/lib/coaching-context";
 
 export type PlannedModality =
-  | "run"
-  | "bike"
-  | "swim"
-  | "strength"
-  | "mobility"
-  | "recovery"
-  | "rest"
-  | "cross_training";
+  "run" | "bike" | "swim" | "strength" | "mobility" | "recovery" | "rest" | "cross_training";
 
-export type PlannedIntensity =
-  | "easy"
-  | "moderate"
-  | "hard"
-  | "recovery"
-  | "rest";
+export type PlannedIntensity = "easy" | "moderate" | "hard" | "recovery" | "rest";
 
-export type WeeklyPlanType =
-  | "build"
-  | "maintain"
-  | "taper"
-  | "recovery"
-  | "race_week";
+export type WeeklyPlanType = "build" | "maintain" | "taper" | "recovery" | "race_week";
 
 export type PlanConfidence = "low" | "medium" | "medium_high" | "high";
 

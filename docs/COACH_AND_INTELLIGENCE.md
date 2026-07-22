@@ -2,16 +2,16 @@
 
 StrideIQ splits **what the system believes** from **what you investigate**.
 
-| Surface | Route | Metaphor |
-|---------|-------|----------|
-| Athlete Intelligence Model | `/intelligence` | Persistent belief state — curated, read-first |
-| Coach | `/coach` | Conversational investigation — ask, challenge, compare |
+| Surface                    | Route           | Metaphor                                               |
+| -------------------------- | --------------- | ------------------------------------------------------ |
+| Athlete Intelligence Model | `/intelligence` | Persistent belief state — curated, read-first          |
+| Coach                      | `/coach`        | Conversational investigation — ask, challenge, compare |
 
 Both read the same underlying data via `hooks/useAthleteIntelligence()` → `lib/intelligence/athleteState.ts` → `lib/coach/activeIntelligence.ts`.
 
 ## Athlete Intelligence Model (`/intelligence`)
 
-**Purpose:** Answer *“What does StrideIQ currently believe about me?”*
+**Purpose:** Answer _“What does StrideIQ currently believe about me?”_
 
 ### Page structure (top → bottom)
 
@@ -44,7 +44,7 @@ Intelligence CTAs use these; Coach reads `domain`, `q`, and `investigate` search
 
 ## Coach (`/coach`)
 
-**Purpose:** Answer *“Why?”, “What if?”, “Compare…”, “What should I do?”* with tool-backed reasoning.
+**Purpose:** Answer _“Why?”, “What if?”, “Compare…”, “What should I do?”_ with tool-backed reasoning.
 
 ### Layout
 

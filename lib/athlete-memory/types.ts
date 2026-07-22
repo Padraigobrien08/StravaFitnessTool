@@ -1,11 +1,5 @@
 export type BeliefCategory =
-  | "adaptation"
-  | "fatigue"
-  | "pacing"
-  | "taper"
-  | "modality"
-  | "durability"
-  | "recovery";
+  "adaptation" | "fatigue" | "pacing" | "taper" | "modality" | "durability" | "recovery";
 
 export type BeliefConfidence = "low" | "medium" | "high";
 
@@ -50,9 +44,7 @@ export interface AthleteMemoryProfile {
 
 export interface MemoryUpdateEvidence {
   observedAt: string;
-  supporting?: Partial<
-    Record<BeliefCategory, string[]>
-  >;
+  supporting?: Partial<Record<BeliefCategory, string[]>>;
   contradicting?: Partial<Record<BeliefCategory, string[]>>;
   newBeliefCandidates?: AthleteBelief[];
 }

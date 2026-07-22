@@ -5,28 +5,17 @@ import { weekStartKey } from "@/lib/analytics/week";
 import { buildRecentWeeks } from "@/lib/ecosystem/aggregates";
 import { collectInterferenceFlags } from "@/lib/ecosystem/interference";
 import type { RaceGoal } from "@/lib/analytics/readiness";
-import type {
-  NotableSession,
-  RecentTrainingBlock,
-  RecentTrainingWeek,
-} from "./types";
+import type { NotableSession, RecentTrainingBlock, RecentTrainingWeek } from "./types";
 
 const MAX_NOTABLE = 5;
 const MAX_WEEKS = 4;
 
 function longRunKm(runs: RunActivity[]): number {
   if (!runs.length) return 0;
-  return (
-    Math.round(
-      Math.max(...runs.map((r) => r.distanceM / 1000)) * 10
-    ) / 10
-  );
+  return Math.round(Math.max(...runs.map((r) => r.distanceM / 1000)) * 10) / 10;
 }
 
-function weekChangeNotes(
-  prev: RecentTrainingWeek | undefined,
-  cur: RecentTrainingWeek
-): string[] {
+function weekChangeNotes(prev: RecentTrainingWeek | undefined, cur: RecentTrainingWeek): string[] {
   if (!prev) return [];
   const notes: string[] = [];
   const dKm = cur.runDistanceKm - prev.runDistanceKm;
@@ -34,7 +23,7 @@ function weekChangeNotes(
     notes.push(
       dKm > 0
         ? `Run volume up ~${Math.round(dKm)} km vs prior week`
-        : `Run volume down ~${Math.round(Math.abs(dKm))} km vs prior week`
+        : `Run volume down ~${Math.round(Math.abs(dKm))} km vs prior week`,
     );
   }
   if (cur.hardRunCount > prev.hardRunCount + 1) {
@@ -49,10 +38,7 @@ function weekChangeNotes(
   return notes;
 }
 
-function restDaysEstimate(
-  weekStart: string,
-  activityDates: Set<string>
-): number {
+function restDaysEstimate(weekStart: string, activityDates: Set<string>): number {
   const start = parseISO(weekStart);
   let rest = 0;
   for (let i = 0; i < 7; i++) {
@@ -73,15 +59,11 @@ export function buildRecentTrainingBlock(params: {
   const windowDays = params.windowDays ?? 28;
   const cutoff = ref.getTime() - windowDays * 86400000;
 
-  const runsInWindow = params.runs.filter(
-    (r) => parseISO(r.date).getTime() >= cutoff
-  );
+  const runsInWindow = params.runs.filter((r) => parseISO(r.date).getTime() >= cutoff);
 
   const activities = params.normalizedActivities ?? [];
   const flags = collectInterferenceFlags(activities, params.raceGoal ?? null);
-  const ecoWeeks = activities.length
-    ? buildRecentWeeks(activities, flags, 12)
-    : [];
+  const ecoWeeks = activities.length ? buildRecentWeeks(activities, flags, 12) : [];
 
   const weekKeys = new Set<string>();
   for (const r of runsInWindow) {
@@ -101,9 +83,10 @@ export function buildRecentTrainingBlock(params: {
     runsByWeek.set(k, list);
   }
 
-  const activityDates = new Set(
-    [...runsInWindow.map((r) => r.date.slice(0, 10)), ...activities.map((a) => a.startDate.slice(0, 10))]
-  );
+  const activityDates = new Set([
+    ...runsInWindow.map((r) => r.date.slice(0, 10)),
+    ...activities.map((a) => a.startDate.slice(0, 10)),
+  ]);
 
   const weeks: RecentTrainingWeek[] = [];
   let prev: RecentTrainingWeek | undefined;
@@ -112,10 +95,7 @@ export function buildRecentTrainingBlock(params: {
     const eco = ecoWeeks.find((w) => w.weekStart === weekStart);
     const weekRuns = runsByWeek.get(weekStart) ?? [];
     const hardRuns = weekRuns.filter(
-      (r) =>
-        (r.avgHr ?? 0) > 0 &&
-        (r.maxHr ?? 0) > 0 &&
-        r.avgHr! / r.maxHr! >= 0.88
+      (r) => (r.avgHr ?? 0) > 0 && (r.maxHr ?? 0) > 0 && r.avgHr! / r.maxHr! >= 0.88,
     );
     const hardCount = eco?.runHardCount ?? hardRuns.length;
 
@@ -128,14 +108,12 @@ export function buildRecentTrainingBlock(params: {
       runCount: eco?.runCount ?? weekRuns.length,
       hardRunCount: hardCount,
       longRunDistanceKm: longRunKm(weekRuns),
-      totalTrainingMinutes: eco?.totalTrainingMinutes ?? Math.round(
-        weekRuns.reduce((s, r) => s + r.movingSec / 60, 0)
-      ),
+      totalTrainingMinutes:
+        eco?.totalTrainingMinutes ?? Math.round(weekRuns.reduce((s, r) => s + r.movingSec / 60, 0)),
       strengthSessions: eco?.strengthSessions ?? 0,
       mobilitySessions: eco?.mobilitySessions ?? 0,
       crossTrainingMinutes: eco?.totalNonRunMinutes ?? 0,
-      highIntensityNonRunSessions:
-        (eco?.hiitSessions ?? 0) + (eco?.sportSessions ?? 0),
+      highIntensityNonRunSessions: (eco?.hiitSessions ?? 0) + (eco?.sportSessions ?? 0),
       restDaysEstimate: restDaysEstimate(weekStart, activityDates),
       changeNotes: [],
     };
@@ -153,10 +131,7 @@ export function buildRecentTrainingBlock(params: {
 
   const keyChanges = weeks.flatMap((w) => w.changeNotes).slice(-6);
 
-  const notableSessions = pickNotableSessions(runsInWindow, activities).slice(
-    0,
-    MAX_NOTABLE
-  );
+  const notableSessions = pickNotableSessions(runsInWindow, activities).slice(0, MAX_NOTABLE);
 
   return {
     windowDays,
@@ -169,12 +144,12 @@ export function buildRecentTrainingBlock(params: {
 
 function pickNotableSessions(
   runs: RunActivity[],
-  activities: NormalizedActivity[]
+  activities: NormalizedActivity[],
 ): NotableSession[] {
   const out: NotableSession[] = [];
 
   const sortedRuns = [...runs].sort(
-    (a, b) => b.distanceM - a.distanceM || b.movingSec - a.movingSec
+    (a, b) => b.distanceM - a.distanceM || b.movingSec - a.movingSec,
   );
   for (const r of sortedRuns.slice(0, 3)) {
     const km = Math.round((r.distanceM / 1000) * 10) / 10;
@@ -197,13 +172,9 @@ function pickNotableSessions(
     .filter(
       (a) =>
         a.modality !== "run" &&
-        (a.perceivedIntensity === "high" ||
-          a.modality === "high_intensity_cross_training")
+        (a.perceivedIntensity === "high" || a.modality === "high_intensity_cross_training"),
     )
-    .sort(
-      (a, b) =>
-        parseISO(b.startDate).getTime() - parseISO(a.startDate).getTime()
-    );
+    .sort((a, b) => parseISO(b.startDate).getTime() - parseISO(a.startDate).getTime());
   for (const a of hardNonRun.slice(0, 2)) {
     out.push({
       date: a.startDate.slice(0, 10),
@@ -214,21 +185,19 @@ function pickNotableSessions(
     });
   }
 
-  return out.sort(
-    (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
-  );
+  return out.sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
 }
 
 /** Rolling snapshots for 7/14/21/28 day windows (compact summaries). */
 export function buildRollingWindowSummaries(
-  block: RecentTrainingBlock
+  block: RecentTrainingBlock,
 ): { days: number; summary: string }[] {
   const windows = [7, 14, 21, 28].filter((d) => d <= block.windowDays);
   const ref = new Date();
   return windows.map((days) => {
     const cutoff = ref.getTime() - days * 86400000;
     const relevant = block.weeks.filter(
-      (w) => parseISO(w.weekStart).getTime() + 7 * 86400000 >= cutoff
+      (w) => parseISO(w.weekStart).getTime() + 7 * 86400000 >= cutoff,
     );
     const km = relevant.reduce((s, w) => s + w.runDistanceKm, 0);
     const runs = relevant.reduce((s, w) => s + w.runCount, 0);

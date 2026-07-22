@@ -11,7 +11,7 @@ export function buildIntelligenceBrief(
   analytics: DashboardInsights,
   insights: Insight[],
   quality: ImportQualityReport,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): IntelligenceBrief {
   const training = buildTrainingPageView(analytics, insights);
   const goals = buildGoalsPageView(analytics, raceGoal, insights);
@@ -19,9 +19,7 @@ export function buildIntelligenceBrief(
   const plan = analytics.nextWeekPlan;
 
   const fitPct =
-    quality.runCount > 0
-      ? Math.round((quality.fitParsed / quality.runCount) * 100)
-      : 0;
+    quality.runCount > 0 ? Math.round((quality.fitParsed / quality.runCount) * 100) : 0;
 
   const lo = Math.round(plan.totalKmRange[0] * 10) / 10;
   const hi = Math.round(plan.totalKmRange[1] * 10) / 10;
@@ -29,10 +27,7 @@ export function buildIntelligenceBrief(
   const predictions = analytics.racePredictionAnalysis.consensus.map((c) => ({
     label: c.label,
     time: formatDuration(c.timeSec),
-    spread:
-      c.spreadSec > 45
-        ? `±${formatDuration(Math.round(c.spreadSec / 2))}`
-        : "narrow",
+    spread: c.spreadSec > 45 ? `±${formatDuration(Math.round(c.spreadSec / 2))}` : "narrow",
   }));
 
   const limitations = [

@@ -42,7 +42,7 @@ async function main() {
       pr.runName.slice(0, 40),
       `${Math.floor(pr.timeSec / 60)}:${String(Math.round(pr.timeSec % 60)).padStart(2, "0")}`,
       `pace ${Math.floor(pr.paceSecPerKm / 60)}:${String(Math.round(pr.paceSecPerKm % 60)).padStart(2, "0")}/km`,
-      pr.source
+      pr.source,
     );
   }
 }

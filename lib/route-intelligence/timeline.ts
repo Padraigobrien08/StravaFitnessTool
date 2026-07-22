@@ -3,9 +3,7 @@ import type { FitLap } from "@/lib/strava/fitTypes";
 import { interpolateAtTime } from "./interpolate";
 import type { TimelinePoint } from "./types";
 
-export function buildTimelineFromStreams(
-  fit: FitRunDetail
-): TimelinePoint[] {
+export function buildTimelineFromStreams(fit: FitRunDetail): TimelinePoint[] {
   const gps = fit.gpsStream ?? [];
   if (gps.length === 0) return [];
 
@@ -14,11 +12,7 @@ export function buildTimelineFromStreams(
     lat: g.lat,
     lon: g.lon,
     elevationM: g.elevationM ?? null,
-    paceSecPerKm: interpolateAtTime(
-      fit.paceStream,
-      g.elapsedSec,
-      (p) => p.paceSecPerKm
-    ),
+    paceSecPerKm: interpolateAtTime(fit.paceStream, g.elapsedSec, (p) => p.paceSecPerKm),
     hr: interpolateAtTime(fit.hrStream, g.elapsedSec, (p) => p.hr),
     cadence: interpolateAtTime(fit.cadenceStream, g.elapsedSec, (p) => p.cadence),
   }));

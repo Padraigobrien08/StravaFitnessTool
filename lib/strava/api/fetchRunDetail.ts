@@ -1,9 +1,6 @@
 import { getValidAccessToken } from "@/lib/db/strava-connection";
 import { upsertFitDetail, getFitDetailForUser } from "@/lib/db/activity-streams";
-import {
-  fetchActivityLaps,
-  fetchActivityStreams,
-} from "@/lib/strava/api/fetchStreams";
+import { fetchActivityLaps, fetchActivityStreams } from "@/lib/strava/api/fetchStreams";
 import { mapStravaStreamsToFitDetail } from "@/lib/strava/api/mapToFitDetail";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import {
@@ -16,7 +13,7 @@ import {
 export async function loadOrFetchFitDetailForRun(
   userId: string,
   activityId: string,
-  options?: { forceRefresh?: boolean }
+  options?: { forceRefresh?: boolean },
 ): Promise<FitRunDetail | null> {
   const cached = await getFitDetailForUser(userId, activityId);
   const id = Number(activityId);

@@ -4,7 +4,7 @@ import type { CalendarWorkout } from "./types";
 export function swapWorkoutSlots(
   workouts: CalendarWorkout[],
   fromId: string,
-  toId: string
+  toId: string,
 ): CalendarWorkout[] | null {
   const fromIdx = workouts.findIndex((w) => w.id === fromId);
   const toIdx = workouts.findIndex((w) => w.id === toId);

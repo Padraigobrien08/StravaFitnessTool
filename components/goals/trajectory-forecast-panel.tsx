@@ -27,8 +27,7 @@ export function TrajectoryForecastPanel({
     return (
       <PanelChrome title="Trajectory & forecasting" subdued>
         <p className="text-sm text-zinc-500">
-          Need more history — predictions are sampled every four weeks once
-          enough training exists.
+          Need more history — predictions are sampled every four weeks once enough training exists.
         </p>
       </PanelChrome>
     );
@@ -48,9 +47,7 @@ export function TrajectoryForecastPanel({
       <div className="rounded-lg bg-white/[0.02] px-2 py-3 ring-1 ring-inset ring-white/[0.04]">
         <PredictionTrendChart
           timeline={timeline}
-          seriesKeys={
-            goalDistance ? GOAL_SERIES[goalDistance] : undefined
-          }
+          seriesKeys={goalDistance ? GOAL_SERIES[goalDistance] : undefined}
         />
       </div>
     </PanelChrome>

@@ -14,14 +14,13 @@ describe("planning intent routing", () => {
   it("detects race week plan", () => {
     const r = classifyPlanningMessage("Plan my race week", false);
     expect(r?.kind).toBe("generate");
-    expect(r?.kind === "generate" && r.args.constraints?.some((c) => /taper|race/i.test(c))).toBe(true);
+    expect(r?.kind === "generate" && r.args.constraints?.some((c) => /taper|race/i.test(c))).toBe(
+      true,
+    );
   });
 
   it("detects HM goal phrasing", () => {
-    const r = classifyPlanningMessage(
-      "What should I train next week given my HM goal?",
-      false
-    );
+    const r = classifyPlanningMessage("What should I train next week given my HM goal?", false);
     expect(r?.kind).toBe("generate");
   });
 
@@ -36,16 +35,12 @@ describe("planning intent routing", () => {
   });
 
   it("parses limited days", () => {
-    const args = parseToolInputFromMessage(
-      "I only have 4 days available next week"
-    );
+    const args = parseToolInputFromMessage("I only have 4 days available next week");
     expect(args.constraints?.some((c) => /4 training days/i.test(c))).toBe(true);
   });
 
   it("parses available day list", () => {
-    const args = parseToolInputFromMessage(
-      "I can only train Mon/Wed/Fri/Sun"
-    );
+    const args = parseToolInputFromMessage("I can only train Mon/Wed/Fri/Sun");
     expect(args.availableDays?.length).toBeGreaterThanOrEqual(3);
   });
 
@@ -57,9 +52,7 @@ describe("planning intent routing", () => {
 
   it("routes remove strength follow-up", () => {
     const r = classifyPlanningMessage("Remove strength", true);
-    expect(r?.kind === "modify" && r?.modification === "remove_strength").toBe(
-      true
-    );
+    expect(r?.kind === "modify" && r?.modification === "remove_strength").toBe(true);
   });
 
   it("routes explain taper", () => {

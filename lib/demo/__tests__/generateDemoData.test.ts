@@ -42,9 +42,7 @@ describe("buildDemoImport", () => {
   });
 
   it("seeds cross-training across multiple modalities for the ecosystem", () => {
-    const nonRun = demo.allActivities.filter(
-      (a) => a.type !== "Run" && a.type !== "TrailRun"
-    );
+    const nonRun = demo.allActivities.filter((a) => a.type !== "Run" && a.type !== "TrailRun");
     expect(nonRun.length).toBeGreaterThanOrEqual(6);
     expect(new Set(nonRun.map((a) => a.type)).size).toBeGreaterThanOrEqual(2);
   });

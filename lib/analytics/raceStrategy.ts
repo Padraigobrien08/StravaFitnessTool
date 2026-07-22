@@ -46,7 +46,7 @@ function segmentMultipliers(
   distanceKm: number,
   midKm: number,
   kmEnd: number,
-  applyDrift: boolean
+  applyDrift: boolean,
 ): number {
   const isSecondHalf = kmEnd > midKm;
   if (mode === "even") {
@@ -66,7 +66,7 @@ function segmentMultipliers(
 export function buildSplitPlan(
   distanceKm: number,
   targetTimeSec: number,
-  mode: StrategyMode
+  mode: StrategyMode,
 ): SplitPoint[] {
   const markers = splitMarkers(distanceKm);
   const basePace = targetTimeSec / distanceKm;
@@ -125,7 +125,7 @@ export function fadeRiskScore(
   exponent: number | null,
   tsb: number,
   longestRunKm: number,
-  raceDistanceKm: number
+  raceDistanceKm: number,
 ): { level: "low" | "medium" | "high"; factors: string[] } {
   const factors: string[] = [];
   let score = 0;
@@ -134,14 +134,14 @@ export function fadeRiskScore(
   if (longestRatio < 0.8) {
     score += 35;
     factors.push(
-      `Longest run ${longestRunKm.toFixed(1)} km is ${Math.round(longestRatio * 100)}% of race distance — pacing conservatively is safer.`
+      `Longest run ${longestRunKm.toFixed(1)} km is ${Math.round(longestRatio * 100)}% of race distance — pacing conservatively is safer.`,
     );
   }
 
   if (exponent !== null && exponent > 1.08) {
     score += 30;
     factors.push(
-      `Your performance curve exponent (${exponent.toFixed(2)}) suggests pace fades as distance grows.`
+      `Your performance curve exponent (${exponent.toFixed(2)}) suggests pace fades as distance grows.`,
     );
   }
 
@@ -157,8 +157,7 @@ export function fadeRiskScore(
     factors.push("Long run and freshness support your target pacing plan.");
   }
 
-  const level: "low" | "medium" | "high" =
-    score >= 50 ? "high" : score >= 25 ? "medium" : "low";
+  const level: "low" | "medium" | "high" = score >= 50 ? "high" : score >= 25 ? "medium" : "low";
 
   return { level, factors };
 }
@@ -182,19 +181,19 @@ function strategyNarrative(mode: StrategyMode, fade: "low" | "medium" | "high"):
   const lines: string[] = [];
   if (mode === "even") {
     lines.push(
-      "Even-split plan: steady effort with a slight slowdown built into the second half for races 15 km+."
+      "Even-split plan: steady effort with a slight slowdown built into the second half for races 15 km+.",
     );
   } else if (mode === "negative") {
     lines.push(
-      "Negative-split plan: controlled first half (~3% slower than even), then ~3% faster second half."
+      "Negative-split plan: controlled first half (~3% slower than even), then ~3% faster second half.",
     );
   } else if (mode === "conservative") {
     lines.push(
-      "Conservative plan: easier first half (+3% vs even), only modest pickup after halfway."
+      "Conservative plan: easier first half (+3% vs even), only modest pickup after halfway.",
     );
   } else {
     lines.push(
-      "Aggressive plan: faster first half (~6% quicker than even), expect heavier fade risk late."
+      "Aggressive plan: faster first half (~6% quicker than even), expect heavier fade risk late.",
     );
   }
   if (fade === "high") {
@@ -210,12 +209,10 @@ export function simulateRaceStrategy(
   prediction: RacePredictionAnalysis,
   fatigue: FatigueSnapshot,
   readiness: RaceReadiness | null,
-  strategy: StrategyMode = "even"
+  strategy: StrategyMode = "even",
 ): RaceStrategy | null {
   const cfg = RACE_READINESS_CONFIG[goal.distance];
-  const consensus = prediction.consensus.find(
-    (c) => c.label === cfg.consensusLabel
-  );
+  const consensus = prediction.consensus.find((c) => c.label === cfg.consensusLabel);
 
   const targetTimeSec = goal.targetTimeSec ?? consensus?.timeSec ?? 0;
   const targetTimeSource = goal.targetTimeSec
@@ -227,18 +224,14 @@ export function simulateRaceStrategy(
   if (targetTimeSec <= 0) return null;
 
   const longestRunKm =
-    readiness?.longestRunKm ??
-    prediction.efforts.reduce(
-      (m, e) => Math.max(m, e.distanceKm),
-      0
-    );
+    readiness?.longestRunKm ?? prediction.efforts.reduce((m, e) => Math.max(m, e.distanceKm), 0);
 
   const exponent = prediction.regression?.exponent ?? null;
   const { level: fadeRisk, factors } = fadeRiskScore(
     exponent,
     fatigue.tsb,
     longestRunKm,
-    cfg.raceDistanceKm
+    cfg.raceDistanceKm,
   );
 
   const splits = buildSplitPlan(cfg.raceDistanceKm, targetTimeSec, strategy);
@@ -248,7 +241,7 @@ export function simulateRaceStrategy(
     const gap = goal.targetTimeSec - consensus.timeSec;
     if (gap < -consensus.spreadSec * 0.5) {
       warnings.push(
-        "Goal time is faster than consensus predictions — aggressive unless recent workouts support it."
+        "Goal time is faster than consensus predictions — aggressive unless recent workouts support it.",
       );
     }
   }

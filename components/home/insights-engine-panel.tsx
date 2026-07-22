@@ -6,11 +6,7 @@ import { IntelligenceFeedCard } from "./intelligence-feed-card";
 import { ops } from "./primitives/tokens";
 import { cn } from "@/lib/utils";
 
-export function InsightsEnginePanel({
-  rows,
-}: {
-  rows: InsightRowViewModel[];
-}) {
+export function InsightsEnginePanel({ rows }: { rows: InsightRowViewModel[] }) {
   const risks = rows.filter((r) => r.kind === "risk");
   const opportunities = rows.filter((r) => r.kind === "opportunity");
 
@@ -23,8 +19,8 @@ export function InsightsEnginePanel({
       className={cn(ops.intelMain)}
     >
       <p className="mb-4 max-w-3xl text-xs leading-relaxed text-zinc-500 sm:text-sm">
-        Personalized coaching signals from load, efficiency, and goals — synthesized
-        for your current training block.
+        Personalized coaching signals from load, efficiency, and goals — synthesized for your
+        current training block.
       </p>
 
       {risks.length > 0 ? (

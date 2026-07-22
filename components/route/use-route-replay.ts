@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  advanceReplay,
-  clampReplayTime,
-  createReplayState,
-} from "@/lib/route-intelligence/replay";
+import { advanceReplay, clampReplayTime, createReplayState } from "@/lib/route-intelligence/replay";
 
 export function useRouteReplay(durationSec: number) {
   const [state, setState] = useState(() => createReplayState(durationSec));

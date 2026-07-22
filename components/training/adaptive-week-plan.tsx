@@ -6,13 +6,7 @@ import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { AdaptiveWeekPlanView } from "@/lib/training/viewModels";
 import { cn } from "@/lib/utils";
-import {
-  ArrowRight,
-  TrendingDown,
-  TrendingUp,
-  Minus,
-  AlertTriangle,
-} from "lucide-react";
+import { ArrowRight, TrendingDown, TrendingUp, Minus, AlertTriangle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
@@ -75,15 +69,14 @@ export function AdaptiveWeekPlan({
         return next;
       });
     },
-    [weekStart, plan.sessions.length]
+    [weekStart, plan.sessions.length],
   );
 
-  const LoadIcon =
-    plan.loadVsLastWeek?.startsWith("+")
-      ? TrendingUp
-      : plan.loadVsLastWeek?.startsWith("-")
-        ? TrendingDown
-        : Minus;
+  const LoadIcon = plan.loadVsLastWeek?.startsWith("+")
+    ? TrendingUp
+    : plan.loadVsLastWeek?.startsWith("-")
+      ? TrendingDown
+      : Minus;
 
   return (
     <PanelChrome title="Recommended next week" href="/report" accent elevated>
@@ -115,8 +108,7 @@ export function AdaptiveWeekPlan({
 
       <div className="mb-4 flex flex-wrap gap-4 text-xs text-zinc-500">
         <span>
-          Est. load{" "}
-          <strong className="text-zinc-300">{plan.estimatedLoad}</strong>
+          Est. load <strong className="text-zinc-300">{plan.estimatedLoad}</strong>
         </span>
         {plan.loadVsLastWeek ? (
           <span className="inline-flex items-center gap-1">
@@ -139,7 +131,7 @@ export function AdaptiveWeekPlan({
             className={cn(
               "flex gap-3 px-3 py-3.5 transition-colors sm:px-4",
               checked[i] && "bg-teal-500/[0.04]",
-              s.isKey && !checked[i] && "bg-white/[0.02]"
+              s.isKey && !checked[i] && "bg-white/[0.02]",
             )}
           >
             <Checkbox
@@ -150,20 +142,16 @@ export function AdaptiveWeekPlan({
             />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="w-8 shrink-0 text-xs font-semibold text-zinc-500">
-                  {s.day}
-                </span>
+                <span className="w-8 shrink-0 text-xs font-semibold text-zinc-500">{s.day}</span>
                 <span
                   className={cn(
                     "rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset",
-                    typeStyles[s.type]
+                    typeStyles[s.type],
                   )}
                 >
                   {WORKOUT_TYPE_LABELS[s.type]}
                 </span>
-                <span className="text-xs tabular-nums text-zinc-400">
-                  {s.kmRange}
-                </span>
+                <span className="text-xs tabular-nums text-zinc-400">{s.kmRange}</span>
                 <span className="ml-auto text-[10px] tabular-nums text-zinc-600">
                   L{s.loadScore}
                 </span>
@@ -180,10 +168,7 @@ export function AdaptiveWeekPlan({
       {plan.warnings.length > 0 ? (
         <ul className="mt-3 space-y-1.5">
           {plan.warnings.map((w, i) => (
-            <li
-              key={i}
-              className="flex items-start gap-2 text-xs text-amber-400/90"
-            >
+            <li key={i} className="flex items-start gap-2 text-xs text-amber-400/90">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
               {w}
             </li>

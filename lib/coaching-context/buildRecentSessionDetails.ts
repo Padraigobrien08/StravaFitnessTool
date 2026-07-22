@@ -18,9 +18,7 @@ export function buildRecentSessionDetails(params: {
   const windowDays = params.windowDays ?? DEFAULT_WINDOW_DAYS;
   const cutoff = Date.now() - windowDays * 86400000;
 
-  const fitById = new Map(
-    (params.fitDetails ?? []).map((f) => [f.activityId, f])
-  );
+  const fitById = new Map((params.fitDetails ?? []).map((f) => [f.activityId, f]));
 
   const recent = [...params.runs]
     .filter((r) => new Date(r.date).getTime() >= cutoff)
@@ -28,11 +26,6 @@ export function buildRecentSessionDetails(params: {
     .slice(0, limit);
 
   return recent.map((run) =>
-    buildRunCoachDetail(
-      run,
-      fitById.get(run.id) ?? null,
-      params.analytics,
-      params.runs
-    )
+    buildRunCoachDetail(run, fitById.get(run.id) ?? null, params.analytics, params.runs),
   );
 }

@@ -14,11 +14,7 @@ const categoryAccent: Record<string, string> = {
   race_execution: "border-l-amber-500/45",
 };
 
-export function AchievementTimeline({
-  milestones,
-}: {
-  milestones: AchievementMilestoneView[];
-}) {
+export function AchievementTimeline({ milestones }: { milestones: AchievementMilestoneView[] }) {
   const grouped = ["speed", "endurance", "consistency", "race_execution"] as const;
 
   return (
@@ -29,8 +25,7 @@ export function AchievementTimeline({
 
       {milestones.length === 0 ? (
         <p className="text-sm text-zinc-500">
-          No milestones detected yet. Timed efforts and consistent blocks will
-          populate this feed.
+          No milestones detected yet. Timed efforts and consistent blocks will populate this feed.
         </p>
       ) : (
         <div className="space-y-6">
@@ -48,7 +43,7 @@ export function AchievementTimeline({
                       key={m.id}
                       className={cn(
                         "rounded-xl border border-white/[0.05] border-l-[3px] bg-white/[0.02] px-4 py-3.5 transition-colors hover:bg-white/[0.035]",
-                        categoryAccent[m.category]
+                        categoryAccent[m.category],
                       )}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-2">

@@ -8,12 +8,12 @@ export interface RouteExportResult {
 
 export async function exportRouteGpx(
   accessToken: string,
-  routeId: number
+  routeId: number,
 ): Promise<RouteExportResult> {
   const text = await stravaGetText(
     accessToken,
     `/routes/${routeId}/export_gpx`,
-    `export gpx route ${routeId}`
+    `export gpx route ${routeId}`,
   );
   return {
     filename: `route-${routeId}.gpx`,
@@ -24,12 +24,12 @@ export async function exportRouteGpx(
 
 export async function exportRouteTcx(
   accessToken: string,
-  routeId: number
+  routeId: number,
 ): Promise<RouteExportResult> {
   const text = await stravaGetText(
     accessToken,
     `/routes/${routeId}/export_tcx`,
-    `export tcx route ${routeId}`
+    `export tcx route ${routeId}`,
   );
   return {
     filename: `route-${routeId}.tcx`,

@@ -11,13 +11,11 @@ export function assessSpecificity(input: RaceForecastInput): SpecificityAssessme
   let score = 50;
 
   const relevantEfforts = efforts.filter(
-    (e) => distanceRelevanceWeight(e.distanceKm, targetKm) >= 0.55
+    (e) => distanceRelevanceWeight(e.distanceKm, targetKm) >= 0.55,
   );
   if (relevantEfforts.length >= 3) {
     score += 22;
-    evidence.push(
-      `${relevantEfforts.length} efforts within relevant distance band for target.`
-    );
+    evidence.push(`${relevantEfforts.length} efforts within relevant distance band for target.`);
   } else if (relevantEfforts.length === 0) {
     score -= 25;
     gaps.push("No race-quality efforts near target distance.");
@@ -27,8 +25,7 @@ export function assessSpecificity(input: RaceForecastInput): SpecificityAssessme
   }
 
   const recentVol = blocks[blocks.length - 1]?.distanceKm ?? 0;
-  const targetVol =
-    targetKm >= 35 ? 200 : targetKm >= 18 ? 140 : targetKm >= 9 ? 55 : 35;
+  const targetVol = targetKm >= 35 ? 200 : targetKm >= 18 ? 140 : targetKm >= 9 ? 55 : 35;
   const volRatio = targetVol > 0 ? recentVol / targetVol : 0;
   if (volRatio >= 0.75 && volRatio <= 1.25) {
     score += 14;
@@ -51,7 +48,7 @@ export function assessSpecificity(input: RaceForecastInput): SpecificityAssessme
   if (nearRaceEfforts.length > 0) {
     score += 28;
     evidence.push(
-      `${nearRaceEfforts.length} effort(s) at or near race distance (≥90% of ${targetKm.toFixed(1)} km).`
+      `${nearRaceEfforts.length} effort(s) at or near race distance (≥90% of ${targetKm.toFixed(1)} km).`,
     );
   }
 
@@ -59,7 +56,7 @@ export function assessSpecificity(input: RaceForecastInput): SpecificityAssessme
   if (maxAnchor < targetKm * 0.35 && targetKm >= 15) {
     score -= 15;
     gaps.push(
-      `Strong short-distance anchors (${maxAnchor.toFixed(1)} km max) predicting ${targetKm.toFixed(1)} km.`
+      `Strong short-distance anchors (${maxAnchor.toFixed(1)} km max) predicting ${targetKm.toFixed(1)} km.`,
     );
   }
 

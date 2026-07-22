@@ -41,8 +41,8 @@ describe("raceReadiness", () => {
         mockRun(
           String(i),
           new Date(Date.now() - i * 2 * 86400000).toISOString().slice(0, 10),
-          i === 0 ? 20 : 12
-        )
+          i === 0 ? 20 : 12,
+        ),
       );
     }
     const analysis = buildRacePredictionAnalysis(runs, []);
@@ -52,7 +52,7 @@ describe("raceReadiness", () => {
       runs,
       { distance: "hm", date: future.toISOString().slice(0, 10) },
       [],
-      analysis
+      analysis,
     );
     expect(readiness.score).toBeGreaterThanOrEqual(80);
     expect(readiness.daysUntilRace).toBeGreaterThanOrEqual(20);
@@ -62,9 +62,7 @@ describe("raceReadiness", () => {
   it("long-run percent uses race distance not training benchmark", () => {
     const raceKm = RACE_READINESS_CONFIG.hm.raceDistanceKm;
     expect(longRunPercentOfRace(20.5, raceKm)).toBe(97);
-    expect(formatLongRunVsRace(20.5, raceKm)).toBe(
-      "20.5 km (97% of 21.1 km race)"
-    );
+    expect(formatLongRunVsRace(20.5, raceKm)).toBe("20.5 km (97% of 21.1 km race)");
   });
 
   it("halfMarathonReadiness matches legacy shape", () => {

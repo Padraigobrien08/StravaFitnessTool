@@ -4,10 +4,7 @@ import { useMemo } from "react";
 import type { CoachWorkspaceState } from "@/lib/coach/types";
 import type { CoachMessage } from "@/lib/coach/types";
 import { parseCoachResponse } from "@/lib/coach/parseResponse";
-import {
-  CoachConversationTurn,
-  CoachUserTurn,
-} from "./coach-conversation-turn";
+import { CoachConversationTurn, CoachUserTurn } from "./coach-conversation-turn";
 import { WeeklyPlanResponse } from "./weekly-plan-response";
 import { CoachComposer } from "./coach-composer";
 import { CoachAnalysisLoader } from "./coach-analysis-loader";
@@ -20,9 +17,7 @@ function pairMessages(messages: CoachMessage[]) {
   for (let i = 0; i < messages.length; i++) {
     const m = messages[i];
     if (m.role !== "user") continue;
-    const assistant = messages
-      .slice(i + 1)
-      .find((x) => x.role === "assistant");
+    const assistant = messages.slice(i + 1).find((x) => x.role === "assistant");
     pairs.push({ user: m, assistant });
   }
   return pairs;
@@ -89,16 +84,12 @@ export function CoachReasoningPanel({
                 {pairs.length > 1 ? (
                   <p className="mb-6 text-[12px] text-zinc-600">
                     {pairs.length} exchanges
-                    {workspace.continuityLine
-                      ? ` · ${workspace.continuityLine}`
-                      : ""}
+                    {workspace.continuityLine ? ` · ${workspace.continuityLine}` : ""}
                   </p>
                 ) : null}
 
                 {liveSignal && !loading ? (
-                  <p className="mb-5 text-[12px] text-zinc-500">
-                    Signal update: {liveSignal}
-                  </p>
+                  <p className="mb-5 text-[12px] text-zinc-500">Signal update: {liveSignal}</p>
                 ) : null}
 
                 <div className="coach-thread">
@@ -112,21 +103,17 @@ export function CoachReasoningPanel({
                         <div className="mt-5 space-y-4">
                           <CoachConversationTurn
                             parsed={
-                              pair.assistant.parsed ??
-                              parseCoachResponse(pair.assistant.content)
+                              pair.assistant.parsed ?? parseCoachResponse(pair.assistant.content)
                             }
                             toolsUsed={pair.assistant.toolsUsed}
                             onFollowUp={onSend}
                             showFollowUps={
-                              i === pairs.length - 1 && !loading &&
-                              !pair.assistant.weeklyPlan
+                              i === pairs.length - 1 && !loading && !pair.assistant.weeklyPlan
                             }
                             animate={i === pairs.length - 1}
                           />
                           {pair.assistant.weeklyPlan ? (
-                            <WeeklyPlanResponse
-                              result={pair.assistant.weeklyPlan}
-                            />
+                            <WeeklyPlanResponse result={pair.assistant.weeklyPlan} />
                           ) : null}
                         </div>
                       ) : null}
@@ -137,24 +124,15 @@ export function CoachReasoningPanel({
             )}
 
             {loading ? (
-              <div
-                className={
-                  hasConversation ? "coach-exchange py-6" : "mt-6 py-2"
-                }
-              >
+              <div className={hasConversation ? "coach-exchange py-6" : "mt-6 py-2"}>
                 <CoachAnalysisLoader activeTools={pendingTools} />
               </div>
             ) : null}
 
-            {error ? (
-              <p className="mt-6 text-sm text-red-400/90">{error}</p>
-            ) : null}
+            {error ? <p className="mt-6 text-sm text-red-400/90">{error}</p> : null}
 
             <p className="mt-8 pb-2 text-[11px] text-zinc-700">
-              <Link
-                href={intelligenceUrl()}
-                className="text-zinc-600 hover:text-zinc-400"
-              >
+              <Link href={intelligenceUrl()} className="text-zinc-600 hover:text-zinc-400">
                 Intelligence model
               </Link>
             </p>

@@ -20,7 +20,7 @@ export function hrCoveragePct(runs: RunActivity[]): number {
 
 export function easyHardLast14Days(
   runs: RunActivity[],
-  athleteMaxHr: number
+  athleteMaxHr: number,
 ): { easy: number; hard: number; easyPct: number } {
   const cutoff = subDays(new Date(), 14);
   const recent = runs.filter((r) => parseISO(r.date) >= cutoff);
@@ -30,7 +30,7 @@ export function easyHardLast14Days(
 export function buildIntensityAdvice(
   runs: RunActivity[],
   athleteMaxHr: number,
-  easyHardLifetime: { easy: number; hard: number; easyPct: number }
+  easyHardLifetime: { easy: number; hard: number; easyPct: number },
 ): IntensityAdvice {
   const easyTargetPct = 80;
   const easyHard14d = easyHardLast14Days(runs, athleteMaxHr);
@@ -43,7 +43,7 @@ export function buildIntensityAdvice(
 
   if (hrCoverage < 50) {
     recommendations.push(
-      "Import activities with heart rate (or FIT files) for more accurate intensity advice."
+      "Import activities with heart rate (or FIT files) for more accurate intensity advice.",
     );
   }
 
@@ -66,11 +66,11 @@ export function buildIntensityAdvice(
   if (currentEasyPct < 30 && easyHard14d.hard >= 2) {
     recommendations.push(
       "Next 7 days: cap hard sessions at 1; add 2 easy runs of 30–45 min in Z1–Z2.",
-      `${easyHard14d.hard} hard runs in the last 14 days — recovery may be lagging volume.`
+      `${easyHard14d.hard} hard runs in the last 14 days — recovery may be lagging volume.`,
     );
     suggestedWeekPlan.push(
       { type: "easy", description: "2 easy runs: 30–45 min, HR below 80% max" },
-      { type: "quality", description: "At most 1 hard session (tempo or intervals)" }
+      { type: "quality", description: "At most 1 hard session (tempo or intervals)" },
     );
     return {
       status: "too_hard",
@@ -84,11 +84,11 @@ export function buildIntensityAdvice(
 
   if (currentEasyPct >= 60) {
     recommendations.push(
-      "Polarized balance looks good — keep most runs easy and limit hard days to 1–2 per week."
+      "Polarized balance looks good — keep most runs easy and limit hard days to 1–2 per week.",
     );
     suggestedWeekPlan.push(
       { type: "easy", description: "3–4 easy aerobic runs" },
-      { type: "quality", description: "0–1 tempo or interval session if feeling fresh" }
+      { type: "quality", description: "0–1 tempo or interval session if feeling fresh" },
     );
     return {
       status: "balanced",
@@ -101,12 +101,11 @@ export function buildIntensityAdvice(
   }
 
   if (currentEasyPct < 40) {
-    recommendations.push(
-      "Add more easy volume — aim for ~80% of runs below 80% max HR."
-    );
-    suggestedWeekPlan.push(
-      { type: "easy", description: "2–3 easy runs before the next hard session" }
-    );
+    recommendations.push("Add more easy volume — aim for ~80% of runs below 80% max HR.");
+    suggestedWeekPlan.push({
+      type: "easy",
+      description: "2–3 easy runs before the next hard session",
+    });
     return {
       status: "too_hard",
       easyTargetPct,
@@ -117,9 +116,7 @@ export function buildIntensityAdvice(
     };
   }
 
-  recommendations.push(
-    "Mixed intensity — track easy days explicitly to avoid creeping fatigue."
-  );
+  recommendations.push("Mixed intensity — track easy days explicitly to avoid creeping fatigue.");
   return {
     status: "balanced",
     easyTargetPct,

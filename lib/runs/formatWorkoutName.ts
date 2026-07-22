@@ -51,9 +51,7 @@ function parsePart(part: string, index: number, total: number): WorkoutTitleSegm
 
   const durPace = t.match(/^(\d+:\d+(?::\d+)?|\d+)\s*@\s*([\d:.]+)$/);
   if (durPace) {
-    const dur = durPace[1].includes(":")
-      ? durPace[1]
-      : `${durPace[1]} min`;
+    const dur = durPace[1].includes(":") ? durPace[1] : `${durPace[1]} min`;
     return {
       label: segmentLabel(index, total, t),
       detail: `${dur} @ ${formatPaceToken(durPace[2])}`,
@@ -98,8 +96,7 @@ export function formatWorkoutTitle(name: string): FormattedWorkoutTitle {
     (trimmed.includes(",") && trimmed.length > 12);
 
   if (!hasStructure) {
-    const short =
-      trimmed.length > 48 ? `${trimmed.slice(0, 45)}…` : trimmed;
+    const short = trimmed.length > 48 ? `${trimmed.slice(0, 45)}…` : trimmed;
     return { primary: short, segments: [], isStructured: false };
   }
 
@@ -109,9 +106,7 @@ export function formatWorkoutTitle(name: string): FormattedWorkoutTitle {
     .filter(Boolean);
   const segments = parts.map((p, i) => parsePart(p, i, parts.length));
   const primary =
-    segments.length === 1
-      ? segments[0].detail
-      : segments.map((s) => s.detail).join(" · ");
+    segments.length === 1 ? segments[0].detail : segments.map((s) => s.detail).join(" · ");
 
   return {
     primary: primary.length > 56 ? `${primary.slice(0, 53)}…` : primary,

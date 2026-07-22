@@ -9,9 +9,7 @@ export function TrainingWorkspace({
   className?: string;
 }) {
   return (
-    <div className={cn(ops.dashboard, "dashboard-enter w-full pb-6", className)}>
-      {children}
-    </div>
+    <div className={cn(ops.dashboard, "dashboard-enter w-full pb-6", className)}>{children}</div>
   );
 }
 
@@ -26,7 +24,7 @@ export function TrainingIntelRow({
     <div
       className={cn(
         "grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:gap-5 lg:items-start",
-        className
+        className,
       )}
     >
       {children}

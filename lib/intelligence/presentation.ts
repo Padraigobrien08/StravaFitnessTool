@@ -20,12 +20,11 @@ export interface StateEvolutionItem {
 
 export function buildCurrentBelief(
   state: CoachWorkspaceState,
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): string {
   const snap = state.snapshot;
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
-  const ready =
-    r.label.toLowerCase().includes("ready") || r.score >= 85;
+  const ready = r.label.toLowerCase().includes("ready") || r.score >= 85;
   const freshHigh = snap.freshness != null && snap.freshness >= 60;
   const intensityHigh = analytics.intensityAdvice.status === "too_hard";
 
@@ -34,11 +33,7 @@ export function buildCurrentBelief(
   }
 
   const parts: string[] = [];
-  parts.push(
-    ready
-      ? "Race readiness is strong"
-      : `Race readiness is ${r.label.toLowerCase()}`
-  );
+  parts.push(ready ? "Race readiness is strong" : `Race readiness is ${r.label.toLowerCase()}`);
   if (snap.freshness != null && snap.freshness >= 60) {
     parts.push("freshness is high");
   } else if (snap.freshness != null && snap.freshness < 45) {
@@ -53,9 +48,7 @@ export function buildCurrentBelief(
   return parts.join(", ") + ".";
 }
 
-export function prioritizeSignals(
-  signals: IntelligenceSignal[]
-): PrioritizedSignals {
+export function prioritizeSignals(signals: IntelligenceSignal[]): PrioritizedSignals {
   if (signals.length === 0) {
     return { primary: null, secondary: [], watchlist: [] };
   }
@@ -74,9 +67,7 @@ export function prioritizeSignals(
   return { primary: primary ?? null, secondary, watchlist };
 }
 
-export function getStateEvolutionStrip(
-  analytics: DashboardInsights
-): StateEvolutionItem[] {
+export function getStateEvolutionStrip(analytics: DashboardInsights): StateEvolutionItem[] {
   const series = getTrajectorySeries(analytics);
   const items: StateEvolutionItem[] = series.map((s) => ({
     id: s.id,

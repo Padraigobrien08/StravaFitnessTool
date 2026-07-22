@@ -78,7 +78,7 @@ describe("buildNextWeekPlan", () => {
           freshness: 30,
           label: "Fatigued",
         },
-      })
+      }),
     );
     expect(plan.template).toBe("recovery");
     expect(countHardSessions(plan)).toBe(0);
@@ -106,15 +106,13 @@ describe("buildNextWeekPlan", () => {
             volumePct: 85,
             gaps: [],
           },
-        })
+        }),
       );
       expect(plan.template).toBe("race_week");
       expect(plan.sessions.some((s) => s.type === "long")).toBe(false);
       const raceSession = plan.sessions.find((s) => s.type === "race");
       expect(raceSession?.day).toBe("Sun");
-      expect(plan.sessions.find((s) => s.day === "Sun" && s.type === "recovery")).toBe(
-        undefined
-      );
+      expect(plan.sessions.find((s) => s.day === "Sun" && s.type === "recovery")).toBe(undefined);
       expect(isRaceInPlanWeek(raceDate, plan.weekStart)).toBe(true);
       const bounds = planWeekBounds(raceDate, 5);
       expect(bounds.weekLabel).toContain("May 19");
@@ -156,7 +154,7 @@ describe("buildNextWeekPlan", () => {
             volumePct: 85,
             gaps: [],
           },
-        })
+        }),
       );
       // Race falls in plan week → race_week, not generic taper
       expect(plan.template).toBe("race_week");
@@ -175,7 +173,7 @@ describe("buildNextWeekPlan", () => {
           currentEasyPct: 15,
           hardRunsLast14d: 4,
         },
-      })
+      }),
     );
     expect(plan.template).toBe("easy_reset");
     expect(countHardSessions(plan)).toBe(0);
@@ -183,8 +181,6 @@ describe("buildNextWeekPlan", () => {
 
   it("includes medical disclaimer in warnings", () => {
     const plan = buildNextWeekPlan(baseContext());
-    expect(
-      plan.warnings.some((w) => w.includes("Not a substitute"))
-    ).toBe(true);
+    expect(plan.warnings.some((w) => w.includes("Not a substitute"))).toBe(true);
   });
 });

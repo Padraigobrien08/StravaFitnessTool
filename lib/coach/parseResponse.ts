@@ -79,14 +79,9 @@ export function parseCoachResponse(content: string): ParsedCoachResponse {
   for (let i = 0; i < matches.length; i++) {
     const title = matches[i][1].trim().toLowerCase();
     const start = (matches[i].index ?? 0) + matches[i][0].length;
-    const end =
-      i + 1 < matches.length
-        ? (matches[i + 1].index ?? content.length)
-        : content.length;
+    const end = i + 1 < matches.length ? (matches[i + 1].index ?? content.length) : content.length;
     const body = content.slice(start, end).trim();
-    const key =
-      SECTION_ALIASES[title] ??
-      SECTION_ALIASES[title.replace(/:$/, "")];
+    const key = SECTION_ALIASES[title] ?? SECTION_ALIASES[title.replace(/:$/, "")];
 
     if (!key) continue;
 

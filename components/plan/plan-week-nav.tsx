@@ -22,7 +22,7 @@ export function PlanWeekNav({
     <div
       className={cn(
         "flex items-center justify-between gap-2 rounded-md border border-[var(--border-subtle)] bg-[var(--surface)]/40 px-2 py-1",
-        className
+        className,
       )}
     >
       <button
@@ -32,7 +32,7 @@ export function PlanWeekNav({
         onClick={onPrev}
         className={cn(
           "inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors",
-          canPrev ? "hover:bg-white/[0.06] hover:text-zinc-300" : "opacity-30"
+          canPrev ? "hover:bg-white/[0.06] hover:text-zinc-300" : "opacity-30",
         )}
       >
         <ChevronLeft className="h-4 w-4" />
@@ -47,7 +47,7 @@ export function PlanWeekNav({
         onClick={onNext}
         className={cn(
           "inline-flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors",
-          canNext ? "hover:bg-white/[0.06] hover:text-zinc-300" : "opacity-30"
+          canNext ? "hover:bg-white/[0.06] hover:text-zinc-300" : "opacity-30",
         )}
       >
         <ChevronRight className="h-4 w-4" />

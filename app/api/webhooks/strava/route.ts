@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findUserIdByStravaAthleteId } from "@/lib/db/users";
-import {
-  deleteActivityForUser,
-  syncSingleActivityForUser,
-} from "@/lib/sync/singleActivity";
+import { deleteActivityForUser, syncSingleActivityForUser } from "@/lib/sync/singleActivity";
 import { verifyWebhookSignature } from "@/lib/strava/webhooks/verify";
 
 export async function GET(request: NextRequest) {
@@ -12,13 +9,7 @@ export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("hub.verify_token");
   const challenge = request.nextUrl.searchParams.get("hub.challenge");
 
-  if (
-    mode === "subscribe" &&
-    token &&
-    verifyToken &&
-    token === verifyToken &&
-    challenge
-  ) {
+  if (mode === "subscribe" && token && verifyToken && token === verifyToken && challenge) {
     return NextResponse.json({ "hub.challenge": challenge });
   }
   return NextResponse.json({ error: "Forbidden" }, { status: 403 });

@@ -23,7 +23,7 @@ interface DistancePoint {
 
 /** Build cumulative distance from pace samples (speed = 1000/pace m/s). */
 function buildDistanceSeries(
-  stream: { elapsedSec: number; paceSecPerKm: number }[]
+  stream: { elapsedSec: number; paceSecPerKm: number }[],
 ): DistancePoint[] {
   if (stream.length < 2) return [];
   const out: DistancePoint[] = [{ elapsedSec: stream[0].elapsedSec, distanceM: 0 }];
@@ -49,7 +49,7 @@ export function bestEffortFromPaceStream(
   stream: { elapsedSec: number; paceSecPerKm: number }[],
   targetDistanceM: number,
   key: string,
-  label: string
+  label: string,
 ): BestEffortResult | null {
   const series = buildDistanceSeries(stream);
   if (series.length < 2) return null;
@@ -93,14 +93,10 @@ export function bestEffortFromLaps(
   laps: FitLap[],
   targetDistanceM: number,
   key: string,
-  label: string
+  label: string,
 ): BestEffortResult | null {
   const valid = laps.filter(
-    (l) =>
-      l.distanceM != null &&
-      l.distanceM > 100 &&
-      l.timeSec != null &&
-      l.timeSec > 0
+    (l) => l.distanceM != null && l.distanceM > 100 && l.timeSec != null && l.timeSec > 0,
   );
   if (valid.length === 0) return null;
 
@@ -135,27 +131,18 @@ export function bestEffortFromLaps(
 
 export function computeAllBestEfforts(
   paceStream: { elapsedSec: number; paceSecPerKm: number }[],
-  laps: FitLap[]
+  laps: FitLap[],
 ): BestEffortResult[] {
   const results: BestEffortResult[] = [];
 
   for (const t of BEST_EFFORT_TARGETS) {
-    const fromStream = bestEffortFromPaceStream(
-      paceStream,
-      t.distanceM,
-      t.key,
-      t.label
-    );
+    const fromStream = bestEffortFromPaceStream(paceStream, t.distanceM, t.key, t.label);
     const fromLaps = bestEffortFromLaps(laps, t.distanceM, t.key, t.label);
 
-    const candidates = [fromStream, fromLaps].filter(
-      (c): c is BestEffortResult => c !== null
-    );
+    const candidates = [fromStream, fromLaps].filter((c): c is BestEffortResult => c !== null);
     if (candidates.length === 0) continue;
 
-    const best = candidates.reduce((a, b) =>
-      a.timeSec < b.timeSec ? a : b
-    );
+    const best = candidates.reduce((a, b) => (a.timeSec < b.timeSec ? a : b));
     results.push(best);
   }
 

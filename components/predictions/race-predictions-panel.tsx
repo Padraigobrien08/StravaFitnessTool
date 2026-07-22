@@ -8,11 +8,7 @@ import type { RacePredictionAnalysis } from "@/lib/analytics/predictions";
 import { formatDuration, formatPace } from "@/lib/utils";
 import Link from "next/link";
 
-export function RacePredictionsPanel({
-  analysis,
-}: {
-  analysis: RacePredictionAnalysis;
-}) {
+export function RacePredictionsPanel({ analysis }: { analysis: RacePredictionAnalysis }) {
   if (analysis.consensus.length === 0) {
     return (
       <Card>
@@ -20,8 +16,8 @@ export function RacePredictionsPanel({
           <CardTitle>Race time predictions</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-zinc-500">
-          Need at least one quality effort between 4–15 km. Import FIT data for
-          best segment detection, or complete a timed 5K/10K run.
+          Need at least one quality effort between 4–15 km. Import FIT data for best segment
+          detection, or complete a timed 5K/10K run.
         </CardContent>
       </Card>
     );
@@ -31,10 +27,7 @@ export function RacePredictionsPanel({
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {analysis.consensus.map((c) => (
-          <div
-            key={c.label}
-            className="rounded-lg border border-white/10 bg-white/[0.03] p-4"
-          >
+          <div key={c.label} className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
             <p className="text-sm text-zinc-500">{c.label}</p>
             <p className="mt-1 font-display text-2xl font-semibold text-white tabular-nums">
               {formatDuration(c.timeSec)}
@@ -73,8 +66,7 @@ export function RacePredictionsPanel({
               </Link>
               {" — "}
               {formatDuration(analysis.primaryAnchor.timeSec)} at{" "}
-              {analysis.primaryAnchor.distanceKm.toFixed(1)} km (
-              {analysis.primaryAnchor.source})
+              {analysis.primaryAnchor.distanceKm.toFixed(1)} km ({analysis.primaryAnchor.source})
             </p>
           )}
         </CardContent>
@@ -86,8 +78,8 @@ export function RacePredictionsPanel({
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-xs text-zinc-500">
-            Green dots = efforts from your data. Lines = model extrapolations. Vertical
-            guides mark 5K, 10K, half, and marathon.
+            Green dots = efforts from your data. Lines = model extrapolations. Vertical guides mark
+            5K, 10K, half, and marathon.
           </p>
           <PredictionChart analysis={analysis} />
         </CardContent>
@@ -113,10 +105,7 @@ export function RacePredictionsPanel({
             </thead>
             <tbody>
               {analysis.consensus.map((c) => (
-                <tr
-                  key={c.label}
-                  className="border-b border-white/5 text-zinc-300"
-                >
+                <tr key={c.label} className="border-b border-white/5 text-zinc-300">
                   <td className="py-3 pr-4 font-medium text-white">{c.label}</td>
                   <td className="py-3 pr-4 tabular-nums text-emerald-400">
                     {formatDuration(c.timeSec)}

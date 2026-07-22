@@ -9,7 +9,7 @@ function signal(
     id?: string;
     stability?: AdaptationSignal["stability"];
     contradictoryEvidence?: string[];
-  }
+  },
 ): AdaptationSignal {
   const evidenceCount = partial.supportingEvidence.length;
   let confidence = partial.confidence;
@@ -25,15 +25,13 @@ function signal(
     contradictoryEvidence: partial.contradictoryEvidence ?? [],
     stability:
       partial.stability ??
-      (evidenceCount >= 3 && !(partial.contradictoryEvidence?.length ?? 0)
-        ? "stable"
-        : "emerging"),
+      (evidenceCount >= 3 && !(partial.contradictoryEvidence?.length ?? 0) ? "stable" : "emerging"),
   };
 }
 
 export function inferAdaptationSignals(
   analytics: DashboardInsights,
-  outcomes: TrackedRecommendationOutcome[] = []
+  outcomes: TrackedRecommendationOutcome[] = [],
 ): AdaptationSignal[] {
   const out: AdaptationSignal[] = [];
 
@@ -43,38 +41,29 @@ export function inferAdaptationSignals(
         category: "threshold",
         statement:
           "Aerobic efficiency appears to improve under stable volume and consistent easy running",
-        confidence:
-          analytics.efficiencyMoM.comparableCount >= 6 ? "medium" : "low",
+        confidence: analytics.efficiencyMoM.comparableCount >= 6 ? "medium" : "low",
         supportingEvidence: [
           "Efficiency trend improving",
-          ...(analytics.efficiencyMoM.narrative
-            ? [analytics.efficiencyMoM.narrative]
-            : []),
+          ...(analytics.efficiencyMoM.narrative ? [analytics.efficiencyMoM.narrative] : []),
         ],
         contradictoryEvidence:
-          analytics.fatigue.tsb < -12
-            ? ["TSB negative — load may mask adaptation"]
-            : [],
-      })
+          analytics.fatigue.tsb < -12 ? ["TSB negative — load may mask adaptation"] : [],
+      }),
     );
   }
 
-  if (
-    analytics.intensityAdvice.status === "too_hard" ||
-    analytics.fatigue.tsb < -10
-  ) {
+  if (analytics.intensityAdvice.status === "too_hard" || analytics.fatigue.tsb < -10) {
     out.push(
       signal({
         category: "freshness",
-        statement:
-          "Freshness appears sensitive to hard-session density in recent blocks",
+        statement: "Freshness appears sensitive to hard-session density in recent blocks",
         confidence: analytics.intensityAdvice.hardRunsLast14d >= 4 ? "medium" : "low",
         supportingEvidence: [
           `${analytics.intensityAdvice.hardRunsLast14d} hard runs / 14d`,
           `Freshness ${Math.round(analytics.fatigue.freshness)}`,
           analytics.intensityAdvice.recommendations[0] ?? "Intensity elevated",
         ],
-      })
+      }),
     );
   }
 
@@ -88,7 +77,7 @@ export function inferAdaptationSignals(
           `Consistency ${analytics.consistencyScore.overall}/100`,
           analytics.consistencyScore.label,
         ],
-      })
+      }),
     );
   }
 
@@ -97,17 +86,14 @@ export function inferAdaptationSignals(
     out.push(
       signal({
         category: "modality",
-        statement:
-          "Modality interference likely when hard cross-training clusters near key runs",
+        statement: "Modality interference likely when hard cross-training clusters near key runs",
         confidence: eco.scores.interferenceRisk >= 60 ? "medium" : "low",
         supportingEvidence: eco.ecosystemInsights
           .slice(0, 3)
           .map((i) => (i.evidence[0] ? `${i.title}: ${i.evidence[0]}` : i.title)),
         contradictoryEvidence:
-          eco.scores.strengthSupport >= 60
-            ? ["Strength support score still adequate"]
-            : [],
-      })
+          eco.scores.strengthSupport >= 60 ? ["Strength support score still adequate"] : [],
+      }),
     );
   }
 
@@ -122,7 +108,7 @@ export function inferAdaptationSignals(
           `${r.daysUntilRace}d to race`,
           `Freshness ${Math.round(analytics.fatigue.freshness)}`,
         ],
-      })
+      }),
     );
   }
 
@@ -138,7 +124,7 @@ export function inferAdaptationSignals(
         confidence: o.evaluation === "supported" ? "medium" : "low",
         supportingEvidence: o.observedSignals.slice(0, 4),
         stability: "emerging",
-      })
+      }),
     );
   }
 

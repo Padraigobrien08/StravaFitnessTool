@@ -1,12 +1,5 @@
 import type { RunActivity } from "@/lib/strava/types";
-import {
-  startOfWeek,
-  endOfWeek,
-  subWeeks,
-  format,
-  parseISO,
-  isWithinInterval,
-} from "date-fns";
+import { startOfWeek, endOfWeek, subWeeks, format, parseISO, isWithinInterval } from "date-fns";
 import { paceSecPerKm } from "./pace";
 
 export interface WeekSnapshot {
@@ -34,10 +27,7 @@ export function weekStartKey(date: Date): string {
   return format(getWeekStart(date), "yyyy-MM-dd");
 }
 
-export function runsInWeek(
-  runs: RunActivity[],
-  weekStart: Date
-): RunActivity[] {
+export function runsInWeek(runs: RunActivity[], weekStart: Date): RunActivity[] {
   const start = weekStart;
   const end = endOfWeek(weekStart, { weekStartsOn: 1 });
   return runs.filter((r) => {
@@ -49,7 +39,7 @@ export function runsInWeek(
 export function easyHardForWeek(
   runs: RunActivity[],
   weekStart: Date,
-  athleteMaxHr: number
+  athleteMaxHr: number,
 ): { easy: number; hard: number } {
   const weekRuns = runsInWeek(runs, weekStart);
   let easy = 0;
@@ -66,7 +56,7 @@ export function easyHardForWeek(
 export function buildWeekSnapshot(
   runs: RunActivity[],
   weekStartDate: Date,
-  athleteMaxHr: number
+  athleteMaxHr: number,
 ): WeekSnapshot {
   const weekRuns = runsInWeek(runs, weekStartDate);
   const weekEnd = endOfWeek(weekStartDate, { weekStartsOn: 1 });
@@ -95,16 +85,11 @@ export function buildWeekSnapshot(
     easyCount: easy,
     hardCount: hard,
     avgPaceSecPerKm:
-      paces.length > 0
-        ? Math.round(paces.reduce((a, b) => a + b, 0) / paces.length)
-        : null,
+      paces.length > 0 ? Math.round(paces.reduce((a, b) => a + b, 0) / paces.length) : null,
   };
 }
 
-export function compareWeeks(
-  current: WeekSnapshot,
-  previous: WeekSnapshot | null
-): WeekComparison {
+export function compareWeeks(current: WeekSnapshot, previous: WeekSnapshot | null): WeekComparison {
   if (!previous) {
     return {
       runCountDelta: current.runCount,
@@ -129,7 +114,7 @@ export function compareWeeks(
 export function buildCurrentAndPreviousWeek(
   runs: RunActivity[],
   athleteMaxHr: number,
-  weekOffset = 0
+  weekOffset = 0,
 ): { current: WeekSnapshot; previous: WeekSnapshot | null } {
   const now = new Date();
   const targetWeek = subWeeks(getWeekStart(now), weekOffset);
@@ -144,7 +129,7 @@ export function maxLongestRunPriorWeeks(
   runs: RunActivity[],
   athleteMaxHr: number,
   beforeWeekStart: Date,
-  weeks = 4
+  weeks = 4,
 ): number {
   let max = 0;
   for (let i = 1; i <= weeks; i++) {

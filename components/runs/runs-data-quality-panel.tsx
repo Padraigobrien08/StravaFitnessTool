@@ -13,9 +13,7 @@ export function RunsDataQualityPanel({ data }: { data: RunsDataQualityView }) {
     <footer className="border-t border-white/[0.04] pt-3 text-[10px] text-zinc-700">
       <span className="text-zinc-600">Data quality · </span>
       {parts.join(" · ")}
-      {data.warnings[0] ? (
-        <span className="text-zinc-600"> · {data.warnings[0]}</span>
-      ) : null}
+      {data.warnings[0] ? <span className="text-zinc-600"> · {data.warnings[0]}</span> : null}
     </footer>
   );
 }

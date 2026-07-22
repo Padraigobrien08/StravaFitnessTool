@@ -22,11 +22,7 @@ function formatSec(sec: number): string {
   return formatDuration(sec);
 }
 
-function RuleRow({
-  rule,
-}: {
-  rule: ForecastEvaluationReport["rules"][number];
-}) {
+function RuleRow({ rule }: { rule: ForecastEvaluationReport["rules"][number] }) {
   return (
     <div
       className={cn(
@@ -35,7 +31,7 @@ function RuleRow({
           ? "border-white/[0.04] bg-white/[0.02] text-zinc-500"
           : rule.severity === "error"
             ? "border-red-500/25 bg-red-500/[0.06] text-red-200/90"
-            : "border-amber-500/20 bg-amber-500/[0.06] text-amber-100/90"
+            : "border-amber-500/20 bg-amber-500/[0.06] text-amber-100/90",
       )}
     >
       <div className="flex items-center justify-between gap-2">
@@ -54,13 +50,10 @@ export function ForecastLabClient() {
 
   const profile = useMemo(
     () => FORECAST_FIXTURES.find((f) => f.id === fixtureId) ?? FORECAST_FIXTURES[0]!,
-    [fixtureId]
+    [fixtureId],
   );
 
-  const report = useMemo(
-    () => evaluateForecastFixture(profile),
-    [profile]
-  );
+  const report = useMemo(() => evaluateForecastFixture(profile), [profile]);
 
   const { forecast: f, observability: obs } = report;
   const failed = report.rules.filter((r) => !r.passed);
@@ -75,20 +68,17 @@ export function ForecastLabClient() {
           Forecast V2 evaluation workbench
         </h1>
         <p className="max-w-2xl text-sm text-zinc-500">
-          Audit harness for coherence, stability, and recommendation alignment.
-          Fixtures are synthetic profiles—not your Strava data. For your real
-          forecast, use Goals → Forecast V2. Try &quot;Near-race evidence
-          (20.5k + 10 mi)&quot; to mirror a 1:53 long run and 1:22 ten-miler.
+          Audit harness for coherence, stability, and recommendation alignment. Fixtures are
+          synthetic profiles—not your Strava data. For your real forecast, use Goals → Forecast V2.
+          Try &quot;Near-race evidence (20.5k + 10 mi)&quot; to mirror a 1:53 long run and 1:22
+          ten-miler.
         </p>
       </header>
 
       <div className="flex flex-wrap items-end gap-4">
         <div className="min-w-[240px] flex-1 space-y-2">
           <Label className="text-[11px] text-zinc-500">Fixture athlete</Label>
-          <Select
-            value={fixtureId}
-            onValueChange={(v) => v && setFixtureId(v)}
-          >
+          <Select value={fixtureId} onValueChange={(v) => v && setFixtureId(v)}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -266,7 +256,7 @@ function StatusBadge({
     <div
       className={cn(
         "rounded-lg px-4 py-2 text-sm font-medium",
-        ok ? "bg-teal-500/15 text-teal-300" : "bg-amber-500/15 text-amber-200"
+        ok ? "bg-teal-500/15 text-teal-300" : "bg-amber-500/15 text-amber-200",
       )}
     >
       {ok ? "Fixture OK" : "Needs review"} · {profile.id}
@@ -274,13 +264,7 @@ function StatusBadge({
   );
 }
 
-function Panel({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
       <h2 className="mb-3 text-[11px] font-medium uppercase tracking-wider text-zinc-500">

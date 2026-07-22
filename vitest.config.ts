@@ -15,13 +15,7 @@ export default defineConfig({
         "lib/**/*.{ts,tsx}",
         "stores/**/*.{ts,tsx}",
       ],
-      exclude: [
-        "**/__tests__/**",
-        "**/*.test.*",
-        "**/*.d.ts",
-        "**/types.ts",
-        "**/fixtures*.ts",
-      ],
+      exclude: ["**/__tests__/**", "**/*.test.*", "**/*.d.ts", "**/types.ts", "**/fixtures*.ts"],
     },
   },
   resolve: {

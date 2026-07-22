@@ -7,7 +7,7 @@ import type { ChatMessage } from "./types";
 export async function runAnthropicCoachChat(
   ctx: IntelligenceContext,
   messages: ChatMessage[],
-  apiKey: string
+  apiKey: string,
 ): Promise<{ reply: string; toolsUsed: string[] }> {
   const toolsUsed: string[] = [];
   const systemPrompt = await buildCoachSystemWithContext(ctx);

@@ -7,18 +7,12 @@ export function assessDurability(input: RaceForecastInput): DurabilityAssessment
   const blocks = input.recentBlocks;
   const runs = input.runs;
 
-  const longestFromRuns = runs.reduce(
-    (m, r) => Math.max(m, (r.distanceMeters ?? 0) / 1000),
-    0
-  );
-  const longestFromEfforts = input.efforts.reduce(
-    (m, e) => Math.max(m, e.distanceKm),
-    0
-  );
+  const longestFromRuns = runs.reduce((m, r) => Math.max(m, (r.distanceMeters ?? 0) / 1000), 0);
+  const longestFromEfforts = input.efforts.reduce((m, e) => Math.max(m, e.distanceKm), 0);
   const longestKm = Math.max(
     longestFromRuns,
     longestFromEfforts,
-    blocks[blocks.length - 1]?.longestRunKm ?? 0
+    blocks[blocks.length - 1]?.longestRunKm ?? 0,
   );
 
   const longestPct = targetKm > 0 ? (longestKm / targetKm) * 100 : 0;
@@ -78,7 +72,11 @@ export function assessDurability(input: RaceForecastInput): DurabilityAssessment
   else if (score < 48) label = "weak";
 
   const timeMultiplier =
-    label === "strong" ? 1 : label === "moderate" ? 1 + (72 - score) * 0.0012 : 1 + (72 - score) * 0.002;
+    label === "strong"
+      ? 1
+      : label === "moderate"
+        ? 1 + (72 - score) * 0.0012
+        : 1 + (72 - score) * 0.002;
 
   const explanation =
     label === "strong"

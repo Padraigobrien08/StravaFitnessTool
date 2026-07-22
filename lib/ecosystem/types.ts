@@ -68,11 +68,7 @@ export type InterferenceSeverity = "low" | "medium" | "high";
 export interface InterferenceFlag {
   id: string;
   severity: InterferenceSeverity;
-  kind:
-    | "near_quality_run"
-    | "race_week"
-    | "weekly_hi_density"
-    | "hybrid_cluster";
+  kind: "near_quality_run" | "race_week" | "weekly_hi_density" | "hybrid_cluster";
   nonRunActivityName: string;
   nonRunSportType: string;
   nonRunDate: string;
@@ -166,11 +162,10 @@ export interface WeeklyTrainingEcosystem {
   supportSignals: TrainingSupportSignal[];
 }
 
-export interface RollingEcosystemSnapshot
-  extends Omit<
-    WeeklyTrainingEcosystem,
-    "weekStart" | "label" | "interferenceFlags" | "supportSignals"
-  > {
+export interface RollingEcosystemSnapshot extends Omit<
+  WeeklyTrainingEcosystem,
+  "weekStart" | "label" | "interferenceFlags" | "supportSignals"
+> {
   windowDays: RollingWindowDays;
 }
 

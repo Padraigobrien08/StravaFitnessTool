@@ -38,7 +38,9 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "check": "tsc --noEmit && eslint && vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "tsc --noEmit && prettier --check . && eslint && vitest run",
     "setup": "node scripts/setup.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "db:reset": "node --env-file-if-exists=.env.local scripts/migrate.mjs --reset"
@@ -95,6 +97,8 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.7"

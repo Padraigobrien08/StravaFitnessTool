@@ -33,9 +33,7 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
 
           <div className="rounded-lg bg-white/[0.04] px-3.5 py-3 ring-1 ring-white/[0.05]">
             <p className="text-[11px] font-medium text-zinc-500">Primary action</p>
-            <p className="mt-1.5 text-[14px] leading-[1.55] text-zinc-100">
-              {brief.primaryAction}
-            </p>
+            <p className="mt-1.5 text-[14px] leading-[1.55] text-zinc-100">{brief.primaryAction}</p>
           </div>
 
           {brief.evidenceBullets.length > 0 ? (
@@ -69,11 +67,7 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
         </div>
 
         <aside className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-          <BriefMetric
-            label="Most likely"
-            value={brief.mostLikely}
-            sub={brief.distanceLabel}
-          />
+          <BriefMetric label="Most likely" value={brief.mostLikely} sub={brief.distanceLabel} />
           <BriefMetric label="Range" value={brief.rangeDisplay} sub="p25–p75" />
           {brief.readinessScore != null ? (
             <BriefMetric
@@ -88,22 +82,14 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
   );
 }
 
-function BriefMetric({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
+function BriefMetric({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-lg bg-white/[0.03] px-3 py-2.5">
       <p className="text-[11px] text-zinc-600">{label}</p>
       <p
         className={cn(
           "mt-0.5 font-medium tabular-nums text-zinc-100",
-          value.length > 12 ? "text-base" : "text-lg"
+          value.length > 12 ? "text-base" : "text-lg",
         )}
       >
         {value}

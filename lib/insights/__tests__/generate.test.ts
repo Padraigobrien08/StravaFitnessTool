@@ -128,7 +128,7 @@ const baseAnalytics = {
     },
     [],
     "medium",
-    null
+    null,
   ),
 } as unknown as DashboardInsights;
 

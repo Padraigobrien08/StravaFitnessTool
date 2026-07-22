@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       resolved.raceGoal ?? null,
       bundle.insights,
       ctx.userId,
-      { trackPrimaryRecommendation: true }
+      { trackPrimaryRecommendation: true },
     );
 
     const msg = body.message ?? "";
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         body.topic ??
         (memoryClassified?.topic === "durability"
           ? "durability"
-          : memoryClassified?.topic ?? "all");
+          : (memoryClassified?.topic ?? "all"));
       const answerTopic =
         topic === "all" || topic === "durability" || topic === "recovery"
           ? topic === "durability"
@@ -65,10 +65,7 @@ export async function POST(req: NextRequest) {
               ? "fatigue"
               : "all"
           : topic;
-      const memoryAnswer = serializeMemoryForCoachAnswer(
-        adaptive.memory,
-        answerTopic
-      );
+      const memoryAnswer = serializeMemoryForCoachAnswer(adaptive.memory, answerTopic);
       const learned =
         adaptive.recentlyLearned.length > 0
           ? `\n\n## Recently learned\n${adaptive.recentlyLearned.map((l) => `- ${l}`).join("\n")}`
@@ -82,15 +79,12 @@ export async function POST(req: NextRequest) {
       answer,
       topic: adaptiveTopic ?? body.topic ?? "all",
       recentlyLearned: adaptive.recentlyLearned,
-      observability:
-        process.env.NODE_ENV === "development"
-          ? adaptive.observability
-          : undefined,
+      observability: process.env.NODE_ENV === "development" ? adaptive.observability : undefined,
     });
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Memory failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

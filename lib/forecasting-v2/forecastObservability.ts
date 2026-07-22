@@ -21,7 +21,7 @@ export function buildForecastObservability(
     uncertainty: UncertaintyAssessment;
     weightedEstimates: ForecastModelEstimate[];
     limitations: string[];
-  }
+  },
 ): ForecastObservability {
   const componentBreakdown: ForecastObservability["componentBreakdown"] = [
     {
@@ -61,9 +61,7 @@ export function buildForecastObservability(
           : opts.specificity.label === "low"
             ? "weakens"
             : "neutral",
-      explanation:
-        opts.specificity.evidence[0] ??
-        "How well training matches target distance.",
+      explanation: opts.specificity.evidence[0] ?? "How well training matches target distance.",
     },
     {
       component: "Execution",
@@ -90,7 +88,7 @@ export function buildForecastObservability(
     reason:
       e.limitations.length > 0
         ? `${e.assumptions[0] ?? "Model fit"} — ${e.limitations[0]}`
-        : e.assumptions[0] ?? "Distance-weighted capability estimate",
+        : (e.assumptions[0] ?? "Distance-weighted capability estimate"),
   }));
 
   const evidenceChain: string[] = [
@@ -117,12 +115,12 @@ export function buildForecastObservability(
       drivers.push(
         delta < 0
           ? `Forecast moved faster by ${Math.abs(Math.round(delta))}s.`
-          : `Forecast moved slower by ${Math.round(delta)}s.`
+          : `Forecast moved slower by ${Math.round(delta)}s.`,
       );
     }
     if (opts.freshness.timeAdjustmentSec !== 0) {
       drivers.push(
-        `Freshness adjustment ${opts.freshness.timeAdjustmentSec > 0 ? "+" : ""}${opts.freshness.timeAdjustmentSec}s.`
+        `Freshness adjustment ${opts.freshness.timeAdjustmentSec > 0 ? "+" : ""}${opts.freshness.timeAdjustmentSec}s.`,
       );
     }
     if (opts.durability.timeMultiplier !== 1) {

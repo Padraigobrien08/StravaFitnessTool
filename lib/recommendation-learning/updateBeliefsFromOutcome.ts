@@ -15,24 +15,19 @@ function categoryFromRecommendation(text: string): AthleteBelief["category"] {
 
 export function updateBeliefsFromOutcome(
   profile: AthleteMemoryProfile,
-  outcome: TrackedRecommendationOutcome
+  outcome: TrackedRecommendationOutcome,
 ): AthleteMemoryProfile {
   const category = categoryFromRecommendation(outcome.recommendation);
   const support =
-    outcome.evaluation === "supported" ||
-    outcome.evaluation === "partially_supported";
+    outcome.evaluation === "supported" || outcome.evaluation === "partially_supported";
   const contradict = outcome.evaluation === "contradicted";
 
   if (!support && !contradict) return profile;
 
   const evidenceUpdate = {
     observedAt: outcome.evaluatedAt ?? new Date().toISOString(),
-    supporting: support
-      ? { [category]: outcome.observedSignals.slice(0, 4) }
-      : undefined,
-    contradicting: contradict
-      ? { [category]: outcome.observedSignals.slice(0, 4) }
-      : undefined,
+    supporting: support ? { [category]: outcome.observedSignals.slice(0, 4) } : undefined,
+    contradicting: contradict ? { [category]: outcome.observedSignals.slice(0, 4) } : undefined,
   };
 
   const updated = updateAthleteMemoryProfile(profile, evidenceUpdate);
@@ -40,7 +35,7 @@ export function updateBeliefsFromOutcome(
   if (support && outcome.evaluation === "supported") {
     const list = getBeliefList(updated, category);
     const match = list.find((b) =>
-      b.statement.toLowerCase().includes(outcome.recommendation.slice(0, 24).toLowerCase())
+      b.statement.toLowerCase().includes(outcome.recommendation.slice(0, 24).toLowerCase()),
     );
     if (!match && outcome.observedSignals.length >= 2) {
       list.push({
@@ -63,7 +58,7 @@ export function updateBeliefsFromOutcome(
 
 function getBeliefList(
   profile: AthleteMemoryProfile,
-  category: AthleteBelief["category"]
+  category: AthleteBelief["category"],
 ): AthleteBelief[] {
   switch (category) {
     case "adaptation":
@@ -86,7 +81,7 @@ function getBeliefList(
 function setBeliefList(
   profile: AthleteMemoryProfile,
   category: AthleteBelief["category"],
-  beliefs: AthleteBelief[]
+  beliefs: AthleteBelief[],
 ): void {
   switch (category) {
     case "adaptation":
@@ -114,7 +109,7 @@ function setBeliefList(
 
 export function applyOutcomesToMemory(
   profile: AthleteMemoryProfile,
-  outcomes: TrackedRecommendationOutcome[]
+  outcomes: TrackedRecommendationOutcome[],
 ): AthleteMemoryProfile {
   let current = profile;
   for (const o of outcomes) {

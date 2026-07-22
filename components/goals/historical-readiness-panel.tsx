@@ -3,16 +3,12 @@
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { dash } from "@/components/home/primitives/tokens";
 
-export function HistoricalReadinessPanel({
-  items,
-}: {
-  items: { label: string; value: string }[];
-}) {
+export function HistoricalReadinessPanel({ items }: { items: { label: string; value: string }[] }) {
   return (
     <PanelChrome title="Historical readiness context" subdued>
       <p className={`${dash.muted} mb-4`}>
-        Background from your training archive — anchors how current readiness
-        compares to prior blocks.
+        Background from your training archive — anchors how current readiness compares to prior
+        blocks.
       </p>
       <dl className="space-y-3">
         {items.map((item) => (

@@ -21,7 +21,7 @@ export function mkRun(
     avgHr?: number | null;
     name?: string;
     id?: string;
-  }
+  },
 ): RunActivity {
   const date = format(subDays(new Date(), daysAgo), "yyyy-MM-dd");
   const movingSec = opts?.movingSec ?? 3600;
@@ -49,7 +49,7 @@ export function mkRun(
 
 export function mkImport(
   runs: RunActivity[],
-  allActivities?: StravaImport["allActivities"]
+  allActivities?: StravaImport["allActivities"],
 ): StravaImport {
   return {
     runs,
@@ -76,7 +76,7 @@ export function mkImport(
 export function insightsFrom(
   runs: RunActivity[],
   goal: RaceGoal | null = null,
-  maxWeeklyKm?: number
+  maxWeeklyKm?: number,
 ) {
   const data = mkImport(runs);
   const analytics = computeInsights(data, [], 3, goal, maxWeeklyKm);
@@ -87,7 +87,7 @@ export function insightsFrom(
 /** Sparse history, no HR */
 export const lowData = insightsFrom(
   [mkRun(3, { avgHr: null }), mkRun(10, { avgHr: null, distanceM: 5000 })],
-  null
+  null,
 );
 
 /** Race in 5 days with taper-like volume drop */
@@ -98,9 +98,7 @@ export function raceWeekAthlete() {
     targetTimeSec: 7200,
   };
   const runs = [
-    ...Array.from({ length: 3 }, (_, i) =>
-      mkRun(14 + i * 2, { distanceM: 12000, name: "Base" })
-    ),
+    ...Array.from({ length: 3 }, (_, i) => mkRun(14 + i * 2, { distanceM: 12000, name: "Base" })),
     mkRun(7, { distanceM: 8000, movingSec: 2400 }),
     mkRun(2, { distanceM: 5000, movingSec: 1500, name: "Shakeout" }),
   ];
@@ -109,9 +107,7 @@ export function raceWeekAthlete() {
 
 /** Runs + synthetic non-run via allActivities */
 export function hybridAthlete() {
-  const runs = Array.from({ length: 10 }, (_, i) =>
-    mkRun(i * 2, { distanceM: 8000 + i * 500 })
-  );
+  const runs = Array.from({ length: 10 }, (_, i) => mkRun(i * 2, { distanceM: 8000 + i * 500 }));
   const data = mkImport(runs, [
     ...runs.map((r) => ({
       id: r.id,
@@ -151,17 +147,14 @@ export function hybridAthlete() {
 }
 
 export const noGoal = insightsFrom(
-  Array.from({ length: 15 }, (_, i) => mkRun(i + 1, { distanceM: 10000 }))
+  Array.from({ length: 15 }, (_, i) => mkRun(i + 1, { distanceM: 10000 })),
 );
 
-export const longTermGoal = insightsFrom(
-  [mkRun(2), mkRun(5), mkRun(8)],
-  {
-    distance: "marathon",
-    date: format(addDays(new Date(), 120), "yyyy-MM-dd"),
-    targetTimeSec: 14400,
-  }
-);
+export const longTermGoal = insightsFrom([mkRun(2), mkRun(5), mkRun(8)], {
+  distance: "marathon",
+  date: format(addDays(new Date(), 120), "yyyy-MM-dd"),
+  targetTimeSec: 14400,
+});
 
 /** High volume recent block */
 export function overloadedBlock() {
@@ -171,7 +164,7 @@ export function overloadedBlock() {
       movingSec: 4200,
       avgHr: 168,
       name: i % 3 === 0 ? "Hard tempo" : "Run",
-    })
+    }),
   );
   return insightsFrom(runs, null);
 }
@@ -183,9 +176,7 @@ export function taperWeek() {
     date: format(addDays(new Date(), 10), "yyyy-MM-dd"),
   };
   const runs = [
-    ...Array.from({ length: 8 }, (_, i) =>
-      mkRun(21 + i, { distanceM: 16000, movingSec: 4800 })
-    ),
+    ...Array.from({ length: 8 }, (_, i) => mkRun(21 + i, { distanceM: 16000, movingSec: 4800 })),
     mkRun(4, { distanceM: 6000, movingSec: 2100 }),
     mkRun(1, { distanceM: 4000, movingSec: 1500 }),
   ];

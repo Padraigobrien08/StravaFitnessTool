@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  isHardTrainingRun,
-  isRaceDayWorkout,
-} from "../hardSessionRules";
+import { isHardTrainingRun, isRaceDayWorkout } from "../hardSessionRules";
 
 describe("hardSessionRules", () => {
   it("does not count pre-race shakeout as hard", () => {
@@ -12,7 +9,7 @@ describe("hardSessionRules", () => {
         type: "shakeout",
         title: "Pre-race shakeout",
         intensity: "easy",
-      })
+      }),
     ).toBe(false);
   });
 
@@ -23,7 +20,7 @@ describe("hardSessionRules", () => {
         type: "race",
         title: "Half marathon",
         intensity: "hard",
-      })
+      }),
     ).toBe(false);
     expect(
       isRaceDayWorkout({
@@ -31,7 +28,7 @@ describe("hardSessionRules", () => {
         type: "race",
         title: "Half marathon",
         intensity: "hard",
-      })
+      }),
     ).toBe(true);
   });
 
@@ -42,7 +39,7 @@ describe("hardSessionRules", () => {
         type: "easy",
         title: "Strides",
         intensity: "easy",
-      })
+      }),
     ).toBe(false);
   });
 
@@ -53,7 +50,7 @@ describe("hardSessionRules", () => {
         type: "tempo",
         title: "Tempo run",
         intensity: "moderate",
-      })
+      }),
     ).toBe(true);
   });
 });

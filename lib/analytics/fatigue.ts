@@ -46,15 +46,13 @@ export function weeklyLoadSeries(runs: RunActivity[]): WeeklyLoadPoint[] {
     map.set(key, existing);
   }
 
-  return [...map.values()].sort((a, b) =>
-    a.weekStart.localeCompare(b.weekStart)
-  );
+  return [...map.values()].sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 }
 
 export function acuteChronicLoad(
   series: WeeklyLoadPoint[],
   ctlTauWeeks = 6,
-  atlTauWeeks = 1
+  atlTauWeeks = 1,
 ): AcuteChronicLoad {
   const alphaCtl = 2 / (ctlTauWeeks + 1);
   const alphaAtl = 2 / (atlTauWeeks + 1);
@@ -83,7 +81,7 @@ export function acuteChronicLoad(
 
 export function freshnessFromTsb(
   tsb: number,
-  restDaysSinceLastRun: number
+  restDaysSinceLastRun: number,
 ): { freshness: number; label: string } {
   let freshness: number;
   let label: string;
@@ -114,14 +112,10 @@ export function buildFatigueSnapshot(runs: RunActivity[]): FatigueSnapshot {
   const usesProxyLoad = withLoad.length < runs.length * 0.5;
 
   const { ctl, atl, tsb, history } = acuteChronicLoad(series);
-  const sorted = [...runs].sort(
-    (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
-  );
+  const sorted = [...runs].sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
   const lastRun = sorted[0];
   const restDaysSinceLastRun = lastRun
-    ? Math.floor(
-        (Date.now() - parseISO(lastRun.date).getTime()) / (1000 * 60 * 60 * 24)
-      )
+    ? Math.floor((Date.now() - parseISO(lastRun.date).getTime()) / (1000 * 60 * 60 * 24))
     : 99;
 
   const { freshness, label } = freshnessFromTsb(tsb, restDaysSinceLastRun);

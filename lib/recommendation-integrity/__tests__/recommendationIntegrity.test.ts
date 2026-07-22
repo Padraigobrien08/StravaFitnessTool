@@ -31,8 +31,8 @@ describe("recommendation integrity", () => {
         (i) =>
           i.type === "race_week_violation" ||
           i.type === "unsafe_progression" ||
-          i.type === "contradiction"
-      )
+          i.type === "contradiction",
+      ),
     ).toBe(true);
   });
 
@@ -90,8 +90,8 @@ describe("recommendation integrity", () => {
     const report = evaluateWeeklyPlan({ plan, context: ctx, guardrails: g });
     expect(
       report.issues.some(
-        (i) => i.type === "unsupported_claim" || i.message.toLowerCase().includes("hrv")
-      )
+        (i) => i.type === "unsupported_claim" || i.message.toLowerCase().includes("hrv"),
+      ),
     ).toBe(true);
   });
 
@@ -198,9 +198,7 @@ describe("recommendation integrity", () => {
       limitations: ["Standard"],
     };
     const report = evaluateWeeklyPlan({ plan, context: ctx, guardrails: g });
-    expect(
-      report.issues.some((i) => i.message.toLowerCase().includes("generic"))
-    ).toBe(true);
+    expect(report.issues.some((i) => i.message.toLowerCase().includes("generic"))).toBe(true);
   });
 
   it("flags contradictory strength advice", () => {
@@ -250,11 +248,15 @@ describe("recommendation integrity", () => {
       context: ctx,
       guardrails: g,
     });
-    const repaired = repairPlanFromIntegrity(parsed.data, {
-      plan: parsed.data,
-      context: ctx,
-      guardrails: g,
-    }, before);
+    const repaired = repairPlanFromIntegrity(
+      parsed.data,
+      {
+        plan: parsed.data,
+        context: ctx,
+        guardrails: g,
+      },
+      before,
+    );
     const after = evaluateWeeklyPlan({
       plan: repaired,
       context: ctx,

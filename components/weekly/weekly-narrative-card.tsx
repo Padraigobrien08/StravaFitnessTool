@@ -17,13 +17,9 @@ export function WeeklyNarrativeCard({
   compact?: boolean;
 }) {
   return (
-    <section
-      className={`rounded-xl border p-5 ${severityBorder[narrative.severity]}`}
-    >
+    <section className={`rounded-xl border p-5 ${severityBorder[narrative.severity]}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-          This week
-        </p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">This week</p>
         <ConfidenceBadge level={narrative.confidence} />
       </div>
       <p className="mt-1 text-sm text-zinc-500">{narrative.weekLabel}</p>

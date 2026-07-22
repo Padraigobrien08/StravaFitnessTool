@@ -2,10 +2,7 @@
 
 import { NotableSessionsFeed } from "./notable-sessions-feed";
 import { WorkoutPatternAnalysis } from "./workout-pattern-analysis";
-import type {
-  NotableSessionView,
-  PatternInsightView,
-} from "@/lib/runs/viewModels";
+import type { NotableSessionView, PatternInsightView } from "@/lib/runs/viewModels";
 
 export function SessionIntelligencePanel({
   sessions,

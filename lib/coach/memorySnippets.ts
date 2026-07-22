@@ -9,9 +9,7 @@ export interface MemorySnippet {
   stability?: "emerging" | "stable" | "weakening";
 }
 
-export function buildMemorySnippets(
-  analytics: DashboardInsights | null
-): MemorySnippet[] {
+export function buildMemorySnippets(analytics: DashboardInsights | null): MemorySnippet[] {
   if (!analytics) return [];
 
   const out: MemorySnippet[] = [];
@@ -31,10 +29,7 @@ export function buildMemorySnippets(
       id: "intensity",
       label: "Intensity pattern",
       text: analytics.intensityAdvice.recommendations[0],
-      confidence:
-        analytics.intensityAdvice.status === "insufficient_data"
-          ? "low"
-          : "medium",
+      confidence: analytics.intensityAdvice.status === "insufficient_data" ? "low" : "medium",
     });
   }
 
@@ -43,8 +38,7 @@ export function buildMemorySnippets(
       id: "efficiency",
       label: "Aerobic efficiency",
       text: analytics.efficiencyMoM.narrative,
-      confidence:
-        analytics.efficiencyMoM.comparableCount >= 6 ? "medium" : "low",
+      confidence: analytics.efficiencyMoM.comparableCount >= 6 ? "medium" : "low",
     });
   }
 

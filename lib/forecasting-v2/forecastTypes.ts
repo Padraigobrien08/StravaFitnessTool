@@ -105,12 +105,7 @@ export type ForecastContributor = {
   direction: "positive" | "negative" | "neutral";
   magnitude: "small" | "medium" | "large";
   component:
-    | "capability"
-    | "durability"
-    | "freshness"
-    | "specificity"
-    | "execution"
-    | "uncertainty";
+    "capability" | "durability" | "freshness" | "specificity" | "execution" | "uncertainty";
   evidence: string;
   confidence: "low" | "medium" | "high";
 };

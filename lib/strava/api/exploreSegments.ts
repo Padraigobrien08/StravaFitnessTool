@@ -8,7 +8,7 @@ export interface ExploreSegmentsResult {
 export async function exploreSegments(
   accessToken: string,
   bounds: [number, number, number, number],
-  activityType?: string
+  activityType?: string,
 ): Promise<ExploreSegmentsResult> {
   const [south, west, north, east] = bounds;
   const data = await stravaGet<ExploreSegmentsResult>(
@@ -18,7 +18,7 @@ export async function exploreSegments(
       bounds: `${south},${west},${north},${east}`,
       ...(activityType ? { activity_type: activityType } : {}),
     },
-    { context: "explore segments" }
+    { context: "explore segments" },
   );
   return data ?? { segments: [] };
 }

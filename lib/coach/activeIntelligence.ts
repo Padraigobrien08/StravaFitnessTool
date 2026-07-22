@@ -11,10 +11,7 @@ import {
 } from "@/lib/athlete-memory";
 import type { MemorySnippet } from "./memorySnippets";
 import { buildCoachContextSnapshot } from "./viewModel";
-import {
-  buildActiveInvestigations,
-  buildContinuityLine,
-} from "./investigations";
+import { buildActiveInvestigations, buildContinuityLine } from "./investigations";
 import type {
   ActiveObservation,
   CoachWorkspaceState,
@@ -33,7 +30,7 @@ function toneFromInsight(severity: Insight["severity"]): ObservationTone {
 
 export function buildActiveObservations(
   analytics: DashboardInsights,
-  insights: Insight[]
+  insights: Insight[],
 ): ActiveObservation[] {
   const out: ActiveObservation[] = [];
   const seen = new Set<string>();
@@ -106,7 +103,7 @@ export function buildActiveObservations(
   }
 
   const tempoCount = analytics.workoutTypeMix.find(
-    (b) => b.type === "tempo" || b.type === "interval"
+    (b) => b.type === "tempo" || b.type === "interval",
   );
   if (tempoCount && tempoCount.runCount >= 2) {
     push({
@@ -124,9 +121,7 @@ export function buildActiveObservations(
     push({
       id: "ecosystem",
       text: ecoHead,
-      tone: eco.interferenceFlags.some((f) => f.severity !== "low")
-        ? "warning"
-        : "neutral",
+      tone: eco.interferenceFlags.some((f) => f.severity !== "low") ? "warning" : "neutral",
       domain: "Cross-training",
       confidence: eco.confidence,
     });
@@ -148,7 +143,7 @@ export function buildActiveObservations(
 
 export function deriveCurrentFocus(
   analytics: DashboardInsights,
-  observations: ActiveObservation[]
+  observations: ActiveObservation[],
 ): { focus: string; rationale: string } {
   if (analytics.fatigue.tsb < -15) {
     return {
@@ -187,10 +182,9 @@ export function deriveCurrentFocus(
 export function buildCoachingDomains(
   analytics: DashboardInsights,
   insights: Insight[],
-  memory: MemorySnippet[]
+  memory: MemorySnippet[],
 ): CoachingDomain[] {
-  const mem = (cat: string) =>
-    memory.find((m) => m.label.toLowerCase() === cat)?.text ?? null;
+  const mem = (cat: string) => memory.find((m) => m.label.toLowerCase() === cat)?.text ?? null;
   const eco = analytics.trainingEcosystem;
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
 
@@ -323,8 +317,7 @@ export function buildCoachingDomains(
       liveInsight: `${analytics.consistencyScore.overall}/100 consistency · ${analytics.currentWeek.distanceKm} km this week`,
       trendBadge: {
         label: analytics.weeklyNarrative.severity === "positive" ? "On track" : "Watch",
-        tone:
-          analytics.weeklyNarrative.severity === "positive" ? "up" : "alert",
+        tone: analytics.weeklyNarrative.severity === "positive" ? "up" : "alert",
       },
       memoryRef: mem("pacing"),
       suggestedQuery: "What type of training helps me improve pace most?",
@@ -335,10 +328,7 @@ export function buildCoachingDomains(
   return domains.sort((a, b) => b.priority - a.priority);
 }
 
-export function buildTemporalContext(
-  analytics: DashboardInsights,
-  raceGoal: RaceGoal | null
-) {
+export function buildTemporalContext(analytics: DashboardInsights, raceGoal: RaceGoal | null) {
   const prev = analytics.previousWeek;
   const cur = analytics.currentWeek;
   let weekTransition: string | null = null;
@@ -376,7 +366,7 @@ export function buildTemporalContext(
 
 export function buildRisksAndOpportunities(
   analytics: DashboardInsights,
-  observations: ActiveObservation[]
+  observations: ActiveObservation[],
 ): RiskOpportunity[] {
   const out: RiskOpportunity[] = [];
 
@@ -460,9 +450,7 @@ export function buildRisksAndOpportunities(
   return out.slice(0, 6);
 }
 
-export function extractPinnedConclusions(
-  messages: CoachMessage[]
-): PinnedConclusion[] {
+export function extractPinnedConclusions(messages: CoachMessage[]): PinnedConclusion[] {
   return messages
     .filter((m) => m.role === "assistant" && m.parsed?.summary)
     .slice(-3)
@@ -480,7 +468,7 @@ export function buildCoachWorkspaceState(
   analytics: DashboardInsights | null,
   insights: Insight[],
   raceGoal: RaceGoal | null,
-  messages: CoachMessage[] = []
+  messages: CoachMessage[] = [],
 ): CoachWorkspaceState | null {
   if (!analytics) return null;
 

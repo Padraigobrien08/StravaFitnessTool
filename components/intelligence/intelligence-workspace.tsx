@@ -11,7 +11,7 @@ export function IntelligenceWorkspace({
     <div
       className={cn(
         "intelligence-workspace -mx-4 w-[calc(100%+2rem)] max-w-none sm:-mx-5 sm:w-[calc(100%+2.5rem)] lg:-mx-6 lg:w-[calc(100%+3rem)]",
-        className
+        className,
       )}
     >
       {children}

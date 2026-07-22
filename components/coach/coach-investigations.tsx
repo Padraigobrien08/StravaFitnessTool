@@ -41,13 +41,13 @@ export function CoachInvestigations({
                 "group w-full rounded-lg border border-white/[0.06] bg-white/[0.02] text-left transition-all",
                 "hover:border-teal-500/25 hover:bg-teal-500/[0.04] disabled:opacity-40",
                 compact ? "px-2.5 py-2" : "px-3 py-3",
-                !compact && i === 0 && "sm:col-span-2 border-teal-500/15 bg-teal-500/[0.03]"
+                !compact && i === 0 && "sm:col-span-2 border-teal-500/15 bg-teal-500/[0.03]",
               )}
             >
               <p
                 className={cn(
                   "font-medium text-zinc-200 group-hover:text-white",
-                  compact ? "text-xs" : "text-sm"
+                  compact ? "text-xs" : "text-sm",
                 )}
               >
                 {inv.question}
@@ -55,7 +55,7 @@ export function CoachInvestigations({
               <p
                 className={cn(
                   "mt-1 text-zinc-600 line-clamp-2",
-                  compact ? "text-[10px]" : "text-[11px]"
+                  compact ? "text-[10px]" : "text-[11px]",
                 )}
               >
                 {inv.rationale}

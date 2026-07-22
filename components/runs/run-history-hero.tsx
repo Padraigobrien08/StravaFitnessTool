@@ -29,10 +29,7 @@ export function RunHistoryHero({ hero }: { hero: RunsHeroView }) {
             <p className="text-[10px] text-zinc-600">Current signals</p>
             <ul className="mt-1 space-y-0.5">
               {hero.signals.map((s) => (
-                <li
-                  key={s}
-                  className="flex gap-2 text-[13px] text-zinc-400 before:content-['–']"
-                >
+                <li key={s} className="flex gap-2 text-[13px] text-zinc-400 before:content-['–']">
                   <span>{s}</span>
                 </li>
               ))}
@@ -50,9 +47,7 @@ export function RunHistoryHero({ hero }: { hero: RunsHeroView }) {
         </div>
 
         <aside className="rounded-lg border border-white/[0.05] bg-white/[0.03] p-3">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-            State
-          </p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">State</p>
           <dl className="mt-2 space-y-2 text-[11px]">
             <StateRow label="Readiness" value={hero.stateCard.readiness} />
             <StateRow label="Consistency" value={hero.stateCard.consistency} />

@@ -1,11 +1,6 @@
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import { weekStartKey } from "@/lib/analytics/week";
-import {
-  aggregateWeek,
-  buildRecentWeeks,
-  buildRollingSnapshots,
-  inWindow,
-} from "./aggregates";
+import { aggregateWeek, buildRecentWeeks, buildRollingSnapshots, inWindow } from "./aggregates";
 import {
   archetypeDisplayLabel,
   detectAthleteArchetype,
@@ -14,17 +9,13 @@ import {
 import { buildEcosystemInsightList } from "./insightGenerators";
 import { collectInterferenceFlags } from "./interference";
 import { computeEcosystemScores } from "./scoring";
-import type {
-  NormalizedActivity,
-  TotalTrainingContext,
-  TrainingEcosystemAnalysis,
-} from "./types";
+import type { NormalizedActivity, TotalTrainingContext, TrainingEcosystemAnalysis } from "./types";
 
 export { detectInterference, detectRaceWeekInterference } from "./interference";
 
 function buildTotalContext(
   activities: NormalizedActivity[],
-  rolling28: ReturnType<typeof buildRollingSnapshots>[28]
+  rolling28: ReturnType<typeof buildRollingSnapshots>[28],
 ): TotalTrainingContext {
   const last28 = activities.filter((a) => inWindow(a.startDate, 28));
   const runs = last28.filter((a) => a.modality === "run");
@@ -33,14 +24,10 @@ function buildTotalContext(
   const crossMin = nonRun.reduce((s, a) => s + a.movingTimeSec, 0) / 60;
   const bikeMin =
     rolling28?.bikeMinutes ??
-    last28
-      .filter((a) => a.modality === "bike")
-      .reduce((s, a) => s + a.movingTimeSec / 60, 0);
+    last28.filter((a) => a.modality === "bike").reduce((s, a) => s + a.movingTimeSec / 60, 0);
   const swimMin =
     rolling28?.swimMinutes ??
-    last28
-      .filter((a) => a.modality === "swim")
-      .reduce((s, a) => s + a.movingTimeSec / 60, 0);
+    last28.filter((a) => a.modality === "swim").reduce((s, a) => s + a.movingTimeSec / 60, 0);
 
   const mixMap = new Map<string, number>();
   for (const a of last28) {
@@ -50,8 +37,7 @@ function buildTotalContext(
     .map(([sportType, count]) => ({
       sportType,
       count,
-      modality:
-        last28.find((x) => x.sportType === sportType)?.modality ?? "unknown",
+      modality: last28.find((x) => x.sportType === sportType)?.modality ?? "unknown",
     }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
@@ -65,11 +51,11 @@ function buildTotalContext(
     last28Days: {
       runSessions: runs.length,
       nonRunSessions: nonRun.length,
-      totalMovingHours: Math.round((runMin + crossMin) / 60 * 10) / 10,
-      runMovingHours: Math.round(runMin / 60 * 10) / 10,
-      crossTrainingMovingHours: Math.round(crossMin / 60 * 10) / 10,
-      bikeHours: Math.round(bikeMin / 60 * 10) / 10,
-      swimHours: Math.round(swimMin / 60 * 10) / 10,
+      totalMovingHours: Math.round(((runMin + crossMin) / 60) * 10) / 10,
+      runMovingHours: Math.round((runMin / 60) * 10) / 10,
+      crossTrainingMovingHours: Math.round((crossMin / 60) * 10) / 10,
+      bikeHours: Math.round((bikeMin / 60) * 10) / 10,
+      swimHours: Math.round((swimMin / 60) * 10) / 10,
       strengthSessions: last28.filter((a) => a.modality === "strength").length,
       mobilitySessions: last28.filter((a) => a.modality === "mobility").length,
     },
@@ -81,7 +67,7 @@ function buildTotalContext(
 export function buildTrainingEcosystem(
   activities: NormalizedActivity[],
   raceGoal: RaceGoal | null = null,
-  dataConfidence: "low" | "medium" | "high" = "medium"
+  dataConfidence: "low" | "medium" | "high" = "medium",
 ): TrainingEcosystemAnalysis {
   const interferenceFlags = collectInterferenceFlags(activities, raceGoal);
   const raceWeekWarnings = interferenceFlags.filter((f) => f.kind === "race_week");
@@ -99,7 +85,7 @@ export function buildTrainingEcosystem(
     interferenceFlags,
     runKm28,
     runSessionPct,
-    nonRun28
+    nonRun28,
   );
 
   const rolling = buildRollingSnapshots(activities);
@@ -110,9 +96,7 @@ export function buildTrainingEcosystem(
 
   const archetype = detectAthleteArchetype(rolling[56], rolling[84]);
   const modalityCoverage = modalityCoverageFromDistribution(
-    rolling[84]?.modalityDistribution ??
-      rolling[28]?.modalityDistribution ??
-      {}
+    rolling[84]?.modalityDistribution ?? rolling[28]?.modalityDistribution ?? {},
   );
 
   for (const f of interferenceFlags.filter((x) => x.severity !== "low").slice(0, 2)) {

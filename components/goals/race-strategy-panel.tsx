@@ -15,10 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WhatThisMeans } from "@/components/layout/what-this-means";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RaceGoal } from "@/lib/analytics/readiness";
-import {
-  simulateRaceStrategy,
-  type StrategyMode,
-} from "@/lib/analytics/raceStrategy";
+import { simulateRaceStrategy, type StrategyMode } from "@/lib/analytics/raceStrategy";
 import { formatDuration, formatPace } from "@/lib/utils";
 import { useTrainingChart } from "@/components/training/charts/chart-theme";
 
@@ -53,9 +50,9 @@ export function RaceStrategyPanel({
         analytics.racePredictionAnalysis,
         analytics.fatigue,
         analytics.raceReadiness,
-        mode
+        mode,
       ),
-    [raceGoal, analytics, mode]
+    [raceGoal, analytics, mode],
   );
 
   if (!strategy) {
@@ -85,11 +82,8 @@ export function RaceStrategyPanel({
       <CardHeader>
         <CardTitle>Race day strategy</CardTitle>
         <p className="text-sm text-zinc-500">
-          Target {formatDuration(strategy.targetTimeSec)} ({strategy.targetTimeSource})
-          · Fade risk:{" "}
-          <span className={fadeColor[strategy.fadeRisk]}>
-            {strategy.fadeRisk}
-          </span>
+          Target {formatDuration(strategy.targetTimeSec)} ({strategy.targetTimeSource}) · Fade risk:{" "}
+          <span className={fadeColor[strategy.fadeRisk]}>{strategy.fadeRisk}</span>
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -128,10 +122,7 @@ export function RaceStrategyPanel({
             </thead>
             <tbody>
               {strategy.splits.map((s) => (
-                <tr
-                  key={s.km}
-                  className="border-b border-white/5 text-zinc-300"
-                >
+                <tr key={s.km} className="border-b border-white/5 text-zinc-300">
                   <td className="py-2 pr-4 tabular-nums">{s.km}</td>
                   <td className="py-2 pr-4 tabular-nums text-white">
                     {formatDuration(s.cumulativeSec)}
@@ -152,25 +143,12 @@ export function RaceStrategyPanel({
           <p className="mb-2 text-xs text-zinc-500">Pace profile by segment</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={chartData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="var(--chart-grid)"
-              />
-              <XAxis
-                dataKey="km"
-                tick={chartTick}
-                unit=" km"
-              />
-              <YAxis
-                tick={chartTick}
-                reversed
-                tickFormatter={formatPaceTick}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+              <XAxis dataKey="km" tick={chartTick} unit=" km" />
+              <YAxis tick={chartTick} reversed tickFormatter={formatPaceTick} />
               <Tooltip
                 contentStyle={chart.tooltip}
-                formatter={(v) =>
-                  typeof v === "number" ? formatPace(v) : String(v)
-                }
+                formatter={(v) => (typeof v === "number" ? formatPace(v) : String(v))}
               />
               <ReferenceLine
                 y={strategy.targetTimeSec / strategy.distanceKm}
@@ -207,8 +185,8 @@ export function RaceStrategyPanel({
         )}
 
         <WhatThisMeans>
-          {strategy.uncertaintyNote} Splits are scaled to match your target time
-          exactly; adjust if conditions or how you feel on the day differ.
+          {strategy.uncertaintyNote} Splits are scaled to match your target time exactly; adjust if
+          conditions or how you feel on the day differ.
         </WhatThisMeans>
       </CardContent>
     </Card>

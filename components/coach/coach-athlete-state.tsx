@@ -4,14 +4,7 @@ import { useState } from "react";
 import type { CoachWorkspaceState } from "@/lib/coach/types";
 import { CoachDomainChips } from "./coach-domain-chips";
 import { cn } from "@/lib/utils";
-import {
-  AlertTriangle,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, ChevronUp, Sparkles, TrendingUp } from "lucide-react";
 
 const toneIcon = {
   positive: Check,
@@ -52,9 +45,7 @@ export function CoachAthleteState({
   const opps = state.risksAndOpportunities.filter((r) => r.kind === "opportunity");
 
   const statusLine = [
-    state.snapshot.freshness != null
-      ? `Freshness ${state.snapshot.freshness}`
-      : null,
+    state.snapshot.freshness != null ? `Freshness ${state.snapshot.freshness}` : null,
     state.snapshot.riskLevel !== "low" ? state.snapshot.riskLabel : null,
     state.snapshot.recommendationConfidence
       ? `${state.snapshot.recommendationConfidence} confidence`
@@ -65,42 +56,28 @@ export function CoachAthleteState({
 
   return (
     <aside
-      className={cn(
-        "coach-athlete-state flex h-full min-h-0 flex-col text-zinc-500",
-        className
-      )}
+      className={cn("coach-athlete-state flex h-full min-h-0 flex-col text-zinc-500", className)}
     >
       <div className="coach-athlete-scroll flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-4 space-y-4">
         <section>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600">
-            Current state
-          </p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-600">Current state</p>
           <h2 className="mt-1 font-display text-base font-semibold text-zinc-200">
             {state.currentFocus}
           </h2>
           {statusLine ? (
-            <p className="mt-1 text-[11px] leading-snug text-zinc-600">
-              {statusLine}
-            </p>
+            <p className="mt-1 text-[11px] leading-snug text-zinc-600">{statusLine}</p>
           ) : null}
         </section>
 
         {state.observations.length > 0 ? (
           <section>
-            <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-zinc-600">
-              Key signals
-            </p>
+            <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-zinc-600">Key signals</p>
             <ul className="space-y-1.5">
               {state.observations.slice(0, 5).map((o) => {
                 const Icon = toneIcon[o.tone];
                 return (
-                  <li
-                    key={o.id}
-                    className="flex gap-2 text-[11px] leading-snug text-zinc-500"
-                  >
-                    <Icon
-                      className={cn("mt-0.5 h-3 w-3 shrink-0", toneClass[o.tone])}
-                    />
+                  <li key={o.id} className="flex gap-2 text-[11px] leading-snug text-zinc-500">
+                    <Icon className={cn("mt-0.5 h-3 w-3 shrink-0", toneClass[o.tone])} />
                     <span>{o.text}</span>
                   </li>
                 );
@@ -117,31 +94,23 @@ export function CoachAthleteState({
               className="flex w-full items-center justify-between text-[10px] uppercase tracking-[0.2em] text-zinc-600"
             >
               Memory
-              {memoryOpen ? (
-                <ChevronUp className="h-3 w-3" />
-              ) : (
-                <ChevronDown className="h-3 w-3" />
-              )}
+              {memoryOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
             </button>
             <ul className="mt-2 space-y-1.5">
-              {(memoryOpen ? state.memory : state.memory.slice(0, 3)).map(
-                (m) => (
-                  <li key={m.id} className="text-[11px] leading-snug">
-                    <span className="text-zinc-600">{m.label}: </span>
-                    <span className="text-zinc-500">
-                      {compactMemoryLine(m.text, memoryOpen ? 200 : 56)}
-                    </span>
-                  </li>
-                )
-              )}
+              {(memoryOpen ? state.memory : state.memory.slice(0, 3)).map((m) => (
+                <li key={m.id} className="text-[11px] leading-snug">
+                  <span className="text-zinc-600">{m.label}: </span>
+                  <span className="text-zinc-500">
+                    {compactMemoryLine(m.text, memoryOpen ? 200 : 56)}
+                  </span>
+                </li>
+              ))}
             </ul>
           </section>
         ) : null}
 
         <section>
-          <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-zinc-600">
-            Domains
-          </p>
+          <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-zinc-600">Domains</p>
           <CoachDomainChips
             domains={state.domains}
             activeDomainId={activeDomainId}
@@ -160,8 +129,8 @@ export function CoachAthleteState({
               Risks / opportunities
             </button>
             <p className="mt-1 text-[11px] text-zinc-600">
-              {risks.length} risk{risks.length !== 1 ? "s" : ""} · {opps.length}{" "}
-              opportunit{opps.length !== 1 ? "ies" : "y"}
+              {risks.length} risk{risks.length !== 1 ? "s" : ""} · {opps.length} opportunit
+              {opps.length !== 1 ? "ies" : "y"}
             </p>
           </section>
         ) : null}

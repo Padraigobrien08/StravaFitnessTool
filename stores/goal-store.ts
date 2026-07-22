@@ -18,6 +18,6 @@ export const useGoalStore = create<GoalState>()(
       setRaceGoal: (raceGoal) => set({ raceGoal }),
       clearRaceGoal: () => set({ raceGoal: null }),
     }),
-    { name: "strideiq-goal-store-v1" }
-  )
+    { name: "strideiq-goal-store-v1" },
+  ),
 );

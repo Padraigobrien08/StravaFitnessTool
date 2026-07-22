@@ -2,9 +2,7 @@ import type { DashboardInsights } from "@/lib/analytics";
 import { createBelief } from "./beliefUtils";
 import type { AthleteBelief } from "./types";
 
-export function inferAdaptationPatterns(
-  analytics: DashboardInsights
-): AthleteBelief[] {
+export function inferAdaptationPatterns(analytics: DashboardInsights): AthleteBelief[] {
   const out: AthleteBelief[] = [];
 
   if (analytics.efficiencySummary.trend === "improving") {
@@ -16,16 +14,13 @@ export function inferAdaptationPatterns(
           "Aerobic efficiency appears to improve during stretches of stable volume and consistent easy running.",
         evidence: [
           "Efficiency trend: improving",
-          ...(analytics.efficiencyMoM.narrative
-            ? [analytics.efficiencyMoM.narrative]
-            : []),
+          ...(analytics.efficiencyMoM.narrative ? [analytics.efficiencyMoM.narrative] : []),
           `Comparable runs: ${analytics.efficiencyMoM.comparableCount}`,
         ].filter(Boolean),
-        confidence:
-          analytics.efficiencyMoM.comparableCount >= 6 ? "medium" : "low",
+        confidence: analytics.efficiencyMoM.comparableCount >= 6 ? "medium" : "low",
         recommendedUse:
           "Favour aerobic rhythm and protect improving trend with polarized easy days.",
-      })
+      }),
     );
   }
 
@@ -41,9 +36,8 @@ export function inferAdaptationPatterns(
           `Freshness ${Math.round(analytics.fatigue.freshness)}`,
         ],
         confidence: "low",
-        recommendedUse:
-          "Prioritize recovery and easy volume before adding quality.",
-      })
+        recommendedUse: "Prioritize recovery and easy volume before adding quality.",
+      }),
     );
   }
 
@@ -62,7 +56,7 @@ export function inferAdaptationPatterns(
         confidence: analytics.dataConfidence === "high" ? "medium" : "low",
         recommendedUse:
           "When building, replicate the rhythm of past strong blocks rather than spiking volume abruptly.",
-      })
+      }),
     );
   }
 
@@ -74,14 +68,11 @@ export function inferAdaptationPatterns(
         category: "adaptation",
         statement:
           "Recent breakthrough efforts suggest the current block is translating to performance when freshness is adequate.",
-        evidence: [
-          `New ${prRecent.label} PR`,
-          `Consistency: ${analytics.consistencyScore.label}`,
-        ],
+        evidence: [`New ${prRecent.label} PR`, `Consistency: ${analytics.consistencyScore.label}`],
         confidence: "low",
         recommendedUse:
           "Anchor confidence on recent proof efforts but avoid stacking quality immediately after.",
-      })
+      }),
     );
   }
 

@@ -51,10 +51,7 @@ function createClient(url: string): SqlClient {
     transform: {
       value: {
         from: (value: unknown, column: { type: number }) => {
-          if (
-            typeof value === "string" &&
-            (column.type === 114 || column.type === 3802)
-          ) {
+          if (typeof value === "string" && (column.type === 114 || column.type === 3802)) {
             try {
               return JSON.parse(value);
             } catch {

@@ -1,9 +1,4 @@
-import {
-  allBeliefs,
-  bumpConfidence,
-  lowerConfidence,
-  uniqueEvidence,
-} from "./beliefUtils";
+import { allBeliefs, bumpConfidence, lowerConfidence, uniqueEvidence } from "./beliefUtils";
 import { buildAthleteMemoryProfile } from "./buildAthleteMemoryProfile";
 import type { DashboardInsights } from "@/lib/analytics";
 import type {
@@ -13,10 +8,7 @@ import type {
   MemoryUpdateEvidence,
 } from "./types";
 
-function categoryKey(
-  profile: AthleteMemoryProfile,
-  category: BeliefCategory
-): AthleteBelief[] {
+function categoryKey(profile: AthleteMemoryProfile, category: BeliefCategory): AthleteBelief[] {
   switch (category) {
     case "adaptation":
       return profile.adaptationPatterns;
@@ -40,7 +32,7 @@ function categoryKey(
 function setCategoryBeliefs(
   profile: AthleteMemoryProfile,
   category: BeliefCategory,
-  beliefs: AthleteBelief[]
+  beliefs: AthleteBelief[],
 ): void {
   switch (category) {
     case "adaptation":
@@ -72,7 +64,7 @@ function setCategoryBeliefs(
 function updateBeliefList(
   existing: AthleteBelief[],
   category: BeliefCategory,
-  evidence: MemoryUpdateEvidence
+  evidence: MemoryUpdateEvidence,
 ): AthleteBelief[] {
   const support = evidence.supporting?.[category] ?? [];
   const contradict = evidence.contradicting?.[category] ?? [];
@@ -85,10 +77,7 @@ function updateBeliefList(
     if (support.length) {
       updated.evidence = uniqueEvidence([...belief.evidence, ...support]);
       updated.lastUpdated = now;
-      updated.confidence = bumpConfidence(
-        belief.confidence,
-        updated.evidence.length
-      );
+      updated.confidence = bumpConfidence(belief.confidence, updated.evidence.length);
       if (updated.evidence.length >= 3 && updated.counterEvidence.length === 0) {
         updated.stability = "stable";
       } else if (updated.stability === "weakening") {
@@ -97,10 +86,7 @@ function updateBeliefList(
     }
 
     if (contradict.length) {
-      updated.counterEvidence = uniqueEvidence([
-        ...belief.counterEvidence,
-        ...contradict,
-      ]);
+      updated.counterEvidence = uniqueEvidence([...belief.counterEvidence, ...contradict]);
       updated.lastUpdated = now;
       updated.confidence = lowerConfidence(belief.confidence);
       if (updated.counterEvidence.length >= updated.evidence.length) {
@@ -118,8 +104,7 @@ function updateBeliefList(
     if (candidate.category !== category) continue;
     if (byId.has(candidate.id)) continue;
     if (candidate.evidence.length < 1) continue;
-    const conf =
-      candidate.evidence.length >= 3 ? candidate.confidence : "low";
+    const conf = candidate.evidence.length >= 3 ? candidate.confidence : "low";
     byId.set(candidate.id, {
       ...candidate,
       confidence: conf === "high" && candidate.evidence.length < 3 ? "medium" : conf,
@@ -143,7 +128,7 @@ const CATEGORIES: BeliefCategory[] = [
 export function updateAthleteMemoryProfile(
   previousProfile: AthleteMemoryProfile | null,
   newEvidence: MemoryUpdateEvidence,
-  freshAnalytics?: DashboardInsights | null
+  freshAnalytics?: DashboardInsights | null,
 ): AthleteMemoryProfile {
   const athleteId = previousProfile?.athleteId;
   const base =
@@ -168,19 +153,12 @@ export function updateAthleteMemoryProfile(
   };
 
   for (const category of CATEGORIES) {
-    const updated = updateBeliefList(
-      categoryKey(profile, category),
-      category,
-      newEvidence
-    );
+    const updated = updateBeliefList(categoryKey(profile, category), category, newEvidence);
     setCategoryBeliefs(profile, category, updated);
   }
 
   if (freshAnalytics) {
-    const rebuilt = buildAthleteMemoryProfile(
-      freshAnalytics,
-      profile.athleteId
-    );
+    const rebuilt = buildAthleteMemoryProfile(freshAnalytics, profile.athleteId);
     const mergedIds = new Set(allBeliefs(profile).map((b) => b.id));
     for (const belief of allBeliefs(rebuilt)) {
       if (mergedIds.has(belief.id)) continue;

@@ -1,11 +1,7 @@
 import type { WorkoutType } from "@/lib/analytics/workoutType";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const styles: Record<WorkoutType, string> = {

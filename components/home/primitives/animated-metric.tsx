@@ -35,18 +35,10 @@ export function AnimatedMetric({
     return () => cancelAnimationFrame(raf);
   }, [value, duration]);
 
-  return (
-    <span className={cn("tabular-nums", className)}>{display}</span>
-  );
+  return <span className={cn("tabular-nums", className)}>{display}</span>;
 }
 
-export function AnimatedText({
-  text,
-  className,
-}: {
-  text: string;
-  className?: string;
-}) {
+export function AnimatedText({ text, className }: { text: string; className?: string }) {
   return (
     <span
       key={text}

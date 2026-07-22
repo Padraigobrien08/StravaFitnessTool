@@ -108,15 +108,15 @@ export function isRunSportType(sportType: string): boolean {
 /** Aerobic support modalities (non-run, non-HIIT) */
 export function isAerobicSupportModality(m: ActivityModality): boolean {
   return (
-    m === "bike" ||
-    m === "swim" ||
-    m === "aerobic_cross_training" ||
-    m === "outdoor_endurance"
+    m === "bike" || m === "swim" || m === "aerobic_cross_training" || m === "outdoor_endurance"
   );
 }
 
 export function isHighIntensityModality(
-  a: Pick<{ modality: ActivityModality; perceivedIntensity: string }, "modality" | "perceivedIntensity">
+  a: Pick<
+    { modality: ActivityModality; perceivedIntensity: string },
+    "modality" | "perceivedIntensity"
+  >,
 ): boolean {
   return (
     a.modality === "high_intensity_cross_training" ||
@@ -143,9 +143,6 @@ export function modalityLabel(m: ActivityModality): string {
   return labels[m];
 }
 
-export function registerSportTypeMapping(
-  sportType: string,
-  modality: ActivityModality
-): void {
+export function registerSportTypeMapping(sportType: string, modality: ActivityModality): void {
   SPORT_TO_MODALITY[normalizeSportType(sportType)] = modality;
 }

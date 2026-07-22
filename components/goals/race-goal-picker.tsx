@@ -13,11 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGoalStore } from "@/stores/goal-store";
-import {
-  RACE_DISTANCE_LABELS,
-  type RaceDistance,
-  type RaceGoal,
-} from "@/lib/analytics/readiness";
+import { RACE_DISTANCE_LABELS, type RaceDistance, type RaceGoal } from "@/lib/analytics/readiness";
 
 const DISTANCES: RaceDistance[] = ["5k", "10k", "hm", "marathon"];
 
@@ -41,8 +37,7 @@ export function RaceGoalPicker() {
   const [distance, setDistance] = useState<RaceDistance>(raceGoal?.distance ?? "hm");
   const [date, setDate] = useState(
     () =>
-      raceGoal?.date ??
-      new Date(Date.now() + 56 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+      raceGoal?.date ?? new Date(Date.now() + 56 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
   );
   const [targetTime, setTargetTime] = useState("");
 
@@ -69,10 +64,7 @@ export function RaceGoalPicker() {
         <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label className="text-zinc-500">Distance</Label>
-            <Select
-              value={distance}
-              onValueChange={(v) => setDistance(v as RaceDistance)}
-            >
+            <Select value={distance} onValueChange={(v) => setDistance(v as RaceDistance)}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>

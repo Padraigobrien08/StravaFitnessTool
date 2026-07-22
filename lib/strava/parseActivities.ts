@@ -27,18 +27,12 @@ function distanceMeters(row: Record<string, string>): number {
 }
 
 function elapsedSeconds(row: Record<string, string>): number {
-  return (
-    parseNum(pickField(row, "Elapsed Time")) ??
-    parseNum(row["Elapsed Time"]) ??
-    0
-  );
+  return parseNum(pickField(row, "Elapsed Time")) ?? parseNum(row["Elapsed Time"]) ?? 0;
 }
 
 function movingSeconds(row: Record<string, string>): number {
   return (
-    parseNum(pickField(row, "Moving Time")) ??
-    parseNum(row["Moving Time"]) ??
-    elapsedSeconds(row)
+    parseNum(pickField(row, "Moving Time")) ?? parseNum(row["Moving Time"]) ?? elapsedSeconds(row)
   );
 }
 
@@ -102,8 +96,7 @@ export function parseActivitiesCsv(csvText: string): {
       calories: parseNum(pickField(row, "Calories")),
       relativeEffort: parseNum(pickField(row, "Relative Effort")),
       trainingLoad: parseNum(pickField(row, "Training Load")),
-      gradeAdjustedPaceSecPerKm:
-        gap && gap > 0 ? gap : null,
+      gradeAdjustedPaceSecPerKm: gap && gap > 0 ? gap : null,
       avgCadence: parseNum(pickField(row, "Average Cadence")),
       totalSteps: parseNum(pickField(row, "Total Steps")),
       weatherTempC: parseNum(row["Weather Temperature"]),
@@ -113,15 +106,11 @@ export function parseActivitiesCsv(csvText: string): {
   }
 
   runs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  allActivities.sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+  allActivities.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return { runs, allActivities };
 }
 
 export function filterRuns(runs: RunActivity[]): RunActivity[] {
-  return runs.filter(
-    (r) => r.distanceM > 0 && !Number.isNaN(new Date(r.date).getTime())
-  );
+  return runs.filter((r) => r.distanceM > 0 && !Number.isNaN(new Date(r.date).getTime()));
 }

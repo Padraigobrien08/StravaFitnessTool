@@ -5,10 +5,7 @@ import type { WeekExecutionSummary } from "@/lib/training-calendar/matchPlannedV
 import type { ExecutionMatchStatus } from "@/lib/training-calendar/matchPlannedVsActual";
 import { cn } from "@/lib/utils";
 
-const statusStyles: Record<
-  ExecutionMatchStatus,
-  { label: string; className: string }
-> = {
+const statusStyles: Record<ExecutionMatchStatus, { label: string; className: string }> = {
   matched: { label: "Matched", className: "text-teal-400/90 bg-teal-500/10" },
   marked_done: {
     label: "Done",
@@ -48,21 +45,13 @@ export function PlanWeekExecution({
         </p>
         {summary.adherencePct != null ? (
           <p className="text-[11px] text-zinc-400">
-            <span className="font-medium text-zinc-300">
-              {summary.adherencePct}%
-            </span>{" "}
-            run sessions aligned
+            <span className="font-medium text-zinc-300">{summary.adherencePct}%</span> run sessions
+            aligned
             {summary.partialDays > 0 ? (
-              <span className="text-zinc-600">
-                {" "}
-                · {summary.partialDays} partial
-              </span>
+              <span className="text-zinc-600"> · {summary.partialDays} partial</span>
             ) : null}
             {summary.missedDays > 0 ? (
-              <span className="text-zinc-600">
-                {" "}
-                · {summary.missedDays} missed
-              </span>
+              <span className="text-zinc-600"> · {summary.missedDays} missed</span>
             ) : null}
           </p>
         ) : null}
@@ -108,14 +97,12 @@ export function PlanWeekExecution({
                         )}
                       </p>
                     ) : null}
-                    {row.note ? (
-                      <p className="text-[10px] text-zinc-600">{row.note}</p>
-                    ) : null}
+                    {row.note ? <p className="text-[10px] text-zinc-600">{row.note}</p> : null}
                   </div>
                   <span
                     className={cn(
                       "shrink-0 rounded px-1.5 py-0.5 text-[9px] font-medium uppercase",
-                      style.className
+                      style.className,
                     )}
                   >
                     {style.label}

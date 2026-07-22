@@ -16,14 +16,10 @@ export function inferPlanHintsFromContext(text: string): PlanContextHints {
   const postRace =
     /\b(just|finished|completed|ran|done|raced)\b/i.test(t) &&
     /\b(half marathon|hm|marathon|10k|race)\b/i.test(t);
-  const recoveryAsk =
-    /\b(recover|recovery|rest week|easy week|de-load|deload)\b/i.test(t);
+  const recoveryAsk = /\b(recover|recovery|rest week|easy week|de-load|deload)\b/i.test(t);
   const conservative =
-    /\b(conservative|cautious|gentle|minimal|very easy|illness|injury|sick)\b/i.test(
-      t
-    );
-  const travel =
-    /\b(travel|away|trip|unavailable|can't run|cannot run)\b/i.test(t);
+    /\b(conservative|cautious|gentle|minimal|very easy|illness|injury|sick)\b/i.test(t);
+  const travel = /\b(travel|away|trip|unavailable|can't run|cannot run)\b/i.test(t);
 
   if (postRace || recoveryAsk) {
     planTypeHint = "recovery";

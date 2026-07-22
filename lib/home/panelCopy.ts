@@ -12,34 +12,23 @@ export interface HomePanelCopy {
   action?: string;
 }
 
-export function heroCopy(
-  insights: Insight[],
-  analytics: DashboardInsights
-): HomePanelCopy {
+export function heroCopy(insights: Insight[], analytics: DashboardInsights): HomePanelCopy {
   const top = topInsightForHome(insights);
   if (top) {
     return {
       title: top.title,
       summary:
-        top.recommendation ??
-        top.evidence[0] ??
-        "Review your training plan for the week ahead.",
+        top.recommendation ?? top.evidence[0] ?? "Review your training plan for the week ahead.",
       severity: mapInsightSeverity(top.severity, top.id),
       action: top.recommendation ? undefined : "Open training plan",
     };
   }
 
-  const readiness =
-    analytics.raceReadiness ?? analytics.halfMarathonReadiness;
+  const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   return {
     title: readiness.label,
     summary: `${readiness.score}/100 readiness · ${analytics.consistencyScore.label}`,
-    severity:
-      readiness.score >= 70
-        ? "positive"
-        : readiness.score >= 50
-          ? "neutral"
-          : "warning",
+    severity: readiness.score >= 70 ? "positive" : readiness.score >= 50 ? "neutral" : "warning",
   };
 }
 
@@ -52,10 +41,7 @@ export function thisWeekCopy(analytics: DashboardInsights): HomePanelCopy {
   };
 }
 
-const intensityTitles: Record<
-  DashboardInsights["intensityAdvice"]["status"],
-  string
-> = {
+const intensityTitles: Record<DashboardInsights["intensityAdvice"]["status"], string> = {
   balanced: "Intensity balance looks sound",
   too_hard: "Training skews too hard",
   too_easy: "Mostly easy running",
@@ -69,7 +55,7 @@ export function nextWeekCopy(analytics: DashboardInsights): HomePanelCopy {
     title: `Next week · ${p.weekLabel}`,
     summary: first
       ? `${first.day ?? "Session"}: ${first.description}`
-      : p.rationale[0] ?? "Plan sessions based on your recent load.",
+      : (p.rationale[0] ?? "Plan sessions based on your recent load."),
     severity: p.warnings.length > 0 ? "warning" : "neutral",
     action: p.warnings[0],
   };
@@ -79,27 +65,19 @@ export function trainingCopy(analytics: DashboardInsights): HomePanelCopy {
   const adv = analytics.intensityAdvice;
   const fatigue = analytics.fatigue;
   let severity: PanelSeverity =
-    adv.status === "too_hard"
-      ? "warning"
-      : adv.status === "balanced"
-        ? "positive"
-        : "neutral";
+    adv.status === "too_hard" ? "warning" : adv.status === "balanced" ? "positive" : "neutral";
   if (fatigue.tsb < -25) severity = "critical";
 
   return {
     title: intensityTitles[adv.status],
     summary:
-      adv.recommendations[0] ??
-      `${adv.currentEasyPct}% easy runs (target ~${adv.easyTargetPct}%).`,
+      adv.recommendations[0] ?? `${adv.currentEasyPct}% easy runs (target ~${adv.easyTargetPct}%).`,
     severity,
     action: adv.recommendations[1],
   };
 }
 
-export function improvingCopy(
-  analytics: DashboardInsights,
-  insights: Insight[]
-): HomePanelCopy {
+export function improvingCopy(analytics: DashboardInsights, insights: Insight[]): HomePanelCopy {
   const improving = insights.filter((i) => i.question === "improving");
   const pr = improving.find((i) => i.id.startsWith("new-pr"));
   if (pr) {
@@ -144,8 +122,7 @@ export function goalCopy(analytics: DashboardInsights): HomePanelCopy {
     return {
       title: `${r.distanceLabel} readiness · ${r.score}/100`,
       summary: `${r.label} · ${r.probabilityBand} · ${r.daysUntilRace} days out`,
-      severity:
-        r.score >= 70 ? "positive" : r.score >= 50 ? "neutral" : "warning",
+      severity: r.score >= 70 ? "positive" : r.score >= 50 ? "neutral" : "warning",
       action: r.gaps[0]
         ? `${r.gaps[0].metric}: ${r.gaps[0].current} → ${r.gaps[0].target}`
         : undefined,
@@ -156,15 +133,11 @@ export function goalCopy(analytics: DashboardInsights): HomePanelCopy {
   return {
     title: `Half marathon readiness · ${hm.score}/100`,
     summary: hm.label,
-    severity:
-      hm.score >= 70 ? "positive" : hm.score >= 50 ? "neutral" : "warning",
+    severity: hm.score >= 70 ? "positive" : hm.score >= 50 ? "neutral" : "warning",
   };
 }
 
-function mapInsightSeverity(
-  severity: Insight["severity"],
-  id: string
-): PanelSeverity {
+function mapInsightSeverity(severity: Insight["severity"], id: string): PanelSeverity {
   if (id === "fatigue-high" || id.includes("overload")) return "critical";
   return severity;
 }

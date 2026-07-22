@@ -22,7 +22,7 @@ export function CoachActivePresence({
     <section
       className={cn(
         "coach-presence relative overflow-hidden rounded-2xl border border-teal-500/10",
-        compact ? "p-4" : "p-5 sm:p-6"
+        compact ? "p-4" : "p-5 sm:p-6",
       )}
     >
       <div
@@ -71,7 +71,7 @@ export function CoachActivePresence({
               key={o.id}
               className={cn(
                 "rounded-lg border px-3 py-2.5 text-[13px] leading-snug",
-                toneStyles[o.tone]
+                toneStyles[o.tone],
               )}
             >
               <span className="text-[10px] font-medium uppercase tracking-wider opacity-60">
@@ -114,7 +114,7 @@ export function CoachObservationStream({
                   ? "text-teal-500/70"
                   : o.tone === "warning"
                     ? "text-amber-500/70"
-                    : "text-zinc-600"
+                    : "text-zinc-600",
               )}
             />
             <span>{o.text}</span>

@@ -6,7 +6,10 @@ import { intelligenceContextFromRequest } from "@/lib/intelligence/auth";
 const bodySchema = z.object({
   forceFallback: z.boolean().optional(),
   planningContext: z.string().max(2000).optional(),
-  weekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  weekStart: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -28,7 +31,7 @@ export async function POST(req: NextRequest) {
     const result = await executeGenerateNextWeekTrainingPlan(
       ctx,
       { planningContext: body.planningContext },
-      { forceFallback: body.forceFallback || !hasOpenAI }
+      { forceFallback: body.forceFallback || !hasOpenAI },
     );
 
     return NextResponse.json({
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Plan generation failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -56,9 +59,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const result = await executeGenerateNextWeekTrainingPlan(ctx, {}, {
-      forceFallback: true,
-    });
+    const result = await executeGenerateNextWeekTrainingPlan(
+      ctx,
+      {},
+      {
+        forceFallback: true,
+      },
+    );
 
     return NextResponse.json({
       plan: result.plan,
@@ -72,7 +79,7 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Plan generation failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -25,8 +25,8 @@ export function RaceProjectionPanel({
     return (
       <PanelChrome title="Race performance projection" accent elevated>
         <p className="text-sm text-zinc-500">
-          Need quality efforts between 4–15 km (or FIT segment data) to build
-          evidence-based projections.{" "}
+          Need quality efforts between 4–15 km (or FIT segment data) to build evidence-based
+          projections.{" "}
           <Link href="/import" className="text-teal-400 hover:underline">
             Import FIT files
           </Link>{" "}
@@ -47,9 +47,7 @@ export function RaceProjectionPanel({
               <p className={dash.label}>{p.label} projection</p>
               <p className="font-display text-3xl font-bold tabular-nums text-white sm:text-4xl">
                 {p.timeDisplay}
-                <span className="ml-2 text-lg font-normal text-zinc-500">
-                  {p.spreadDisplay}
-                </span>
+                <span className="ml-2 text-lg font-normal text-zinc-500">{p.spreadDisplay}</span>
               </p>
               <p className="mt-1 text-sm text-zinc-500">
                 Evidence band {p.rangeDisplay} · {p.paceDisplay} even effort
@@ -59,8 +57,7 @@ export function RaceProjectionPanel({
           </div>
 
           <p className="mt-3 text-xs text-zinc-600">
-            Estimate — not a guarantee. Spread reflects model disagreement and
-            sample size.
+            Estimate — not a guarantee. Spread reflects model disagreement and sample size.
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -146,9 +143,7 @@ export function RaceProjectionPanel({
         aria-expanded={curveOpen}
       >
         Performance curve & model scatter
-        <ChevronDown
-          className={cn("h-4 w-4 transition-transform", curveOpen && "rotate-180")}
-        />
+        <ChevronDown className={cn("h-4 w-4 transition-transform", curveOpen && "rotate-180")} />
       </button>
       {curveOpen ? (
         <div className="mt-3 rounded-lg bg-white/[0.02] p-2 ring-1 ring-inset ring-white/[0.04]">

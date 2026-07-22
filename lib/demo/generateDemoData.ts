@@ -182,8 +182,10 @@ function weeklyVolumeTargets(): number[] {
   const targets: number[] = [];
   for (let w = 0; w < TOTAL_WEEKS; w++) {
     let base: number;
-    if (w < 16) base = 30 + w * 0.6; // base building 30 → ~39
-    else if (w < 34) base = 40 + (w - 16) * 0.35; // aerobic build 40 → ~46
+    if (w < 16)
+      base = 30 + w * 0.6; // base building 30 → ~39
+    else if (w < 34)
+      base = 40 + (w - 16) * 0.35; // aerobic build 40 → ~46
     else base = 43 + Math.sin((w - 34) / 2.5) * 3; // steady undulating plateau ~40–46
     // recovery/down week every 4th week, but not the current week
     if (w % 4 === 1 && w !== TOTAL_WEEKS - 1) base *= 0.75;
@@ -218,7 +220,7 @@ function buildRun(
   date: Date,
   weekIndex: number,
   seq: number,
-  isTrail: boolean
+  isTrail: boolean,
 ): BuiltRun {
   const rng = mulberry32(weekIndex * 1000 + seq * 7 + 13);
   const profile = KIND_PROFILES[kind];
@@ -296,9 +298,31 @@ interface CrossSpec {
 
 /** Weekly cross-training rotation, layered onto the most recent ~16 weeks. */
 const CROSS_TEMPLATE: CrossSpec[] = [
-  { type: "WeightTraining", day: 1, name: "Strength & core", distanceKm: 0, minutes: 45, hrFrac: 0.55 },
-  { type: "Ride", day: 4, name: "Zone 2 spin", distanceKm: 32, minutes: 68, hrFrac: 0.68, watts: 165 },
-  { type: "WeightTraining", day: 4, name: "Lower-body strength", distanceKm: 0, minutes: 40, hrFrac: 0.56 },
+  {
+    type: "WeightTraining",
+    day: 1,
+    name: "Strength & core",
+    distanceKm: 0,
+    minutes: 45,
+    hrFrac: 0.55,
+  },
+  {
+    type: "Ride",
+    day: 4,
+    name: "Zone 2 spin",
+    distanceKm: 32,
+    minutes: 68,
+    hrFrac: 0.68,
+    watts: 165,
+  },
+  {
+    type: "WeightTraining",
+    day: 4,
+    name: "Lower-body strength",
+    distanceKm: 0,
+    minutes: 40,
+    hrFrac: 0.56,
+  },
 ];
 
 /** Less frequent extras for modality variety. */
@@ -343,9 +367,7 @@ function buildCross(spec: CrossSpec, date: Date, seq: number): ActivitySummary {
 function activeSlots(w: number): SessionSpec[] {
   if (w === 20 || w === 41) {
     // disrupted week — just a token easy run + the long run
-    return WEEK_TEMPLATE.filter(
-      (s) => (s.kind === "easy" && s.day === 0) || s.kind === "long"
-    );
+    return WEEK_TEMPLATE.filter((s) => (s.kind === "easy" && s.day === 0) || s.kind === "long");
   }
   const isDown = w % 4 === 1 && w !== TOTAL_WEEKS - 1;
   return WEEK_TEMPLATE.filter((spec) => {

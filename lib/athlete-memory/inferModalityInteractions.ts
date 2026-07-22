@@ -2,16 +2,12 @@ import type { DashboardInsights } from "@/lib/analytics";
 import { createBelief } from "./beliefUtils";
 import type { AthleteBelief } from "./types";
 
-export function inferModalityInteractions(
-  analytics: DashboardInsights
-): AthleteBelief[] {
+export function inferModalityInteractions(analytics: DashboardInsights): AthleteBelief[] {
   const out: AthleteBelief[] = [];
   const eco = analytics.trainingEcosystem;
 
   if (eco.scores.interferenceRisk >= 50) {
-    const flags = eco.interferenceFlags
-      .filter((f) => f.severity !== "low")
-      .slice(0, 2);
+    const flags = eco.interferenceFlags.filter((f) => f.severity !== "low").slice(0, 2);
     out.push(
       createBelief({
         id: "mod-interference",
@@ -25,7 +21,7 @@ export function inferModalityInteractions(
         confidence: eco.scores.interferenceRisk >= 65 ? "medium" : "low",
         recommendedUse:
           "Separate hard cross-training from key run sessions by at least 24–48 hours.",
-      })
+      }),
     );
   }
 
@@ -42,12 +38,9 @@ export function inferModalityInteractions(
         ],
         confidence: "low",
         counterEvidence:
-          eco.scores.interferenceRisk >= 50
-            ? ["Interference risk elevated — timing matters"]
-            : [],
-        recommendedUse:
-          "Keep strength moderate in build phases; reduce before race week.",
-      })
+          eco.scores.interferenceRisk >= 50 ? ["Interference risk elevated — timing matters"] : [],
+        recommendedUse: "Keep strength moderate in build phases; reduce before race week.",
+      }),
     );
   }
 
@@ -60,7 +53,7 @@ export function inferModalityInteractions(
         evidence: eco.archetype.evidence.slice(0, 3),
         confidence: eco.archetype.confidence,
         recommendedUse: eco.archetype.coachingNotes[0] ?? "Balance modalities around run priority.",
-      })
+      }),
     );
   }
 

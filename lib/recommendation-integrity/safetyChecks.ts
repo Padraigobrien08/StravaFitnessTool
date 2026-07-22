@@ -28,8 +28,7 @@ function isHardRun(w: WeeklyPlanIntegrityInput["plan"]["workouts"][0]): boolean 
   if (w.modality !== "run") return false;
   if (w.type === "race") return w.intensity === "hard";
   return (
-    w.intensity === "hard" ||
-    /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`)
+    w.intensity === "hard" || /\btempo|interval|threshold|quality\b/i.test(`${w.type} ${w.title}`)
   );
 }
 
@@ -46,9 +45,7 @@ function recentWeeklyKm(context: WeeklyPlanIntegrityInput["context"]): number {
   return weeks[weeks.length - 1]?.runDistanceKm ?? 0;
 }
 
-export function runSafetyChecks(
-  input: WeeklyPlanIntegrityInput
-): RecommendationIssue[] {
+export function runSafetyChecks(input: WeeklyPlanIntegrityInput): RecommendationIssue[] {
   const { plan, context, guardrails } = input;
   const issues: RecommendationIssue[] = [];
   const text = [
@@ -75,10 +72,7 @@ export function runSafetyChecks(
 
   const recentKm = recentWeeklyKm(context);
   const planKm = totalRunKm(plan);
-  if (
-    recentKm > 0 &&
-    planKm > recentKm * (1 + guardrails.maxVolumeIncreasePct / 100 + 0.08)
-  ) {
+  if (recentKm > 0 && planKm > recentKm * (1 + guardrails.maxVolumeIncreasePct / 100 + 0.08)) {
     issues.push({
       type: "unsafe_progression",
       severity: "high",
@@ -96,8 +90,7 @@ export function runSafetyChecks(
   for (let i = 1; i < hardDays.length; i++) {
     if (hardDays[i] - hardDays[i - 1] <= 1) {
       const advanced =
-        context.dataQuality.activityCount >= 40 &&
-        context.currentState.fatigueState === "fresh";
+        context.dataQuality.activityCount >= 40 && context.currentState.fatigueState === "fresh";
       if (!advanced) {
         issues.push({
           type: "unsafe_progression",
@@ -121,8 +114,7 @@ export function runSafetyChecks(
     const hardStrength = plan.workouts.filter(
       (w) =>
         w.modality === "strength" &&
-        (w.intensity === "hard" ||
-          /\b(hard|heavy|max|hiit)\b/i.test(`${w.title} ${w.type}`))
+        (w.intensity === "hard" || /\b(hard|heavy|max|hiit)\b/i.test(`${w.title} ${w.type}`)),
     );
     if (hardStrength.length > 0) {
       issues.push({
@@ -139,7 +131,7 @@ export function runSafetyChecks(
       w.modality === "run" &&
       (w.type === "long" ||
         (w.distanceKm ?? 0) >= guardrails.longRunMaxKm * 0.85 ||
-        /\blong run|race\b/i.test(w.title))
+        /\blong run|race\b/i.test(w.title)),
   );
   if (keyRunDay) {
     const keyIdx = dayIndex(keyRunDay.day);
@@ -147,7 +139,7 @@ export function runSafetyChecks(
       (w) =>
         w.modality === "strength" &&
         /\b(hard|heavy)\b/i.test(w.title) &&
-        Math.abs(dayIndex(w.day) - keyIdx) <= 1
+        Math.abs(dayIndex(w.day) - keyIdx) <= 1,
     );
     if (nearStrength) {
       issues.push({
@@ -162,12 +154,12 @@ export function runSafetyChecks(
   const longOrHard = plan.workouts.filter(
     (w) =>
       w.modality === "run" &&
-      (isHardRun(w) || (w.distanceKm ?? 0) >= guardrails.longRunMaxKm * 0.75)
+      (isHardRun(w) || (w.distanceKm ?? 0) >= guardrails.longRunMaxKm * 0.75),
   );
   for (const session of longOrHard) {
     const idx = dayIndex(session.day);
     const next = plan.workouts.find(
-      (w) => dayIndex(w.day) === idx + 1 && w.modality === "run" && isHardRun(w)
+      (w) => dayIndex(w.day) === idx + 1 && w.modality === "run" && isHardRun(w),
     );
     if (next) {
       issues.push({
@@ -184,7 +176,7 @@ export function runSafetyChecks(
     const hardCross = plan.workouts.filter(
       (w) =>
         (w.modality === "cross_training" || w.modality === "strength") &&
-        (w.intensity === "hard" || /\bhiit|crossfit\b/i.test(w.type))
+        (w.intensity === "hard" || /\bhiit|crossfit\b/i.test(w.type)),
     );
     if (hardCross.length > 0 && hardDays.length >= 1) {
       issues.push({

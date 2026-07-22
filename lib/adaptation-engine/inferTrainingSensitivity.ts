@@ -1,9 +1,7 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { AdaptationSignal } from "./types";
 
-export function inferTrainingSensitivity(
-  analytics: DashboardInsights
-): AdaptationSignal[] {
+export function inferTrainingSensitivity(analytics: DashboardInsights): AdaptationSignal[] {
   const hardPct = analytics.intensityAdvice.currentEasyPct;
   const target = analytics.intensityAdvice.easyTargetPct;
   const gap = target - hardPct;
@@ -31,8 +29,7 @@ export function inferTrainingSensitivity(
       {
         id: "sensitivity-stable-polarized",
         category: "threshold",
-        statement:
-          "Appears to respond well to polarized easy/hard structure with stable volume",
+        statement: "Appears to respond well to polarized easy/hard structure with stable volume",
         confidence: "low",
         supportingEvidence: [
           "Efficiency improving",

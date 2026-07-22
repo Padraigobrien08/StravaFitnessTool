@@ -27,19 +27,15 @@ const TRACK_BUCKETS = ["5k", "10k", "hm"] as const;
 
 export function buildPrTimeline(
   runs: RunActivity[],
-  fitDetails: FitRunDetail[] = []
+  fitDetails: FitRunDetail[] = [],
 ): PrTimelinePoint[] {
-  const sorted = [...runs].sort(
-    (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()
-  );
+  const sorted = [...runs].sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime());
   const points: PrTimelinePoint[] = [];
   const bestByBucket = new Map<string, number>();
 
   for (let i = 0; i < sorted.length; i++) {
     const slice = sorted.slice(0, i + 1);
-    const fitSlice = fitDetails.filter((f) =>
-      slice.some((r) => r.id === f.activityId)
-    );
+    const fitSlice = fitDetails.filter((f) => slice.some((r) => r.id === f.activityId));
     const prs = findPersonalRecords(slice, fitSlice);
 
     for (const pr of prs) {
@@ -70,13 +66,13 @@ export function buildPredictionTimeline(
   runs: RunActivity[],
   fitDetails: FitRunDetail[] = [],
   sampleEveryNWeeks = 4,
-  maxPoints = 15
+  maxPoints = 15,
 ): PredictionTimelinePoint[] {
   const weeks = weeklyVolume(runs);
   if (weeks.length === 0) return [];
 
   const sortedRuns = [...runs].sort(
-    (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()
+    (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime(),
   );
 
   const sampleIndices: number[] = [];
@@ -95,9 +91,7 @@ export function buildPredictionTimeline(
     const slice = sortedRuns.filter((r) => r.date <= weekEnd + "T23:59:59");
     if (slice.length < 3) continue;
 
-    const fitSlice = fitDetails.filter((f) =>
-      slice.some((r) => r.id === f.activityId)
-    );
+    const fitSlice = fitDetails.filter((f) => slice.some((r) => r.id === f.activityId));
     const analysis = buildRacePredictionAnalysis(slice, fitSlice);
 
     const getConsensus = (label: string) =>
@@ -117,11 +111,9 @@ export function buildPredictionTimeline(
 
 export function recentPrHighlights(
   timeline: PrTimelinePoint[],
-  withinDays = 14
+  withinDays = 14,
 ): PrTimelinePoint[] {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - withinDays);
-  return timeline.filter(
-    (p) => p.isNewPr && parseISO(p.date) >= cutoff
-  );
+  return timeline.filter((p) => p.isNewPr && parseISO(p.date) >= cutoff);
 }

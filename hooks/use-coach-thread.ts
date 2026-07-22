@@ -54,19 +54,16 @@ export function useCoachThread(disabled?: boolean) {
     }
   }, [activeId, threads, loadThread]);
 
-  const persist = useCallback(
-    (msgs: CoachMessage[], threadId: string, title?: string) => {
-      const existing = getThread(threadId);
-      if (!existing) return;
-      upsertThread({
-        ...existing,
-        messages: msgs,
-        title: title ?? existing.title,
-      });
-      setThreads(listThreads());
-    },
-    []
-  );
+  const persist = useCallback((msgs: CoachMessage[], threadId: string, title?: string) => {
+    const existing = getThread(threadId);
+    if (!existing) return;
+    upsertThread({
+      ...existing,
+      messages: msgs,
+      title: title ?? existing.title,
+    });
+    setThreads(listThreads());
+  }, []);
 
   const ensureThread = useCallback(() => {
     if (activeId && getThread(activeId)) return activeId;
@@ -98,11 +95,7 @@ export function useCoachThread(disabled?: boolean) {
       setLoadingPhase(0);
 
       const isFirst = messages.filter((m) => m.role === "user").length === 0;
-      persist(
-        nextMessages,
-        threadId,
-        isFirst ? titleFromFirstMessage(trimmed) : undefined
-      );
+      persist(nextMessages, threadId, isFirst ? titleFromFirstMessage(trimmed) : undefined);
 
       try {
         const lastPlan = [...messages]
@@ -145,10 +138,7 @@ export function useCoachThread(disabled?: boolean) {
           return;
         }
 
-        const planningRoute = classifyPlanningMessage(
-          trimmed,
-          Boolean(previousPlan)
-        );
+        const planningRoute = classifyPlanningMessage(trimmed, Boolean(previousPlan));
 
         if (planningRoute) {
           setPendingTools(["generate_next_week_training_plan"]);
@@ -170,9 +160,7 @@ export function useCoachThread(disabled?: boolean) {
           }
 
           const replyText =
-            planData.replySummary ??
-            planData.explanationOnly ??
-            planData.plan.summary;
+            planData.replySummary ?? planData.explanationOnly ?? planData.plan.summary;
 
           const parsed = parseCoachResponse(replyText);
           const assistantMsg: CoachMessage = {
@@ -237,7 +225,7 @@ export function useCoachThread(disabled?: boolean) {
         setPendingTools([]);
       }
     },
-    [messages, loading, disabled, ensureThread, persist]
+    [messages, loading, disabled, ensureThread, persist],
   );
 
   useEffect(() => {
@@ -249,8 +237,7 @@ export function useCoachThread(disabled?: boolean) {
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const distanceFromBottom =
-      el.scrollHeight - el.scrollTop - el.clientHeight;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
     const nearBottom = distanceFromBottom < 140;
     if (nearBottom || loading) {
       el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
@@ -278,7 +265,7 @@ export function useCoachThread(disabled?: boolean) {
         }
       }
     },
-    [activeId, loadThread]
+    [activeId, loadThread],
   );
 
   return {

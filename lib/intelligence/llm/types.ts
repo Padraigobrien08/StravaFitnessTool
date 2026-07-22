@@ -68,7 +68,5 @@ export function resolveCoachProvider(): {
   if (anthropicKey) {
     return { provider: "anthropic", apiKey: anthropicKey };
   }
-  throw new Error(
-    "Coach requires OPENAI_API_KEY or ANTHROPIC_API_KEY in server environment."
-  );
+  throw new Error("Coach requires OPENAI_API_KEY or ANTHROPIC_API_KEY in server environment.");
 }

@@ -24,13 +24,13 @@ export function computeTrainingEcosystem(
   workoutLabels: RunWorkoutLabel[],
   dataConfidence: "low" | "medium" | "high",
   raceGoal: RaceGoal | null = null,
-  source: ActivitySource = "strava_api"
+  source: ActivitySource = "strava_api",
 ): TrainingEcosystemAnalysis {
   const activities = normalizeActivitiesFromImport(
     data,
     workoutLabels,
     data.fitRunIds ?? [],
-    source
+    source,
   );
   return buildTrainingEcosystem(activities, raceGoal, dataConfidence);
 }

@@ -72,9 +72,7 @@ export function RunsTable({
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortAsc, setSortAsc] = useState(false);
-  const [typeFilter, setTypeFilter] = useState<WorkoutType | typeof ALL_TYPES>(
-    ALL_TYPES
-  );
+  const [typeFilter, setTypeFilter] = useState<WorkoutType | typeof ALL_TYPES>(ALL_TYPES);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -82,14 +80,11 @@ export function RunsTable({
     if (q) {
       list = list.filter(
         (r) =>
-          r.name.toLowerCase().includes(q) ||
-          new Date(r.date).toLocaleDateString().includes(q)
+          r.name.toLowerCase().includes(q) || new Date(r.date).toLocaleDateString().includes(q),
       );
     }
     if (typeFilter !== ALL_TYPES) {
-      list = list.filter(
-        (r) => workoutByRunId.get(r.id)?.type === typeFilter
-      );
+      list = list.filter((r) => workoutByRunId.get(r.id)?.type === typeFilter);
     }
     list.sort((a, b) => {
       let cmp = 0;
@@ -156,9 +151,7 @@ export function RunsTable({
         </div>
         <Select
           value={typeFilter}
-          onValueChange={(value) =>
-            setTypeFilter(value as WorkoutType | typeof ALL_TYPES)
-          }
+          onValueChange={(value) => setTypeFilter(value as WorkoutType | typeof ALL_TYPES)}
         >
           <SelectTrigger className="w-[180px]" aria-label="Filter by workout type">
             <SelectValue />
@@ -179,12 +172,42 @@ export function RunsTable({
         <Table>
           <TableHeader>
             <TableRow className="border-white/10 hover:bg-transparent">
-              <SortHead label="Date" col="date" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <SortHead
+                label="Date"
+                col="date"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
               <TableHead className="pr-4 text-zinc-500">Run</TableHead>
-              <SortHead label="Type" col="type" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
-              <SortHead label="Distance" col="distance" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
-              <SortHead label="Pace" col="pace" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
-              <SortHead label="HR" col="hr" sortKey={sortKey} sortAsc={sortAsc} onSort={toggleSort} />
+              <SortHead
+                label="Type"
+                col="type"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
+              <SortHead
+                label="Distance"
+                col="distance"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
+              <SortHead
+                label="Pace"
+                col="pace"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
+              <SortHead
+                label="HR"
+                col="hr"
+                sortKey={sortKey}
+                sortAsc={sortAsc}
+                onSort={toggleSort}
+              />
               <TableHead className="text-zinc-500">FIT</TableHead>
             </TableRow>
           </TableHeader>
@@ -211,10 +234,7 @@ export function RunsTable({
                   </TableCell>
                   <TableCell className="pr-4">
                     {workout ? (
-                      <WorkoutTypeBadge
-                        type={workout.type}
-                        confidence={workout.confidence}
-                      />
+                      <WorkoutTypeBadge type={workout.type} confidence={workout.confidence} />
                     ) : (
                       "—"
                     )}
@@ -225,9 +245,7 @@ export function RunsTable({
                   <TableCell className="tabular-nums pr-4">
                     {pace ? formatPace(pace) : "—"}
                   </TableCell>
-                  <TableCell className="tabular-nums pr-4">
-                    {run.avgHr ?? "—"}
-                  </TableCell>
+                  <TableCell className="tabular-nums pr-4">{run.avgHr ?? "—"}</TableCell>
                   <TableCell>
                     {hasFit ? (
                       <span className="text-emerald-500" title="FIT data loaded">

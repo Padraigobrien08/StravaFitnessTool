@@ -3,15 +3,11 @@ import { stravaUrl } from "../client";
 
 describe("stravaUrl (SSRF guard)", () => {
   it("builds a Strava API URL from a leading-slash path", () => {
-    expect(stravaUrl("/activities/123")).toBe(
-      "https://www.strava.com/api/v3/activities/123"
-    );
+    expect(stravaUrl("/activities/123")).toBe("https://www.strava.com/api/v3/activities/123");
   });
 
   it("builds a Strava API URL from a bare path", () => {
-    expect(stravaUrl("segments/9")).toBe(
-      "https://www.strava.com/api/v3/segments/9"
-    );
+    expect(stravaUrl("segments/9")).toBe("https://www.strava.com/api/v3/segments/9");
   });
 
   // The request must never leave the Strava host, whatever the path contains —

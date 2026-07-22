@@ -40,9 +40,7 @@ export function mapStravaActivityToSummary(a: StravaActivity): ActivitySummary {
     distanceM: a.distance ?? 0,
     elapsedSec: a.elapsed_time ?? 0,
     movingSec: a.moving_time ?? a.elapsed_time ?? 0,
-    startDateLocal: a.start_date_local
-      ? new Date(a.start_date_local).toISOString()
-      : undefined,
+    startDateLocal: a.start_date_local ? new Date(a.start_date_local).toISOString() : undefined,
     avgHr: a.average_heartrate ?? null,
     maxHr: a.max_heartrate ?? null,
     calories: a.calories ?? null,

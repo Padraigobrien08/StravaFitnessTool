@@ -5,19 +5,15 @@ import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { RaceProjectionView } from "@/lib/performance/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
 
-export function PredictionIntegrityPanel({
-  projection,
-}: {
-  projection: RaceProjectionView;
-}) {
+export function PredictionIntegrityPanel({ projection }: { projection: RaceProjectionView }) {
   const conf = projection.primary?.confidence ?? "medium";
 
   return (
     <PanelChrome title="Prediction integrity" accent>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-zinc-400">
-          Evidence-based estimate — not a guarantee. Spread reflects model
-          agreement and data completeness.
+          Evidence-based estimate — not a guarantee. Spread reflects model agreement and data
+          completeness.
         </p>
         <ConfidenceBadge level={conf} />
       </div>
@@ -31,9 +27,7 @@ export function PredictionIntegrityPanel({
               {projection.primary.spreadDisplay}
             </span>
           </p>
-          <p className="mt-1 text-xs text-zinc-600">
-            Band {projection.primary.rangeDisplay}
-          </p>
+          <p className="mt-1 text-xs text-zinc-600">Band {projection.primary.rangeDisplay}</p>
         </div>
       ) : null}
 

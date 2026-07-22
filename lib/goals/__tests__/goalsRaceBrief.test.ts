@@ -83,9 +83,7 @@ describe("buildGoalsRaceBrief", () => {
     expect(brief.belief).toMatch(/20\.5|10-mile|10 mile/i);
     expect(brief.evidenceBullets.length).toBeGreaterThan(0);
     expect(brief.coachPrompts.length).toBeGreaterThanOrEqual(3);
-    expect(brief.coachPrompts.every((p) => p.href.includes("investigate=1"))).toBe(
-      true
-    );
+    expect(brief.coachPrompts.every((p) => p.href.includes("investigate=1"))).toBe(true);
     expect(brief.primaryAction).not.toMatch(/^Recommendation:/i);
   });
 

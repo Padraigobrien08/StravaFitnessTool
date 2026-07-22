@@ -27,7 +27,7 @@ export function CoachDomainChips({
             "disabled:opacity-40",
             activeDomainId === d.id
               ? "border-teal-500/35 bg-teal-500/15 text-teal-100"
-              : "border-white/[0.08] bg-white/[0.02] text-zinc-500 hover:border-white/[0.14] hover:text-zinc-300"
+              : "border-white/[0.08] bg-white/[0.02] text-zinc-500 hover:border-white/[0.14] hover:text-zinc-300",
           )}
         >
           {d.title}

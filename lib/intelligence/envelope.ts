@@ -1,14 +1,11 @@
 import type { ImportQualityReport } from "@/lib/quality/assessImport";
-import type {
-  IntelligenceConfidence,
-  IntelligenceEnvelope,
-} from "./types";
+import type { IntelligenceConfidence, IntelligenceEnvelope } from "./types";
 
 export function wrapIntelligence<T>(
   payload: T,
   quality: ImportQualityReport,
   extraEvidence: string[] = [],
-  extraLimitations: string[] = []
+  extraLimitations: string[] = [],
 ): IntelligenceEnvelope<T> {
   const hr = quality.fieldCoverage.find((f) => f.label === "Heart rate");
   const evidence = [
@@ -16,9 +13,7 @@ export function wrapIntelligence<T>(
     quality.fitParsed > 0
       ? `${quality.fitParsed} runs with FIT stream data`
       : "No FIT streams parsed yet",
-    hr && hr.total > 0
-      ? `HR on ${hr.count}/${hr.total} runs`
-      : "Limited heart rate coverage",
+    hr && hr.total > 0 ? `HR on ${hr.count}/${hr.total} runs` : "Limited heart rate coverage",
     ...extraEvidence,
   ];
 
@@ -35,9 +30,7 @@ export function wrapIntelligence<T>(
   };
 }
 
-export function confidenceFromRuns(
-  runCount: number
-): IntelligenceConfidence {
+export function confidenceFromRuns(runCount: number): IntelligenceConfidence {
   if (runCount >= 40) return "high";
   if (runCount >= 20) return "medium";
   return "low";
@@ -52,13 +45,13 @@ export function wrapReasoning<T>(
     limitations: string[];
     confidence: IntelligenceConfidence;
   },
-  quality: ImportQualityReport
+  quality: ImportQualityReport,
 ): IntelligenceEnvelope<T & { assumptions: string[] }> {
   const base = wrapIntelligence(
     { ...result.payload, assumptions: result.assumptions },
     quality,
     result.evidence,
-    result.limitations
+    result.limitations,
   );
   return {
     ...base,

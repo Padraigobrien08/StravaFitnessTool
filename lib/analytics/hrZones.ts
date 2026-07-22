@@ -15,10 +15,7 @@ const ZONE_DEFS = [
   { zone: "Z5", label: "Max (90%+)", min: 0.9, max: 1.01 },
 ];
 
-export function classifyHrZone(
-  avgHr: number,
-  maxHr: number
-): string {
+export function classifyHrZone(avgHr: number, maxHr: number): string {
   const pct = avgHr / maxHr;
   for (const z of ZONE_DEFS) {
     if (pct >= z.min && pct < z.max) return z.zone;
@@ -26,10 +23,7 @@ export function classifyHrZone(
   return "Z5";
 }
 
-export function hrZoneDistribution(
-  runs: RunActivity[],
-  athleteMaxHr: number
-): HrZoneBucket[] {
+export function hrZoneDistribution(runs: RunActivity[], athleteMaxHr: number): HrZoneBucket[] {
   const counts: Record<string, number> = {};
   let total = 0;
 
@@ -50,7 +44,7 @@ export function hrZoneDistribution(
 
 export function easyHardSplit(
   runs: RunActivity[],
-  athleteMaxHr: number
+  athleteMaxHr: number,
 ): { easy: number; hard: number; easyPct: number } {
   let easy = 0;
   let hard = 0;

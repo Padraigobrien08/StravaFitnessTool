@@ -69,15 +69,12 @@ export async function GET(req: NextRequest) {
         error: "Invalid or missing action",
         allowed: [...STRAVA_MCP_ACTIONS],
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (action === "segment_star") {
-    return NextResponse.json(
-      { error: "Use POST for segment_star" },
-      { status: 405 }
-    );
+    return NextResponse.json({ error: "Use POST for segment_star" }, { status: 405 });
   }
 
   try {
@@ -101,14 +98,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const action = (body.action ?? req.nextUrl.searchParams.get("action")) as
-    | StravaMcpAction
-    | null;
+  const action = (body.action ?? req.nextUrl.searchParams.get("action")) as StravaMcpAction | null;
 
   if (action !== "segment_star") {
     return NextResponse.json(
       { error: "POST supports action=segment_star only", allowed: ["segment_star"] },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

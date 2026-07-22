@@ -1,9 +1,6 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import { RACE_READINESS_CONFIG } from "@/lib/analytics/readiness";
-import {
-  buildActiveObservations,
-  deriveCurrentFocus,
-} from "@/lib/coach/activeIntelligence";
+import { buildActiveObservations, deriveCurrentFocus } from "@/lib/coach/activeIntelligence";
 import type {
   CoachingCurrentState,
   DurabilityLabel,
@@ -12,10 +9,7 @@ import type {
   SpecificityLabel,
 } from "./types";
 
-function mapFatigueState(
-  freshness: number,
-  tsb: number
-): FatigueStateLabel {
+function mapFatigueState(freshness: number, tsb: number): FatigueStateLabel {
   if (freshness >= 65 && tsb > -5) return "fresh";
   if (freshness < 45 || tsb < -15) return "fatigued";
   if (freshness >= 45 && freshness < 65) return "neutral";
@@ -27,9 +21,7 @@ function mapDurability(insights: DashboardInsights): DurabilityLabel {
   const score = eco?.scores.durabilitySupport;
   if (score == null) {
     const long =
-      insights.raceReadiness?.longestRunKm ??
-      insights.halfMarathonReadiness.longestRunKm ??
-      0;
+      insights.raceReadiness?.longestRunKm ?? insights.halfMarathonReadiness.longestRunKm ?? 0;
     if (long >= 18) return "strong";
     if (long >= 12) return "moderate";
     if (long > 0) return "weak";
@@ -58,9 +50,7 @@ function mapSpecificity(insights: DashboardInsights): SpecificityLabel {
   return "low";
 }
 
-function mapIntensityBalance(
-  insights: DashboardInsights
-): IntensityBalanceLabel {
+function mapIntensityBalance(insights: DashboardInsights): IntensityBalanceLabel {
   const status = insights.intensityAdvice.status;
   if (status === "too_hard") return "intensity_heavy";
   if (status === "too_easy") return "easy_biased";
@@ -68,9 +58,7 @@ function mapIntensityBalance(
   return "unknown";
 }
 
-export function buildAthleteStateSummary(
-  insights: DashboardInsights
-): CoachingCurrentState {
+export function buildAthleteStateSummary(insights: DashboardInsights): CoachingCurrentState {
   const observations = buildActiveObservations(insights, []);
   const { focus, rationale } = deriveCurrentFocus(insights, observations);
   const freshness = insights.fatigue.freshness;

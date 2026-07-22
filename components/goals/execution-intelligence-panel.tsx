@@ -15,10 +15,7 @@ import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { useTrainingChart } from "@/components/training/charts/chart-theme";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RaceGoal } from "@/lib/analytics/readiness";
-import {
-  simulateRaceStrategy,
-  type StrategyMode,
-} from "@/lib/analytics/raceStrategy";
+import { simulateRaceStrategy, type StrategyMode } from "@/lib/analytics/raceStrategy";
 import { minMaxYDomainReversed } from "@/lib/charts/yDomain";
 import { formatDuration, formatPace, cn } from "@/lib/utils";
 import { dash } from "@/components/home/primitives/tokens";
@@ -53,9 +50,9 @@ export function ExecutionIntelligencePanel({
         analytics.racePredictionAnalysis,
         analytics.fatigue,
         analytics.raceReadiness,
-        mode
+        mode,
       ),
-    [raceGoal, analytics, mode]
+    [raceGoal, analytics, mode],
   );
 
   if (!strategy) {
@@ -75,7 +72,7 @@ export function ExecutionIntelligencePanel({
 
   const paceDomain = minMaxYDomainReversed(
     chartData.map((d) => d.pace),
-    { paddingPct: 0.12, paddingMin: 8, filterOutliers: false }
+    { paddingPct: 0.12, paddingMin: 8, filterOutliers: false },
   );
 
   const formatPaceTick = (sec: number) => {
@@ -89,8 +86,7 @@ export function ExecutionIntelligencePanel({
   return (
     <PanelChrome title="Execution intelligence" elevated>
       <p className={`${dash.muted} mb-4`}>
-        Target {formatDuration(strategy.targetTimeSec)} ({strategy.targetTimeSource})
-        · Fade risk{" "}
+        Target {formatDuration(strategy.targetTimeSec)} ({strategy.targetTimeSource}) · Fade risk{" "}
         <span className={fadeColor[strategy.fadeRisk]}>{strategy.fadeRisk}</span>
       </p>
 
@@ -104,7 +100,7 @@ export function ExecutionIntelligencePanel({
               "rounded-xl border px-3 py-2.5 text-left transition-colors",
               mode === m.id
                 ? "border-teal-500/35 bg-teal-500/10"
-                : "border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04]"
+                : "border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04]",
             )}
           >
             <span className="text-xs font-semibold text-zinc-200">{m.label}</span>
@@ -125,13 +121,7 @@ export function ExecutionIntelligencePanel({
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartData}>
             <CartesianGrid stroke={chart.grid} vertical={false} />
-            <XAxis
-              dataKey="km"
-              tick={chart.tick}
-              unit=" km"
-              axisLine={false}
-              tickLine={false}
-            />
+            <XAxis dataKey="km" tick={chart.tick} unit=" km" axisLine={false} tickLine={false} />
             <YAxis
               domain={paceDomain}
               allowDataOverflow
@@ -143,9 +133,7 @@ export function ExecutionIntelligencePanel({
             />
             <Tooltip
               contentStyle={chart.tooltip}
-              formatter={(v) =>
-                typeof v === "number" ? formatPace(v) : String(v)
-              }
+              formatter={(v) => (typeof v === "number" ? formatPace(v) : String(v))}
             />
             <ReferenceLine
               y={strategy.targetTimeSec / strategy.distanceKm}
@@ -175,10 +163,7 @@ export function ExecutionIntelligencePanel({
           </thead>
           <tbody>
             {strategy.splits.map((s) => (
-              <tr
-                key={s.km}
-                className="border-b border-white/[0.03] text-zinc-400"
-              >
+              <tr key={s.km} className="border-b border-white/[0.03] text-zinc-400">
                 <td className="px-3 py-2 tabular-nums">{s.km}</td>
                 <td className="px-3 py-2 tabular-nums text-zinc-200">
                   {formatDuration(s.cumulativeSec)}

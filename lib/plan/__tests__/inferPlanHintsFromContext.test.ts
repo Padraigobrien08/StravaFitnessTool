@@ -4,7 +4,7 @@ import { inferPlanHintsFromContext } from "../inferPlanHintsFromContext";
 describe("inferPlanHintsFromContext", () => {
   it("detects post-race recovery", () => {
     const hints = inferPlanHintsFromContext(
-      "I just ran a half marathon — plan recovery for this week"
+      "I just ran a half marathon — plan recovery for this week",
     );
     expect(hints.planTypeHint).toBe("recovery");
     expect(hints.notes.length).toBeGreaterThan(0);

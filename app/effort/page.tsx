@@ -20,7 +20,8 @@ export default function EffortPage() {
         <div className="space-y-8">
           <h1 className="font-display text-2xl font-bold text-white">Effort & HR</h1>
           <p className="text-sm text-zinc-500">
-            Zones based on average HR per run vs max HR ({insights.athleteMaxHr} bpm from your Strava settings).
+            Zones based on average HR per run vs max HR ({insights.athleteMaxHr} bpm from your
+            Strava settings).
           </p>
 
           <InsightList insights={trainingInsights} limit={2} />
@@ -33,8 +34,7 @@ export default function EffortPage() {
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-xs text-zinc-500">
-                Auto-labeled from distance, heart rate, activity title, and FIT
-                lap patterns.
+                Auto-labeled from distance, heart rate, activity title, and FIT lap patterns.
               </p>
               <WorkoutTypeChart data={insights.workoutTypeMix} />
             </CardContent>
@@ -64,15 +64,11 @@ export default function EffortPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg bg-emerald-500/10 p-4 text-center">
-                    <p className="text-3xl font-bold text-emerald-400">
-                      {insights.easyHard.easy}
-                    </p>
+                    <p className="text-3xl font-bold text-emerald-400">{insights.easyHard.easy}</p>
                     <p className="text-sm text-zinc-500">Easy (&lt;80% max HR)</p>
                   </div>
                   <div className="rounded-lg bg-red-500/10 p-4 text-center">
-                    <p className="text-3xl font-bold text-red-400">
-                      {insights.easyHard.hard}
-                    </p>
+                    <p className="text-3xl font-bold text-red-400">{insights.easyHard.hard}</p>
                     <p className="text-sm text-zinc-500">Hard (80%+ max HR)</p>
                   </div>
                 </div>

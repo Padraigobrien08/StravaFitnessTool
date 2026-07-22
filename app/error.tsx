@@ -29,12 +29,10 @@ export default function Error({
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
           <AlertTriangle className="h-6 w-6 text-red-300" />
         </div>
-        <h2 className="text-lg font-medium text-red-100">
-          Something went wrong on this page
-        </h2>
+        <h2 className="text-lg font-medium text-red-100">Something went wrong on this page</h2>
         <p className="mt-2 text-sm text-zinc-400">
-          This is usually a hiccup rendering your data. Try again, or head back
-          to Import to re-load your activities.
+          This is usually a hiccup rendering your data. Try again, or head back to Import to re-load
+          your activities.
         </p>
         {error.message && (
           <p className="mt-3 break-words rounded-lg bg-black/30 px-3 py-2 text-left font-mono text-xs text-zinc-500">
@@ -42,19 +40,14 @@ export default function Error({
           </p>
         )}
         {error.digest && (
-          <p className="mt-2 text-[11px] text-zinc-600">
-            Reference: {error.digest}
-          </p>
+          <p className="mt-2 text-[11px] text-zinc-600">Reference: {error.digest}</p>
         )}
         <div className="mt-6 flex items-center justify-center gap-3">
           <Button onClick={() => unstable_retry()}>
             <RotateCcw className="mr-2 h-4 w-4" />
             Try again
           </Button>
-          <Link
-            href="/import"
-            className={cn(buttonVariants({ variant: "outline" }))}
-          >
+          <Link href="/import" className={cn(buttonVariants({ variant: "outline" }))}>
             <Upload className="mr-2 h-4 w-4" />
             Go to Import
           </Link>

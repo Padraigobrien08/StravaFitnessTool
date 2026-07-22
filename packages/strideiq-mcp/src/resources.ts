@@ -31,6 +31,6 @@ export function registerMcpResources(server: McpServer) {
           },
         ],
       };
-    }
+    },
   );
 }

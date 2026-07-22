@@ -32,10 +32,7 @@ export default function DashboardPage() {
                   : undefined
               }
             />
-            <KpiCard
-              title="All-time distance"
-              value={`${insights.summary.totalDistanceKm} km`}
-            />
+            <KpiCard title="All-time distance" value={`${insights.summary.totalDistanceKm} km`} />
             <KpiCard
               title="Avg pace"
               value={
@@ -43,11 +40,7 @@ export default function DashboardPage() {
                   ? formatPace(insights.summary.avgPaceSecPerKm)
                   : "—"
               }
-              subtitle={
-                insights.summary.avgHr
-                  ? `Avg HR ${insights.summary.avgHr} bpm`
-                  : undefined
-              }
+              subtitle={insights.summary.avgHr ? `Avg HR ${insights.summary.avgHr} bpm` : undefined}
             />
             <KpiCard
               title="Last 7 days"
@@ -114,11 +107,8 @@ export default function DashboardPage() {
               <CardContent className="flex flex-wrap items-center justify-between gap-4">
                 <p className="text-zinc-300">
                   {insights.bestBlock.label}:{" "}
-                  <strong className="text-white">
-                    {insights.bestBlock.distanceKm} km
-                  </strong>{" "}
-                  · {insights.bestBlock.runCount} runs · longest{" "}
-                  {insights.bestBlock.longestRunKm} km
+                  <strong className="text-white">{insights.bestBlock.distanceKm} km</strong> ·{" "}
+                  {insights.bestBlock.runCount} runs · longest {insights.bestBlock.longestRunKm} km
                 </p>
                 <Link href="/training">
                   <Button variant="outline" size="sm">
@@ -161,8 +151,8 @@ export default function DashboardPage() {
                   )}
                 </p>
                 <p className="mt-2 text-sm text-zinc-500">
-                  Met goal in {insights.goalProgress.weeksMet} of{" "}
-                  {insights.goalProgress.weeksTotal} weeks since start
+                  Met goal in {insights.goalProgress.weeksMet} of {insights.goalProgress.weeksTotal}{" "}
+                  weeks since start
                 </p>
               </CardContent>
             </Card>

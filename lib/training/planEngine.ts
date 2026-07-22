@@ -67,7 +67,7 @@ function nextWeekBounds(): { weekStart: string; weekLabel: string } {
 /** When a race is soon, plan the ISO week that contains race day (not the week after). */
 export function planWeekBounds(
   raceDate: string | undefined,
-  daysUntilRace: number | null
+  daysUntilRace: number | null,
 ): { weekStart: string; weekLabel: string } {
   if (raceDate && daysUntilRace !== null && daysUntilRace >= 0 && daysUntilRace <= 14) {
     const race = parseISO(raceDate);
@@ -100,8 +100,7 @@ function twoDaysBefore(label: (typeof DAY_LABELS)[number]): (typeof DAY_LABELS)[
 function baselineWeeklyKm(ctx: PlanContext): number {
   const recent = ctx.weeklyVolume.slice(-4);
   if (recent.length === 0) return 25;
-  const avg =
-    recent.reduce((s, w) => s + w.distanceKm, 0) / recent.length;
+  const avg = recent.reduce((s, w) => s + w.distanceKm, 0) / recent.length;
   return Math.round(avg * 10) / 10;
 }
 
@@ -117,7 +116,10 @@ function longRunTargetKm(ctx: PlanContext): number {
   return Math.min(18, Math.max(12, ctx.longestRunKm + 1));
 }
 
-function buildFatiguePlan(ctx: PlanContext, week: { weekStart: string; weekLabel: string }): WeekPlan {
+function buildFatiguePlan(
+  ctx: PlanContext,
+  week: { weekStart: string; weekLabel: string },
+): WeekPlan {
   const base = baselineWeeklyKm(ctx);
   const cap = Math.round(base * 0.9 * 10) / 10;
   return {
@@ -126,9 +128,24 @@ function buildFatiguePlan(ctx: PlanContext, week: { weekStart: string; weekLabel
     totalKmRange: [Math.round(cap * 0.85 * 10) / 10, cap],
     sessions: [
       { day: "Mon", type: "easy", distanceKmRange: [5, 7], description: "Easy aerobic 30–40 min" },
-      { day: "Wed", type: "easy", distanceKmRange: [6, 8], description: "Easy run, conversational pace" },
-      { day: "Fri", type: "recovery", distanceKmRange: [4, 6], description: "Short recovery jog or rest" },
-      { day: "Sun", type: "easy", distanceKmRange: [5, 8], description: "Optional easy strides: 4–6 × 20 sec" },
+      {
+        day: "Wed",
+        type: "easy",
+        distanceKmRange: [6, 8],
+        description: "Easy run, conversational pace",
+      },
+      {
+        day: "Fri",
+        type: "recovery",
+        distanceKmRange: [4, 6],
+        description: "Short recovery jog or rest",
+      },
+      {
+        day: "Sun",
+        type: "easy",
+        distanceKmRange: [5, 8],
+        description: "Optional easy strides: 4–6 × 20 sec",
+      },
     ],
     warnings: [],
     rationale: [
@@ -142,7 +159,7 @@ function buildFatiguePlan(ctx: PlanContext, week: { weekStart: string; weekLabel
 function buildTaperPlan(
   ctx: PlanContext,
   week: { weekStart: string; weekLabel: string },
-  daysUntilRace: number
+  daysUntilRace: number,
 ): WeekPlan {
   const base = baselineWeeklyKm(ctx);
   const factor = 0.65;
@@ -154,8 +171,18 @@ function buildTaperPlan(
     totalKmRange: [Math.round(cap * 0.8 * 10) / 10, cap],
     sessions: [
       { day: "Mon", type: "easy", distanceKmRange: [5, 7], description: "Easy aerobic" },
-      { day: "Wed", type: "tempo", distanceKmRange: [4, 6], description: "Short tempo: 15–20 min steady" },
-      { day: "Sat", type: "long", distanceKmRange: [longKm - 1, longKm + 1], description: "Easy long run — last moderate effort before race week" },
+      {
+        day: "Wed",
+        type: "tempo",
+        distanceKmRange: [4, 6],
+        description: "Short tempo: 15–20 min steady",
+      },
+      {
+        day: "Sat",
+        type: "long",
+        distanceKmRange: [longKm - 1, longKm + 1],
+        description: "Easy long run — last moderate effort before race week",
+      },
       { day: "Sun", type: "recovery", distanceKmRange: [3, 5], description: "Easy recovery" },
     ],
     warnings: [],
@@ -173,7 +200,7 @@ function buildRaceWeekPlan(
   ctx: PlanContext,
   week: { weekStart: string; weekLabel: string },
   daysUntilRace: number,
-  raceDate: string
+  raceDate: string,
 ): WeekPlan {
   const readiness = ctx.raceReadiness!;
   const cfg = RACE_READINESS_CONFIG[readiness.distance];
@@ -235,9 +262,7 @@ function buildRaceWeekPlan(
     template: "race_week",
     totalKmRange: [Math.round(cap * 0.75 * 10) / 10, cap],
     sessions,
-    warnings: [
-      "No long run this week — race replaces the weekend long effort.",
-    ],
+    warnings: ["No long run this week — race replaces the weekend long effort."],
     rationale: [
       `Race week (${readiness.distanceLabel} on ${raceDay}) — ${daysUntilRace} day(s) out.`,
       `Volume capped ~${Math.round((1 - factor) * 100)}% below baseline; freshness over fitness.`,
@@ -256,7 +281,7 @@ function formatRaceTarget(sec: number): string {
 
 function buildEasyBalancePlan(
   ctx: PlanContext,
-  week: { weekStart: string; weekLabel: string }
+  week: { weekStart: string; weekLabel: string },
 ): WeekPlan {
   const base = baselineWeeklyKm(ctx);
   const cap = Math.round(base * 10) / 10;
@@ -266,10 +291,30 @@ function buildEasyBalancePlan(
     template: "easy_reset",
     totalKmRange: [cap - 4, cap],
     sessions: [
-      { day: "Tue", type: "easy", distanceKmRange: [per - 1, per + 1], description: "Easy aerobic" },
-      { day: "Thu", type: "easy", distanceKmRange: [per - 1, per + 1], description: "Easy run Z1–Z2" },
-      { day: "Sat", type: "easy", distanceKmRange: [per, per + 2], description: "Easy medium-long" },
-      { day: "Sun", type: "recovery", distanceKmRange: [4, 6], description: "Recovery jog or cross-train" },
+      {
+        day: "Tue",
+        type: "easy",
+        distanceKmRange: [per - 1, per + 1],
+        description: "Easy aerobic",
+      },
+      {
+        day: "Thu",
+        type: "easy",
+        distanceKmRange: [per - 1, per + 1],
+        description: "Easy run Z1–Z2",
+      },
+      {
+        day: "Sat",
+        type: "easy",
+        distanceKmRange: [per, per + 2],
+        description: "Easy medium-long",
+      },
+      {
+        day: "Sun",
+        type: "recovery",
+        distanceKmRange: [4, 6],
+        description: "Recovery jog or cross-train",
+      },
     ],
     warnings: [],
     rationale: [
@@ -279,10 +324,7 @@ function buildEasyBalancePlan(
   };
 }
 
-function buildBasePlan(
-  ctx: PlanContext,
-  week: { weekStart: string; weekLabel: string }
-): WeekPlan {
+function buildBasePlan(ctx: PlanContext, week: { weekStart: string; weekLabel: string }): WeekPlan {
   const base = baselineWeeklyKm(ctx);
   let cap = Math.round(base * 1.05 * 10) / 10;
   if (ctx.maxWeeklyKm && cap > ctx.maxWeeklyKm) {
@@ -293,13 +335,21 @@ function buildBasePlan(
   const easy2 = Math.round(cap * 0.2 * 10) / 10;
   const quality = Math.round(cap * 0.18 * 10) / 10;
 
-  const allowQuality =
-    ctx.fatigue.freshness >= 50 &&
-    ctx.intensityAdvice.status !== "too_hard";
+  const allowQuality = ctx.fatigue.freshness >= 50 && ctx.intensityAdvice.status !== "too_hard";
 
   const sessions: PlannedSession[] = [
-    { day: "Tue", type: "easy", distanceKmRange: [easy1 - 1, easy1 + 2], description: "Easy aerobic run" },
-    { day: "Thu", type: "easy", distanceKmRange: [easy2 - 1, easy2 + 2], description: "Easy run, nose breathing" },
+    {
+      day: "Tue",
+      type: "easy",
+      distanceKmRange: [easy1 - 1, easy1 + 2],
+      description: "Easy aerobic run",
+    },
+    {
+      day: "Thu",
+      type: "easy",
+      distanceKmRange: [easy2 - 1, easy2 + 2],
+      description: "Easy run, nose breathing",
+    },
     {
       day: "Sat",
       type: "long",
@@ -353,12 +403,7 @@ export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
   const raceInPlanWeek =
     raceDate && daysUntilRace !== null && isRaceInPlanWeek(raceDate, week.weekStart);
 
-  if (
-    raceDate &&
-    daysUntilRace !== null &&
-    daysUntilRace <= 14 &&
-    raceInPlanWeek
-  ) {
+  if (raceDate && daysUntilRace !== null && daysUntilRace <= 14 && raceInPlanWeek) {
     plan = buildRaceWeekPlan(ctx, week, daysUntilRace, raceDate);
   } else if (ctx.fatigue.freshness < 40 && (daysUntilRace === null || daysUntilRace > 3)) {
     plan = buildFatiguePlan(ctx, week);
@@ -372,8 +417,18 @@ export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
       template: "return",
       totalKmRange: [12, 20],
       sessions: [
-        { day: "Any", type: "easy", distanceKmRange: [5, 8], description: "Resume with one easy 30–40 min run" },
-        { day: "Any", type: "easy", distanceKmRange: [5, 7], description: "Second easy run later in the week" },
+        {
+          day: "Any",
+          type: "easy",
+          distanceKmRange: [5, 8],
+          description: "Resume with one easy 30–40 min run",
+        },
+        {
+          day: "Any",
+          type: "easy",
+          distanceKmRange: [5, 7],
+          description: "Second easy run later in the week",
+        },
       ],
       warnings: [],
       rationale: ["Little recent running — rebuild gradually before adding intensity."],
@@ -382,11 +437,7 @@ export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
     plan = buildBasePlan(ctx, week);
   }
 
-  const { plan: safePlan } = validatePlan(
-    plan,
-    lastCompletedWeekKm(ctx),
-    ctx.fatigue.tsb
-  );
+  const { plan: safePlan } = validatePlan(plan, lastCompletedWeekKm(ctx), ctx.fatigue.tsb);
 
   return safePlan;
 }
@@ -404,7 +455,7 @@ export function buildPlanContextFromInsights(
     goalProgress: { targetPerWeek: number } | null;
     halfMarathonReadiness: { longestRunKm: number };
   },
-  options: { runsPerWeekTarget: number; maxWeeklyKm?: number }
+  options: { runsPerWeekTarget: number; maxWeeklyKm?: number },
 ): PlanContext {
   return {
     fatigue: analytics.fatigue,
@@ -417,7 +468,7 @@ export function buildPlanContextFromInsights(
     easyHardPct: analytics.easyHard.easyPct,
     runsPerWeekTarget: options.runsPerWeekTarget,
     maxWeeklyKm: options.maxWeeklyKm,
-    longestRunKm: analytics.raceReadiness?.longestRunKm ??
-      analytics.halfMarathonReadiness.longestRunKm,
+    longestRunKm:
+      analytics.raceReadiness?.longestRunKm ?? analytics.halfMarathonReadiness.longestRunKm,
   };
 }

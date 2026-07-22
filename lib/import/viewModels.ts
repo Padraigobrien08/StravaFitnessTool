@@ -100,16 +100,12 @@ function confidenceScore(report: ImportQualityReport): number {
   const weights = { high: 100, medium: 65, low: 35 };
   const fields = report.fieldCoverage.filter((f) => f.label !== "Distance & time");
   if (fields.length === 0) return 50;
-  const avg =
-    fields.reduce((s, f) => s + weights[f.level], 0) / fields.length;
+  const avg = fields.reduce((s, f) => s + weights[f.level], 0) / fields.length;
   const sampleBonus = report.runCount >= 40 ? 8 : report.runCount >= 15 ? 4 : 0;
   return Math.min(100, Math.round(avg + sampleBonus));
 }
 
-function buildCapabilities(
-  report: ImportQualityReport,
-  apiConnected: boolean
-): CapabilityItem[] {
+function buildCapabilities(report: ImportQualityReport, apiConnected: boolean): CapabilityItem[] {
   const hr = report.fieldCoverage.find((f) => f.label === "Heart rate");
   const fit = report.fieldCoverage.find((f) => f.label === "FIT streams");
   const hrRatio = hr && hr.total ? hr.count / hr.total : 0;
@@ -164,7 +160,7 @@ function buildCapabilities(
 function buildCoverage(report: ImportQualityReport): CoverageRowView[] {
   const impacts: Record<string, string> = {
     "Heart rate": "Effort zones, load, and aerobic efficiency need HR.",
-    "Elevation": "Course-adjusted pacing and climb context.",
+    Elevation: "Course-adjusted pacing and climb context.",
     "Training load": "Fatigue modeling and TSB when load is present.",
     Cadence: "Form and rhythm signals on steady runs.",
     "FIT streams": "Intervals, splits, drift, and execution analysis.",
@@ -184,7 +180,7 @@ function buildCoverage(report: ImportQualityReport): CoverageRowView[] {
 function buildMissingGuidance(
   report: ImportQualityReport,
   apiConnected: boolean,
-  hasData: boolean
+  hasData: boolean,
 ): MissingGuidanceView[] {
   const items: MissingGuidanceView[] = [];
 
@@ -261,7 +257,7 @@ export function buildImportPageView(
     loading: boolean;
     lastImport?: string;
     importData?: StravaImport | null;
-  }
+  },
 ): ImportPageView {
   const modalityCoverage = opts.importData
     ? modalityCoverageRows(modalityCoverageFromImport(opts.importData))
@@ -273,9 +269,11 @@ export function buildImportPageView(
       title: "Training data not connected",
       subtitle: "Connect sources to unlock intelligence",
       ingestionSummary: "No runs ingested yet",
-      qualityNarrative: "StrideIQ analyzes locally — nothing leaves your device without Strava API sync.",
+      qualityNarrative:
+        "StrideIQ analyzes locally — nothing leaves your device without Strava API sync.",
       fitNarrative: "FIT streams are optional but unlock the deepest workout intelligence.",
-      recommendation: "Start with Strava API for seamless sync, or import a full export for history.",
+      recommendation:
+        "Start with Strava API for seamless sync, or import a full export for history.",
       unlockedCapabilities: [],
       missingCapabilities: [
         "Readiness modeling",
@@ -339,7 +337,7 @@ export function buildImportPageView(
           overallConfidence: "low",
           sportTypes: [],
         },
-        opts.apiConnected
+        opts.apiConnected,
       ),
       fitComparison: {
         without: ["Basic run summaries", "Weekly volume trends", "Manual PR tables"],
@@ -367,7 +365,7 @@ export function buildImportPageView(
           sportTypes: [],
         },
         opts.apiConnected,
-        false
+        false,
       ),
       trustTopics: defaultTrustTopics(),
       processingSteps: buildProcessingSteps(opts),
@@ -441,9 +439,7 @@ export function buildImportPageView(
       confidence: opts.apiConnected ? report.overallConfidence : "low",
       runsSynced: opts.apiConnected ? report.runCount : 0,
       activitiesAvailable: report.activityCount,
-      streamsLoaded:
-        opts.streamsFromApi ??
-        (opts.apiConnected ? report.fitParsed : 0),
+      streamsLoaded: opts.streamsFromApi ?? (opts.apiConnected ? report.fitParsed : 0),
       streamsPending: opts.runsMissingStreams ?? 0,
       lastSyncHint: opts.apiConnected ? "Use Sync now to refresh activities" : null,
       enabledCapabilities: opts.apiConnected
@@ -467,11 +463,7 @@ export function buildImportPageView(
       streamsPending: report.skippedFit,
       lastSyncHint: report.exportLabel ?? null,
       enabledCapabilities: opts.dataSources.localExport
-        ? [
-            "Long-term progression",
-            "Performance curves",
-            "Historical readiness",
-          ]
+        ? ["Long-term progression", "Performance curves", "Historical readiness"]
         : [],
       missingItems: opts.dataSources.localExport
         ? report.skippedFit > 0
@@ -488,11 +480,7 @@ export function buildImportPageView(
     modalityCoverage,
     capabilities,
     fitComparison: {
-      without: [
-        "Basic run summaries",
-        "Weekly volume & pace trends",
-        "Table-based PR detection",
-      ],
+      without: ["Basic run summaries", "Weekly volume & pace trends", "Table-based PR detection"],
       with: [
         "Interval & rep detection",
         "HR drift & pacing telemetry",
@@ -542,10 +530,7 @@ function defaultTrustTopics(): TrustTopicView[] {
   ];
 }
 
-function buildProcessingSteps(opts: {
-  parsing: boolean;
-  loading: boolean;
-}): ProcessingStepView[] {
+function buildProcessingSteps(opts: { parsing: boolean; loading: boolean }): ProcessingStepView[] {
   const active = opts.loading || opts.parsing;
   return [
     {

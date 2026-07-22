@@ -5,13 +5,8 @@ import type { ActiveInvestigation } from "./types";
 export function buildActiveInvestigations(
   state: Pick<
     CoachWorkspaceState,
-    | "currentFocus"
-    | "observations"
-    | "domains"
-    | "temporal"
-    | "snapshot"
-    | "lastAssistantSummary"
-  >
+    "currentFocus" | "observations" | "domains" | "temporal" | "snapshot" | "lastAssistantSummary"
+  >,
 ): ActiveInvestigation[] {
   const out: ActiveInvestigation[] = [];
   const seen = new Set<string>();
@@ -102,7 +97,7 @@ export function buildActiveInvestigations(
 
 export function buildContinuityLine(
   messages: import("./types").CoachMessage[],
-  observations: CoachWorkspaceState["observations"]
+  observations: CoachWorkspaceState["observations"],
 ): string | null {
   const lastUser = [...messages].reverse().find((m) => m.role === "user");
   const lastAssist = [...messages].reverse().find((m) => m.role === "assistant");

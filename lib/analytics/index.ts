@@ -10,10 +10,7 @@ import {
   type RaceReadiness,
 } from "./readiness";
 import { findPersonalRecords, racePredictions } from "./records";
-import {
-  buildRacePredictionAnalysis,
-  type RacePredictionAnalysis,
-} from "./predictions";
+import { buildRacePredictionAnalysis, type RacePredictionAnalysis } from "./predictions";
 import { fitnessIndex, loadByRun } from "./trainingLoad";
 import { hrTrend, paceTrend, rollingAveragePace } from "./trends";
 import { lastNDaysVolume, monthlyVolume, weeklyVolume } from "./volume";
@@ -32,22 +29,10 @@ import {
 } from "./fatigue";
 import { elevationPerKm, avgElevationPerKm } from "./elevation";
 import { rollingFourWeekBlocks, bestTrainingBlock } from "./block";
-import {
-  buildCurrentAndPreviousWeek,
-  type WeekSnapshot,
-} from "./week";
-import {
-  buildWeeklyNarrative,
-  type WeeklyNarrative,
-} from "./narrative";
-import {
-  buildConsistencyScore,
-  type ConsistencyScore,
-} from "./consistency";
-import {
-  buildIntensityAdvice,
-  type IntensityAdvice,
-} from "./intensityAdvisor";
+import { buildCurrentAndPreviousWeek, type WeekSnapshot } from "./week";
+import { buildWeeklyNarrative, type WeeklyNarrative } from "./narrative";
+import { buildConsistencyScore, type ConsistencyScore } from "./consistency";
+import { buildIntensityAdvice, type IntensityAdvice } from "./intensityAdvisor";
 import {
   buildPrTimeline,
   buildPredictionTimeline,
@@ -65,14 +50,8 @@ import {
   buildPlanContextFromInsights,
   type WeekPlan,
 } from "@/lib/training/planEngine";
-import {
-  simulateRaceStrategy,
-  type RaceStrategy,
-} from "./raceStrategy";
-import {
-  computeTrainingEcosystem,
-  type TrainingEcosystemAnalysis,
-} from "@/lib/ecosystem";
+import { simulateRaceStrategy, type RaceStrategy } from "./raceStrategy";
+import { computeTrainingEcosystem, type TrainingEcosystemAnalysis } from "@/lib/ecosystem";
 
 export interface DashboardInsights {
   summary: {
@@ -133,7 +112,7 @@ export function computeInsights(
   fitDetails: FitRunDetail[] = [],
   defaultWeeklyRuns = 3,
   raceGoal: RaceGoal | null = null,
-  maxWeeklyKm?: number
+  maxWeeklyKm?: number,
 ): DashboardInsights {
   const { runs, profile, goals, allActivities } = data;
   const athleteMaxHr = profile.maxHeartRate ?? DEFAULT_MAX_HR;
@@ -153,8 +132,10 @@ export function computeInsights(
 
   const goalProgress = runGoalProgress(runs, goals);
   const efficiencySummaryResult = efficiencySummary(efficiencyPoints);
-  const { current: currentWeek, previous: previousWeek } =
-    buildCurrentAndPreviousWeek(runs, athleteMaxHr);
+  const { current: currentWeek, previous: previousWeek } = buildCurrentAndPreviousWeek(
+    runs,
+    athleteMaxHr,
+  );
   const weeklyNarrative = buildWeeklyNarrative(
     runs,
     {
@@ -164,15 +145,11 @@ export function computeInsights(
       efficiencySummary: efficiencySummaryResult,
     },
     0,
-    defaultWeeklyRuns
+    defaultWeeklyRuns,
   );
 
   const easyHard = easyHardSplit(runs, athleteMaxHr);
-  const consistencyScore = buildConsistencyScore(
-    runs,
-    goalProgress,
-    defaultWeeklyRuns
-  );
+  const consistencyScore = buildConsistencyScore(runs, goalProgress, defaultWeeklyRuns);
   const intensityAdvice = buildIntensityAdvice(runs, athleteMaxHr, easyHard);
   const prTimeline = buildPrTimeline(runs, fitDetails);
   const predictionTimeline = buildPredictionTimeline(runs, fitDetails);
@@ -187,23 +164,12 @@ export function computeInsights(
     : null;
   const workoutLabels = classifyAllRuns(runs, fitDetails, athleteMaxHr);
   const workoutTypeMix = workoutTypeDistribution(workoutLabels, 56);
-  const trainingEcosystem = computeTrainingEcosystem(
-    data,
-    workoutLabels,
-    dataConfidence,
-    raceGoal
-  );
+  const trainingEcosystem = computeTrainingEcosystem(data, workoutLabels, dataConfidence, raceGoal);
   const weeks = weeklyVolume(runs);
   const hmReadiness = halfMarathonReadiness(runs);
 
   const raceStrategyResult = raceGoal
-    ? simulateRaceStrategy(
-        raceGoal,
-        racePredictionAnalysis,
-        fatigue,
-        raceReadinessResult,
-        "even"
-      )
+    ? simulateRaceStrategy(raceGoal, racePredictionAnalysis, fatigue, raceReadinessResult, "even")
     : null;
 
   const nextWeekPlan = buildNextWeekPlan(
@@ -223,23 +189,16 @@ export function computeInsights(
       {
         runsPerWeekTarget: goalProgress?.targetPerWeek ?? defaultWeeklyRuns,
         maxWeeklyKm,
-      }
-    )
+      },
+    ),
   );
 
   return {
     summary: {
       runCount: runs.length,
-      totalDistanceKm:
-        Math.round(runs.reduce((s, r) => s + r.distanceM / 1000, 0) * 10) / 10,
-      dateRange:
-        runs.length > 0
-          ? { start: runs[0].date, end: runs[runs.length - 1].date }
-          : null,
-      avgPaceSecPerKm:
-        paces.length > 0
-          ? paces.reduce((a, b) => a + b, 0) / paces.length
-          : null,
+      totalDistanceKm: Math.round(runs.reduce((s, r) => s + r.distanceM / 1000, 0) * 10) / 10,
+      dateRange: runs.length > 0 ? { start: runs[0].date, end: runs[runs.length - 1].date } : null,
+      avgPaceSecPerKm: paces.length > 0 ? paces.reduce((a, b) => a + b, 0) / paces.length : null,
       avgHr: hrs.length > 0 ? Math.round(hrs.reduce((a, b) => a + b, 0) / hrs.length) : null,
       last7DaysKm: Math.round(last7.distanceKm * 10) / 10,
       last7DaysRuns: last7.runCount,

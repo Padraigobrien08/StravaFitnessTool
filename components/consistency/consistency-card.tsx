@@ -7,9 +7,7 @@ export function ConsistencyCard({ score }: { score: ConsistencyScore }) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-zinc-500">
-          Consistency
-        </CardTitle>
+        <CardTitle className="text-sm font-medium text-zinc-500">Consistency</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="font-display text-3xl font-bold text-white tabular-nums">
@@ -20,7 +18,9 @@ export function ConsistencyCard({ score }: { score: ConsistencyScore }) {
         <ul className="mt-3 space-y-1 text-xs text-zinc-500">
           <li>Frequency: {score.frequency}/100</li>
           <li>Volume stability: {score.volumeStability}/100</li>
-          <li>Streak: {score.streakWeeks} week{score.streakWeeks === 1 ? "" : "s"}</li>
+          <li>
+            Streak: {score.streakWeeks} week{score.streakWeeks === 1 ? "" : "s"}
+          </li>
         </ul>
       </CardContent>
     </Card>

@@ -22,17 +22,17 @@ StrideIQ MVP is a **local-first training intelligence dashboard**: import Strava
 
 ### Product surfaces
 
-| Area | Highlights |
-|------|------------|
-| **Home** | Operating-system layout: hero, week board, intelligence feed |
-| **Plan** | Planning context, generate/save week, execution vs Strava, DnD board |
-| **Goals** | Race briefing V2, readiness, forecasts, mission control |
-| **Training / Performance** | Volume, blocks, efficiency, projections, records |
-| **Runs** | Explorer, session intelligence, route replay |
-| **Intelligence** | Persistent belief model (not a chat UI) |
-| **Coach** | Investigation workspace with tool-use loop |
-| **Report** | Printable change summary |
-| **Import / Settings** | Quality panel, units (stored), webhooks, clear data |
+| Area                       | Highlights                                                           |
+| -------------------------- | -------------------------------------------------------------------- |
+| **Home**                   | Operating-system layout: hero, week board, intelligence feed         |
+| **Plan**                   | Planning context, generate/save week, execution vs Strava, DnD board |
+| **Goals**                  | Race briefing V2, readiness, forecasts, mission control              |
+| **Training / Performance** | Volume, blocks, efficiency, projections, records                     |
+| **Runs**                   | Explorer, session intelligence, route replay                         |
+| **Intelligence**           | Persistent belief model (not a chat UI)                              |
+| **Coach**                  | Investigation workspace with tool-use loop                           |
+| **Report**                 | Printable change summary                                             |
+| **Import / Settings**      | Quality panel, units (stored), webhooks, clear data                  |
 
 ### Engineering
 
@@ -46,14 +46,14 @@ StrideIQ MVP is a **local-first training intelligence dashboard**: import Strava
 
 These features need `DATABASE_URL`, `SESSION_SECRET`, and Strava OAuth env vars (see [`.env.example`](../.env.example)):
 
-| Feature | Without server |
-|---------|----------------|
-| Connect Strava / live sync | ❌ Export only |
-| Coach chat (`/coach`) | ❌ No tool loop |
+| Feature                                  | Without server              |
+| ---------------------------------------- | --------------------------- |
+| Connect Strava / live sync               | ❌ Export only              |
+| Coach chat (`/coach`)                    | ❌ No tool loop             |
 | `GET /api/me/intelligence` (full bundle) | ❌ Limited client analytics |
-| MCP package against hosted API | ❌ |
-| Webhooks auto-sync | ❌ |
-| Server-side coach memory API | ❌ |
+| MCP package against hosted API           | ❌                          |
+| Webhooks auto-sync                       | ❌                          |
+| Server-side coach memory API             | ❌                          |
 
 **Export-only path still provides:** Home, Training, Performance, Goals (predictions from CSV), Plan (local), Runs, Report, Intelligence (client-derived), Import quality.
 
@@ -61,10 +61,10 @@ These features need `DATABASE_URL`, `SESSION_SECRET`, and Strava OAuth env vars 
 
 ## What requires LLM keys
 
-| Feature | Env |
-|---------|-----|
-| Coach replies | `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` |
-| AI weekly plan (when not using fallback rules) | `OPENAI_API_KEY` |
+| Feature                                        | Env                                         |
+| ---------------------------------------------- | ------------------------------------------- |
+| Coach replies                                  | `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY` |
+| AI weekly plan (when not using fallback rules) | `OPENAI_API_KEY`                            |
 
 Fallback rule-based plan generation works without OpenAI when the API route allows it.
 

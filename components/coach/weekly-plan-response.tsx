@@ -29,7 +29,7 @@ export function WeeklyPlanResponse({
     <article
       className={cn(
         "weekly-plan-response rounded-xl border border-white/[0.06] bg-[#0c0d10]/80",
-        className
+        className,
       )}
     >
       <header className="border-b border-white/[0.04] px-4 py-3">
@@ -52,13 +52,9 @@ export function WeeklyPlanResponse({
             ) : null}
           </span>
         </div>
-        <p className="mt-2 text-[14px] leading-relaxed text-zinc-200">
-          {plan.summary}
-        </p>
+        <p className="mt-2 text-[14px] leading-relaxed text-zinc-200">{plan.summary}</p>
         <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-zinc-500">
-          {plan.totalRunDistanceKm != null ? (
-            <span>{plan.totalRunDistanceKm} km runs</span>
-          ) : null}
+          {plan.totalRunDistanceKm != null ? <span>{plan.totalRunDistanceKm} km runs</span> : null}
           <span>{plan.hardSessionCount} hard</span>
           <span>via {source}</span>
         </div>
@@ -88,7 +84,7 @@ export function WeeklyPlanResponse({
               <span
                 className={cn(
                   "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
-                  intensityDot[w.intensity] ?? "bg-zinc-600"
+                  intensityDot[w.intensity] ?? "bg-zinc-600",
                 )}
               />
               <div className="min-w-0 flex-1">
@@ -98,9 +94,7 @@ export function WeeklyPlanResponse({
                   {w.distanceKm != null ? ` · ${w.distanceKm} km` : ""}
                   {w.durationMin != null ? ` · ${w.durationMin} min` : ""}
                 </p>
-                <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">
-                  {w.purpose}
-                </p>
+                <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">{w.purpose}</p>
               </div>
             </li>
           ))}
@@ -109,14 +103,8 @@ export function WeeklyPlanResponse({
 
       <div className="grid gap-3 border-t border-white/[0.04] px-4 py-3 sm:grid-cols-2">
         <ObservabilityBlock title="Evidence used" items={plan.rationale.evidenceUsed} />
-        <ObservabilityBlock
-          title="Constraints applied"
-          items={guardrails?.constraintNotes ?? []}
-        />
-        <ObservabilityBlock
-          title="Risks managed"
-          items={plan.rationale.risksManaged}
-        />
+        <ObservabilityBlock title="Constraints applied" items={guardrails?.constraintNotes ?? []} />
+        <ObservabilityBlock title="Risks managed" items={plan.rationale.risksManaged} />
         <ObservabilityBlock title="Limitations" items={plan.limitations} />
       </div>
 
@@ -154,7 +142,7 @@ export function WeeklyPlanResponse({
                 integrity: integrity ?? result.observability?.dev?.integrityReport,
               },
               null,
-              2
+              2,
             )}
           </pre>
         </div>
@@ -163,19 +151,11 @@ export function WeeklyPlanResponse({
   );
 }
 
-function ObservabilityBlock({
-  title,
-  items,
-}: {
-  title: string;
-  items: string[];
-}) {
+function ObservabilityBlock({ title, items }: { title: string; items: string[] }) {
   if (!items.length) return null;
   return (
     <div>
-      <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-        {title}
-      </p>
+      <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-zinc-600">{title}</p>
       <ul className="space-y-0.5 text-[11px] leading-snug text-zinc-500">
         {items.slice(0, 5).map((item) => (
           <li key={item}>· {item}</li>

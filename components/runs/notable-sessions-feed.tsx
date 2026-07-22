@@ -19,9 +19,7 @@ export function NotableSessionsFeed({
   compact?: boolean;
 }) {
   if (sessions.length === 0) {
-    return (
-      <p className="text-[12px] text-zinc-600">No ranked sessions yet.</p>
-    );
+    return <p className="text-[12px] text-zinc-600">No ranked sessions yet.</p>;
   }
 
   return (
@@ -32,7 +30,7 @@ export function NotableSessionsFeed({
             href={s.href}
             className={cn(
               "group flex gap-3 rounded-lg border px-3 py-2.5 transition-colors hover:bg-white/[0.03]",
-              sigStyles[s.significance]
+              sigStyles[s.significance],
             )}
           >
             <span className="mt-0.5 w-5 shrink-0 text-[11px] font-medium tabular-nums text-zinc-600">
@@ -51,9 +49,7 @@ export function NotableSessionsFeed({
               <p className="mt-0.5 text-[11px] text-zinc-500">{s.why}</p>
               {!compact ? (
                 <>
-                  <p className="mt-1 text-[11px] text-teal-400/70">
-                    {s.adaptation}
-                  </p>
+                  <p className="mt-1 text-[11px] text-teal-400/70">{s.adaptation}</p>
                   <p className="text-[10px] text-zinc-600">{s.goalRelation}</p>
                 </>
               ) : null}

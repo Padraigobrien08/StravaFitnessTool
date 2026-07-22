@@ -11,7 +11,7 @@ export async function syncStravaActivitiesForUser(
     afterEpochSec?: number;
     streamMaxRuns?: number;
     skipStreams?: boolean;
-  }
+  },
 ): Promise<{
   synced: number;
   streamsSynced: number;
@@ -20,18 +20,11 @@ export async function syncStravaActivitiesForUser(
   const syncRunId = await startSyncRun(userId);
   try {
     const { accessToken } = await getValidAccessToken(userId);
-    const activities = await fetchAthleteActivities(
-      accessToken,
-      options?.afterEpochSec
-    );
+    const activities = await fetchAthleteActivities(accessToken, options?.afterEpochSec);
     const synced = await upsertActivities(userId, activities);
     const lastAfter =
       activities.length > 0
-        ? Math.floor(
-            new Date(
-              activities[activities.length - 1]!.start_date
-            ).getTime() / 1000
-          )
+        ? Math.floor(new Date(activities[activities.length - 1]!.start_date).getTime() / 1000)
         : null;
     await finishSyncRun(syncRunId, "completed", synced, lastAfter);
 
@@ -48,9 +41,7 @@ export async function syncStravaActivitiesForUser(
     }
 
     try {
-      const { syncAthleteMetaForUser } = await import(
-        "@/lib/db/strava-connection"
-      );
+      const { syncAthleteMetaForUser } = await import("@/lib/db/strava-connection");
       await syncAthleteMetaForUser(userId);
     } catch {
       // Stats/zones optional

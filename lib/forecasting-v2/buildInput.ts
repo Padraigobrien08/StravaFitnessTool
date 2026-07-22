@@ -1,10 +1,7 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
-import {
-  RACE_READINESS_CONFIG,
-  type RaceGoal,
-} from "@/lib/analytics/readiness";
+import { RACE_READINESS_CONFIG, type RaceGoal } from "@/lib/analytics/readiness";
 import { effortsFromRuns } from "./capabilityModels";
 import { prepareCapabilityEfforts } from "./effortSelection";
 import type { RaceForecastInput, RaceQualityEffort } from "./forecastTypes";
@@ -32,7 +29,7 @@ function runsToNormalized(runs: RunActivity[]): NormalizedActivity[] {
 
 function effortsFromAnalysis(
   analytics: DashboardInsights,
-  runs: RunActivity[]
+  runs: RunActivity[],
 ): RaceQualityEffort[] {
   return analytics.racePredictionAnalysis.efforts.map((e) => ({
     ...e,
@@ -57,9 +54,7 @@ export function buildRaceForecastInput(opts: {
   const runs = opts.runs ?? [];
   const fitDetails = opts.fitDetails ?? [];
   const rawEfforts =
-    runs.length > 0
-      ? effortsFromRuns(runs, fitDetails)
-      : effortsFromAnalysis(analytics, runs);
+    runs.length > 0 ? effortsFromRuns(runs, fitDetails) : effortsFromAnalysis(analytics, runs);
   const efforts = prepareCapabilityEfforts(rawEfforts);
   const normalized = runsToNormalized(runs);
   const cfg = RACE_READINESS_CONFIG[goal.distance];

@@ -31,22 +31,17 @@ export function DashboardPanel({
             ? dash.padRail
             : dash.pad;
 
-  const surface = elevated
-    ? dash.surfaceElevated
-    : subdued
-      ? dash.surfaceSubdued
-      : dash.surface;
+  const surface = elevated ? dash.surfaceElevated : subdued ? dash.surfaceSubdued : dash.surface;
 
   return (
     <div
       className={cn(
         surface,
-        variant === "hero" &&
-          "bg-gradient-to-br from-[#0f1218] via-[#0c0d10] to-[#09090b]",
+        variant === "hero" && "bg-gradient-to-br from-[#0f1218] via-[#0c0d10] to-[#09090b]",
         variant === "flat" && "shadow-none bg-white/[0.02]",
         hover && dash.surfaceHover,
         pad,
-        className
+        className,
       )}
     >
       {children}

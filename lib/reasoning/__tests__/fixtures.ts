@@ -27,7 +27,7 @@ export function makeRun(
   id: string,
   date: string,
   distanceKm: number,
-  overrides: Partial<RunActivity> = {}
+  overrides: Partial<RunActivity> = {},
 ): RunActivity {
   return {
     ...baseRun,
@@ -42,7 +42,7 @@ export function makeRun(
 export function makePaceStream(
   length: number,
   startPace: number,
-  endPace: number
+  endPace: number,
 ): FitRunDetail["paceStream"] {
   const stream: FitRunDetail["paceStream"] = [];
   for (let i = 0; i < length; i++) {
@@ -86,7 +86,7 @@ const defaultQuality: ImportQualityReport = {
 export function buildTestBundle(
   runs: RunActivity[],
   fitDetails: FitRunDetail[] = [],
-  labels?: RunWorkoutLabel[]
+  labels?: RunWorkoutLabel[],
 ): AthleteIntelligenceBundle {
   const importData = {
     runs,

@@ -9,7 +9,7 @@ const bodySchema = z.object({
     z.object({
       role: z.enum(["user", "assistant"]),
       content: z.string().min(1).max(8000),
-    })
+    }),
   ),
   clientBrief: z.custom<IntelligenceBrief>().optional(),
 });
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
         error:
           "Coach chat requires OPENAI_API_KEY or ANTHROPIC_API_KEY in server environment. See .env.example.",
       },
-      { status: 503 }
+      { status: 503 },
     );
   }
 
@@ -42,28 +42,24 @@ export async function POST(req: NextRequest) {
           error:
             "Connect Strava (Import page) or sign in for server intelligence. Local-only mode can pass clientBrief later.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
     return NextResponse.json(
       {
-        error:
-          "Server session required for coach tools. Connect Strava API and sync data.",
+        error: "Server session required for coach tools. Connect Strava API and sync data.",
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   try {
-    const { reply, toolsUsed } = await runCoachChat(
-      ctx,
-      body.messages as ChatMessage[]
-    );
+    const { reply, toolsUsed } = await runCoachChat(ctx, body.messages as ChatMessage[]);
     return NextResponse.json({ reply, toolsUsed });
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Chat failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

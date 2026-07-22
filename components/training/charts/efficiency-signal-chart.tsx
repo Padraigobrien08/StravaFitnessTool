@@ -58,12 +58,7 @@ export function EfficiencySignalChart({
           domain={["auto", "auto"]}
         />
         <Tooltip contentStyle={chart.tooltip} />
-        <Area
-          type="monotone"
-          dataKey="efficiency"
-          stroke="none"
-          fill="url(#effGrad)"
-        />
+        <Area type="monotone" dataKey="efficiency" stroke="none" fill="url(#effGrad)" />
         <Line
           type="monotone"
           dataKey="efficiency"

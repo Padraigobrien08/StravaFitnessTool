@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth/session";
 import { getStravaConnection } from "@/lib/db/strava-connection";
-import {
-  countRunsMissingStreams,
-  countStreamsForUser,
-} from "@/lib/db/activity-streams";
+import { countRunsMissingStreams, countStreamsForUser } from "@/lib/db/activity-streams";
 import { getSql } from "@/lib/db/client";
 
 export async function GET() {

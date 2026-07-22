@@ -1,13 +1,7 @@
 import type { Insight } from "@/lib/insights/types";
 import { InsightCard } from "./insight-card";
 
-export function InsightList({
-  insights,
-  limit,
-}: {
-  insights: Insight[];
-  limit?: number;
-}) {
+export function InsightList({ insights, limit }: { insights: Insight[]; limit?: number }) {
   const shown = limit ? insights.slice(0, limit) : insights;
   if (shown.length === 0) return null;
 

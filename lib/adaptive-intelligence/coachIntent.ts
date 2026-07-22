@@ -1,11 +1,5 @@
 export type AdaptiveCoachTopic =
-  | "adaptation"
-  | "readiness"
-  | "taper"
-  | "outcomes"
-  | "history"
-  | "fatigue"
-  | "all";
+  "adaptation" | "readiness" | "taper" | "outcomes" | "history" | "fatigue" | "all";
 
 const PATTERNS: { pattern: RegExp; topic: AdaptiveCoachTopic }[] = [
   { pattern: /\bwhat historically improves my pace\b/i, topic: "adaptation" },
@@ -18,9 +12,7 @@ const PATTERNS: { pattern: RegExp; topic: AdaptiveCoachTopic }[] = [
   { pattern: /\bwhat have you learned\b/i, topic: "all" },
 ];
 
-export function classifyAdaptiveCoachQuestion(
-  text: string
-): AdaptiveCoachTopic | null {
+export function classifyAdaptiveCoachQuestion(text: string): AdaptiveCoachTopic | null {
   const t = text.trim();
   for (const { pattern, topic } of PATTERNS) {
     if (pattern.test(t)) return topic;

@@ -2,9 +2,7 @@ import type { DashboardInsights } from "@/lib/analytics";
 import { createBelief } from "./beliefUtils";
 import type { AthleteBelief } from "./types";
 
-export function inferTaperResponses(
-  analytics: DashboardInsights
-): AthleteBelief[] {
+export function inferTaperResponses(analytics: DashboardInsights): AthleteBelief[] {
   const out: AthleteBelief[] = [];
   const rr = analytics.raceReadiness;
 
@@ -13,8 +11,7 @@ export function inferTaperResponses(
   if (rr.daysUntilRace <= 21 && rr.daysUntilRace >= 0) {
     const volDrop =
       analytics.previousWeek &&
-      analytics.currentWeek.distanceKm <
-        analytics.previousWeek.distanceKm * 0.9;
+      analytics.currentWeek.distanceKm < analytics.previousWeek.distanceKm * 0.9;
 
     out.push(
       createBelief({
@@ -30,7 +27,7 @@ export function inferTaperResponses(
         confidence: rr.daysUntilRace <= 14 ? "medium" : "low",
         recommendedUse:
           "Race-week plans should cap hard sessions and prioritise sleep and easy rhythm.",
-      })
+      }),
     );
   }
 
@@ -46,9 +43,8 @@ export function inferTaperResponses(
           `Freshness ${Math.round(analytics.fatigue.freshness)}`,
         ],
         confidence: "low",
-        recommendedUse:
-          "No stacked quality — one optional sharpener at most, then race execution.",
-      })
+        recommendedUse: "No stacked quality — one optional sharpener at most, then race execution.",
+      }),
     );
   }
 

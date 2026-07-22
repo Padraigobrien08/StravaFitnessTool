@@ -1,9 +1,4 @@
-export type InsightQuestion =
-  | "improving"
-  | "training"
-  | "ready"
-  | "next"
-  | "changed";
+export type InsightQuestion = "improving" | "training" | "ready" | "next" | "changed";
 
 export type InsightSeverity = "positive" | "neutral" | "warning";
 

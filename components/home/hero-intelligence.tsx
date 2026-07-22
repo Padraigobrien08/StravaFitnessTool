@@ -32,9 +32,7 @@ export function HeroIntelligence({ hero }: { hero: HeroViewModel }) {
 
           <div className="max-w-4xl space-y-2">
             <h1 className={dash.h1}>{hero.title}</h1>
-            <p className={cn(dash.lead, "text-zinc-300/90")}>
-              {hero.interpretation}
-            </p>
+            <p className={cn(dash.lead, "text-zinc-300/90")}>{hero.interpretation}</p>
           </div>
 
           <dl className="flex flex-wrap gap-x-8 gap-y-3 border-t border-white/[0.05] pt-4">
@@ -43,9 +41,7 @@ export function HeroIntelligence({ hero }: { hero: HeroViewModel }) {
                 <dt className={cn(dash.label, "shrink-0")}>{m.label}</dt>
                 <dd className="flex items-baseline gap-2">
                   <span className={dash.metricSm}>{m.value}</span>
-                  {m.hint ? (
-                    <span className={dash.muted}>{m.hint}</span>
-                  ) : null}
+                  {m.hint ? <span className={dash.muted}>{m.hint}</span> : null}
                 </dd>
               </div>
             ))}
@@ -86,15 +82,8 @@ export function HeroIntelligence({ hero }: { hero: HeroViewModel }) {
         >
           <ReadinessRing score={hero.readinessScore} size={108} showGlow />
           <div className="min-w-0 flex-1 space-y-2 lg:w-full lg:max-w-[220px]">
-            <p className="text-sm text-zinc-400 lg:text-center">
-              {hero.readinessLabel}
-            </p>
-            <Sparkline
-              data={hero.loadSparkline}
-              fullWidth
-              height={36}
-              positive={hero.tsb >= 0}
-            />
+            <p className="text-sm text-zinc-400 lg:text-center">{hero.readinessLabel}</p>
+            <Sparkline data={hero.loadSparkline} fullWidth height={36} positive={hero.tsb >= 0} />
             <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500 lg:justify-center">
               <span className="tabular-nums">{hero.trendLabel}</span>
               <span>

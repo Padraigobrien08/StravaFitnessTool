@@ -27,24 +27,18 @@ export function WorkoutSessionRow({
 }) {
   return (
     <div className="flex items-center gap-2.5 py-2.5 transition-colors duration-200 hover:bg-white/[0.03]">
-      <span className="w-9 shrink-0 text-xs font-medium text-zinc-500">
-        {day}
-      </span>
+      <span className="w-9 shrink-0 text-xs font-medium text-zinc-500">{day}</span>
       <span
         className={cn(
           "shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset",
-          typeStyles[type]
+          typeStyles[type],
         )}
       >
         {WORKOUT_TYPE_LABELS[type]}
       </span>
-      <span className="min-w-0 flex-1 truncate text-xs text-zinc-400">
-        {kmRange ?? "—"}
-      </span>
+      <span className="min-w-0 flex-1 truncate text-xs text-zinc-400">{kmRange ?? "—"}</span>
       {loadScore != null ? (
-        <span className="shrink-0 text-[10px] tabular-nums text-zinc-600">
-          L{loadScore}
-        </span>
+        <span className="shrink-0 text-[10px] tabular-nums text-zinc-600">L{loadScore}</span>
       ) : null}
     </div>
   );

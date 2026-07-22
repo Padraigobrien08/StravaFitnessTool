@@ -5,13 +5,18 @@ import type { IntelligenceContext } from "./types";
 import type { RaceGoal, RaceDistance } from "@/lib/analytics/readiness";
 
 export async function intelligenceContextFromRequest(
-  req: NextRequest
+  req: NextRequest,
 ): Promise<IntelligenceContext | null> {
   let userId = await getSessionUserId();
   if (!userId) {
     const apiKey = req.headers.get("x-strideiq-api-key");
     const keyUser = process.env.STRIDEIQ_API_KEY_USER_ID;
-    if (apiKey && process.env.STRIDEIQ_API_KEY && apiKey === process.env.STRIDEIQ_API_KEY && keyUser) {
+    if (
+      apiKey &&
+      process.env.STRIDEIQ_API_KEY &&
+      apiKey === process.env.STRIDEIQ_API_KEY &&
+      keyUser
+    ) {
       userId = keyUser;
     }
   }
@@ -25,22 +30,15 @@ export async function intelligenceContextFromRequest(
   if (!userId) return null;
 
   const raceGoal = parseRaceGoalQuery(req);
-  const defaultWeeklyRuns = parseInt(
-    req.nextUrl.searchParams.get("defaultWeeklyRuns") ?? "",
-    10
-  );
+  const defaultWeeklyRuns = parseInt(req.nextUrl.searchParams.get("defaultWeeklyRuns") ?? "", 10);
   const maxWeeklyKm = parseFloat(req.nextUrl.searchParams.get("maxWeeklyKm") ?? "");
 
   return {
     userId,
     raceGoal,
     settings: {
-      ...(Number.isFinite(defaultWeeklyRuns) && defaultWeeklyRuns > 0
-        ? { defaultWeeklyRuns }
-        : {}),
-      ...(Number.isFinite(maxWeeklyKm) && maxWeeklyKm > 0
-        ? { maxWeeklyKm }
-        : {}),
+      ...(Number.isFinite(defaultWeeklyRuns) && defaultWeeklyRuns > 0 ? { defaultWeeklyRuns } : {}),
+      ...(Number.isFinite(maxWeeklyKm) && maxWeeklyKm > 0 ? { maxWeeklyKm } : {}),
     },
   };
 }

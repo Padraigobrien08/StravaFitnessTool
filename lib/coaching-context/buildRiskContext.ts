@@ -1,11 +1,7 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import { buildRisksAndOpportunities } from "@/lib/coach/activeIntelligence";
 import type { ActiveObservation } from "@/lib/coach/types";
-import type {
-  CoachingOpportunityItem,
-  CoachingRiskItem,
-  ConfidenceLevel,
-} from "./types";
+import type { CoachingOpportunityItem, CoachingRiskItem, ConfidenceLevel } from "./types";
 
 const MAX_RISKS = 5;
 const MAX_OPPORTUNITIES = 4;
@@ -33,7 +29,7 @@ function confidenceFromInsights(insights: DashboardInsights): ConfidenceLevel {
 
 export function buildRiskContext(
   insights: DashboardInsights,
-  observations: ActiveObservation[] = []
+  observations: ActiveObservation[] = [],
 ): { risks: CoachingRiskItem[]; opportunities: CoachingOpportunityItem[] } {
   const baseConf = confidenceFromInsights(insights);
   const ro = buildRisksAndOpportunities(insights, observations);
@@ -51,7 +47,10 @@ export function buildRiskContext(
     risks.push({
       label: "Deep negative training stress balance",
       severity: "high",
-      evidence: [`TSB ${insights.fatigue.tsb.toFixed(0)}`, `CTL ${insights.fatigue.ctl.toFixed(0)}`],
+      evidence: [
+        `TSB ${insights.fatigue.tsb.toFixed(0)}`,
+        `CTL ${insights.fatigue.ctl.toFixed(0)}`,
+      ],
       confidence: "medium",
     });
   }

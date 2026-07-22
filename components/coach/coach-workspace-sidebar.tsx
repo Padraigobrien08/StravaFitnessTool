@@ -18,9 +18,7 @@ function SidebarSection({
 }) {
   return (
     <div className={cn("px-3", className)}>
-      <p className="mb-1.5 px-1 text-[11px] font-medium text-zinc-500">
-        {title}
-      </p>
+      <p className="mb-1.5 px-1 text-[11px] font-medium text-zinc-500">{title}</p>
       {children}
     </div>
   );
@@ -55,7 +53,7 @@ export function CoachWorkspaceSidebar({
     <aside
       className={cn(
         "coach-sidebar flex h-full min-h-0 w-[260px] shrink-0 flex-col overflow-hidden bg-[#0a0b0e]/60 lg:bg-[#0a0b0e]/40",
-        className
+        className,
       )}
     >
       <div className="shrink-0 px-3 pt-3 pb-2">
@@ -92,7 +90,7 @@ export function CoachWorkspaceSidebar({
                       "min-w-0 flex-1 truncate rounded-md px-2 py-1.5 text-left text-[12px] leading-snug transition-colors",
                       activeId === t.id
                         ? "bg-white/[0.06] text-zinc-200"
-                        : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-400"
+                        : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-400",
                     )}
                   >
                     {t.title}
@@ -143,7 +141,7 @@ export function CoachWorkspaceSidebar({
                     "w-full rounded-md px-2 py-1.5 text-left text-[12px] transition-colors disabled:opacity-40",
                     activeDomainId === d.id
                       ? "bg-white/[0.06] text-zinc-300"
-                      : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-400"
+                      : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-400",
                   )}
                 >
                   {d.title}

@@ -20,7 +20,7 @@ export function OsChangeFeed({ items }: { items: ChangeFeedItem[] }) {
                 "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
                 item.tone === "positive" && "bg-teal-400/80",
                 item.tone === "warning" && "bg-amber-400/80",
-                item.tone === "neutral" && "bg-zinc-500/60"
+                item.tone === "neutral" && "bg-zinc-500/60",
               )}
               aria-hidden
             />

@@ -31,12 +31,7 @@ export default function RunsPage() {
 
   const view = useMemo(() => {
     if (!importData || !analytics) return null;
-    return buildRunsPageView(
-      importData.runs,
-      analytics,
-      fitRunIds,
-      quality
-    );
+    return buildRunsPageView(importData.runs, analytics, fitRunIds, quality);
   }, [importData, analytics, fitRunIds, quality]);
 
   if ((loading || stravaLoading) && !view) {
@@ -65,16 +60,10 @@ export default function RunsPage() {
               </p>
             </div>
             <div className="flex rounded-lg border border-white/[0.06] p-0.5">
-              <ModeButton
-                active={mode === "intelligence"}
-                onClick={() => setMode("intelligence")}
-              >
+              <ModeButton active={mode === "intelligence"} onClick={() => setMode("intelligence")}>
                 Session intelligence
               </ModeButton>
-              <ModeButton
-                active={mode === "explorer"}
-                onClick={() => setMode("explorer")}
-              >
+              <ModeButton active={mode === "explorer"} onClick={() => setMode("explorer")}>
                 Activity explorer
               </ModeButton>
             </div>
@@ -131,9 +120,7 @@ function ModeButton({
       onClick={onClick}
       className={cn(
         "rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors",
-        active
-          ? "bg-teal-500/15 text-teal-200"
-          : "text-zinc-500 hover:text-zinc-300"
+        active ? "bg-teal-500/15 text-teal-200" : "text-zinc-500 hover:text-zinc-300",
       )}
     >
       {children}

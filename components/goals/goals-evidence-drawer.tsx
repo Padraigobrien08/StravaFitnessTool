@@ -9,11 +9,7 @@ import { PredictionConsensusPanel } from "@/components/goals/prediction-consensu
 import type { ModelConsensusRow } from "@/lib/goals/viewModels";
 import type { RacePredictionAnalysis } from "@/lib/analytics/predictions";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +44,7 @@ export function GoalsEvidenceDrawer({
           <ChevronDown
             className={cn(
               "h-4 w-4 shrink-0 text-zinc-600 transition-transform",
-              open && "rotate-180"
+              open && "rotate-180",
             )}
           />
         </CollapsibleTrigger>
@@ -69,10 +65,7 @@ export function GoalsEvidenceDrawer({
           >
             <span>Compare legacy V1 estimate</span>
             <ChevronDown
-              className={cn(
-                "h-3.5 w-3.5 transition-transform",
-                legacyOpen && "rotate-180"
-              )}
+              className={cn("h-3.5 w-3.5 transition-transform", legacyOpen && "rotate-180")}
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3 grid gap-4 lg:grid-cols-2">

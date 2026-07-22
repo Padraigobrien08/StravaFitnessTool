@@ -16,9 +16,7 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get("error");
 
   if (error) {
-    return NextResponse.redirect(
-      new URL(`/import?strava=denied`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/import?strava=denied`, request.url));
   }
 
   const jar = await cookies();
@@ -26,17 +24,13 @@ export async function GET(request: NextRequest) {
   jar.delete(STATE_COOKIE);
 
   if (!code || !state || state !== expectedState) {
-    return NextResponse.redirect(
-      new URL(`/import?strava=error`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/import?strava=error`, request.url));
   }
 
   try {
     const tokens = await exchangeCodeForTokens(code, resolveRedirectUri(request));
     if (!tokens.athlete?.id) {
-      return NextResponse.redirect(
-        new URL(`/import?strava=error`, request.url)
-      );
+      return NextResponse.redirect(new URL(`/import?strava=error`, request.url));
     }
     let userId = await findUserByStravaAthleteId(tokens.athlete.id);
     if (!userId) userId = await createUser();
@@ -49,12 +43,8 @@ export async function GET(request: NextRequest) {
       // Initial sync can fail on rate limits; user can retry from Import
     }
 
-    return NextResponse.redirect(
-      new URL(`/import?strava=connected`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/import?strava=connected`, request.url));
   } catch {
-    return NextResponse.redirect(
-      new URL(`/import?strava=error`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/import?strava=error`, request.url));
   }
 }

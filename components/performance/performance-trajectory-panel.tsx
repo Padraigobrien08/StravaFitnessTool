@@ -10,27 +10,16 @@ import { cn } from "@/lib/utils";
 import { Trophy } from "lucide-react";
 import type { PrTimelinePoint } from "@/lib/analytics/progression";
 
-function TrendBlock({
-  chart,
-}: {
-  chart: ProgressionViewModel["trends"]["efficiency"];
-}) {
+function TrendBlock({ chart }: { chart: ProgressionViewModel["trends"]["efficiency"] }) {
   return (
     <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-3">
       <div className="flex items-baseline justify-between gap-2">
         <span className={dash.label}>{chart.label}</span>
         {chart.caption ? (
-          <span className="text-[10px] tabular-nums text-teal-400/80">
-            {chart.caption}
-          </span>
+          <span className="text-[10px] tabular-nums text-teal-400/80">{chart.caption}</span>
         ) : null}
       </div>
-      <TrendChart
-        data={chart.data}
-        positive={chart.positive}
-        height={44}
-        className="mt-2"
-      />
+      <TrendChart data={chart.data} positive={chart.positive} height={44} className="mt-2" />
     </div>
   );
 }
@@ -44,9 +33,7 @@ export function PerformanceTrajectoryPanel({
 }) {
   return (
     <PanelChrome title="Performance trajectory intelligence" accent elevated>
-      <p className={cn(dash.muted, "mb-4 max-w-3xl leading-relaxed")}>
-        {data.trajectory}
-      </p>
+      <p className={cn(dash.muted, "mb-4 max-w-3xl leading-relaxed")}>{data.trajectory}</p>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] xl:gap-6">
         <div className="space-y-4">
@@ -59,15 +46,12 @@ export function PerformanceTrajectoryPanel({
                     key={a.id}
                     className={cn(
                       "flex items-start gap-2 py-2.5",
-                      i < data.achievements.length - 1 &&
-                        "border-b border-white/[0.04]"
+                      i < data.achievements.length - 1 && "border-b border-white/[0.04]",
                     )}
                   >
                     <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-teal-400/70" />
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-zinc-200">
-                        {a.title}
-                      </span>
+                      <span className="block text-sm font-medium text-zinc-200">{a.title}</span>
                       <span className={dash.muted}>{a.meta}</span>
                     </span>
                   </li>
@@ -109,7 +93,7 @@ export function PerformanceTrajectoryPanel({
                     "text-xs font-medium tabular-nums",
                     c.positive === true && "text-teal-400/90",
                     c.positive === false && "text-amber-400/90",
-                    c.positive === null && "text-zinc-500"
+                    c.positive === null && "text-zinc-500",
                   )}
                 >
                   {c.label} {c.value}

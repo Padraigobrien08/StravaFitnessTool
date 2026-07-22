@@ -35,15 +35,9 @@ export const FitRunDetailSchema = z.object({
   activityId: z.string(),
   bestEfforts: z.array(BestEffortSchema).optional().default([]),
   laps: z.array(FitLapSchema),
-  hrStream: z.array(
-    z.object({ elapsedSec: z.number(), hr: z.number() })
-  ),
-  paceStream: z.array(
-    z.object({ elapsedSec: z.number(), paceSecPerKm: z.number() })
-  ),
-  cadenceStream: z.array(
-    z.object({ elapsedSec: z.number(), cadence: z.number() })
-  ),
+  hrStream: z.array(z.object({ elapsedSec: z.number(), hr: z.number() })),
+  paceStream: z.array(z.object({ elapsedSec: z.number(), paceSecPerKm: z.number() })),
+  cadenceStream: z.array(z.object({ elapsedSec: z.number(), cadence: z.number() })),
   gpsStream: z.array(GpsPointSchema).optional().default([]),
   hrDriftPct: z.number().nullable(),
   avgCadence: z.number().nullable(),

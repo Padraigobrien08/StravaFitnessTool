@@ -32,16 +32,12 @@ export function paceTrend(runs: RunActivity[]): PaceTrendPoint[] {
     .filter((p): p is PaceTrendPoint => p !== null);
 }
 
-export function rollingAveragePace(
-  points: PaceTrendPoint[],
-  window = 4
-): RollingPacePoint[] {
+export function rollingAveragePace(points: PaceTrendPoint[], window = 4): RollingPacePoint[] {
   if (points.length < window) return [];
   const result: RollingPacePoint[] = [];
   for (let i = window - 1; i < points.length; i++) {
     const slice = points.slice(i - window + 1, i + 1);
-    const avg =
-      slice.reduce((s, p) => s + p.paceSecPerKm, 0) / slice.length;
+    const avg = slice.reduce((s, p) => s + p.paceSecPerKm, 0) / slice.length;
     const last = slice[slice.length - 1];
     result.push({
       date: last.date,

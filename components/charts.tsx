@@ -55,9 +55,7 @@ export function PaceChart({
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  const rollingByDate = new Map(
-    (rolling ?? []).map((r) => [r.date, r.rollingPaceSecPerKm])
-  );
+  const rollingByDate = new Map((rolling ?? []).map((r) => [r.date, r.rollingPaceSecPerKm]));
 
   const tooltipStyle = useChartTooltip();
   const chartData = data.map((d) => ({
@@ -71,18 +69,10 @@ export function PaceChart({
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID} />
         <XAxis dataKey="label" tick={chartTick} interval="preserveStartEnd" />
-        <YAxis
-          tick={chartTick}
-          reversed
-          domain={["auto", "auto"]}
-          tickFormatter={formatPaceTick}
-        />
+        <YAxis tick={chartTick} reversed domain={["auto", "auto"]} tickFormatter={formatPaceTick} />
         <Tooltip
           contentStyle={tooltipStyle}
-          formatter={(v) => [
-            typeof v === "number" ? formatPaceTick(v) + "/km" : "—",
-            "Pace",
-          ]}
+          formatter={(v) => [typeof v === "number" ? formatPaceTick(v) + "/km" : "—", "Pace"]}
         />
         <Line
           type="monotone"
@@ -106,11 +96,7 @@ export function PaceChart({
   );
 }
 
-export function HrChart({
-  data,
-}: {
-  data: { label: string; avgHr: number }[];
-}) {
+export function HrChart({ data }: { data: { label: string; avgHr: number }[] }) {
   const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={240}>
@@ -125,11 +111,7 @@ export function HrChart({
   );
 }
 
-export function LoadChart({
-  data,
-}: {
-  data: { label: string; trainingLoad: number | null }[];
-}) {
+export function LoadChart({ data }: { data: { label: string; trainingLoad: number | null }[] }) {
   const tooltipStyle = useChartTooltip();
   const filtered = data.filter((d) => d.trainingLoad !== null);
   return (
@@ -152,11 +134,7 @@ export function LoadChart({
   );
 }
 
-export function FitnessChart({
-  data,
-}: {
-  data: { label: string; ctl: number }[];
-}) {
+export function FitnessChart({ data }: { data: { label: string; ctl: number }[] }) {
   const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={220}>
@@ -178,11 +156,7 @@ export function FitnessChart({
   );
 }
 
-export function FatigueChart({
-  data,
-}: {
-  data: { label: string; ctl: number; atl: number }[];
-}) {
+export function FatigueChart({ data }: { data: { label: string; ctl: number; atl: number }[] }) {
   const tooltipStyle = useChartTooltip();
   return (
     <ResponsiveContainer width="100%" height={220}>

@@ -14,13 +14,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const action = req.nextUrl.searchParams.get(
-    "action"
-  ) as CompositeCoachAction | null;
+  const action = req.nextUrl.searchParams.get("action") as CompositeCoachAction | null;
   if (!action || !ACTIONS.has(action)) {
     return NextResponse.json(
       { error: "Invalid action", allowed: [...COMPOSITE_ACTIONS] },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

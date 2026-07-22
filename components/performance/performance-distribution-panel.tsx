@@ -5,11 +5,7 @@ import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import type { PerformanceDistributionView } from "@/lib/performance/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
 
-export function PerformanceDistributionPanel({
-  data,
-}: {
-  data: PerformanceDistributionView;
-}) {
+export function PerformanceDistributionPanel({ data }: { data: PerformanceDistributionView }) {
   return (
     <PanelChrome title="Performance distribution" href="/effort" subdued>
       <p className="text-sm leading-relaxed text-zinc-400">{data.interpretation}</p>
@@ -19,10 +15,7 @@ export function PerformanceDistributionPanel({
           <p className={dash.label}>Easy share</p>
           <p className="mt-0.5 font-semibold text-zinc-200">
             {data.easyPct}%
-            <span className="font-normal text-zinc-600">
-              {" "}
-              (target ~{data.easyTarget}%)
-            </span>
+            <span className="font-normal text-zinc-600"> (target ~{data.easyTarget}%)</span>
           </p>
         </div>
         <div>
@@ -35,9 +28,7 @@ export function PerformanceDistributionPanel({
         <div className="mt-4 space-y-2">
           {data.zones.map((z) => (
             <div key={z.zone} className="flex items-center gap-3">
-              <span className="w-8 text-[10px] font-medium text-zinc-600">
-                {z.zone}
-              </span>
+              <span className="w-8 text-[10px] font-medium text-zinc-600">{z.zone}</span>
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                 <div
                   className="h-full rounded-full bg-teal-500/50"

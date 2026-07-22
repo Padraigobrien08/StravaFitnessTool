@@ -15,7 +15,7 @@ export async function finishSyncRun(
   status: "completed" | "failed",
   activitiesSynced: number,
   lastAfter: number | null,
-  error?: string
+  error?: string,
 ): Promise<void> {
   const sql = getSql();
   await sql`

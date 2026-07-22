@@ -2,30 +2,17 @@
 
 import type { HistoricalContextView } from "@/lib/runs/viewModels";
 
-export function HistoricalContextPanel({
-  data,
-}: {
-  data: HistoricalContextView;
-}) {
+export function HistoricalContextPanel({ data }: { data: HistoricalContextView }) {
   return (
     <section className="rounded-lg border border-white/[0.05] bg-white/[0.02] px-4 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Athlete memory · longitudinal context
-      </p>
+      <p className="text-[11px] font-medium text-zinc-500">Athlete memory · longitudinal context</p>
       <ul className="mt-2.5 grid gap-2 sm:grid-cols-2">
         {data.items.map((item) => (
-          <li
-            key={item.label}
-            className="rounded-md bg-white/[0.02] px-2.5 py-2"
-          >
+          <li key={item.label} className="rounded-md bg-white/[0.02] px-2.5 py-2">
             <p className="text-[10px] text-zinc-600">{item.label}</p>
-            <p className="mt-0.5 text-[12px] font-medium text-zinc-300">
-              {item.value}
-            </p>
+            <p className="mt-0.5 text-[12px] font-medium text-zinc-300">{item.value}</p>
             {item.detail ? (
-              <p className="mt-0.5 text-[10px] leading-snug text-zinc-600">
-                {item.detail}
-              </p>
+              <p className="mt-0.5 text-[10px] leading-snug text-zinc-600">{item.detail}</p>
             ) : null}
           </li>
         ))}

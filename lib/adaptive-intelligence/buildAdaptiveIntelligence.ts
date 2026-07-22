@@ -1,9 +1,6 @@
 import type { AthleteIntelligenceBundle } from "@/lib/intelligence/types";
 import type { RaceGoal } from "@/lib/analytics/readiness";
-import {
-  buildAthleteMemoryProfile,
-  updateAthleteMemoryProfile,
-} from "@/lib/athlete-memory";
+import { buildAthleteMemoryProfile, updateAthleteMemoryProfile } from "@/lib/athlete-memory";
 import {
   trackRecommendationOutcome,
   evaluatePendingOutcomes,
@@ -27,28 +24,20 @@ export function buildAdaptiveIntelligence(
   raceGoal: RaceGoal | null,
   insights: Insight[] = [],
   athleteKey = "default",
-  opts?: { trackPrimaryRecommendation?: boolean }
+  opts?: { trackPrimaryRecommendation?: boolean },
 ): AdaptiveIntelligenceSnapshot {
   const analytics = bundle.analytics;
-  const state = buildCoachWorkspaceState(
-    analytics,
-    insights,
-    raceGoal
-  );
+  const state = buildCoachWorkspaceState(analytics, insights, raceGoal);
 
   const primaryRec = state
     ? getPrimaryRecommendation(state, analytics)
-    : analytics.intensityAdvice.recommendations[0] ?? "Maintain aerobic rhythm";
+    : (analytics.intensityAdvice.recommendations[0] ?? "Maintain aerobic rhythm");
 
   if (opts?.trackPrimaryRecommendation) {
     trackRecommendationOutcome(athleteKey, {
       recommendationId: `primary-${analytics.currentWeek.weekStart}`,
       recommendation: primaryRec,
-      expectedOutcome: [
-        "freshness",
-        "readiness",
-        "sustainable intensity",
-      ],
+      expectedOutcome: ["freshness", "readiness", "sustainable intensity"],
       confidenceBefore: confidenceToScore(analytics.dataConfidence),
     });
   }
@@ -58,15 +47,13 @@ export function buildAdaptiveIntelligence(
   memory = applyOutcomesToMemory(memory, outcomes);
 
   const sessionCtx = buildReasoningContext(bundle, raceGoal);
-  const labelById = new Map(
-    analytics.workoutLabels.map((l) => [l.runId, l.classification])
-  );
+  const labelById = new Map(analytics.workoutLabels.map((l) => [l.runId, l.classification]));
   const recentSessions = evaluateRecentSessions(
     sessionCtx.runs,
     sessionCtx.fitByRunId,
     labelById,
     analytics,
-    5
+    5,
   );
   const sessionSummary = sessionEffectivenessSummary(recentSessions);
 
@@ -85,12 +72,7 @@ export function buildAdaptiveIntelligence(
   const causalReadiness = inferLikelyCauses(analytics, "readiness");
   const causalFatigue = inferLikelyCauses(analytics, "fatigue");
 
-  const recentlyLearned = buildRecentlyLearned(
-    memory,
-    adaptationSignals,
-    outcomes,
-    sessionSummary
-  );
+  const recentlyLearned = buildRecentlyLearned(memory, adaptationSignals, outcomes, sessionSummary);
 
   const observability = buildLearningObservabilityReport({
     memory,
@@ -121,7 +103,7 @@ function buildRecentlyLearned(
   memory: ReturnType<typeof buildAthleteMemoryProfile>,
   signals: ReturnType<typeof buildAdaptationSignals>,
   outcomes: ReturnType<typeof evaluatePendingOutcomes>,
-  sessionNotes: string[]
+  sessionNotes: string[],
 ): string[] {
   const items: string[] = [];
 

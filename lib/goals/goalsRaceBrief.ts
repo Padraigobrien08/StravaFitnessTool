@@ -48,10 +48,7 @@ function formatEffortClause(forecast: ForecastV2View): string | null {
   return `Your recent efforts — ${parts.join(" and ")}`;
 }
 
-function buildBelief(
-  forecast: ForecastV2View,
-  goal: RaceGoal | null
-): string {
+function buildBelief(forecast: ForecastV2View, goal: RaceGoal | null): string {
   const effortClause = formatEffortClause(forecast);
   const opener = effortClause
     ? `${effortClause} support a ${forecast.distanceLabel.toLowerCase()} around ${forecast.mostLikely} (realistic range ${forecast.rangeDisplay}).`
@@ -88,20 +85,12 @@ function buildEvidenceBullets(forecast: ForecastV2View): string[] {
 }
 
 function buildConfidenceLine(forecast: ForecastV2View): string {
-  const drivers = forecast.uncertaintyDrivers
-    .slice(0, 2)
-    .map((d) => d.label.toLowerCase());
-  const why =
-    drivers.length > 0
-      ? ` — mainly because of ${drivers.join(" and ")}.`
-      : ".";
+  const drivers = forecast.uncertaintyDrivers.slice(0, 2).map((d) => d.label.toLowerCase());
+  const why = drivers.length > 0 ? ` — mainly because of ${drivers.join(" and ")}.` : ".";
   return `${forecast.confidence} confidence${why} Model agreement is ${forecast.modelAgreement.label} (spread ${forecast.modelAgreement.spread}).`;
 }
 
-function buildCoachPrompts(
-  forecast: ForecastV2View,
-  goal: RaceGoal | null
-): GoalsCoachPrompt[] {
+function buildCoachPrompts(forecast: ForecastV2View, goal: RaceGoal | null): GoalsCoachPrompt[] {
   const prompts: GoalsCoachPrompt[] = [
     {
       label: "Why this forecast?",
@@ -151,9 +140,7 @@ export function buildGoalsRaceBrief(opts: {
   readiness: RaceReadiness | null;
 }): GoalsRaceBriefView {
   const { forecast, goal, readiness } = opts;
-  const targetTimeDisplay = goal?.targetTimeSec
-    ? formatDuration(goal.targetTimeSec)
-    : null;
+  const targetTimeDisplay = goal?.targetTimeSec ? formatDuration(goal.targetTimeSec) : null;
 
   return {
     headline: `${forecast.mostLikely} ${forecast.distanceLabel}`,

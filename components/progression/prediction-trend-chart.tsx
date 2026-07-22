@@ -40,17 +40,11 @@ function formatTimeTick(sec: number): string {
 
 function valuesForSeries(
   timeline: PredictionTimelinePoint[],
-  dataKey: "5K" | "10K" | "HM"
+  dataKey: "5K" | "10K" | "HM",
 ): number[] {
   const field =
-    dataKey === "5K"
-      ? "consensus5kSec"
-      : dataKey === "10K"
-        ? "consensus10kSec"
-        : "consensusHmSec";
-  return timeline
-    .map((p) => p[field])
-    .filter((v): v is number => v != null && v > 0);
+    dataKey === "5K" ? "consensus5kSec" : dataKey === "10K" ? "consensus10kSec" : "consensusHmSec";
+  return timeline.map((p) => p[field]).filter((v): v is number => v != null && v > 0);
 }
 
 export function PredictionTrendChart({
@@ -75,7 +69,7 @@ export function PredictionTrendChart({
         "10K": p.consensus10kSec ?? undefined,
         HM: p.consensusHmSec ?? undefined,
       })),
-    [timeline]
+    [timeline],
   );
 
   const yDomain = useMemo(() => {
@@ -93,8 +87,7 @@ export function PredictionTrendChart({
   if (timeline.length < 2) {
     return (
       <p className="text-sm text-zinc-500">
-        Need more training history to show prediction trends (sampled every 4
-        weeks).
+        Need more training history to show prediction trends (sampled every 4 weeks).
       </p>
     );
   }
@@ -113,9 +106,7 @@ export function PredictionTrendChart({
         />
         <Tooltip
           contentStyle={chart.tooltip}
-          formatter={(v) =>
-            typeof v === "number" ? formatDuration(v) : String(v)
-          }
+          formatter={(v) => (typeof v === "number" ? formatDuration(v) : String(v))}
         />
         <Legend wrapperStyle={{ fontSize: 11 }} />
         {activeSeries.map((s) => (

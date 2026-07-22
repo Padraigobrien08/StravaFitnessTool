@@ -17,7 +17,7 @@ export function buildUncertaintyAssessment(
     specificity: SpecificityAssessment;
     freshness: FreshnessAssessment;
     mostLikelyTimeSec: number;
-  }
+  },
 ): UncertaintyAssessment {
   const drivers: ForecastUncertaintyDriver[] = [];
   let score = 72;
@@ -110,7 +110,7 @@ export function buildUncertaintyAssessment(
 
   const distanceFactor = targetKm >= 35 ? 1.35 : targetKm >= 18 ? 1.15 : 1;
   const intervalWidthSec = Math.round(
-    width * distanceFactor * (1 + (100 - opts.specificity.score) / 200)
+    width * distanceFactor * (1 + (100 - opts.specificity.score) / 200),
   );
 
   let confidenceLabel: UncertaintyAssessment["confidenceLabel"] = "medium";
@@ -128,7 +128,7 @@ export function buildUncertaintyAssessment(
 
 export function buildPredictionInterval(
   centerSec: number,
-  widthSec: number
+  widthSec: number,
 ): {
   p10: number;
   p25: number;

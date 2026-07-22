@@ -20,12 +20,7 @@ export function ReadinessRing({
   const r = (size - 12) / 2;
   const c = 2 * Math.PI * r;
   const offset = c - (progress / 100) * c;
-  const color =
-    clamped >= 70
-      ? "#2dd4bf"
-      : clamped >= 50
-        ? "#fbbf24"
-        : "#f87171";
+  const color = clamped >= 70 ? "#2dd4bf" : clamped >= 50 ? "#fbbf24" : "#f87171";
 
   useEffect(() => {
     const t = requestAnimationFrame(() => {
@@ -75,10 +70,7 @@ export function ReadinessRing({
         />
       </svg>
       <div className="absolute z-10 flex flex-col items-center">
-        <AnimatedMetric
-          value={clamped}
-          className="font-display text-3xl font-bold text-white"
-        />
+        <AnimatedMetric value={clamped} className="font-display text-3xl font-bold text-white" />
         <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500">
           ready
         </span>

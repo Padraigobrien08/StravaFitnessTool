@@ -32,14 +32,20 @@ export function FreshnessPanel({
               {fatigue.freshness}
               <span className="text-lg text-zinc-500"> / 100</span>
             </p>
-            <p className={`mt-1 text-sm font-medium ${labelColor[fatigue.label] ?? "text-zinc-400"}`}>
+            <p
+              className={`mt-1 text-sm font-medium ${labelColor[fatigue.label] ?? "text-zinc-400"}`}
+            >
               {fatigue.label}
             </p>
           </div>
           <div className="text-sm text-zinc-400">
-            <p>CTL {fatigue.ctl} · ATL {fatigue.atl} · TSB {fatigue.tsb > 0 ? "+" : ""}{fatigue.tsb}</p>
+            <p>
+              CTL {fatigue.ctl} · ATL {fatigue.atl} · TSB {fatigue.tsb > 0 ? "+" : ""}
+              {fatigue.tsb}
+            </p>
             <p className="mt-1 text-xs text-zinc-600">
-              {fatigue.restDaysSinceLastRun} day{fatigue.restDaysSinceLastRun === 1 ? "" : "s"} since last run
+              {fatigue.restDaysSinceLastRun} day{fatigue.restDaysSinceLastRun === 1 ? "" : "s"}{" "}
+              since last run
             </p>
           </div>
         </div>
@@ -48,13 +54,10 @@ export function FreshnessPanel({
             <li key={i}>• {e}</li>
           ))}
         </ul>
-        {loadHistory.length >= 2 && (
-          <FatigueChart data={loadHistory} />
-        )}
+        {loadHistory.length >= 2 && <FatigueChart data={loadHistory} />}
         <WhatThisMeans formula="TSB = CTL − ATL">
-          CTL is a slow-moving fitness estimate; ATL reflects recent load. Positive
-          TSB suggests freshness for quality work. Not medical advice — use feel +
-          sleep to confirm.
+          CTL is a slow-moving fitness estimate; ATL reflects recent load. Positive TSB suggests
+          freshness for quality work. Not medical advice — use feel + sleep to confirm.
         </WhatThisMeans>
       </CardContent>
     </Card>

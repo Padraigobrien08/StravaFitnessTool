@@ -10,11 +10,11 @@
 
 Today:
 
-| Layer | What exists |
-|--------|-------------|
+| Layer               | What exists                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------ |
 | **UI intelligence** | `computeInsights()` + `generateInsights()` + page `viewModels` — rich, tested, client-side |
-| **HTTP API** | Import JSON, FIT details, sync, status — **no pre-computed insights** |
-| **MCP** | Neon MCP only (DB ops), not product intelligence |
+| **HTTP API**        | Import JSON, FIT details, sync, status — **no pre-computed insights**                      |
+| **MCP**             | Neon MCP only (DB ops), not product intelligence                                           |
 
 If we wrap only `GET /api/me/import` in MCP tools, the LLM gets thousands of raw runs and will **hallucinate readiness, plans, and predictions**. Maximum reliability requires **structured intelligence endpoints** that return evidence-backed snapshots the UI already trusts.
 
@@ -110,17 +110,17 @@ export async function computeAthleteIntelligence(ctx: IntelligenceContext): Prom
 
 export function buildIntelligenceBrief(
   bundle: Awaited<ReturnType<typeof computeAthleteIntelligence>>,
-  sections?: IntelligenceSection[]
+  sections?: IntelligenceSection[],
 ): IntelligenceBrief; // ~2–6k tokens, stable schema
 ```
 
 **Persistence gaps to close for server parity:**
 
-| Setting | Today | Server needs |
-|---------|--------|----------------|
-| Race goal | `zustand` localStorage | `user_goals` table or pass in API body |
-| `defaultWeeklyRuns`, `maxWeeklyKm` | settings store | `user_settings` table or session |
-| FIT details | IndexedDB + API merge | Already in `activity_streams` when synced |
+| Setting                            | Today                  | Server needs                              |
+| ---------------------------------- | ---------------------- | ----------------------------------------- |
+| Race goal                          | `zustand` localStorage | `user_goals` table or pass in API body    |
+| `defaultWeeklyRuns`, `maxWeeklyKm` | settings store         | `user_settings` table or session          |
+| FIT details                        | IndexedDB + API merge  | Already in `activity_streams` when synced |
 
 **Recommendation:** Add minimal tables in migration `002_coach.sql`:
 
@@ -137,17 +137,17 @@ Extend `/api/me/*` with **session auth** (`getSessionUserId`) — same as import
 
 ### 5.1 Intelligence routes (new)
 
-| Method | Route | Purpose |
-|--------|--------|---------|
-| `GET` | `/api/me/intelligence` | Full bundle: analytics summary + insights + quality meta |
-| `GET` | `/api/me/intelligence/brief` | Token-efficient coach brief (default for chat) |
-| `GET` | `/api/me/intelligence/readiness` | Race readiness + gaps + probability band |
-| `GET` | `/api/me/intelligence/predictions` | `racePredictionAnalysis` + consensus only |
-| `GET` | `/api/me/intelligence/plan` | `nextWeekPlan` + rationale + warnings |
-| `GET` | `/api/me/intelligence/strategy` | `?mode=even\|negative\|conservative\|aggressive` |
-| `GET` | `/api/me/intelligence/fatigue` | TSB, CTL, ATL, freshness, load history tail |
-| `GET` | `/api/me/runs` | Paginated run list with workout labels |
-| `GET` | `/api/me/runs/[id]` | Single run + FIT summary + classification |
+| Method | Route                              | Purpose                                                  |
+| ------ | ---------------------------------- | -------------------------------------------------------- |
+| `GET`  | `/api/me/intelligence`             | Full bundle: analytics summary + insights + quality meta |
+| `GET`  | `/api/me/intelligence/brief`       | Token-efficient coach brief (default for chat)           |
+| `GET`  | `/api/me/intelligence/readiness`   | Race readiness + gaps + probability band                 |
+| `GET`  | `/api/me/intelligence/predictions` | `racePredictionAnalysis` + consensus only                |
+| `GET`  | `/api/me/intelligence/plan`        | `nextWeekPlan` + rationale + warnings                    |
+| `GET`  | `/api/me/intelligence/strategy`    | `?mode=even\|negative\|conservative\|aggressive`         |
+| `GET`  | `/api/me/intelligence/fatigue`     | TSB, CTL, ATL, freshness, load history tail              |
+| `GET`  | `/api/me/runs`                     | Paginated run list with workout labels                   |
+| `GET`  | `/api/me/runs/[id]`                | Single run + FIT summary + classification                |
 
 Query params:
 
@@ -162,20 +162,20 @@ Query params:
   "confidence": "medium",
   "evidence": ["61 HR-backed runs", "12 FIT streams parsed"],
   "limitations": ["No sleep/HRV", "3 runs missing streams"],
-  "payload": { }
+  "payload": {}
 }
 ```
 
 ### 5.3 Existing routes (MCP wrappers, no change required)
 
-| Route | MCP tool name |
-|-------|----------------|
-| `GET /api/me/status` | `strideiq_get_connection_status` |
-| `GET /api/me/import` | `strideiq_get_import_metadata` (counts only, not full dump) |
-| `GET /api/me/fit-details` | `strideiq_get_fit_coverage` |
-| `GET /api/me/fit-details/[id]` | `strideiq_get_run_streams` |
-| `GET /api/me/athlete-stats` | `strideiq_get_strava_stats` |
-| `POST /api/sync/strava` | `strideiq_trigger_sync` (v2, confirm=true) |
+| Route                          | MCP tool name                                               |
+| ------------------------------ | ----------------------------------------------------------- |
+| `GET /api/me/status`           | `strideiq_get_connection_status`                            |
+| `GET /api/me/import`           | `strideiq_get_import_metadata` (counts only, not full dump) |
+| `GET /api/me/fit-details`      | `strideiq_get_fit_coverage`                                 |
+| `GET /api/me/fit-details/[id]` | `strideiq_get_run_streams`                                  |
+| `GET /api/me/athlete-stats`    | `strideiq_get_strava_stats`                                 |
+| `POST /api/sync/strava`        | `strideiq_trigger_sync` (v2, confirm=true)                  |
 
 ---
 
@@ -209,26 +209,26 @@ STRIDEIQ_API_KEY=          # v2: long-lived PAT per user
 
 ### 6.2 Tool catalog (v1 read-only)
 
-| Tool | Description | Backend |
-|------|-------------|---------|
-| `get_coach_brief` | One-shot context: hero state, readiness, next week, top 3 insights, data quality | `/intelligence/brief` |
-| `get_readiness` | Race/HM readiness score, gaps, days to race | `/intelligence/readiness` |
-| `get_predictions` | Consensus times, confidence, primary anchor run | `/intelligence/predictions` |
-| `get_week_plan` | Sessions by day, template, rationale | `/intelligence/plan` |
-| `get_race_strategy` | Splits, fade risk, narrative for mode | `/intelligence/strategy` |
-| `get_fatigue_load` | Freshness, TSB, trend note | `/intelligence/fatigue` |
-| `list_recent_runs` | Last N runs with type, distance, pace, date | `/runs?limit=` |
-| `get_run_analysis` | Workout detail view model for one run | `/runs/[id]` |
-| `get_data_quality` | Field coverage, warnings, FIT % | derived from intelligence bundle |
-| `get_connection_status` | API connected, stream gaps | `/me/status` |
+| Tool                    | Description                                                                      | Backend                          |
+| ----------------------- | -------------------------------------------------------------------------------- | -------------------------------- |
+| `get_coach_brief`       | One-shot context: hero state, readiness, next week, top 3 insights, data quality | `/intelligence/brief`            |
+| `get_readiness`         | Race/HM readiness score, gaps, days to race                                      | `/intelligence/readiness`        |
+| `get_predictions`       | Consensus times, confidence, primary anchor run                                  | `/intelligence/predictions`      |
+| `get_week_plan`         | Sessions by day, template, rationale                                             | `/intelligence/plan`             |
+| `get_race_strategy`     | Splits, fade risk, narrative for mode                                            | `/intelligence/strategy`         |
+| `get_fatigue_load`      | Freshness, TSB, trend note                                                       | `/intelligence/fatigue`          |
+| `list_recent_runs`      | Last N runs with type, distance, pace, date                                      | `/runs?limit=`                   |
+| `get_run_analysis`      | Workout detail view model for one run                                            | `/runs/[id]`                     |
+| `get_data_quality`      | Field coverage, warnings, FIT %                                                  | derived from intelligence bundle |
+| `get_connection_status` | API connected, stream gaps                                                       | `/me/status`                     |
 
 ### 6.3 MCP resources (large context)
 
-| URI | Content |
-|-----|---------|
-| `strideiq://athlete/brief` | Latest `IntelligenceBrief` markdown |
-| `strideiq://athlete/plan` | Current week plan as structured JSON |
-| `strideiq://athlete/predictions` | Prediction consensus table |
+| URI                              | Content                              |
+| -------------------------------- | ------------------------------------ |
+| `strideiq://athlete/brief`       | Latest `IntelligenceBrief` markdown  |
+| `strideiq://athlete/plan`        | Current week plan as structured JSON |
+| `strideiq://athlete/predictions` | Prediction consensus table           |
 
 Resources refresh on read (no stale cache > 5 min in v1).
 
@@ -283,11 +283,11 @@ Resources refresh on read (no stale cache > 5 min in v1).
 
 ### 7.3 Implementation modes
 
-| Mode | Pros | Cons |
-|------|------|------|
+| Mode                                       | Pros                                   | Cons                                          |
+| ------------------------------------------ | -------------------------------------- | --------------------------------------------- |
 | **A. In-app tool loop** (`POST /api/chat`) | Best UX, auth built-in, no MCP install | Needs `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` |
-| **B. External MCP only** | No LLM cost in app | User leaves product |
-| **C. Hybrid (recommended)** | Same tools in MCP + `/api/chat` | Slightly more code |
+| **B. External MCP only**                   | No LLM cost in app                     | User leaves product                           |
+| **C. Hybrid (recommended)**                | Same tools in MCP + `/api/chat`        | Slightly more code                            |
 
 **Recommended:** **C** — implement tools once in `lib/intelligence/tools.ts`, register for MCP and for Vercel AI SDK / Anthropic tool_use in `/api/chat`.
 
@@ -337,8 +337,8 @@ interface IntelligenceBrief {
   briefVersion: 1;
   dataAsOf: string;
   confidence: "low" | "medium" | "high";
-  athleteState: string;           // training hero classification
-  recommendation: string;         // top insight recommendation
+  athleteState: string; // training hero classification
+  recommendation: string; // top insight recommendation
   race: {
     hasGoal: boolean;
     distanceLabel: string | null;
@@ -368,42 +368,47 @@ Implement via `buildIntelligenceBrief()` composing `buildTrainingPageView`, `bui
 
 ## 9. Security & privacy
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                 | Mitigation                                                                   |
+| -------------------- | ---------------------------------------------------------------------------- |
 | Cross-user data leak | Session cookie / PAT scoped to `user_id`; never accept `userId` in tool args |
-| PAT theft | Short-lived tokens, rotate, scope `read:intelligence` only |
-| LLM prompt injection | Tools ignore user text; server validates inputs |
-| Medical liability | Fixed disclaimer in system prompt + UI footer |
-| Sync abuse | `trigger_sync` rate limit 1/min, requires `confirm: true` |
-| PII in exports | Brief excludes email; profile.csv never loaded |
+| PAT theft            | Short-lived tokens, rotate, scope `read:intelligence` only                   |
+| LLM prompt injection | Tools ignore user text; server validates inputs                              |
+| Medical liability    | Fixed disclaimer in system prompt + UI footer                                |
+| Sync abuse           | `trigger_sync` rate limit 1/min, requires `confirm: true`                    |
+| PII in exports       | Brief excludes email; profile.csv never loaded                               |
 
 ---
 
 ## 10. Phased delivery
 
 ### Phase 1 — Intelligence API (1 PR)
+
 - [ ] `lib/intelligence/service.ts` + `buildIntelligenceBrief`
 - [ ] `GET /api/me/intelligence/brief` (+ optional full `/intelligence`)
 - [ ] Server-side race goal: DB migration or read from request header stub
 - [ ] Tests: brief matches `computeInsights` golden snapshot for fixture export
 
 ### Phase 2 — MCP server read-only (1 PR)
+
 - [ ] `packages/strideiq-mcp` with stdio + 8 tools
 - [ ] Dev auth: document session cookie extraction
 - [ ] README + Claude Desktop sample config
 
 ### Phase 3 — Coach chat UI (1–2 PRs)
+
 - [ ] `/coach` page + `CoachWorkspace` components
 - [ ] `POST /api/chat` with tool loop (Anthropic or OpenAI)
 - [ ] `lib/intelligence/tools.ts` shared executors
 - [ ] Streaming UI + collapsible tool trace
 
 ### Phase 4 — Parity & write tools
+
 - [ ] `user_settings` + `user_race_goals` in Neon; sync from client stores
 - [ ] MCP: `set_race_goal`, `trigger_sync` (gated)
 - [ ] What-if plan: ephemeral race date override
 
 ### Phase 5 — Deep workout Q&A
+
 - [ ] `get_run_analysis` with interval segments, HR drift, execution score
 - [ ] Resource `strideiq://run/{id}/report` markdown for long runs
 
@@ -411,13 +416,13 @@ Implement via `buildIntelligenceBrief()` composing `buildTrainingPageView`, `bui
 
 ## 11. Open decisions
 
-| # | Question | Recommendation |
-|---|----------|----------------|
-| 1 | PAT vs session cookie for MCP? | PAT for production; cookie for local dev |
-| 2 | Which LLM provider first? | Anthropic (tool_use quality) or OpenAI via AI SDK |
-| 3 | Persist chat threads server-side? | No in v1 (localStorage) |
-| 4 | Export-only users without Neon? | Chat works in browser via client tool executor calling `computeInsights` locally; MCP requires hosted API |
-| 5 | Monorepo vs folder in app? | `packages/strideiq-mcp` publishable npm package |
+| #   | Question                          | Recommendation                                                                                            |
+| --- | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| 1   | PAT vs session cookie for MCP?    | PAT for production; cookie for local dev                                                                  |
+| 2   | Which LLM provider first?         | Anthropic (tool_use quality) or OpenAI via AI SDK                                                         |
+| 3   | Persist chat threads server-side? | No in v1 (localStorage)                                                                                   |
+| 4   | Export-only users without Neon?   | Chat works in browser via client tool executor calling `computeInsights` locally; MCP requires hosted API |
+| 5   | Monorepo vs folder in app?        | `packages/strideiq-mcp` publishable npm package                                                           |
 
 ---
 
@@ -433,17 +438,17 @@ Implement via `buildIntelligenceBrief()` composing `buildTrainingPageView`, `bui
 
 ## 13. Related files (implementation anchors)
 
-| Concern | Path |
-|---------|------|
-| Analytics core | `lib/analytics/index.ts` → `computeInsights` |
-| Narrative insights | `lib/insights/generate.ts` |
-| Week plan | `lib/training/planEngine.ts` |
-| Goals context | `lib/goals/viewModels.ts` |
-| DB import | `lib/db/activities.ts` → `buildStravaImportFromDb` |
-| Session auth | `lib/auth/session.ts` |
-| Client hook | `hooks/use-training-intelligence.ts` |
-| Quality | `lib/quality/assessImport.ts` |
+| Concern            | Path                                               |
+| ------------------ | -------------------------------------------------- |
+| Analytics core     | `lib/analytics/index.ts` → `computeInsights`       |
+| Narrative insights | `lib/insights/generate.ts`                         |
+| Week plan          | `lib/training/planEngine.ts`                       |
+| Goals context      | `lib/goals/viewModels.ts`                          |
+| DB import          | `lib/db/activities.ts` → `buildStravaImportFromDb` |
+| Session auth       | `lib/auth/session.ts`                              |
+| Client hook        | `hooks/use-training-intelligence.ts`               |
+| Quality            | `lib/quality/assessImport.ts`                      |
 
 ---
 
-*This document is the source of truth for MCP + Coach Chat until implementation issues supersede it.*
+_This document is the source of truth for MCP + Coach Chat until implementation issues supersede it._

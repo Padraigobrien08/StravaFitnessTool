@@ -30,10 +30,7 @@ export function CoachingExplainability({
         </p>
 
         <p className="mt-4 text-xs text-zinc-500">
-          Confidence:{" "}
-          <span className="font-medium text-zinc-300">
-            {data.confidenceLabel}
-          </span>
+          Confidence: <span className="font-medium text-zinc-300">{data.confidenceLabel}</span>
         </p>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -69,10 +66,7 @@ export function CoachingExplainability({
         >
           Limitations & assumptions
           <ChevronDown
-            className={cn(
-              "h-4 w-4 shrink-0 transition-transform",
-              open && "rotate-180"
-            )}
+            className={cn("h-4 w-4 shrink-0 transition-transform", open && "rotate-180")}
           />
         </button>
         {open ? (

@@ -30,10 +30,7 @@ export {
   formatWeekRange,
 } from "./planToCalendar";
 
-export {
-  validateCalendarWeek,
-  validateBeforeSave,
-} from "./calendarValidation";
+export { validateCalendarWeek, validateBeforeSave } from "./calendarValidation";
 
 export {
   buildCalendarCoachPayload,

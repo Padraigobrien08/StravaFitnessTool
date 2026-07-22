@@ -16,16 +16,9 @@ const kindLabel = {
 export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
   const [whyOpen, setWhyOpen] = useState(false);
   const pillTone =
-    item.severity === "risk"
-      ? "risk"
-      : item.severity === "caution"
-        ? "caution"
-        : "positive";
+    item.severity === "risk" ? "risk" : item.severity === "caution" ? "caution" : "positive";
 
-  const borderTone =
-    item.kind === "risk"
-      ? "border-l-red-500/45"
-      : "border-l-teal-500/45";
+  const borderTone = item.kind === "risk" ? "border-l-red-500/45" : "border-l-teal-500/45";
 
   const TrendIcon =
     item.trend?.positive === true
@@ -39,7 +32,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
       className={cn(
         "rounded-xl border border-white/[0.05] border-l-[3px] bg-white/[0.02] px-4 py-3.5 transition-colors duration-200 sm:px-5",
         borderTone,
-        "hover:bg-white/[0.035] hover:border-white/[0.08]"
+        "hover:bg-white/[0.035] hover:border-white/[0.08]",
       )}
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
@@ -48,7 +41,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
             <span
               className={cn(
                 "text-[10px] font-bold uppercase tracking-[0.14em]",
-                item.kind === "risk" ? "text-red-400/85" : "text-teal-400/85"
+                item.kind === "risk" ? "text-red-400/85" : "text-teal-400/85",
               )}
             >
               {kindLabel[item.kind]}
@@ -59,7 +52,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
                   "inline-flex items-center gap-1 text-[10px] font-medium",
                   item.trend.positive === true && "text-teal-400/90",
                   item.trend.positive === false && "text-amber-400/90",
-                  item.trend.positive === null && "text-zinc-500"
+                  item.trend.positive === null && "text-zinc-500",
                 )}
               >
                 <TrendIcon className="h-3 w-3" aria-hidden />
@@ -72,9 +65,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
           <h3 className="mt-1.5 font-display text-base font-semibold leading-snug text-zinc-50 sm:text-lg">
             {item.title}
           </h3>
-          <p className="mt-1 text-sm leading-relaxed text-zinc-400">
-            {item.summary}
-          </p>
+          <p className="mt-1 text-sm leading-relaxed text-zinc-400">{item.summary}</p>
 
           {item.pills.length > 0 ? (
             <div className="mt-2.5 flex flex-wrap items-center gap-1.5">

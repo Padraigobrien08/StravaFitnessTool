@@ -1,9 +1,7 @@
 import type { RaceQualityEffort } from "./forecastTypes";
 
 /** Dedupe and cap efforts so power-law fit stays stable (avoids negative R² / weight blow-ups). */
-export function prepareCapabilityEfforts(
-  efforts: RaceQualityEffort[]
-): RaceQualityEffort[] {
+export function prepareCapabilityEfforts(efforts: RaceQualityEffort[]): RaceQualityEffort[] {
   const seen = new Set<string>();
   const deduped: RaceQualityEffort[] = [];
 
@@ -15,7 +13,5 @@ export function prepareCapabilityEfforts(
     deduped.push(e);
   }
 
-  return deduped
-    .sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm)
-    .slice(0, 40);
+  return deduped.sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm).slice(0, 40);
 }

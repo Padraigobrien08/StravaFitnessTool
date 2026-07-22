@@ -10,10 +10,7 @@ import type { Insight } from "@/lib/insights/types";
 import type { RaceProjectionView } from "@/lib/performance/viewModels";
 import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
 import { buildForecastV2View } from "@/lib/goals/forecastV2ViewModel";
-import {
-  buildGoalsRaceBrief,
-  type GoalsRaceBriefView,
-} from "@/lib/goals/goalsRaceBrief";
+import { buildGoalsRaceBrief, type GoalsRaceBriefView } from "@/lib/goals/goalsRaceBrief";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { formatDuration, formatKm, formatPace } from "@/lib/utils";
@@ -83,7 +80,7 @@ export interface GoalsPageView {
 function pickGoalProjection(
   analysis: RacePredictionAnalysis,
   goal: RaceGoal | null,
-  readiness: RaceReadiness | null
+  readiness: RaceReadiness | null,
 ): ConsensusPrediction | null {
   if (analysis.consensus.length === 0) return null;
   const dist = goal?.distance ?? readiness?.distance ?? "hm";
@@ -95,15 +92,13 @@ function pickGoalProjection(
         : dist === "10k"
           ? "10K"
           : "5K";
-  return (
-    analysis.consensus.find((c) => c.label === key) ?? analysis.consensus[0]
-  );
+  return analysis.consensus.find((c) => c.label === key) ?? analysis.consensus[0];
 }
 
 function buildProjection(
   analytics: DashboardInsights,
   goal: RaceGoal | null,
-  readiness: RaceReadiness | null
+  readiness: RaceReadiness | null,
 ): RaceProjectionView {
   const analysis = analytics.racePredictionAnalysis;
   const primary = pickGoalProjection(analysis, goal, readiness);
@@ -165,9 +160,7 @@ function buildProjection(
       label: c.label,
       timeDisplay: formatDuration(c.timeSec),
       rangeDisplay:
-        c.spreadSec > 45
-          ? `${formatDuration(c.timeMin)} – ${formatDuration(c.timeMax)}`
-          : null,
+        c.spreadSec > 45 ? `${formatDuration(c.timeMin)} – ${formatDuration(c.timeMax)}` : null,
     })),
     confidenceDrivers: confidenceDrivers.slice(0, 5),
     confidenceReducers: confidenceReducers.slice(0, 5),
@@ -192,7 +185,7 @@ function levelFromScore(score: number): ReadinessDimensionView["level"] {
 
 function buildDimensions(
   analytics: DashboardInsights,
-  readiness: RaceReadiness | null
+  readiness: RaceReadiness | null,
 ): ReadinessDimensionView[] {
   const r = readiness;
   const fatigue = analytics.fatigue;
@@ -209,12 +202,9 @@ function buildDimensions(
       ? 78
       : analytics.efficiencySummary.trend === "declining"
         ? 42
-        : 58
+        : 58,
   );
-  const threshold = Math.min(
-    100,
-    hardPct >= 15 && hardPct <= 28 ? 75 : hardPct > 28 ? 45 : 60
-  );
+  const threshold = Math.min(100, hardPct >= 15 && hardPct <= 28 ? 75 : hardPct > 28 ? 45 : 60);
   const longRun = r?.longestRunPct ?? analytics.halfMarathonReadiness.longestRunPct;
 
   return [
@@ -233,13 +223,10 @@ function buildDimensions(
       score: longRun,
       level: levelFromScore(longRun),
       note: r
-        ? formatLongRunVsRace(
-            r.longestRunKm,
-            RACE_READINESS_CONFIG[r.distance].raceDistanceKm
-          )
+        ? formatLongRunVsRace(r.longestRunKm, RACE_READINESS_CONFIG[r.distance].raceDistanceKm)
         : formatLongRunVsRace(
             analytics.halfMarathonReadiness.longestRunKm,
-            RACE_READINESS_CONFIG.hm.raceDistanceKm
+            RACE_READINESS_CONFIG.hm.raceDistanceKm,
           ),
     },
     {
@@ -278,7 +265,7 @@ function buildDimensions(
 function buildRisks(
   analytics: DashboardInsights,
   readiness: RaceReadiness | null,
-  projection: RaceProjectionView
+  projection: RaceProjectionView,
 ): GoalRiskView[] {
   const risks: GoalRiskView[] = [];
 
@@ -316,7 +303,7 @@ function buildRisks(
   }
 
   const hiInterference = analytics.trainingEcosystem.interferenceFlags.filter(
-    (f) => f.severity === "high"
+    (f) => f.severity === "high",
   );
   if (hiInterference.length > 0 && readiness && (readiness.daysUntilRace ?? 99) > 7) {
     risks.push({
@@ -341,9 +328,7 @@ function buildRisks(
   }
 
   if (projection.primary && projection.primary.spreadDisplay.includes("±")) {
-    const spread = projection.analysis.consensus.find(
-      (c) => c.label === projection.primary!.label
-    );
+    const spread = projection.analysis.consensus.find((c) => c.label === projection.primary!.label);
     if (spread && spread.spreadSec > 90) {
       risks.push({
         title: "Prediction uncertainty",
@@ -359,7 +344,8 @@ function buildRisks(
     risks.push({
       title: "Race-day variables",
       severity: "low",
-      evidence: "Training signals are balanced — weather, fueling, and pacing discipline still matter.",
+      evidence:
+        "Training signals are balanced — weather, fueling, and pacing discipline still matter.",
       mitigation: "Rehearse nutrition and first 5 km pacing.",
       confidence: "medium",
     });
@@ -373,11 +359,8 @@ function buildConsensus(analysis: RacePredictionAnalysis): ModelConsensusRow[] {
     label: c.label,
     consensusDisplay: formatDuration(c.timeSec),
     spreadDisplay:
-      c.spreadSec > 45
-        ? `${formatDuration(c.timeMin)} – ${formatDuration(c.timeMax)}`
-        : null,
-    agreement:
-      c.spreadSec <= 45 ? "tight" : c.spreadSec <= 120 ? "moderate" : "wide",
+      c.spreadSec > 45 ? `${formatDuration(c.timeMin)} – ${formatDuration(c.timeMax)}` : null,
+    agreement: c.spreadSec <= 45 ? "tight" : c.spreadSec <= 120 ? "moderate" : "wide",
   }));
 }
 
@@ -387,7 +370,7 @@ function buildHero(
   analytics: DashboardInsights,
   projection: RaceProjectionView,
   insights: Insight[],
-  forecastV2: ForecastV2View | null
+  forecastV2: ForecastV2View | null,
 ): RaceMissionHeroView {
   const r = readiness ?? {
     distance: "hm" as const,
@@ -440,8 +423,7 @@ function buildHero(
     targetTimeDisplay: targetDisplay,
     readinessScore: r.score,
     readinessLabel: r.label,
-    confidenceLabel:
-      forecastV2?.confidence ?? projection.primary?.confidenceLabel ?? "Medium",
+    confidenceLabel: forecastV2?.confidence ?? projection.primary?.confidenceLabel ?? "Medium",
     confidence: analytics.dataConfidence,
     strongestSignal: strongest,
     biggestLimiter: limiter,
@@ -450,10 +432,8 @@ function buildHero(
       (r.score >= 70
         ? "Maintain rhythm; add short race-pace touches without increasing fatigue."
         : "Extend long run and volume before taper; keep easy days truly easy."),
-    projectedFinish:
-      forecastV2?.mostLikely ?? primary?.timeDisplay ?? null,
-    projectedSpread:
-      forecastV2?.rangeDisplay ?? primary?.spreadDisplay ?? null,
+    projectedFinish: forecastV2?.mostLikely ?? primary?.timeDisplay ?? null,
+    projectedSpread: forecastV2?.rangeDisplay ?? primary?.spreadDisplay ?? null,
     daysUntilRace: readiness?.daysUntilRace ?? null,
     raceDateDisplay: readiness
       ? new Date(readiness.raceDate).toLocaleDateString(undefined, {
@@ -472,7 +452,7 @@ export function buildGoalsPageView(
   analytics: DashboardInsights,
   goal: RaceGoal | null,
   insights: Insight[] = [],
-  opts?: { runs?: RunActivity[]; fitDetails?: FitRunDetail[] }
+  opts?: { runs?: RunActivity[]; fitDetails?: FitRunDetail[] },
 ): GoalsPageView {
   const readiness = analytics.raceReadiness;
   const projection = buildProjection(analytics, goal, readiness);
@@ -484,12 +464,12 @@ export function buildGoalsPageView(
   });
   const hero = buildHero(goal, readiness, analytics, projection, insights, forecastV2);
   const raceBrief =
-    forecastV2 != null
-      ? buildGoalsRaceBrief({ forecast: forecastV2, goal, readiness })
-      : null;
+    forecastV2 != null ? buildGoalsRaceBrief({ forecast: forecastV2, goal, readiness }) : null;
 
   const explain: GoalsExplainView = {
-    summary: projection.explanation[0] ?? "Predictions combine recent efforts with endurance scaling models.",
+    summary:
+      projection.explanation[0] ??
+      "Predictions combine recent efforts with endurance scaling models.",
     basedOn: [
       ...projection.confidenceDrivers,
       readiness
@@ -550,7 +530,6 @@ export function buildGoalsPageView(
     explain,
     historical,
     targetDistanceLabel:
-      readiness?.distanceLabel ??
-      (goal ? RACE_DISTANCE_LABELS[goal.distance] : "Half marathon"),
+      readiness?.distanceLabel ?? (goal ? RACE_DISTANCE_LABELS[goal.distance] : "Half marathon"),
   };
 }

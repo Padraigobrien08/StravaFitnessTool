@@ -5,7 +5,7 @@ export function minMaxYDomain(
     paddingPct?: number;
     paddingMin?: number;
     filterOutliers?: boolean;
-  }
+  },
 ): [number, number] {
   let vals = values.filter((v) => Number.isFinite(v) && v > 0);
   if (vals.length === 0) return [0, 1];
@@ -32,7 +32,7 @@ export function minMaxYDomain(
 /** Reversed axis (pace): faster = lower sec = top of chart → domain [high, low]. */
 export function minMaxYDomainReversed(
   values: number[],
-  opts?: Parameters<typeof minMaxYDomain>[1]
+  opts?: Parameters<typeof minMaxYDomain>[1],
 ): [number, number] {
   const [lo, hi] = minMaxYDomain(values, opts);
   return [hi, lo];

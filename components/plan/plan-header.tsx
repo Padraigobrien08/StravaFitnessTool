@@ -1,24 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Copy,
-  Loader2,
-  MessageCircle,
-  RefreshCw,
-  Save,
-  Trash2,
-} from "lucide-react";
+import { Copy, Loader2, MessageCircle, RefreshCw, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import { cn } from "@/lib/utils";
 
-export type PlanHeaderStatus =
-  | "empty"
-  | "saved"
-  | "preview"
-  | "saved_with_preview"
-  | "modified";
+export type PlanHeaderStatus = "empty" | "saved" | "preview" | "saved_with_preview" | "modified";
 
 export function PlanHeader({
   title,
@@ -164,13 +152,7 @@ export function PlanHeader({
   );
 }
 
-function StatusBadge({
-  status,
-  label,
-}: {
-  status: PlanHeaderStatus;
-  label: string;
-}) {
+function StatusBadge({ status, label }: { status: PlanHeaderStatus; label: string }) {
   return (
     <span
       className={cn(
@@ -179,7 +161,7 @@ function StatusBadge({
         status === "modified" && "bg-teal-500/10 text-teal-400",
         status === "preview" && "bg-amber-500/12 text-amber-200/90",
         status === "saved_with_preview" && "bg-zinc-500/10 text-zinc-400",
-        status === "empty" && "bg-[var(--surface)] text-zinc-600"
+        status === "empty" && "bg-[var(--surface)] text-zinc-600",
       )}
     >
       {label}

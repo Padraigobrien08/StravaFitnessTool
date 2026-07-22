@@ -43,8 +43,7 @@ export function assessExecution(input: RaceForecastInput): ExecutionAssessment {
     pacingRisk = "high";
   }
 
-  const conservativePaddingSec =
-    fadeRisk === "high" ? 90 : fadeRisk === "medium" ? 45 : 20;
+  const conservativePaddingSec = fadeRisk === "high" ? 90 : fadeRisk === "medium" ? 45 : 20;
 
   const recommendation =
     fadeRisk === "high"

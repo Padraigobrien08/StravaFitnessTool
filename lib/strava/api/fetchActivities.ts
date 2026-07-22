@@ -6,7 +6,7 @@ const MAX_PAGES = 50;
 
 export async function fetchAthleteActivities(
   accessToken: string,
-  afterEpochSec?: number
+  afterEpochSec?: number,
 ): Promise<StravaActivity[]> {
   const all: StravaActivity[] = [];
   let page = 1;
@@ -18,12 +18,9 @@ export async function fetchAthleteActivities(
     });
     if (afterEpochSec) params.set("after", String(afterEpochSec));
 
-    const res = await fetch(
-      `${STRAVA_API_BASE}/athlete/activities?${params}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
+    const res = await fetch(`${STRAVA_API_BASE}/athlete/activities?${params}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
     if (!res.ok) {
       const text = await res.text();

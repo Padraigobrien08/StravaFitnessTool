@@ -16,9 +16,7 @@ function ContextRow({
   return (
     <div className="rounded-md bg-white/[0.025] px-2.5 py-2">
       <p className="text-[11px] text-zinc-600">{label}</p>
-      <p className="mt-0.5 text-[13px] font-medium tabular-nums text-zinc-300">
-        {value}
-      </p>
+      <p className="mt-0.5 text-[13px] font-medium tabular-nums text-zinc-300">{value}</p>
       {sub ? <p className="mt-0.5 text-[11px] text-zinc-600">{sub}</p> : null}
     </div>
   );
@@ -35,9 +33,7 @@ export function CoachMiniContext({
 }) {
   const { snapshot } = state;
   const topRisk = state.risksAndOpportunities.find((r) => r.kind === "risk");
-  const topOpp = state.risksAndOpportunities.find(
-    (r) => r.kind === "opportunity"
-  );
+  const topOpp = state.risksAndOpportunities.find((r) => r.kind === "opportunity");
 
   if (collapsed) {
     return (
@@ -55,9 +51,7 @@ export function CoachMiniContext({
   return (
     <aside className="coach-mini-context hidden h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden bg-[#0a0b0e]/50 xl:flex">
       <div className="flex shrink-0 items-center justify-between px-3 py-2.5">
-        <span className="text-[12px] font-medium text-zinc-500">
-          Answer context
-        </span>
+        <span className="text-[12px] font-medium text-zinc-500">Answer context</span>
         <button
           type="button"
           onClick={onToggle}
@@ -69,9 +63,7 @@ export function CoachMiniContext({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
-        <p className="mb-3 text-[13px] leading-snug text-zinc-400">
-          {snapshot.currentFocus}
-        </p>
+        <p className="mb-3 text-[13px] leading-snug text-zinc-400">{snapshot.currentFocus}</p>
 
         <div className="grid grid-cols-2 gap-2">
           {snapshot.readinessScore != null ? (
@@ -88,7 +80,7 @@ export function CoachMiniContext({
               sub={
                 snapshot.tsb != null
                   ? `TSB ${snapshot.tsb > 0 ? "+" : ""}${Math.round(snapshot.tsb)}`
-                  : snapshot.fatigueLabel ?? undefined
+                  : (snapshot.fatigueLabel ?? undefined)
               }
             />
           ) : null}
@@ -101,9 +93,7 @@ export function CoachMiniContext({
               <p className="text-[11px] text-zinc-600">Race</p>
               <p className="text-[13px] text-zinc-300">{snapshot.raceLabel}</p>
               {snapshot.daysToRace != null ? (
-                <p className="text-[11px] text-zinc-600">
-                  {snapshot.daysToRace} days out
-                </p>
+                <p className="text-[11px] text-zinc-600">{snapshot.daysToRace} days out</p>
               ) : null}
             </div>
           </div>
@@ -119,27 +109,21 @@ export function CoachMiniContext({
         {topRisk ? (
           <div className="mt-3 rounded-md border-l-2 border-amber-500/25 bg-amber-500/[0.04] px-2.5 py-2">
             <p className="text-[11px] text-amber-200/50">Risk</p>
-            <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">
-              {topRisk.text}
-            </p>
+            <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">{topRisk.text}</p>
           </div>
         ) : null}
 
         {topOpp ? (
           <div className="mt-2 rounded-md border-l-2 border-teal-500/20 bg-teal-500/[0.03] px-2.5 py-2">
             <p className="text-[11px] text-teal-400/50">Opportunity</p>
-            <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">
-              {topOpp.text}
-            </p>
+            <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">{topOpp.text}</p>
           </div>
         ) : null}
 
         {snapshot.weekLabel ? (
           <p className={cn("mt-3 text-[11px] text-zinc-600")}>
             {snapshot.weekLabel}
-            {snapshot.last7Km > 0
-              ? ` · ${snapshot.last7Km.toFixed(0)} km (7d)`
-              : ""}
+            {snapshot.last7Km > 0 ? ` · ${snapshot.last7Km.toFixed(0)} km (7d)` : ""}
           </p>
         ) : null}
       </div>

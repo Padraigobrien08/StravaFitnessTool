@@ -60,11 +60,9 @@ describe("validateWeeklyPlan", () => {
     const bad = invalidPlanMissingEvidence(g.weekStart) as never;
     const result = validateWeeklyPlan(bad, ctx, g);
     expect(result.valid).toBe(false);
-    expect(
-      result.issues.some(
-        (i) => i.code === "volume_high" || i.code === "hard_sessions"
-      )
-    ).toBe(true);
+    expect(result.issues.some((i) => i.code === "volume_high" || i.code === "hard_sessions")).toBe(
+      true,
+    );
   });
 });
 
@@ -75,7 +73,7 @@ describe("repairWeeklyPlan", () => {
     const bad = invalidLlmPlan(g.weekStart) as never;
     const repaired = repairWeeklyPlan(bad, g);
     const hard = repaired.workouts.filter(
-      (w) => w.modality === "run" && w.intensity === "hard"
+      (w) => w.modality === "run" && w.intensity === "hard",
     ).length;
     expect(hard).toBeLessThanOrEqual(g.maxHardSessions);
   });

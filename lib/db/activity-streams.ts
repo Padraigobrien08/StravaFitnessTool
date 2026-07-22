@@ -5,7 +5,7 @@ import { FitRunDetailSchema } from "@/lib/strava/fitTypes";
 export async function upsertFitDetail(
   userId: string,
   stravaActivityId: number,
-  detail: FitRunDetail
+  detail: FitRunDetail,
 ): Promise<void> {
   const sql = getSql();
   const parsed = FitRunDetailSchema.parse(detail);
@@ -25,7 +25,7 @@ export async function upsertFitDetail(
 
 export async function getFitDetailForUser(
   userId: string,
-  activityId: string
+  activityId: string,
 ): Promise<FitRunDetail | null> {
   const sql = getSql();
   const id = Number(activityId);
@@ -44,10 +44,7 @@ export async function getFitDetailForUser(
   }
 }
 
-export async function listRunIdsMissingStreams(
-  userId: string,
-  limit: number
-): Promise<number[]> {
+export async function listRunIdsMissingStreams(userId: string, limit: number): Promise<number[]> {
   const sql = getSql();
   const rows = await sql`
     SELECT a.strava_activity_id
@@ -70,9 +67,7 @@ export async function listRunIdsMissingStreams(
     ORDER BY a.start_date DESC
     LIMIT ${limit}
   `;
-  return (rows as { strava_activity_id: number }[]).map((r) =>
-    Number(r.strava_activity_id)
-  );
+  return (rows as { strava_activity_id: number }[]).map((r) => Number(r.strava_activity_id));
 }
 
 export async function getFitRunIdsForUser(userId: string): Promise<string[]> {
@@ -81,14 +76,10 @@ export async function getFitRunIdsForUser(userId: string): Promise<string[]> {
     SELECT strava_activity_id FROM activity_streams
     WHERE user_id = ${userId}::uuid
   `;
-  return (rows as { strava_activity_id: number }[]).map((r) =>
-    String(r.strava_activity_id)
-  );
+  return (rows as { strava_activity_id: number }[]).map((r) => String(r.strava_activity_id));
 }
 
-export async function getAllFitDetailsForUser(
-  userId: string
-): Promise<FitRunDetail[]> {
+export async function getAllFitDetailsForUser(userId: string): Promise<FitRunDetail[]> {
   const sql = getSql();
   const rows = await sql`
     SELECT streams_json FROM activity_streams

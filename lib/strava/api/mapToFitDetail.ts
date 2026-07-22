@@ -1,9 +1,5 @@
 import { computeAllBestEfforts } from "@/lib/analytics/bestEfforts";
-import {
-  downsample,
-  MAX_GPS_POINTS,
-  MAX_STREAM_POINTS,
-} from "@/lib/strava/downsample";
+import { downsample, MAX_GPS_POINTS, MAX_STREAM_POINTS } from "@/lib/strava/downsample";
 import type { FitLap, FitRunDetail, GpsPoint } from "@/lib/strava/fitTypes";
 import type { StravaLap, StravaStreamSet } from "./types";
 
@@ -12,9 +8,7 @@ function speedToPaceSecPerKm(speedMps: number): number | null {
   return 1000 / speedMps;
 }
 
-function computeHrDrift(
-  hrStream: { elapsedSec: number; hr: number }[]
-): number | null {
+function computeHrDrift(hrStream: { elapsedSec: number; hr: number }[]): number | null {
   if (hrStream.length < 10) return null;
   const mid = hrStream[Math.floor(hrStream.length / 2)].elapsedSec;
   const first = hrStream.filter((p) => p.elapsedSec <= mid);
@@ -32,10 +26,7 @@ export function mapStravaLaps(laps: StravaLap[]): FitLap[] {
     distanceM: lap.distance ?? null,
     timeSec: lap.elapsed_time ?? lap.moving_time ?? null,
     avgHr: lap.average_heartrate ?? null,
-    avgPaceSecPerKm:
-      lap.average_speed != null
-        ? speedToPaceSecPerKm(lap.average_speed)
-        : null,
+    avgPaceSecPerKm: lap.average_speed != null ? speedToPaceSecPerKm(lap.average_speed) : null,
     avgCadence: lap.average_cadence ?? null,
   }));
 }
@@ -43,7 +34,7 @@ export function mapStravaLaps(laps: StravaLap[]): FitLap[] {
 export function mapStravaStreamsToFitDetail(
   activityId: string,
   streams: StravaStreamSet | null,
-  laps: StravaLap[]
+  laps: StravaLap[],
 ): FitRunDetail | null {
   const time = streams?.time?.data;
   if (!time?.length) {
@@ -61,9 +52,7 @@ export function mapStravaStreamsToFitDetail(
       avgCadence: (() => {
         const withCad = lapOnly.filter((l) => l.avgCadence != null);
         if (withCad.length === 0) return null;
-        return Math.round(
-          withCad.reduce((s, l) => s + (l.avgCadence ?? 0), 0) / withCad.length
-        );
+        return Math.round(withCad.reduce((s, l) => s + (l.avgCadence ?? 0), 0) / withCad.length);
       })(),
     };
   }
@@ -72,10 +61,7 @@ export function mapStravaStreamsToFitDetail(
   const velData = streams?.velocity_smooth?.data ?? [];
   const cadData = streams?.cadence?.data ?? [];
   const altData = streams?.altitude?.data ?? [];
-  const latlngRaw = streams?.latlng?.data as
-    | [number, number][]
-    | number[]
-    | undefined;
+  const latlngRaw = streams?.latlng?.data as [number, number][] | number[] | undefined;
 
   const hrStream: { elapsedSec: number; hr: number }[] = [];
   const paceStream: { elapsedSec: number; paceSecPerKm: number }[] = [];
@@ -138,7 +124,6 @@ export function mapStravaStreamsToFitDetail(
     cadenceStream: downsample(cadenceStream, MAX_STREAM_POINTS),
     gpsStream: downsample(gpsStream, MAX_GPS_POINTS),
     hrDriftPct: computeHrDrift(hrStream),
-    avgCadence:
-      cadenceCount > 0 ? Math.round(cadenceSum / cadenceCount) : null,
+    avgCadence: cadenceCount > 0 ? Math.round(cadenceSum / cadenceCount) : null,
   };
 }

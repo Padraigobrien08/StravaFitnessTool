@@ -13,12 +13,10 @@ function levelFromRatio(ratio: number): CoverageLevel {
 export function buildDataQualityContext(
   insights: DashboardInsights,
   quality: ImportQualityReport,
-  runs?: RunActivity[]
+  runs?: RunActivity[],
 ): CoachingDataQuality {
   const hrPct = hrCoveragePct(runs ?? []) / 100;
-  const withStreams = insights.trainingEcosystem.activities.filter(
-    (a) => a.hasStreams
-  ).length;
+  const withStreams = insights.trainingEcosystem.activities.filter((a) => a.hasStreams).length;
   const streamRatio =
     insights.trainingEcosystem.activities.length > 0
       ? withStreams / insights.trainingEcosystem.activities.length

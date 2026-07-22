@@ -62,9 +62,7 @@ function scoreTrend(score: number): "positive" | "neutral" | "warning" {
   return "warning";
 }
 
-function buildModalityRows(
-  eco: TrainingEcosystemAnalysis
-): ModalityDistributionRow[] {
+function buildModalityRows(eco: TrainingEcosystemAnalysis): ModalityDistributionRow[] {
   const dist = eco.currentWeek.modalityDistribution ?? {};
   const w = eco.currentWeek;
   const minutesByMod: Partial<Record<ActivityModality, number>> = {
@@ -84,9 +82,7 @@ function buildModalityRows(
     }));
 }
 
-export function buildTrainingEcosystemView(
-  analytics: DashboardInsights
-): TrainingEcosystemView {
+export function buildTrainingEcosystemView(analytics: DashboardInsights): TrainingEcosystemView {
   const eco = analytics.trainingEcosystem;
   const w = eco.currentWeek;
   const ctx = eco.totalContext.last28Days;
@@ -161,7 +157,7 @@ export function buildTrainingEcosystemView(
   const headline =
     interferenceWarnings.length > 0
       ? interferenceWarnings[0].message
-      : topInsight?.title ?? eco.totalContext.headline;
+      : (topInsight?.title ?? eco.totalContext.headline);
 
   return {
     headline: ctx.nonRunSessions > 0 ? headline : null,
@@ -174,8 +170,7 @@ export function buildTrainingEcosystemView(
       runSessions: w.runCount,
       bikeMinutes: w.bikeMinutes,
       swimMinutes: w.swimMinutes,
-      crossTrainingMinutes:
-        w.bikeMinutes + w.swimMinutes + w.aerobicCrossTrainingMinutes,
+      crossTrainingMinutes: w.bikeMinutes + w.swimMinutes + w.aerobicCrossTrainingMinutes,
       strengthSessions: w.strengthSessions,
       mobilitySessions: w.mobilitySessions,
       hiitSessions: w.hiitSessions + w.sportSessions,
@@ -205,9 +200,7 @@ export interface ReportEcosystemView {
   sportMix: { label: string; count: number }[];
 }
 
-export function buildReportEcosystemView(
-  analytics: DashboardInsights
-): ReportEcosystemView {
+export function buildReportEcosystemView(analytics: DashboardInsights): ReportEcosystemView {
   const eco = analytics.trainingEcosystem;
   const ctx = eco.totalContext.last28Days;
   const r28 = eco.rolling[28];
@@ -218,8 +211,7 @@ export function buildReportEcosystemView(
     crossTrainingHours: `${ctx.crossTrainingMovingHours}h`,
     strengthSessions: ctx.strengthSessions,
     mobilitySessions: ctx.mobilitySessions,
-    interferenceCount: eco.interferenceFlags.filter((f) => f.severity !== "low")
-      .length,
+    interferenceCount: eco.interferenceFlags.filter((f) => f.severity !== "low").length,
     archetypeLabel: archetypeDisplayLabel(eco.archetype.archetype),
     supportHighlights: eco.ecosystemInsights
       .filter((i) => i.severity === "positive")

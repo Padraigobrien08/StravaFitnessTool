@@ -28,8 +28,7 @@ export function rollingFourWeekBlocks(runs: RunActivity[]): TrainingBlock[] {
       label: `${format(blockStart, "MMM d")} – ${format(blockEnd, "MMM d")}`,
       distanceKm: Math.round(inBlock.reduce((s, r) => s + r.distanceM / 1000, 0) * 10) / 10,
       runCount: inBlock.length,
-      longestRunKm:
-        Math.round(Math.max(...inBlock.map((r) => r.distanceM)) / 100) / 10,
+      longestRunKm: Math.round(Math.max(...inBlock.map((r) => r.distanceM)) / 100) / 10,
     });
   }
 

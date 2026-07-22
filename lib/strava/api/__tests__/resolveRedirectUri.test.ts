@@ -23,13 +23,13 @@ describe("resolveRedirectUri", () => {
   it("uses STRAVA_REDIRECT_URI when set (explicit override wins)", () => {
     process.env.STRAVA_REDIRECT_URI = "https://pinned.example.com" + CALLBACK;
     expect(resolveRedirectUri(req({ host: "192.168.1.5:3000" }))).toBe(
-      "https://pinned.example.com" + CALLBACK
+      "https://pinned.example.com" + CALLBACK,
     );
   });
 
   it("derives from the request host (LAN access)", () => {
     expect(resolveRedirectUri(req({ host: "192.168.1.5:3000" }))).toBe(
-      "http://192.168.1.5:3000" + CALLBACK
+      "http://192.168.1.5:3000" + CALLBACK,
     );
   });
 
@@ -40,8 +40,8 @@ describe("resolveRedirectUri", () => {
           host: "localhost:3000",
           "x-forwarded-proto": "https",
           "x-forwarded-host": "abc.trycloudflare.com",
-        })
-      )
+        }),
+      ),
     ).toBe("https://abc.trycloudflare.com" + CALLBACK);
   });
 

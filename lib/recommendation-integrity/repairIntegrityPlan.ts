@@ -30,21 +30,18 @@ function defaultEvidence(context: WeeklyPlanIntegrityInput["context"]): string[]
 export function repairPlanFromIntegrity(
   plan: WeeklyTrainingPlan,
   input: WeeklyPlanIntegrityInput,
-  report: RecommendationIntegrityReport
+  report: RecommendationIntegrityReport,
 ): WeeklyTrainingPlan {
   let current = stripMedicalLanguage(plan);
   current = repairWeeklyPlan(current, input.guardrails);
 
   const cap = maxAllowedConfidence(input.context);
-  if (
-    report.issues.some((i) => i.type === "overconfidence") &&
-    current.confidence !== cap
-  ) {
+  if (report.issues.some((i) => i.type === "overconfidence") && current.confidence !== cap) {
     current = { ...current, confidence: cap };
   }
 
   const needsEvidence = report.issues.some(
-    (i) => i.type === "missing_evidence" || i.type === "unsupported_claim"
+    (i) => i.type === "missing_evidence" || i.type === "unsupported_claim",
   );
   if (needsEvidence) {
     const allowed = buildAllowedEvidenceTokens(input.context);
@@ -63,9 +60,7 @@ export function repairPlanFromIntegrity(
   }
 
   const limitations = new Set(current.limitations);
-  limitations.add(
-    "Plan adjusted for StrideIQ recommendation integrity (evidence and safety)."
-  );
+  limitations.add("Plan adjusted for StrideIQ recommendation integrity (evidence and safety).");
   if (input.context.dataQuality.hrCoverage === "low") {
     limitations.add("Limited HR coverage — treat paces and load as approximate.");
   }

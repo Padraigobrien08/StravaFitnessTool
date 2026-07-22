@@ -4,17 +4,9 @@ import type { FitRunDetail, FitLap } from "@/lib/strava/fitTypes";
 import type { WorkoutClassification, WorkoutType } from "@/lib/analytics/workoutType";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import { formatWorkoutTitle, type FormattedWorkoutTitle } from "./formatWorkoutName";
-import {
-  formatDistanceKm,
-  formatDuration,
-  formatKm,
-  formatPace,
-} from "@/lib/utils";
+import { formatDistanceKm, formatDuration, formatKm, formatPace } from "@/lib/utils";
 import { paceSecPerKm } from "@/lib/analytics/pace";
-import {
-  scoreSessionExecution,
-  thirdAvgPace,
-} from "@/lib/reasoning/executionScore";
+import { scoreSessionExecution, thirdAvgPace } from "@/lib/reasoning/executionScore";
 import { parseISO, subDays } from "date-fns";
 
 export type ExecutionGrade = "strong" | "steady" | "mixed" | "limited";
@@ -115,8 +107,7 @@ function paceCv(paces: number[]): number | null {
   if (paces.length < 3) return null;
   const mean = paces.reduce((a, b) => a + b, 0) / paces.length;
   if (mean === 0) return null;
-  const variance =
-    paces.reduce((s, p) => s + (p - mean) ** 2, 0) / paces.length;
+  const variance = paces.reduce((s, p) => s + (p - mean) ** 2, 0) / paces.length;
   return Math.sqrt(variance) / mean;
 }
 
@@ -124,7 +115,7 @@ function classifyLapRole(
   lap: FitLap,
   index: number,
   total: number,
-  medianPace: number
+  medianPace: number,
 ): { role: string; tone: SegmentRowView["roleTone"] } {
   if (index === 0 && total > 3) return { role: "Warm-up", tone: "neutral" };
   if (index === total - 1 && total > 3) return { role: "Cool-down", tone: "neutral" };
@@ -138,20 +129,16 @@ function classifyLapRole(
 function buildSegments(fit: FitRunDetail | null): SegmentRowView[] {
   if (!fit?.laps.length) return [];
   const laps = fit.laps.filter((l) => l.avgPaceSecPerKm && l.avgPaceSecPerKm > 0);
-  const paces = laps
-    .map((l) => l.avgPaceSecPerKm!)
-    .filter((p) => p > 0);
+  const paces = laps.map((l) => l.avgPaceSecPerKm!).filter((p) => p > 0);
   const median =
-    paces.length > 0
-      ? [...paces].sort((a, b) => a - b)[Math.floor(paces.length / 2)]
-      : 0;
+    paces.length > 0 ? [...paces].sort((a, b) => a - b)[Math.floor(paces.length / 2)] : 0;
 
   const fastestIdx = laps.reduce(
     (best, l, i) =>
       l.avgPaceSecPerKm && (!best || l.avgPaceSecPerKm < best.pace)
         ? { i, pace: l.avgPaceSecPerKm }
         : best,
-    null as { i: number; pace: number } | null
+    null as { i: number; pace: number } | null,
   );
 
   const workPaces = laps
@@ -160,9 +147,7 @@ function buildSegments(fit: FitRunDetail | null): SegmentRowView[] {
     .map((x) => x.p!);
 
   const fadePct =
-    workPaces.length >= 2
-      ? ((workPaces.at(-1)! - workPaces[0]) / workPaces[0]) * 100
-      : null;
+    workPaces.length >= 2 ? ((workPaces.at(-1)! - workPaces[0]) / workPaces[0]) * 100 : null;
 
   return fit.laps.map((lap, index) => {
     const { role, tone } = classifyLapRole(lap, index, fit.laps.length, median);
@@ -173,9 +158,7 @@ function buildSegments(fit: FitRunDetail | null): SegmentRowView[] {
       highlight = "Pace fade";
     }
 
-    const cv = paceCv(
-      laps.map((l) => l.avgPaceSecPerKm!).filter(Boolean)
-    );
+    const cv = paceCv(laps.map((l) => l.avgPaceSecPerKm!).filter(Boolean));
 
     return {
       index: lap.index,
@@ -186,10 +169,7 @@ function buildSegments(fit: FitRunDetail | null): SegmentRowView[] {
       role,
       roleTone: tone,
       highlight,
-      consistencyNote:
-        cv != null && cv < 0.04 && role === "Work"
-          ? "Tight pacing"
-          : null,
+      consistencyNote: cv != null && cv < 0.04 && role === "Work" ? "Tight pacing" : null,
     };
   });
 }
@@ -197,7 +177,7 @@ function buildSegments(fit: FitRunDetail | null): SegmentRowView[] {
 function buildExecution(
   run: RunActivity,
   fit: FitRunDetail | null,
-  workout: WorkoutClassification
+  workout: WorkoutClassification,
 ): ExecutionAnalysisView {
   const scored = scoreSessionExecution(run, fit, workout);
   return {
@@ -217,7 +197,7 @@ function executionGrade(score: number): { grade: ExecutionGrade; label: string }
 
 function buildStreamAnnotations(
   fit: FitRunDetail | null,
-  execution: ExecutionAnalysisView
+  execution: ExecutionAnalysisView,
 ): StreamAnnotationView[] {
   const notes: StreamAnnotationView[] = [];
   if (fit && fit.hrStream.length > 20) {
@@ -266,7 +246,7 @@ function buildStreamAnnotations(
 function buildAdaptations(
   workout: WorkoutClassification,
   run: RunActivity,
-  execution: ExecutionAnalysisView
+  execution: ExecutionAnalysisView,
 ): AdaptationSignalView[] {
   const conf = workout.confidence;
   const items: AdaptationSignalView[] = [
@@ -308,7 +288,7 @@ function comparableRuns(
   run: RunActivity,
   allRuns: RunActivity[],
   workoutType: WorkoutType,
-  workoutMap: Map<string, WorkoutClassification>
+  workoutMap: Map<string, WorkoutClassification>,
 ): RunActivity[] {
   const cutoff = subDays(parseISO(run.date), 56);
   return allRuns.filter(
@@ -316,7 +296,7 @@ function comparableRuns(
       r.id !== run.id &&
       parseISO(r.date) >= cutoff &&
       parseISO(r.date) < parseISO(run.date) &&
-      workoutMap.get(r.id)?.type === workoutType
+      workoutMap.get(r.id)?.type === workoutType,
   );
 }
 
@@ -325,7 +305,7 @@ function buildHistorical(
   allRuns: RunActivity[],
   workout: WorkoutClassification,
   workoutMap: Map<string, WorkoutClassification>,
-  insights: DashboardInsights | null
+  insights: DashboardInsights | null,
 ): HistoricalCompareView[] {
   const items: HistoricalCompareView[] = [];
   const pace = paceSecPerKm(run);
@@ -339,9 +319,7 @@ function buildHistorical(
   }
 
   if (pace && similar.length > 0) {
-    const similarPaces = similar
-      .map((r) => paceSecPerKm(r))
-      .filter((p): p is number => p != null);
+    const similarPaces = similar.map((r) => paceSecPerKm(r)).filter((p): p is number => p != null);
     if (similarPaces.length > 0) {
       const best = Math.min(...similarPaces);
       if (pace <= best + 3) {
@@ -352,9 +330,7 @@ function buildHistorical(
       }
       const avgHrSimilar = similar.filter((r) => r.avgHr != null);
       if (run.avgHr && avgHrSimilar.length >= 2) {
-        const avg =
-          avgHrSimilar.reduce((s, r) => s + (r.avgHr ?? 0), 0) /
-          avgHrSimilar.length;
+        const avg = avgHrSimilar.reduce((s, r) => s + (r.avgHr ?? 0), 0) / avgHrSimilar.length;
         if (run.avgHr < avg - 3) {
           items.push({
             text: "Lower average HR than prior comparable sessions — improved efficiency.",
@@ -387,21 +363,17 @@ export function buildWorkoutDetailView(
   workout: WorkoutClassification,
   fit: FitRunDetail | null,
   allRuns: RunActivity[],
-  insights: DashboardInsights | null
+  insights: DashboardInsights | null,
 ): WorkoutDetailView {
   const formattedTitle = formatWorkoutTitle(run.name);
   const execution = buildExecution(run, fit, workout);
   const grade = executionGrade(execution.qualityScore);
   const pace = paceSecPerKm(run);
   const efficiency =
-    pace && run.avgHr && run.avgHr > 0
-      ? Math.round((pace / run.avgHr) * 1000) / 1000
-      : null;
+    pace && run.avgHr && run.avgHr > 0 ? Math.round((pace / run.avgHr) * 1000) / 1000 : null;
 
   const workoutMap = insights
-    ? new Map(
-        insights.workoutLabels.map((l) => [l.runId, l.classification])
-      )
+    ? new Map(insights.workoutLabels.map((l) => [l.runId, l.classification]))
     : new Map<string, WorkoutClassification>();
 
   const characteristics: string[] = [];
@@ -492,11 +464,7 @@ export function buildWorkoutDetailView(
   const hasHr = (fit?.hrStream.length ?? 0) > 10 || run.avgHr != null;
   const hasPace = (fit?.paceStream.length ?? 0) > 10 || pace != null;
   const streamConf =
-    hasHr && hasPace && (fit?.laps.length ?? 0) >= 3
-      ? "high"
-      : hasHr || hasPace
-        ? "medium"
-        : "low";
+    hasHr && hasPace && (fit?.laps.length ?? 0) >= 3 ? "high" : hasHr || hasPace ? "medium" : "low";
 
   return {
     hero,
@@ -527,9 +495,7 @@ export function buildWorkoutDetailView(
     compactStats: [
       {
         label: "Elevation",
-        value: run.elevationGainM
-          ? `+${Math.round(run.elevationGainM)} m`
-          : "—",
+        value: run.elevationGainM ? `+${Math.round(run.elevationGainM)} m` : "—",
       },
       {
         label: "Load",

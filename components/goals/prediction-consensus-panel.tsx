@@ -29,24 +29,19 @@ export function PredictionConsensusPanel({
     );
   }
 
-  const maxSpread = Math.max(
-    ...analysis.consensus.map((c) => c.spreadSec),
-    1
-  );
+  const maxSpread = Math.max(...analysis.consensus.map((c) => c.spreadSec), 1);
 
   return (
     <PanelChrome title="Prediction consensus" accent>
       <p className={`${dash.muted} mb-4`}>
-        Where models agree, trust the corridor. Wider spread at longer distances
-        usually means extrapolation — pace conservatively.
+        Where models agree, trust the corridor. Wider spread at longer distances usually means
+        extrapolation — pace conservatively.
       </p>
 
       <div className="space-y-4">
         {rows.map((row) => {
           const c = analysis.consensus.find((x) => x.label === row.label);
-          const spreadPct = c
-            ? Math.min(100, Math.round((c.spreadSec / maxSpread) * 100))
-            : 30;
+          const spreadPct = c ? Math.min(100, Math.round((c.spreadSec / maxSpread) * 100)) : 30;
           const style = agreementStyle[row.agreement];
 
           return (
@@ -61,9 +56,7 @@ export function PredictionConsensusPanel({
                 </span>
               </div>
               {row.spreadDisplay ? (
-                <p className="mt-0.5 text-xs text-zinc-600">
-                  Corridor · {row.spreadDisplay}
-                </p>
+                <p className="mt-0.5 text-xs text-zinc-600">Corridor · {row.spreadDisplay}</p>
               ) : (
                 <p className="mt-0.5 text-xs text-zinc-600">Narrow model agreement</p>
               )}
@@ -83,9 +76,7 @@ export function PredictionConsensusPanel({
         <p className="mt-4 text-xs text-zinc-600">
           {analysis.models.length} model paths · confidence{" "}
           <span className="text-zinc-400">{analysis.confidence}</span>
-          {analysis.regression
-            ? ` · curve fit from ${analysis.efforts.length} efforts`
-            : null}
+          {analysis.regression ? ` · curve fit from ${analysis.efforts.length} efforts` : null}
         </p>
       ) : null}
     </PanelChrome>

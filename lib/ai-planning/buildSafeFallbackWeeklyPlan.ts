@@ -1,28 +1,22 @@
 import type { CoachingContext } from "@/lib/coaching-context";
-import type {
-  WeeklyPlanGuardrails,
-  WeeklyTrainingPlan,
-  PlannedWorkout,
-} from "./types";
+import type { WeeklyPlanGuardrails, WeeklyTrainingPlan, PlannedWorkout } from "./types";
 
 function session(
   partial: Omit<PlannedWorkout, "constraintsApplied" | "reasoning"> & {
     constraintsApplied?: string[];
     reasoning?: string;
-  }
+  },
 ): PlannedWorkout {
   return {
     constraintsApplied: partial.constraintsApplied ?? ["Deterministic fallback"],
-    reasoning:
-      partial.reasoning ??
-      "Conservative default session based on current training state.",
+    reasoning: partial.reasoning ?? "Conservative default session based on current training state.",
     ...partial,
   };
 }
 
 export function buildSafeFallbackWeeklyPlan(
   context: CoachingContext,
-  guardrails: WeeklyPlanGuardrails
+  guardrails: WeeklyPlanGuardrails,
 ): WeeklyTrainingPlan {
   const type = guardrails.planTypeHint;
   const cap = guardrails.maxWeeklyRunKm;
@@ -210,7 +204,7 @@ export function buildSafeFallbackWeeklyPlan(
     primaryGoal = "Sustain consistency without a target race";
   } else {
     hardSessionCount = Math.min(2, guardrails.maxHardSessions);
-    const easyKm = Math.round((cap * 0.22) * 10) / 10;
+    const easyKm = Math.round(cap * 0.22 * 10) / 10;
     const longKm = Math.min(guardrails.longRunMaxKm, cap * 0.35);
     workouts = [
       session({
@@ -261,24 +255,20 @@ export function buildSafeFallbackWeeklyPlan(
           intensity: "moderate",
           purpose: "Maintain durability — avoid failure sets",
           constraintsApplied: ["Not within 24h of hard run"],
-        })
+        }),
       );
     }
     summary = `Build week toward ${context.goal.raceType}: modest progression within ${cap} km cap.`;
     primaryGoal = `Progress toward ${context.goal.raceType} on ${context.goal.raceDate ?? "goal date"}`;
   }
 
-  const totalRunDistanceKm = Math.round(
-    workouts
-      .filter((w) => w.modality === "run")
-      .reduce((s, w) => s + (w.distanceKm ?? 0), 0) * 10
-  ) / 10;
+  const totalRunDistanceKm =
+    Math.round(
+      workouts.filter((w) => w.modality === "run").reduce((s, w) => s + (w.distanceKm ?? 0), 0) *
+        10,
+    ) / 10;
 
-  hardSessionCount = workouts.filter(
-    (w) =>
-      w.modality === "run" &&
-      w.intensity === "hard"
-  ).length;
+  hardSessionCount = workouts.filter((w) => w.modality === "run" && w.intensity === "hard").length;
 
   return {
     weekStart: guardrails.weekStart,
@@ -290,13 +280,10 @@ export function buildSafeFallbackWeeklyPlan(
     rationale: {
       primaryGoal,
       evidenceUsed: evidence.length ? evidence : ["Limited data — conservative template"],
-      tradeoffs: [
-        "Deterministic plan used when LLM output is unavailable or invalid",
-      ],
+      tradeoffs: ["Deterministic plan used when LLM output is unavailable or invalid"],
       risksManaged: guardrails.constraintNotes.slice(0, 4),
     },
-    confidence:
-      context.dataQuality.hrCoverage === "high" ? "medium" : "low",
+    confidence: context.dataQuality.hrCoverage === "high" ? "medium" : "low",
     limitations: [
       "This is a rule-based fallback plan, not a personalized LLM synthesis.",
       "Adjust sessions based on how you feel — not medical advice.",

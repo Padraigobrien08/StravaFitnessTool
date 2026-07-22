@@ -19,19 +19,14 @@ import { beliefsToMemoryDisplay } from "@/lib/athlete-memory";
 
 /** Shared intelligence model for /intelligence and /coach */
 export function useAthleteIntelligence(
-  threadMessages: import("@/lib/coach/types").CoachMessage[] = []
+  threadMessages: import("@/lib/coach/types").CoachMessage[] = [],
 ) {
   const { analytics, insights, loading, quality } = useTrainingIntelligence();
   const { importData } = useStrava();
   const raceGoal = useGoalStore((s) => s.raceGoal);
 
   return useMemo(() => {
-    const state = getAthleteIntelligenceState(
-      analytics,
-      insights,
-      raceGoal,
-      threadMessages
-    );
+    const state = getAthleteIntelligenceState(analytics, insights, raceGoal, threadMessages);
 
     if (!analytics || !state) {
       return {
@@ -62,7 +57,7 @@ export function useAthleteIntelligence(
         runs: importData?.runs ?? [],
         fitDetails: [],
       },
-      raceGoal
+      raceGoal,
     );
 
     return {
@@ -79,7 +74,7 @@ export function useAthleteIntelligence(
           ...adaptive.memory.pacingPatterns,
           ...adaptive.memory.taperResponses,
           ...adaptive.memory.durabilitySignals,
-        ].slice(0, 6)
+        ].slice(0, 6),
       ),
       risksAndOpportunities: getRisksAndOpportunities(state),
       ecosystem: getTrainingEcosystem(analytics),
@@ -92,13 +87,5 @@ export function useAthleteIntelligence(
       adaptationSignals: adaptive.adaptationSignals,
       longitudinalComparisons: adaptive.longitudinalComparisons,
     };
-  }, [
-    analytics,
-    insights,
-    raceGoal,
-    threadMessages,
-    loading,
-    quality,
-    importData,
-  ]);
+  }, [analytics, insights, raceGoal, threadMessages, loading, quality, importData]);
 }

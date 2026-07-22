@@ -19,8 +19,7 @@ function buildFitFilenameMap(runs: RunActivity[]): Map<string, string> {
 
 function countFitFilesInList(files: File[]): number {
   return files.filter((f) => {
-    const path =
-      (f as File & { webkitRelativePath?: string }).webkitRelativePath ?? f.name;
+    const path = (f as File & { webkitRelativePath?: string }).webkitRelativePath ?? f.name;
     return /\.fit(\.gz)?$/i.test(path);
   }).length;
 }
@@ -29,7 +28,7 @@ function countFitFilesInList(files: File[]): number {
 export async function importFitFilesOnly(
   files: File[],
   existing: StravaImport,
-  onProgress?: (done: number, total: number) => void
+  onProgress?: (done: number, total: number) => void,
 ): Promise<FitImportResult> {
   const fitFilenameById = buildFitFilenameMap(existing.runs);
   if (fitFilenameById.size === 0) {
@@ -39,26 +38,26 @@ export async function importFitFilesOnly(
   const fitAvailable = countFitFilesInList(files);
   if (fitAvailable === 0) {
     throw new Error(
-      "No .fit or .fit.gz files found. Select the activities folder from your Strava archive."
+      "No .fit or .fit.gz files found. Select the activities folder from your Strava archive.",
     );
   }
 
   const { details, matched, unmatched } = await parseFitFilesFromUpload(
     files,
     fitFilenameById,
-    onProgress
+    onProgress,
   );
 
   if (details.length === 0) {
     throw new Error(
-      `Found ${fitAvailable} FIT file(s) but none matched your runs. Ensure filenames match activities.csv (e.g. activities/19543214110.fit.gz).`
+      `Found ${fitAvailable} FIT file(s) but none matched your runs. Ensure filenames match activities.csv (e.g. activities/19543214110.fit.gz).`,
     );
   }
 
   await mergeFitDetails(details);
 
   const fitRunIds = Array.from(
-    new Set([...(existing.fitRunIds ?? []), ...details.map((d) => d.activityId)])
+    new Set([...(existing.fitRunIds ?? []), ...details.map((d) => d.activityId)]),
   );
 
   return {

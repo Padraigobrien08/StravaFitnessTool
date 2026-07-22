@@ -57,7 +57,7 @@ export function CoachComposer({
             "shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ring-1 ring-white/[0.07]",
             "transition-[box-shadow,ring-color]",
             "focus-within:ring-white/[0.12] focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_0_1px_rgba(255,255,255,0.04)]",
-            (disabled || loading) && "opacity-60"
+            (disabled || loading) && "opacity-60",
           )}
         >
           <Textarea
@@ -66,13 +66,10 @@ export function CoachComposer({
             onChange={(e) => onChange(e.target.value)}
             disabled={loading || disabled}
             rows={1}
-            placeholder={
-              placeholder ??
-              "Ask a follow-up or compare another block…"
-            }
+            placeholder={placeholder ?? "Ask a follow-up or compare another block…"}
             className={cn(
               "min-h-[44px] max-h-32 flex-1 resize-none overflow-y-auto border-0 bg-transparent px-0.5 py-2.5 text-[15px] leading-snug text-zinc-100 shadow-none",
-              "placeholder:text-zinc-600 focus-visible:border-0 focus-visible:ring-0 disabled:cursor-not-allowed dark:bg-transparent"
+              "placeholder:text-zinc-600 focus-visible:border-0 focus-visible:ring-0 disabled:cursor-not-allowed dark:bg-transparent",
             )}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

@@ -83,14 +83,11 @@ export function PlanOperationalSidebar({
     );
   }
 
-  const whyWeek = [
-    data.summary,
-    ...data.evidenceUsed.slice(0, 2),
-  ].filter(Boolean);
+  const whyWeek = [data.summary, ...data.evidenceUsed.slice(0, 2)].filter(Boolean);
 
-  const coachNotes = data.limitations.slice(0, 3).map((l) =>
-    l.length > 80 ? `${l.slice(0, 77)}…` : l
-  );
+  const coachNotes = data.limitations
+    .slice(0, 3)
+    .map((l) => (l.length > 80 ? `${l.slice(0, 77)}…` : l));
 
   return (
     <aside className="space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
@@ -100,23 +97,15 @@ export function PlanOperationalSidebar({
           items={whyWeek}
           coachQuery="Explain why this week plan is structured this way"
         />
-        <SidebarSection
-          title="Constraints applied"
-          items={data.constraintsApplied}
-        />
+        <SidebarSection title="Constraints applied" items={data.constraintsApplied} />
         <SidebarSection
           title="Risks managed"
           items={data.risksManaged}
           tone="risk"
           coachQuery="What risks remain in this week plan?"
         />
-        <PlanIntegrityPanel
-          items={integrityItems}
-          onHighlightWorkouts={onHighlightWorkouts}
-        />
-        {coachNotes.length > 0 ? (
-          <SidebarSection title="Coach notes" items={coachNotes} />
-        ) : null}
+        <PlanIntegrityPanel items={integrityItems} onHighlightWorkouts={onHighlightWorkouts} />
+        {coachNotes.length > 0 ? <SidebarSection title="Coach notes" items={coachNotes} /> : null}
       </div>
 
       <PlanExplainability lines={explainLines} />

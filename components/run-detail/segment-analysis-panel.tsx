@@ -12,17 +12,12 @@ const roleStyles: Record<SegmentRowView["roleTone"], string> = {
   neutral: "bg-white/[0.04] text-zinc-500 ring-white/10",
 };
 
-export function SegmentAnalysisPanel({
-  segments,
-}: {
-  segments: SegmentRowView[];
-}) {
+export function SegmentAnalysisPanel({ segments }: { segments: SegmentRowView[] }) {
   if (segments.length === 0) {
     return (
       <PanelChrome title="Segment performance analysis" subdued>
         <p className="text-sm text-zinc-500">
-          Lap data unavailable — FIT or Strava lap streams unlock segment
-          analysis.
+          Lap data unavailable — FIT or Strava lap streams unlock segment analysis.
         </p>
       </PanelChrome>
     );
@@ -52,7 +47,7 @@ export function SegmentAnalysisPanel({
                 key={row.index}
                 className={cn(
                   "border-b border-white/[0.03] transition-colors hover:bg-white/[0.03]",
-                  row.highlight && "bg-teal-500/[0.04]"
+                  row.highlight && "bg-teal-500/[0.04]",
                 )}
               >
                 <td className="px-3 py-2.5 text-zinc-500">{row.index}</td>
@@ -60,24 +55,16 @@ export function SegmentAnalysisPanel({
                   <span
                     className={cn(
                       "rounded-md px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset",
-                      roleStyles[row.roleTone]
+                      roleStyles[row.roleTone],
                     )}
                   >
                     {row.role}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-400">
-                  {row.distance}
-                </td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-400">
-                  {row.time}
-                </td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-200">
-                  {row.pace}
-                </td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-500">
-                  {row.hr}
-                </td>
+                <td className="px-3 py-2.5 tabular-nums text-zinc-400">{row.distance}</td>
+                <td className="px-3 py-2.5 tabular-nums text-zinc-400">{row.time}</td>
+                <td className="px-3 py-2.5 tabular-nums text-zinc-200">{row.pace}</td>
+                <td className="px-3 py-2.5 tabular-nums text-zinc-500">{row.hr}</td>
                 <td className="px-3 py-2.5 text-xs text-teal-400/80">
                   {row.highlight ?? row.consistencyNote ?? "—"}
                 </td>

@@ -8,12 +8,7 @@ import {
 import { predictRaceTime } from "../records";
 import type { RunActivity } from "@/lib/strava/types";
 
-function mockRun(
-  id: string,
-  km: number,
-  paceMin: number,
-  date = "2025-01-15"
-): RunActivity {
+function mockRun(id: string, km: number, paceMin: number, date = "2025-01-15"): RunActivity {
   const paceSec = paceMin * 60;
   const movingSec = Math.round(km * 1000 * (paceSec / 1000));
   return {

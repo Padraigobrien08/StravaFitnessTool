@@ -9,7 +9,7 @@ export interface PushSubscription {
 
 export async function createPushSubscription(
   callbackUrl: string,
-  verifyToken: string
+  verifyToken: string,
 ): Promise<PushSubscription> {
   const { clientId, clientSecret } = stravaConfig();
   const body = new URLSearchParams({
@@ -38,9 +38,7 @@ export async function listPushSubscriptions(): Promise<PushSubscription[]> {
     client_id: clientId,
     client_secret: clientSecret,
   });
-  const res = await fetch(
-    `https://www.strava.com/api/v3/push_subscriptions?${params}`
-  );
+  const res = await fetch(`https://www.strava.com/api/v3/push_subscriptions?${params}`);
   if (!res.ok) return [];
   return res.json() as Promise<PushSubscription[]>;
 }

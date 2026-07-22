@@ -25,14 +25,11 @@ export async function GET(req: NextRequest) {
       resolved.raceGoal ?? null,
       bundle.insights,
       ctx.userId,
-      { trackPrimaryRecommendation: true }
+      { trackPrimaryRecommendation: true },
     );
 
     return NextResponse.json(snap.observability);
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 500 });
   }
 }

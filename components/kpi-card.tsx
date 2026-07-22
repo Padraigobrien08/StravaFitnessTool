@@ -23,9 +23,7 @@ export function KpiCard({
       </CardHeader>
       <CardContent>
         <TypographyMetric className="text-foreground">{value}</TypographyMetric>
-        {subtitle ? (
-          <TypographyMuted className="mt-2">{subtitle}</TypographyMuted>
-        ) : null}
+        {subtitle ? <TypographyMuted className="mt-2">{subtitle}</TypographyMuted> : null}
       </CardContent>
     </Card>
   );

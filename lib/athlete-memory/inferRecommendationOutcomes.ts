@@ -2,9 +2,7 @@ import type { DashboardInsights } from "@/lib/analytics";
 import type { RecommendationOutcome } from "./types";
 
 /** Placeholder outcomes from deterministic plan + intensity advice until explicit tracking exists. */
-export function inferRecommendationOutcomes(
-  analytics: DashboardInsights
-): RecommendationOutcome[] {
+export function inferRecommendationOutcomes(analytics: DashboardInsights): RecommendationOutcome[] {
   const out: RecommendationOutcome[] = [];
   const now = new Date().toISOString();
 

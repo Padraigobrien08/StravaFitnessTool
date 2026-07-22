@@ -17,9 +17,7 @@ export interface ActivitiesSyncStatus {
   source: "sync_runs" | "activities_max" | "none";
 }
 
-export async function getActivitiesSyncStatus(
-  userId: string
-): Promise<ActivitiesSyncStatus> {
+export async function getActivitiesSyncStatus(userId: string): Promise<ActivitiesSyncStatus> {
   const sql = getSql();
 
   const syncRows = await sql`
@@ -29,9 +27,7 @@ export async function getActivitiesSyncStatus(
     ORDER BY finished_at DESC NULLS LAST
     LIMIT 1
   `;
-  const sync = syncRows[0] as
-    | { finished_at: Date | null; activities_synced: number }
-    | undefined;
+  const sync = syncRows[0] as { finished_at: Date | null; activities_synced: number } | undefined;
 
   const countRows = await sql`
     SELECT COUNT(*)::int AS n, MAX(synced_at) AS latest
@@ -48,9 +44,7 @@ export async function getActivitiesSyncStatus(
       : "none";
 
   const fresh =
-    n > 0 &&
-    lastSyncAt != null &&
-    Date.now() - new Date(lastSyncAt).getTime() < FRESH_SYNC_MS;
+    n > 0 && lastSyncAt != null && Date.now() - new Date(lastSyncAt).getTime() < FRESH_SYNC_MS;
 
   return {
     fresh,
@@ -67,19 +61,15 @@ export async function listActivitiesFromDb(
     per_page?: number;
     after?: number;
     before?: number;
-  }
+  },
 ): Promise<{ activities: Record<string, unknown>[]; total: number }> {
   const sql = getSql();
   const page = Math.max(1, options.page ?? 1);
   const per_page = Math.min(Math.max(options.per_page ?? 30, 1), 200);
   const offset = (page - 1) * per_page;
 
-  const afterDate = options.after
-    ? new Date(options.after * 1000).toISOString()
-    : null;
-  const beforeDate = options.before
-    ? new Date(options.before * 1000).toISOString()
-    : null;
+  const afterDate = options.after ? new Date(options.after * 1000).toISOString() : null;
+  const beforeDate = options.before ? new Date(options.before * 1000).toISOString() : null;
 
   const countRows = await sql`
     SELECT COUNT(*)::int AS n FROM activities
@@ -122,7 +112,7 @@ export async function listActivitiesFromDb(
 
 export async function listAllActivitiesFromDb(
   userId: string,
-  options?: { after?: number; before?: number; max?: number }
+  options?: { after?: number; before?: number; max?: number },
 ): Promise<Record<string, unknown>[]> {
   const max = Math.min(options?.max ?? 500, 1000);
   const { activities } = await listActivitiesFromDb(userId, {

@@ -6,9 +6,11 @@ import { KpiCard } from "@/components/kpi-card";
 import type { StravaActivityStats } from "@/lib/strava/api/fetchAthlete";
 import { formatDistanceKm, formatDuration } from "@/lib/utils";
 
-function formatTotal(
-  total: StravaActivityStats["ytd_run_totals"] | undefined
-): { distance: string; count: string; time: string } {
+function formatTotal(total: StravaActivityStats["ytd_run_totals"] | undefined): {
+  distance: string;
+  count: string;
+  time: string;
+} {
   if (!total || total.count === 0) {
     return { distance: "—", count: "—", time: "—" };
   }
@@ -58,9 +60,7 @@ export function StravaStatsCard({ apiConnected }: { apiConnected: boolean }) {
             title="All-time runs"
             value={String(stats.all_run_totals?.count ?? "—")}
             subtitle={
-              stats.all_run_totals?.distance
-                ? formatDistanceKm(stats.all_run_totals.distance)
-                : "—"
+              stats.all_run_totals?.distance ? formatDistanceKm(stats.all_run_totals.distance) : "—"
             }
           />
         </div>

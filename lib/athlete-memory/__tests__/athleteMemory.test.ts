@@ -10,11 +10,7 @@ import {
 } from "../index";
 import { classifyMemoryQuestion } from "../memoryIntent";
 import { emptyProfile } from "../beliefUtils";
-import {
-  hybridAthlete,
-  lowData,
-  raceWeekAthlete,
-} from "@/lib/coaching-context/__tests__/fixtures";
+import { hybridAthlete, lowData, raceWeekAthlete } from "@/lib/coaching-context/__tests__/fixtures";
 
 describe("AthleteMemoryProfile", () => {
   it("returns empty profile with no data", () => {
@@ -135,15 +131,9 @@ describe("AthleteMemoryProfile", () => {
   });
 
   it("classifies coach memory questions", () => {
-    expect(classifyMemoryQuestion("What have you learned about me?")?.topic).toBe(
-      "all"
-    );
-    expect(classifyMemoryQuestion("What tends to make me fatigued?")?.topic).toBe(
-      "fatigue"
-    );
-    expect(classifyMemoryQuestion("What patterns are still uncertain?")?.topic).toBe(
-      "all"
-    );
+    expect(classifyMemoryQuestion("What have you learned about me?")?.topic).toBe("all");
+    expect(classifyMemoryQuestion("What tends to make me fatigued?")?.topic).toBe("fatigue");
+    expect(classifyMemoryQuestion("What patterns are still uncertain?")?.topic).toBe("all");
   });
 
   it("coach answer mentions uncertainty when empty", () => {

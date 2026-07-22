@@ -33,10 +33,7 @@ function mockRun(id: string, date: string, km: number, hr = 150): RunActivity {
 
 describe("week snapshots", () => {
   it("builds snapshot for runs in ISO week", () => {
-    const runs = [
-      mockRun("1", "2025-05-12", 10),
-      mockRun("2", "2025-05-14", 8),
-    ];
+    const runs = [mockRun("1", "2025-05-12", 10), mockRun("2", "2025-05-14", 8)];
     const ws = getWeekStart(new Date("2025-05-15"));
     const snap = buildWeekSnapshot(runs, ws, 190);
     expect(snap.runCount).toBe(2);

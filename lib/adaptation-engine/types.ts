@@ -1,11 +1,5 @@
 export type AdaptationCategory =
-  | "threshold"
-  | "freshness"
-  | "durability"
-  | "volume"
-  | "modality"
-  | "pacing"
-  | "recovery";
+  "threshold" | "freshness" | "durability" | "volume" | "modality" | "pacing" | "recovery";
 
 export type AdaptationConfidence = "low" | "medium" | "high";
 export type AdaptationStability = "emerging" | "stable" | "weakening";

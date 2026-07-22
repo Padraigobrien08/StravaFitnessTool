@@ -1,21 +1,12 @@
-import {
-  buildCoachingContext,
-  buildCoachingContextFromBundle,
-} from "@/lib/coaching-context";
+import { buildCoachingContext, buildCoachingContextFromBundle } from "@/lib/coaching-context";
 import type { CoachingContext } from "@/lib/coaching-context";
 import type { AthleteIntelligenceBundle } from "@/lib/intelligence/types";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import { buildWeeklyPlanPrompt } from "./buildWeeklyPlanPrompt";
 import { buildSafeFallbackWeeklyPlan } from "./buildSafeFallbackWeeklyPlan";
 import { repairWeeklyPlan, stripMedicalLanguage } from "./repairWeeklyPlan";
-import {
-  parseWeeklyTrainingPlan,
-  WEEKLY_TRAINING_PLAN_JSON_SCHEMA,
-} from "./weeklyPlanSchema";
-import {
-  evaluateWeeklyPlan,
-  repairPlanFromIntegrity,
-} from "@/lib/recommendation-integrity";
+import { parseWeeklyTrainingPlan, WEEKLY_TRAINING_PLAN_JSON_SCHEMA } from "./weeklyPlanSchema";
+import { evaluateWeeklyPlan, repairPlanFromIntegrity } from "@/lib/recommendation-integrity";
 import { validateWeeklyPlan } from "./validateWeeklyPlan";
 import { applyPlanPreferenceToGuardrails } from "./applyPlanPreference";
 import { computeWeeklyPlanGuardrails } from "./weeklyPlanGuardrails";
@@ -29,7 +20,7 @@ import type {
 
 async function callOpenAIWeeklyPlan(
   messages: ReturnType<typeof buildWeeklyPlanPrompt>,
-  apiKey: string
+  apiKey: string,
 ): Promise<unknown> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -65,7 +56,7 @@ function finalizePlan(
   plan: WeeklyTrainingPlan,
   context: CoachingContext,
   guardrails: ReturnType<typeof computeWeeklyPlanGuardrails>,
-  source: GenerateWeeklyPlanResult["source"]
+  source: GenerateWeeklyPlanResult["source"],
 ): GenerateWeeklyPlanResult {
   let current = stripMedicalLanguage(plan);
   let validation = validateWeeklyPlan(current, context, guardrails);
@@ -104,24 +95,17 @@ function finalizePlan(
 
 export async function generateWeeklyPlanFromContext(
   context: CoachingContext,
-  options?: GenerateWeeklyPlanOptions
+  options?: GenerateWeeklyPlanOptions,
 ): Promise<GenerateWeeklyPlanResult> {
   let guardrails = computeWeeklyPlanGuardrails(context);
-  guardrails = applyPlanPreferenceToGuardrails(
-    guardrails,
-    options?.planPreference
-  );
+  guardrails = applyPlanPreferenceToGuardrails(guardrails, options?.planPreference);
   if (options?.extraConstraints?.length) {
     guardrails.constraintNotes.push(...options.extraConstraints);
   }
 
-  const planningContext = options?.planningContext
-    ?.trim()
-    .slice(0, PLAN_CONTEXT_MAX_CHARS);
+  const planningContext = options?.planningContext?.trim().slice(0, PLAN_CONTEXT_MAX_CHARS);
   if (planningContext) {
-    guardrails.constraintNotes.push(
-      `Athlete planning context: ${planningContext}`
-    );
+    guardrails.constraintNotes.push(`Athlete planning context: ${planningContext}`);
     const hints = inferPlanHintsFromContext(planningContext);
     if (hints.notes.length) {
       guardrails.constraintNotes.push(...hints.notes);
@@ -167,18 +151,13 @@ export async function generateWeeklyPlanFromBundle(
   bundle: AthleteIntelligenceBundle,
   raceGoal: RaceGoal | null,
   maxWeeklyKm?: number,
-  options?: GenerateWeeklyPlanOptions
+  options?: GenerateWeeklyPlanOptions,
 ): Promise<GenerateWeeklyPlanResult> {
-  const context = buildCoachingContextFromBundle(
-    bundle,
-    raceGoal,
-    maxWeeklyKm,
-    {
-      windowDays: options?.windowDays ?? 21,
-      includeForecast: true,
-      includeMemory: true,
-    }
-  );
+  const context = buildCoachingContextFromBundle(bundle, raceGoal, maxWeeklyKm, {
+    windowDays: options?.windowDays ?? 21,
+    includeForecast: true,
+    includeMemory: true,
+  });
   return generateWeeklyPlanFromContext(context, options);
 }
 

@@ -6,13 +6,13 @@ import type { ReasoningContext } from "./types";
 
 export function buildReasoningContext(
   bundle: AthleteIntelligenceBundle,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): ReasoningContext {
   const fitDetails = bundle.fitDetails ?? [];
   const runs = bundle.runs ?? [];
   const fitByRunId = new Map(fitDetails.map((f) => [f.activityId, f]));
   const labelByRunId = new Map(
-    bundle.analytics.workoutLabels.map((l) => [l.runId, l.classification])
+    bundle.analytics.workoutLabels.map((l) => [l.runId, l.classification]),
   );
 
   return {
@@ -30,14 +30,12 @@ export function buildTestReasoningContext(
   runs: RunActivity[],
   fitDetails: FitRunDetail[],
   bundle: AthleteIntelligenceBundle,
-  raceGoal: RaceGoal | null
+  raceGoal: RaceGoal | null,
 ): ReasoningContext {
   return {
     runs: [...runs].sort((a, b) => a.date.localeCompare(b.date)),
     fitByRunId: new Map(fitDetails.map((f) => [f.activityId, f])),
-    labelByRunId: new Map(
-      bundle.analytics.workoutLabels.map((l) => [l.runId, l.classification])
-    ),
+    labelByRunId: new Map(bundle.analytics.workoutLabels.map((l) => [l.runId, l.classification])),
     analytics: bundle.analytics,
     quality: bundle.quality,
     raceGoal,

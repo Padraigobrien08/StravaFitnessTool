@@ -12,7 +12,7 @@ import type {
 
 export function compareSessions(
   ctx: ReasoningContext,
-  args: CompareSessionsArgs = {}
+  args: CompareSessionsArgs = {},
 ): ReasoningResult<{
   type: CompareSessionType;
   requested: number;
@@ -66,32 +66,23 @@ export function compareSessions(
   const evidence: string[] = [];
   const limitations: string[] = [];
   if (matched.length === 0) {
-    limitations.push(
-      `No ${WORKOUT_TYPE_LABELS[type]} sessions found in your history.`
-    );
+    limitations.push(`No ${WORKOUT_TYPE_LABELS[type]} sessions found in your history.`);
   } else {
     for (const s of sessions) {
       evidence.push(
-        `${s.name} (${s.date.slice(0, 10)}): quality ${s.qualityScore}, pacing stability ${s.pacingStabilityScore}`
+        `${s.name} (${s.date.slice(0, 10)}): quality ${s.qualityScore}, pacing stability ${s.pacingStabilityScore}`,
       );
     }
     if (sessions.some((s) => s.lateFadePct == null)) {
-      limitations.push(
-        "Some sessions lack FIT pace streams — fade metrics may be missing."
-      );
+      limitations.push("Some sessions lack FIT pace streams — fade metrics may be missing.");
     }
   }
 
   let summary = `No ${WORKOUT_TYPE_LABELS[type]} sessions to compare.`;
   if (sessions.length >= 2) {
-    const best = [...sessions].sort(
-      (a, b) => b.qualityScore - a.qualityScore
-    )[0];
-    const worst = [...sessions].sort(
-      (a, b) => a.qualityScore - b.qualityScore
-    )[0];
-    const trend =
-      sessions[0].qualityScore - sessions[sessions.length - 1].qualityScore;
+    const best = [...sessions].sort((a, b) => b.qualityScore - a.qualityScore)[0];
+    const worst = [...sessions].sort((a, b) => a.qualityScore - b.qualityScore)[0];
+    const trend = sessions[0].qualityScore - sessions[sessions.length - 1].qualityScore;
     summary = `Best execution: ${best.name} (quality ${best.qualityScore}). Weakest: ${worst.name} (quality ${worst.qualityScore}). Recent vs oldest quality delta: ${trend > 0 ? "+" : ""}${trend} points.`;
   } else if (sessions.length === 1) {
     summary = `Single ${WORKOUT_TYPE_LABELS[type]} session — quality ${sessions[0].qualityScore}/100.`;

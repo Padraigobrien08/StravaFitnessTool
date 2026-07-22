@@ -16,9 +16,7 @@ const TOOL_GROUNDING: Record<string, string> = {
   get_data_quality: "data quality",
 };
 
-export function confidenceLevel(
-  raw: string | null
-): "low" | "medium" | "high" | null {
+export function confidenceLevel(raw: string | null): "low" | "medium" | "high" | null {
   if (!raw) return null;
   const l = raw.toLowerCase();
   if (l.includes("high")) return "high";
@@ -27,24 +25,18 @@ export function confidenceLevel(
   return null;
 }
 
-export function inferGroundedIn(
-  parsed: ParsedCoachResponse,
-  toolsUsed?: string[]
-): string[] {
+export function inferGroundedIn(parsed: ParsedCoachResponse, toolsUsed?: string[]): string[] {
   const fromTools = (toolsUsed ?? [])
     .map((t) => TOOL_GROUNDING[t] ?? labelForTool(t).toLowerCase())
     .filter(Boolean);
 
-  const fromEvidence = parsed.evidence
-    .join(" ")
-    .toLowerCase();
+  const fromEvidence = parsed.evidence.join(" ").toLowerCase();
   const hints: string[] = [];
   if (/readiness|freshness|tsb/.test(fromEvidence)) hints.push("readiness");
   if (/volume|km|week/.test(fromEvidence)) hints.push("volume");
   if (/threshold|interval|tempo|pace/.test(fromEvidence)) hints.push("sessions");
   if (/race|half|marathon/.test(fromEvidence)) hints.push("race prep");
-  if (/strength|gym|cross|modality|ecosystem/.test(fromEvidence))
-    hints.push("ecosystem");
+  if (/strength|gym|cross|modality|ecosystem/.test(fromEvidence)) hints.push("ecosystem");
 
   const merged = [...fromTools, ...hints];
   return [...new Set(merged)].slice(0, 4);

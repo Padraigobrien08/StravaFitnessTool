@@ -66,9 +66,7 @@ export function HomeCommandBar({
             disabled={syncing}
             onClick={onSync}
           >
-            <RefreshCw
-              className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} />
             Sync
           </Button>
         ) : null}

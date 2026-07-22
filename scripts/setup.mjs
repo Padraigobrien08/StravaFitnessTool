@@ -8,7 +8,7 @@ const force = process.argv.includes("--force");
 if (existsSync(".env.local") && !force) {
   console.log(
     ".env.local already exists — leaving it untouched.\n" +
-      "Run `npm run setup -- --force` to regenerate it from .env.example."
+      "Run `npm run setup -- --force` to regenerate it from .env.example.",
   );
   process.exit(0);
 }
@@ -21,7 +21,7 @@ if (!existsSync(".env.example")) {
 const secret = randomBytes(32).toString("hex");
 const contents = readFileSync(".env.example", "utf8").replace(
   /^SESSION_SECRET=.*$/m,
-  `SESSION_SECRET=${secret}`
+  `SESSION_SECRET=${secret}`,
 );
 writeFileSync(".env.local", contents);
 

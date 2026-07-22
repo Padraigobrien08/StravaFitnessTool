@@ -18,9 +18,7 @@ export function CommandCenter({
   planLoading?: boolean;
 }) {
   const primaryPlanHref = "/plan";
-  const primaryPlanLabel = vm.hasSavedPlan
-    ? "Open saved plan"
-    : "Generate next week plan";
+  const primaryPlanLabel = vm.hasSavedPlan ? "Open saved plan" : "Generate next week plan";
   return (
     <div className="command-center space-y-4">
       <section className="relative overflow-hidden rounded-xl border border-teal-500/20 bg-gradient-to-br from-[#0f1418] via-[#0c0e12] to-[#09090b] px-5 py-5 sm:px-6 sm:py-6">
@@ -70,9 +68,7 @@ export function CommandCenter({
               )}
               <Link
                 href={coachUrl({
-                  q: vm.hasSavedPlan
-                    ? "Refine my saved next week plan"
-                    : "Help me plan next week",
+                  q: vm.hasSavedPlan ? "Refine my saved next week plan" : "Help me plan next week",
                 })}
               >
                 <Button size="sm" variant="outline" className="h-9 text-zinc-400">
@@ -96,9 +92,7 @@ export function CommandCenter({
           </div>
           <aside className="flex flex-col gap-2 lg:min-w-[200px]">
             <MetaChip label="Focus" value={vm.focusLabel} />
-            {vm.raceContext ? (
-              <MetaChip label="Race" value={vm.raceContext} accent />
-            ) : null}
+            {vm.raceContext ? <MetaChip label="Race" value={vm.raceContext} accent /> : null}
             <div className="flex items-center gap-2">
               <ConfidenceBadge level={vm.confidence} />
               <span className="text-[11px] text-zinc-600">{vm.planHint}</span>
@@ -147,20 +141,12 @@ export function CommandCenter({
   );
 }
 
-function MetaChip({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
+function MetaChip({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div
       className={cn(
         "rounded-lg px-3 py-2",
-        accent ? "bg-teal-500/10 ring-1 ring-teal-500/20" : "bg-white/[0.03]"
+        accent ? "bg-teal-500/10 ring-1 ring-teal-500/20" : "bg-white/[0.03]",
       )}
     >
       <p className="text-[10px] text-zinc-600">{label}</p>
@@ -190,7 +176,7 @@ function RiskOpportunityCard({
         <Icon
           className={cn(
             "mt-0.5 h-3.5 w-3.5 shrink-0",
-            kind === "risk" ? "text-amber-500/80" : "text-teal-500/80"
+            kind === "risk" ? "text-amber-500/80" : "text-teal-500/80",
           )}
         />
         <div className="min-w-0">
@@ -198,9 +184,7 @@ function RiskOpportunityCard({
             {kind === "risk" ? "Primary risk" : "Primary opportunity"}
           </p>
           <p className="mt-0.5 text-[13px] font-medium text-zinc-200">{label}</p>
-          <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-zinc-500">
-            {summary}
-          </p>
+          <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-zinc-500">{summary}</p>
         </div>
         <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-zinc-700 opacity-0 transition-opacity group-hover:opacity-100" />
       </div>

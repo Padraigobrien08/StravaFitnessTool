@@ -11,11 +11,7 @@ import type {
 
 const MS_DAY = 86400000;
 
-export function inWindow(
-  dateIso: string,
-  days: number,
-  ref = new Date()
-): boolean {
+export function inWindow(dateIso: string, days: number, ref = new Date()): boolean {
   return parseISO(dateIso).getTime() >= ref.getTime() - days * MS_DAY;
 }
 
@@ -29,15 +25,13 @@ export function isQualityRun(a: NormalizedActivity): boolean {
 
 function minutesFor(
   activities: NormalizedActivity[],
-  pred: (a: NormalizedActivity) => boolean
+  pred: (a: NormalizedActivity) => boolean,
 ): number {
-  return Math.round(
-    activities.filter(pred).reduce((s, a) => s + a.movingTimeSec / 60, 0)
-  );
+  return Math.round(activities.filter(pred).reduce((s, a) => s + a.movingTimeSec / 60, 0));
 }
 
 function buildDistribution(
-  activities: NormalizedActivity[]
+  activities: NormalizedActivity[],
 ): Partial<Record<ActivityModality, number>> {
   const dist: Partial<Record<ActivityModality, number>> = {};
   for (const a of activities) {
@@ -49,27 +43,18 @@ function buildDistribution(
 export function aggregateActivities(
   activities: NormalizedActivity[],
   interferenceFlags: InterferenceFlag[] = [],
-  opts?: { weekStart?: string; label?: string }
+  opts?: { weekStart?: string; label?: string },
 ): WeeklyTrainingEcosystem | RollingEcosystemSnapshot {
   const runs = activities.filter((a) => a.modality === "run");
-  const runKm =
-    Math.round(
-      runs.reduce((s, r) => s + (r.distanceMeters ?? 0) / 1000, 0) * 10
-    ) / 10;
+  const runKm = Math.round(runs.reduce((s, r) => s + (r.distanceMeters ?? 0) / 1000, 0) * 10) / 10;
 
-  const hiit = activities.filter(
-    (a) => a.modality === "high_intensity_cross_training"
-  );
+  const hiit = activities.filter((a) => a.modality === "high_intensity_cross_training");
   const sport = activities.filter((a) => a.modality === "sport");
 
   const highIntensitySessions = activities.filter(
-    (a) =>
-      a.perceivedIntensity === "high" ||
-      a.modality === "high_intensity_cross_training"
+    (a) => a.perceivedIntensity === "high" || a.modality === "high_intensity_cross_training",
   ).length;
-  const lowIntensitySessions = activities.filter(
-    (a) => a.perceivedIntensity === "low"
-  ).length;
+  const lowIntensitySessions = activities.filter((a) => a.perceivedIntensity === "low").length;
 
   const base = {
     runDistanceKm: runKm,
@@ -80,14 +65,12 @@ export function aggregateActivities(
     swimMinutes: minutesFor(activities, (a) => a.modality === "swim"),
     aerobicCrossTrainingMinutes: minutesFor(
       activities,
-      (a) =>
-        a.modality === "aerobic_cross_training" ||
-        a.modality === "outdoor_endurance"
+      (a) => a.modality === "aerobic_cross_training" || a.modality === "outdoor_endurance",
     ),
     strengthSessions: activities.filter((a) => a.modality === "strength").length,
     mobilitySessions: activities.filter((a) => a.modality === "mobility").length,
     recoverySessions: activities.filter(
-      (a) => a.modality === "recovery" || a.modality === "mobility"
+      (a) => a.modality === "recovery" || a.modality === "mobility",
     ).length,
     hiitSessions: hiit.length,
     sportSessions: sport.length,
@@ -125,7 +108,7 @@ export function aggregateActivities(
 export function aggregateWeek(
   activities: NormalizedActivity[],
   weekStart: string,
-  interferenceFlags: InterferenceFlag[]
+  interferenceFlags: InterferenceFlag[],
 ): WeeklyTrainingEcosystem {
   const start = parseISO(weekStart);
   const end = addDays(start, 7);
@@ -140,7 +123,7 @@ export function aggregateWeek(
 }
 
 export function buildRollingSnapshots(
-  activities: NormalizedActivity[]
+  activities: NormalizedActivity[],
 ): Partial<Record<RollingWindowDays, RollingEcosystemSnapshot>> {
   const windows: RollingWindowDays[] = [7, 14, 28, 56, 84];
   const out: Partial<Record<RollingWindowDays, RollingEcosystemSnapshot>> = {};
@@ -156,7 +139,7 @@ export function buildRollingSnapshots(
 export function buildRecentWeeks(
   activities: NormalizedActivity[],
   interferenceFlags: InterferenceFlag[],
-  maxWeeks = 12
+  maxWeeks = 12,
 ): WeeklyTrainingEcosystem[] {
   const weekKeys = new Set<string>();
   for (const a of activities) {

@@ -28,9 +28,8 @@ export function IntensityAdvisorPanel({ advice }: { advice: IntensityAdvice }) {
           {statusLabel[advice.status]}
         </p>
         <p className="mt-2 text-sm text-zinc-400">
-          {advice.currentEasyPct.toFixed(0)}% easy runs (lifetime, HR runs only) ·
-          target ~{advice.easyTargetPct}% easy · {advice.hardRunsLast14d} hard
-          runs in last 14 days
+          {advice.currentEasyPct.toFixed(0)}% easy runs (lifetime, HR runs only) · target ~
+          {advice.easyTargetPct}% easy · {advice.hardRunsLast14d} hard runs in last 14 days
         </p>
         {advice.recommendations.length > 0 && (
           <ul className="mt-4 space-y-2 text-sm text-zinc-300">
@@ -59,8 +58,8 @@ export function IntensityAdvisorPanel({ advice }: { advice: IntensityAdvice }) {
         )}
       </div>
       <WhatThisMeans formula="Easy: avg HR &lt; 80% max · Hard: avg HR ≥ 80% max">
-        Easy vs hard uses average HR per run as a proxy — not time-in-zone from
-        FIT streams. Polarized training typically targets most volume easy.
+        Easy vs hard uses average HR per run as a proxy — not time-in-zone from FIT streams.
+        Polarized training typically targets most volume easy.
       </WhatThisMeans>
     </div>
   );

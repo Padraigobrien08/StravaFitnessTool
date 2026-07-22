@@ -50,9 +50,7 @@ describe("archetype detection", () => {
   it("detects hybrid_runner", () => {
     const rolling = buildRollingSnapshots(hybridRunner);
     const r = detectAthleteArchetype(rolling[56]);
-    expect(["hybrid_runner", "strength_endurance", "multisport"]).toContain(
-      r.archetype
-    );
+    expect(["hybrid_runner", "strength_endurance", "multisport"]).toContain(r.archetype);
   });
 
   it("returns unknown for low data", () => {
@@ -71,16 +69,16 @@ describe("interference", () => {
         { ...run, startDate: "2025-05-10T18:00:00.000Z" },
         { ...hiit, startDate: "2025-05-10T10:00:00.000Z" },
       ],
-      null
+      null,
     );
     expect(flags.some((f) => f.kind === "near_quality_run")).toBe(true);
   });
 
   it("flags weekly HI density for strength-heavy athlete", () => {
     const flags = collectInterferenceFlags(strengthHeavy, null);
-    expect(
-      flags.some((f) => f.kind === "weekly_hi_density" || f.kind === "hybrid_cluster")
-    ).toBe(true);
+    expect(flags.some((f) => f.kind === "weekly_hi_density" || f.kind === "hybrid_cluster")).toBe(
+      true,
+    );
   });
 });
 
@@ -134,7 +132,7 @@ describe("computeTrainingEcosystem from import", () => {
       [],
       "low",
       null,
-      "strava_api"
+      "strava_api",
     );
     expect(eco.activities[0]?.source).toBe("strava_api");
     expect(eco.activities[0]?.modality).toBe("bike");

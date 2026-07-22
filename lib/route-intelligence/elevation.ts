@@ -3,12 +3,8 @@ import type { ElevationSegment, TimelinePoint } from "./types";
 const MIN_GRADE_PCT = 2.5;
 const MIN_SEGMENT_SEC = 30;
 
-export function analyzeElevationSegments(
-  timeline: TimelinePoint[]
-): ElevationSegment[] {
-  const withEle = timeline.filter(
-    (p) => p.elevationM != null && Number.isFinite(p.elevationM)
-  );
+export function analyzeElevationSegments(timeline: TimelinePoint[]): ElevationSegment[] {
+  const withEle = timeline.filter((p) => p.elevationM != null && Number.isFinite(p.elevationM));
   if (withEle.length < 4) return [];
 
   const segments: ElevationSegment[] = [];
@@ -35,19 +31,12 @@ export function analyzeElevationSegments(
       if (dEle > 0) gain += dEle;
       else loss += Math.abs(dEle);
 
-      const grade = distApprox > 0 ? (gain - loss) / distApprox * 100 : 0;
+      const grade = distApprox > 0 ? ((gain - loss) / distApprox) * 100 : 0;
       const duration = cur.elapsedSec - start.elapsedSec;
 
-      if (
-        duration >= MIN_SEGMENT_SEC &&
-        (grade >= MIN_GRADE_PCT || grade <= -MIN_GRADE_PCT)
-      ) {
+      if (duration >= MIN_SEGMENT_SEC && (grade >= MIN_GRADE_PCT || grade <= -MIN_GRADE_PCT)) {
         const kind =
-          grade >= MIN_GRADE_PCT
-            ? "climb"
-            : grade <= -MIN_GRADE_PCT
-              ? "descent"
-              : "flat";
+          grade >= MIN_GRADE_PCT ? "climb" : grade <= -MIN_GRADE_PCT ? "descent" : "flat";
         if (kind !== "flat") {
           segments.push({
             id: `ele-${segId++}`,
@@ -57,9 +46,7 @@ export function analyzeElevationSegments(
             gainM: Math.round((kind === "climb" ? gain : loss) * 10) / 10,
             avgGradePct: Math.round(Math.abs(grade) * 10) / 10,
             label:
-              kind === "climb"
-                ? `Climb +${Math.round(gain)}m`
-                : `Descent −${Math.round(loss)}m`,
+              kind === "climb" ? `Climb +${Math.round(gain)}m` : `Descent −${Math.round(loss)}m`,
           });
         }
         i = j;

@@ -67,9 +67,7 @@ function SyncChart({
             if (e?.activeLabel != null) {
               const t = Number(e.activeLabel);
               if (!Number.isNaN(t)) {
-                window.dispatchEvent(
-                  new CustomEvent("route-scrub", { detail: t })
-                );
+                window.dispatchEvent(new CustomEvent("route-scrub", { detail: t }));
               }
             }
           }}
@@ -97,12 +95,7 @@ function SyncChart({
               strokeOpacity={0}
             />
           ))}
-          <ReferenceLine
-            x={currentSec}
-            stroke="#5eead4"
-            strokeWidth={2}
-            strokeOpacity={0.9}
-          />
+          <ReferenceLine x={currentSec} stroke="#5eead4" strokeWidth={2} strokeOpacity={0.9} />
           {children}
         </ComposedChart>
       </ResponsiveContainer>
@@ -194,21 +187,12 @@ export function RouteTelemetryPanel({
         </div>
       ) : null}
 
-      <Scrubber
-        duration={timeline[timeline.length - 1]?.elapsedSec ?? 0}
-        currentSec={currentSec}
-      />
+      <Scrubber duration={timeline[timeline.length - 1]?.elapsedSec ?? 0} currentSec={currentSec} />
     </div>
   );
 }
 
-function Scrubber({
-  duration,
-  currentSec,
-}: {
-  duration: number;
-  currentSec: number;
-}) {
+function Scrubber({ duration, currentSec }: { duration: number; currentSec: number }) {
   return (
     <div className="pt-1">
       <Input
@@ -221,7 +205,7 @@ function Scrubber({
           window.dispatchEvent(
             new CustomEvent("route-scrub", {
               detail: Number(e.target.value),
-            })
+            }),
           );
         }}
         className="route-scrubber h-2 w-full border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"

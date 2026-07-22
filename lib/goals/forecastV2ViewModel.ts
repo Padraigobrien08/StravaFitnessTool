@@ -84,7 +84,7 @@ function confidenceLabel(c: RaceForecastV2["confidence"]): string {
 }
 
 function buildKeyEfforts(
-  input: NonNullable<ReturnType<typeof buildRaceForecastInput>>
+  input: NonNullable<ReturnType<typeof buildRaceForecastInput>>,
 ): ForecastV2KeyEffort[] {
   const targetKm = input.goal.distanceMeters / 1000;
   const now = new Date();
@@ -176,9 +176,7 @@ export function buildForecastV2View(opts: {
       magnitude: c.magnitude,
     })),
     modelRows: raw.modelEstimates.map((est) => {
-      const meta = raw.observability.modelWeights.find(
-        (m) => m.modelName === est.modelName
-      );
+      const meta = raw.observability.modelWeights.find((m) => m.modelName === est.modelName);
       return {
         name: est.modelName,
         time: formatDuration(est.predictedTimeSec),
@@ -200,8 +198,7 @@ export function buildForecastV2View(opts: {
       summary: raw.observability.summary,
       evidenceChain: raw.observability.evidenceChain,
       warnings: raw.observability.warnings,
-      changeDrivers:
-        raw.observability.whyPredictionChanged?.drivers ?? null,
+      changeDrivers: raw.observability.whyPredictionChanged?.drivers ?? null,
     },
     uncertaintyDrivers: raw.uncertaintyDrivers.map((d) => ({
       label: d.label,

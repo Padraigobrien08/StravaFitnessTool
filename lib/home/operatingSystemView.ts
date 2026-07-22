@@ -75,17 +75,14 @@ export function buildHomeOperatingSystemView(params: {
     params.insights,
     state,
     params.risksAndOpportunities,
-    savedWeek ? { summary: savedWeek.summary } : null
+    savedWeek ? { summary: savedWeek.summary } : null,
   );
 
-  const primaryAction = state
-    ? getPrimaryRecommendation(state, analytics)
-    : command.nextAction;
+  const primaryAction = state ? getPrimaryRecommendation(state, analytics) : command.nextAction;
 
   const r = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const daysUntil = analytics.raceReadiness?.daysUntilRace ?? null;
-  const taperActive =
-    daysUntil != null && daysUntil <= 14 && daysUntil >= 0;
+  const taperActive = daysUntil != null && daysUntil <= 14 && daysUntil >= 0;
 
   const hero: HomeHeroView = {
     focusTitle: state?.currentFocus ?? command.focusLabel,
@@ -120,12 +117,10 @@ export function buildHomeOperatingSystemView(params: {
       params.signals,
       params.recentlyLearned,
       params.adaptationSignals,
-      analytics
+      analytics,
     ),
     risks: params.risksAndOpportunities.filter((x) => x.kind === "risk"),
-    opportunities: params.risksAndOpportunities.filter(
-      (x) => x.kind === "opportunity"
-    ),
+    opportunities: params.risksAndOpportunities.filter((x) => x.kind === "opportunity"),
     primaryActionBullets: primaryActionBullets(primaryAction),
     trajectory: getStateEvolutionStrip(analytics),
     memory: params.memory,
@@ -145,15 +140,14 @@ function formatWeekLabel(weekStart?: string): string {
 function buildTodayFocus(
   savedWeek: TrainingCalendarWeek | null,
   analytics: DashboardInsights,
-  fallbackAction: string
+  fallbackAction: string,
 ): HomeTodayView {
   const todayIso = format(new Date(), "yyyy-MM-dd");
   const dayShort = format(new Date(), "EEE");
 
   const planned = savedWeek?.workouts.find(
     (w) =>
-      w.date.slice(0, 10) === todayIso ||
-      w.day.toLowerCase().startsWith(dayShort.toLowerCase())
+      w.date.slice(0, 10) === todayIso || w.day.toLowerCase().startsWith(dayShort.toLowerCase()),
   );
 
   if (planned && planned.modality !== "rest") {
@@ -179,8 +173,7 @@ function buildTodayFocus(
     };
   }
 
-  const firstLine =
-    primaryActionBullets(fallbackAction)[0] ?? fallbackAction;
+  const firstLine = primaryActionBullets(fallbackAction)[0] ?? fallbackAction;
   return {
     title: inferTodayTitle(analytics, firstLine),
     why: firstLine,
@@ -189,10 +182,7 @@ function buildTodayFocus(
   };
 }
 
-function inferTodayTitle(
-  analytics: DashboardInsights,
-  action: string
-): string {
+function inferTodayTitle(analytics: DashboardInsights, action: string): string {
   if (analytics.raceReadiness && analytics.raceReadiness.daysUntilRace <= 3) {
     return "Race-week execution";
   }
@@ -211,10 +201,7 @@ function buildOperationalStateLine(analytics: DashboardInsights): string {
   } else {
     parts.push("intensity balanced");
   }
-  if (
-    analytics.raceReadiness &&
-    analytics.raceReadiness.daysUntilRace <= 14
-  ) {
+  if (analytics.raceReadiness && analytics.raceReadiness.daysUntilRace <= 14) {
     parts.push("taper active");
   }
   return parts.join(" · ");
@@ -224,16 +211,12 @@ function buildChangeFeed(
   signals: IntelligenceSignal[],
   recentlyLearned: string[],
   adaptationSignals: string[],
-  analytics: DashboardInsights
+  analytics: DashboardInsights,
 ): ChangeFeedItem[] {
   const items: ChangeFeedItem[] = [];
   const seen = new Set<string>();
 
-  const push = (
-    id: string,
-    text: string,
-    tone: ChangeFeedItem["tone"] = "neutral"
-  ) => {
+  const push = (id: string, text: string, tone: ChangeFeedItem["tone"] = "neutral") => {
     const key = text.slice(0, 48);
     if (seen.has(key)) return;
     seen.add(key);

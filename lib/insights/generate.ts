@@ -7,7 +7,7 @@ import { generateEcosystemInsights } from "@/lib/ecosystem/insights";
 
 export function generateInsights(
   analytics: DashboardInsights,
-  quality: ImportQualityReport
+  quality: ImportQualityReport,
 ): Insight[] {
   const insights: Insight[] = [];
   const {
@@ -63,8 +63,7 @@ export function generateInsights(
       evidence: [
         "Pace at a given HR has worsened vs your prior block — fatigue or heat may be a factor.",
       ],
-      recommendation:
-        "Consider an easy week or check sleep and hydration before adding intensity.",
+      recommendation: "Consider an easy week or check sleep and hydration before adding intensity.",
       confidence: analytics.dataConfidence,
     });
   }
@@ -97,10 +96,8 @@ export function generateInsights(
         `${easyHard.hard} of ${easyHard.easy + easyHard.hard} runs classified as hard (≥80% max HR).`,
         `Only ${easyPct.toFixed(0)}% easy — polarized plans often target ~80% easy.`,
       ],
-      recommendation:
-        "Add 1–2 low-HR easy runs per week to support recovery and aerobic base.",
-      confidence: quality.fieldCoverage.find((f) => f.label === "Heart rate")
-        ?.level ?? "medium",
+      recommendation: "Add 1–2 low-HR easy runs per week to support recovery and aerobic base.",
+      confidence: quality.fieldCoverage.find((f) => f.label === "Heart rate")?.level ?? "medium",
     });
   }
 
@@ -125,8 +122,7 @@ export function generateInsights(
       title: `Fatigue elevated (${fatigue.label})`,
       severity: "warning",
       evidence: fatigue.evidence,
-      recommendation:
-        "Consider an easy week — limit hard sessions and keep most runs in Z1–Z2.",
+      recommendation: "Consider an easy week — limit hard sessions and keep most runs in Z1–Z2.",
       confidence: analytics.dataConfidence,
     });
   } else if (fatigue.freshness >= 75) {
@@ -140,21 +136,17 @@ export function generateInsights(
     });
   }
 
-  const easyTypes = analytics.workoutTypeMix.filter((b) =>
-    ["easy", "recovery"].includes(b.type)
-  );
+  const easyTypes = analytics.workoutTypeMix.filter((b) => ["easy", "recovery"].includes(b.type));
   const easyPctMix = easyTypes.reduce((s, b) => s + b.pct, 0);
   if (analytics.workoutTypeMix.length > 0) {
-    const top = [...analytics.workoutTypeMix].sort(
-      (a, b) => b.runCount - a.runCount
-    )[0];
+    const top = [...analytics.workoutTypeMix].sort((a, b) => b.runCount - a.runCount)[0];
     insights.push({
       id: "workout-mix",
       question: "training",
       title: `Workout mix: ${top.label} most common (8 weeks)`,
       severity: easyPctMix >= 60 ? "positive" : "neutral",
       evidence: analytics.workoutTypeMix.map(
-        (b) => `${b.label}: ${b.runCount} runs (${b.pct.toFixed(0)}%)`
+        (b) => `${b.label}: ${b.runCount} runs (${b.pct.toFixed(0)}%)`,
       ),
       confidence: analytics.dataConfidence,
     });
@@ -168,8 +160,7 @@ export function generateInsights(
       severity: "warning",
       evidence: intensityAdvice.recommendations,
       recommendation: intensityAdvice.recommendations[0],
-      confidence:
-        intensityAdvice.hardRunsLast14d > 0 ? "medium" : "low",
+      confidence: intensityAdvice.hardRunsLast14d > 0 ? "medium" : "low",
     });
   } else if (easyPct >= 60) {
     insights.push({
@@ -191,12 +182,7 @@ export function generateInsights(
       id: "race-strategy",
       question: "ready",
       title: `Race strategy: ${formatDuration(s.targetTimeSec)} (${s.strategy})`,
-      severity:
-        s.fadeRisk === "high"
-          ? "warning"
-          : s.fadeRisk === "low"
-            ? "positive"
-            : "neutral",
+      severity: s.fadeRisk === "high" ? "warning" : s.fadeRisk === "low" ? "positive" : "neutral",
       evidence: [
         `Fade risk: ${s.fadeRisk}.`,
         s.narrative[0],
@@ -216,8 +202,7 @@ export function generateInsights(
       id: "race-readiness",
       question: "ready",
       title: `${r.distanceLabel} readiness: ${r.score}/100 (${r.label})`,
-      severity:
-        r.score >= 65 ? "positive" : r.score >= 40 ? "neutral" : "warning",
+      severity: r.score >= 65 ? "positive" : r.score >= 40 ? "neutral" : "warning",
       evidence: [
         `${r.daysUntilRace} days until race · ${r.probabilityBand}.`,
         `Longest run: ${r.longestRunKm} km (${r.longestRunPct}% of long-run target).`,
@@ -225,9 +210,7 @@ export function generateInsights(
         ...r.gaps.slice(0, 2).map((g) => `${g.metric}: ${g.current} → ${g.target}`),
       ],
       recommendation:
-        r.gaps.length > 0
-          ? `Focus on: ${r.gaps.map((g) => g.metric).join(", ")}.`
-          : undefined,
+        r.gaps.length > 0 ? `Focus on: ${r.gaps.map((g) => g.metric).join(", ")}.` : undefined,
       confidence: analytics.dataConfidence,
     });
   } else {
@@ -267,13 +250,15 @@ export function generateInsights(
           : "positive",
     evidence: [
       plan.rationale[0],
-      ...plan.sessions.slice(0, 3).map(
-        (s) =>
-          `${s.day ? s.day + ": " : ""}${s.description} (${s.distanceKmRange[0]}–${s.distanceKmRange[1]} km)`
-      ),
+      ...plan.sessions
+        .slice(0, 3)
+        .map(
+          (s) =>
+            `${s.day ? s.day + ": " : ""}${s.description} (${s.distanceKmRange[0]}–${s.distanceKmRange[1]} km)`,
+        ),
     ],
-    recommendation: plan.warnings.find((w) => !w.includes("Not a substitute"))
-      ?? plan.sessions[0]?.description,
+    recommendation:
+      plan.warnings.find((w) => !w.includes("Not a substitute")) ?? plan.sessions[0]?.description,
     confidence: analytics.dataConfidence,
   });
 
@@ -281,9 +266,7 @@ export function generateInsights(
     insights.push({
       id: "weekly-goal",
       question: "next",
-      title: goalProgress.met
-        ? "Weekly run goal on track"
-        : "Weekly run goal needs attention",
+      title: goalProgress.met ? "Weekly run goal on track" : "Weekly run goal needs attention",
       severity: goalProgress.met ? "positive" : "warning",
       evidence: [
         `This week: ${goalProgress.currentWeekRuns} / ${goalProgress.targetPerWeek} runs.`,
@@ -301,8 +284,7 @@ export function generateInsights(
       title: "Set a weekly run goal in Strava",
       severity: "neutral",
       evidence: ["No weekly run goal found in your export."],
-      recommendation:
-        "Add a count-based weekly run goal in Strava to track consistency here.",
+      recommendation: "Add a count-based weekly run goal in Strava to track consistency here.",
       confidence: "high",
     });
   }
@@ -315,12 +297,10 @@ export function generateInsights(
     severity: weeklyNarrative.severity,
     evidence: weeklyNarrative.bullets,
     recommendation:
-      weeklyNarrative.severity === "warning" &&
-      analytics.currentWeek.runCount === 0
+      weeklyNarrative.severity === "warning" && analytics.currentWeek.runCount === 0
         ? "Resume with an easy run if returning from rest."
         : weeklyNarrative.severity === "warning" &&
-            analytics.currentWeek.hardCount >
-              analytics.currentWeek.easyCount
+            analytics.currentWeek.hardCount > analytics.currentWeek.easyCount
           ? "Add 1–2 easy runs this week to balance intensity."
           : undefined,
     confidence: weeklyNarrative.confidence,
@@ -354,9 +334,7 @@ export function generateInsights(
   return insights;
 }
 
-export function insightsByQuestion(
-  insights: Insight[]
-): Record<string, Insight[]> {
+export function insightsByQuestion(insights: Insight[]): Record<string, Insight[]> {
   const map: Record<string, Insight[]> = {};
   for (const i of insights) {
     (map[i.question] ??= []).push(i);

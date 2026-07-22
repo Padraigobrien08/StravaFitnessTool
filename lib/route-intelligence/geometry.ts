@@ -17,7 +17,7 @@ export function computeBounds(points: { lat: number; lon: number }[]): RouteBoun
 
 export function buildRouteGeometry(
   activityId: string,
-  timeline: TimelinePoint[]
+  timeline: TimelinePoint[],
 ): RouteGeometry | null {
   if (timeline.length < 2) return null;
 
@@ -28,7 +28,7 @@ export function buildRouteGeometry(
       timeline[i - 1].lat,
       timeline[i - 1].lon,
       timeline[i].lat,
-      timeline[i].lon
+      timeline[i].lon,
     );
   }
 
@@ -45,7 +45,7 @@ export function buildRouteGeometry(
 
 export function positionAtTime(
   timeline: TimelinePoint[],
-  t: number
+  t: number,
 ): { lat: number; lon: number; index: number } | null {
   if (timeline.length === 0) return null;
   if (t <= timeline[0].elapsedSec) {
@@ -63,8 +63,7 @@ export function positionAtTime(
     const a = timeline[i];
     const b = timeline[i + 1];
     if (t >= a.elapsedSec && t <= b.elapsedSec) {
-      const ratio =
-        (t - a.elapsedSec) / Math.max(0.001, b.elapsedSec - a.elapsedSec);
+      const ratio = (t - a.elapsedSec) / Math.max(0.001, b.elapsedSec - a.elapsedSec);
       return {
         lat: a.lat + (b.lat - a.lat) * ratio,
         lon: a.lon + (b.lon - a.lon) * ratio,

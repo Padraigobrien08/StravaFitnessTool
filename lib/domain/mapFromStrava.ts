@@ -17,10 +17,7 @@ function toSport(type: string): SportType {
   return "Other";
 }
 
-export function mapRunFromStrava(
-  run: StravaRun,
-  fitRunIds: string[]
-): RunActivity {
+export function mapRunFromStrava(run: StravaRun, fitRunIds: string[]): RunActivity {
   const pace = paceSecPerKm({
     ...run,
     distanceM: run.distanceM,
@@ -54,26 +51,22 @@ export function mapStravaImport(data: StravaImport): TrainingDataset {
   const fitRunIds = data.fitRunIds ?? [];
   return {
     runs: data.runs.map((r) => mapRunFromStrava(r, fitRunIds)),
-    activities: data.allActivities.map(
-      (a): ActivitySummary => ({
-        id: a.id,
-        date: a.date,
-        name: a.name,
-        sport: toSport(a.type),
-        distanceKm: a.distanceM / 1000,
-        elapsedTimeSec: a.elapsedSec,
-      })
-    ),
+    activities: data.allActivities.map((a): ActivitySummary => ({
+      id: a.id,
+      date: a.date,
+      name: a.name,
+      sport: toSport(a.type),
+      distanceKm: a.distanceM / 1000,
+      elapsedTimeSec: a.elapsedSec,
+    })),
     profile: data.profile,
-    goals: data.goals.map(
-      (g): WeeklyGoal => ({
-        type: g.type,
-        activityType: g.activityType,
-        targetPerWeek: g.target,
-        startDate: g.startDate,
-        timePeriod: g.timePeriod,
-      })
-    ),
+    goals: data.goals.map((g): WeeklyGoal => ({
+      type: g.type,
+      activityType: g.activityType,
+      targetPerWeek: g.target,
+      startDate: g.startDate,
+      timePeriod: g.timePeriod,
+    })),
     importedAt: data.importedAt,
     exportLabel: data.exportLabel,
     fitRunIds,

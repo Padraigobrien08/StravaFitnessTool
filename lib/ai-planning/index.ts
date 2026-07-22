@@ -23,17 +23,10 @@ export {
   generateWeeklyPlanFromContext,
 } from "./generateWeeklyPlan";
 export { repairWeeklyPlan, stripMedicalLanguage } from "./repairWeeklyPlan";
-export {
-  parseWeeklyTrainingPlan,
-  WEEKLY_TRAINING_PLAN_JSON_SCHEMA,
-} from "./weeklyPlanSchema";
+export { parseWeeklyTrainingPlan, WEEKLY_TRAINING_PLAN_JSON_SCHEMA } from "./weeklyPlanSchema";
 export { validateWeeklyPlan } from "./validateWeeklyPlan";
 export { evaluateWeeklyPlan } from "@/lib/recommendation-integrity";
-export {
-  computeWeeklyPlanGuardrails,
-  nextPlanWeekStart,
-  DAY_ORDER,
-} from "./weeklyPlanGuardrails";
+export { computeWeeklyPlanGuardrails, nextPlanWeekStart, DAY_ORDER } from "./weeklyPlanGuardrails";
 export {
   classifyPlanningMessage,
   isPlanningIntent,
@@ -55,4 +48,3 @@ export type {
   PlanToolObservability,
   PlanToolResult,
 } from "./types";
-

@@ -50,16 +50,12 @@ export function saveCalendarWeek(week: TrainingCalendarWeek): void {
   writeIndex(index);
 }
 
-export function getCalendarWeek(
-  weekStart: string
-): TrainingCalendarWeek | null {
+export function getCalendarWeek(weekStart: string): TrainingCalendarWeek | null {
   return readIndex().weeks[weekStart] ?? null;
 }
 
 export function listCalendarWeeks(): TrainingCalendarWeek[] {
-  return Object.values(readIndex().weeks).sort((a, b) =>
-    a.weekStart.localeCompare(b.weekStart)
-  );
+  return Object.values(readIndex().weeks).sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 }
 
 export function updateCalendarWorkout(
@@ -68,15 +64,9 @@ export function updateCalendarWorkout(
   patch: Partial<
     Pick<
       CalendarWorkout,
-      | "title"
-      | "durationMin"
-      | "distanceKm"
-      | "status"
-      | "intensity"
-      | "purpose"
-      | "type"
+      "title" | "durationMin" | "distanceKm" | "status" | "intensity" | "purpose" | "type"
     >
-  >
+  >,
 ): TrainingCalendarWeek | null {
   const week = getCalendarWeek(weekStart);
   if (!week) return null;
@@ -101,7 +91,7 @@ export function updateCalendarWorkout(
 
 export function deleteCalendarWorkout(
   weekStart: string,
-  workoutId: string
+  workoutId: string,
 ): TrainingCalendarWeek | null {
   const week = getCalendarWeek(weekStart);
   if (!week) return null;
@@ -117,7 +107,7 @@ export function deleteCalendarWorkout(
 export function swapCalendarWorkouts(
   weekStart: string,
   fromWorkoutId: string,
-  toWorkoutId: string
+  toWorkoutId: string,
 ): TrainingCalendarWeek | null {
   const week = getCalendarWeek(weekStart);
   if (!week) return null;

@@ -10,11 +10,7 @@ import { dash } from "@/components/home/primitives/tokens";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import { cn } from "@/lib/utils";
 
-export function WorkoutInterpretationPanel({
-  text,
-}: {
-  text: string;
-}) {
+export function WorkoutInterpretationPanel({ text }: { text: string }) {
   return (
     <PanelChrome title="Workout interpretation">
       <p className="text-sm leading-relaxed text-zinc-300">{text}</p>
@@ -22,11 +18,7 @@ export function WorkoutInterpretationPanel({
   );
 }
 
-export function HistoricalContextPanel({
-  items,
-}: {
-  items: HistoricalCompareView[];
-}) {
+export function HistoricalContextPanel({ items }: { items: HistoricalCompareView[] }) {
   return (
     <PanelChrome title="Historical context" subdued>
       <ul className="space-y-2">
@@ -37,7 +29,7 @@ export function HistoricalContextPanel({
               "rounded-lg px-3 py-2.5 text-sm ring-1 ring-inset",
               item.tone === "positive"
                 ? "bg-teal-500/[0.05] text-zinc-300 ring-teal-500/15"
-                : "bg-white/[0.02] text-zinc-400 ring-white/[0.05]"
+                : "bg-white/[0.02] text-zinc-400 ring-white/[0.05]",
             )}
           >
             {item.text}
@@ -65,9 +57,7 @@ export function WorkoutQualityPanel({ data }: { data: WorkoutDataQualityView }) 
             Pace {data.paceCoverage ? "✓" : "○"}
           </span>
           <span className="text-zinc-500">{data.lapCount} laps</span>
-          <span className="text-zinc-500">
-            Classification {data.classificationConfidence}
-          </span>
+          <span className="text-zinc-500">Classification {data.classificationConfidence}</span>
         </div>
         {data.gaps.length > 0 ? (
           <ul className="mt-3 space-y-1 text-xs text-zinc-600">
@@ -82,11 +72,7 @@ export function WorkoutQualityPanel({ data }: { data: WorkoutDataQualityView }) 
   );
 }
 
-export function CompactStatsRail({
-  stats,
-}: {
-  stats: { label: string; value: string }[];
-}) {
+export function CompactStatsRail({ stats }: { stats: { label: string; value: string }[] }) {
   return (
     <div className="flex flex-wrap gap-3">
       {stats.map((s) => (

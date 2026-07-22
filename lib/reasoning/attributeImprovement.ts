@@ -12,7 +12,7 @@ import type {
 function outcomeAfterBlock(
   ctx: ReasoningContext,
   blockEnd: Date,
-  metric: AttributeMetric
+  metric: AttributeMetric,
 ): number | null {
   const followEnd = subWeeks(blockEnd, -4);
   const follow = ctx.runs.filter((r) => {
@@ -46,7 +46,7 @@ function outcomeAfterBlock(
 
 export function attributeImprovement(
   ctx: ReasoningContext,
-  args: AttributeImprovementArgs = {}
+  args: AttributeImprovementArgs = {},
 ): ReasoningResult<{
   metric: AttributeMetric;
   factors: {
@@ -66,20 +66,17 @@ export function attributeImprovement(
       const outcome = outcomeAfterBlock(ctx, end, metric);
       return { block, outcome };
     })
-    .filter((x): x is { block: typeof blocks[0]; outcome: number } => x.outcome != null);
+    .filter((x): x is { block: (typeof blocks)[0]; outcome: number } => x.outcome != null);
 
   if (scored.length < 2) {
     return {
       payload: {
         metric,
         factors: [],
-        narrative:
-          "Not enough historical blocks with follow-on data to attribute improvement.",
+        narrative: "Not enough historical blocks with follow-on data to attribute improvement.",
       },
       evidence: [],
-      assumptions: [
-        "Associates each 4-week block with outcomes in the following 4 weeks.",
-      ],
+      assumptions: ["Associates each 4-week block with outcomes in the following 4 weeks."],
       limitations: ["Need at least 8 weeks of varied training history."],
       confidence: "low",
     };
@@ -92,13 +89,10 @@ export function attributeImprovement(
   });
   const topBlocks = bestOutcomes.slice(0, Math.min(3, bestOutcomes.length));
 
-  const avgRunsPerWeek =
-    topBlocks.reduce((s, t) => s + t.block.runsPerWeek, 0) / topBlocks.length;
-  const avgHard =
-    topBlocks.reduce((s, t) => s + t.block.hardPct, 0) / topBlocks.length;
+  const avgRunsPerWeek = topBlocks.reduce((s, t) => s + t.block.runsPerWeek, 0) / topBlocks.length;
+  const avgHard = topBlocks.reduce((s, t) => s + t.block.hardPct, 0) / topBlocks.length;
   const avgLongPct =
-    topBlocks.reduce((s, t) => s + t.block.longRunPctOfVolume, 0) /
-    topBlocks.length;
+    topBlocks.reduce((s, t) => s + t.block.longRunPctOfVolume, 0) / topBlocks.length;
 
   const factors = [
     {
@@ -110,19 +104,14 @@ export function attributeImprovement(
     {
       rank: 2,
       description: `Hard-day share ~${avgHard.toFixed(0)}%`,
-      association:
-        avgHard <= 25
-          ? "moderate intensity density"
-          : "higher intensity concentration",
+      association: avgHard <= 25 ? "moderate intensity density" : "higher intensity concentration",
       evidence: `Hard % in top blocks: ${topBlocks.map((t) => `${t.block.hardPct}%`).join(", ")}`,
     },
     {
       rank: 3,
       description: `Long run ~${avgLongPct.toFixed(0)}% of block volume`,
       association: "long-run loading pattern",
-      evidence: topBlocks
-        .map((t) => `${t.block.longestRunKm} km longest`)
-        .join("; "),
+      evidence: topBlocks.map((t) => `${t.block.longestRunKm} km longest`).join("; "),
     },
   ];
 
@@ -139,17 +128,13 @@ export function attributeImprovement(
     payload: { metric, factors, narrative },
     evidence: topBlocks.map(
       (t) =>
-        `Block ${t.block.label}: ${t.block.distanceKm} km, hard ${t.block.hardPct}% → strong follow-on ${metric}`
+        `Block ${t.block.label}: ${t.block.distanceKm} km, hard ${t.block.hardPct}% → strong follow-on ${metric}`,
     ),
     assumptions: [
       "Outcome measured in the 4 weeks after each block ends.",
       "Correlation only — other life factors not modeled.",
     ],
-    limitations:
-      blocks.length < 6
-        ? ["Limited block count — treat rankings as directional."]
-        : [],
-    confidence:
-      blocks.length >= 8 ? "medium" : confidenceFromRuns(ctx.runs.length),
+    limitations: blocks.length < 6 ? ["Limited block count — treat rankings as directional."] : [],
+    confidence: blocks.length >= 8 ? "medium" : confidenceFromRuns(ctx.runs.length),
   };
 }

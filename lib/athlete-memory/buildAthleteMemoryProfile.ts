@@ -10,7 +10,7 @@ import type { AthleteMemoryProfile } from "./types";
 
 export function buildAthleteMemoryProfile(
   analytics: DashboardInsights | null,
-  athleteId?: string
+  athleteId?: string,
 ): AthleteMemoryProfile {
   if (!analytics || analytics.summary.runCount === 0) {
     return {

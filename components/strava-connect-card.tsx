@@ -10,12 +10,11 @@ interface StravaConnectCardProps {
   stravaQuery?: string | null;
 }
 
-export function StravaConnectCard({
-  onSynced,
-  stravaQuery,
-}: StravaConnectCardProps) {
-  const { status, syncing, message, handleSync, handleDisconnect } =
-    useStravaConnection(stravaQuery, onSynced);
+export function StravaConnectCard({ onSynced, stravaQuery }: StravaConnectCardProps) {
+  const { status, syncing, message, handleSync, handleDisconnect } = useStravaConnection(
+    stravaQuery,
+    onSynced,
+  );
 
   if (status === null) {
     return (
@@ -29,12 +28,10 @@ export function StravaConnectCard({
     <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="font-display text-lg font-semibold text-white">
-            Connect Strava
-          </h2>
+          <h2 className="font-display text-lg font-semibold text-white">Connect Strava</h2>
           <p className="mt-1 text-sm text-zinc-400">
-            Sync runs from the API instead of waiting for a bulk export. FIT
-            streams remain optional for segment PRs.
+            Sync runs from the API instead of waiting for a bulk export. FIT streams remain optional
+            for segment PRs.
           </p>
         </div>
         {status.connected ? (
@@ -54,9 +51,7 @@ export function StravaConnectCard({
         </p>
       ) : null}
 
-      {message ? (
-        <p className="mt-3 text-sm text-zinc-300">{message}</p>
-      ) : null}
+      {message ? <p className="mt-3 text-sm text-zinc-300">{message}</p> : null}
 
       <div className="mt-5 flex flex-wrap gap-3">
         {!status.connected ? (
@@ -70,9 +65,7 @@ export function StravaConnectCard({
         ) : (
           <>
             <Button onClick={() => void handleSync()} disabled={syncing}>
-              <RefreshCw
-                className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`}
-              />
+              <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
               {syncing ? "Syncing…" : "Sync now"}
             </Button>
             <Button variant="ghost" onClick={() => void handleDisconnect()}>

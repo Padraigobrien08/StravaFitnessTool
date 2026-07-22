@@ -32,10 +32,7 @@ export function useTrainingCalendar(weekStart?: string) {
   }, [refresh]);
 
   const saveFromGenerated = useCallback(
-    (
-      result: GenerateWeeklyPlanResult,
-      opts?: { planningContext?: string }
-    ) => {
+    (result: GenerateWeeklyPlanResult, opts?: { planningContext?: string }) => {
       const week = weeklyPlanToCalendarWeek(result.plan, result, {
         generatedAt: new Date().toISOString(),
         planningContext: opts?.planningContext,
@@ -45,7 +42,7 @@ export function useTrainingCalendar(weekStart?: string) {
         result.plan,
         result.guardrails,
         result.integrity?.severity,
-        { source: result.source }
+        { source: result.source },
       );
       if (!validation.canSave) {
         return { ok: false as const, validation, week };
@@ -54,7 +51,7 @@ export function useTrainingCalendar(weekStart?: string) {
       setSavedWeek(week);
       return { ok: true as const, validation, week };
     },
-    []
+    [],
   );
 
   const clearWeek = useCallback(() => {
@@ -68,20 +65,15 @@ export function useTrainingCalendar(weekStart?: string) {
       patch: Partial<
         Pick<
           CalendarWorkout,
-          | "title"
-          | "durationMin"
-          | "distanceKm"
-          | "status"
-          | "intensity"
-          | "purpose"
+          "title" | "durationMin" | "distanceKm" | "status" | "intensity" | "purpose"
         >
-      >
+      >,
     ) => {
       const updated = updateCalendarWorkout(targetWeek, workoutId, patch);
       if (updated) setSavedWeek(updated);
       return updated;
     },
-    [targetWeek]
+    [targetWeek],
   );
 
   const removeWorkout = useCallback(
@@ -90,20 +82,16 @@ export function useTrainingCalendar(weekStart?: string) {
       if (updated) setSavedWeek(updated);
       return updated;
     },
-    [targetWeek]
+    [targetWeek],
   );
 
   const swapWorkouts = useCallback(
     (fromWorkoutId: string, toWorkoutId: string) => {
-      const updated = swapCalendarWorkouts(
-        targetWeek,
-        fromWorkoutId,
-        toWorkoutId
-      );
+      const updated = swapCalendarWorkouts(targetWeek, fromWorkoutId, toWorkoutId);
       if (updated) setSavedWeek(updated);
       return updated;
     },
-    [targetWeek]
+    [targetWeek],
   );
 
   return {

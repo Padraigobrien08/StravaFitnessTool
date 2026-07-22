@@ -33,9 +33,7 @@ export function weeklyVolume(runs: RunActivity[]): WeeklyVolume[] {
     map.set(key, existing);
   }
 
-  return [...map.values()].sort((a, b) =>
-    a.weekStart.localeCompare(b.weekStart)
-  );
+  return [...map.values()].sort((a, b) => a.weekStart.localeCompare(b.weekStart));
 }
 
 export function monthlyVolume(runs: RunActivity[]): MonthlyVolume[] {
@@ -60,7 +58,7 @@ export function monthlyVolume(runs: RunActivity[]): MonthlyVolume[] {
 
 export function lastNDaysVolume(
   runs: RunActivity[],
-  days: number
+  days: number,
 ): { distanceKm: number; runCount: number } {
   const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
   const recent = runs.filter((r) => new Date(r.date).getTime() >= cutoff);

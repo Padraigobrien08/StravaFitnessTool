@@ -1,22 +1,18 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { AdaptationSignal } from "./types";
 
-export function inferTaperResponse(
-  analytics: DashboardInsights
-): AdaptationSignal[] {
+export function inferTaperResponse(analytics: DashboardInsights): AdaptationSignal[] {
   const r = analytics.raceReadiness;
   if (!r || r.daysUntilRace > 21) return [];
 
   const weeks = analytics.trainingBlocks;
   const volDrop =
     weeks.length >= 2 &&
-    weeks[weeks.length - 1].distanceKm <
-      weeks[weeks.length - 2].distanceKm * 0.85;
+    weeks[weeks.length - 1].distanceKm < weeks[weeks.length - 2].distanceKm * 0.85;
 
   if (!volDrop && r.daysUntilRace > 10) return [];
 
-  const effective =
-    analytics.fatigue.freshness >= 50 && analytics.fatigue.tsb > -8;
+  const effective = analytics.fatigue.freshness >= 50 && analytics.fatigue.tsb > -8;
 
   return [
     {
@@ -32,9 +28,7 @@ export function inferTaperResponse(
         volDrop ? "Volume down vs prior block" : "Race proximity",
       ],
       contradictoryEvidence:
-        !effective && analytics.fatigue.tsb < -12
-          ? ["TSB still deeply negative"]
-          : [],
+        !effective && analytics.fatigue.tsb < -12 ? ["TSB still deeply negative"] : [],
       stability: effective ? "stable" : "emerging",
     },
   ];

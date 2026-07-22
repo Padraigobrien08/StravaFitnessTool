@@ -1,11 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-export function ConfidenceBadge({
-  level,
-}: {
-  level: "low" | "medium" | "high";
-}) {
+export function ConfidenceBadge({ level }: { level: "low" | "medium" | "high" }) {
   const labels = {
     low: "Limited data — trends are indicative",
     medium: "Moderate sample — trends are reasonably reliable",

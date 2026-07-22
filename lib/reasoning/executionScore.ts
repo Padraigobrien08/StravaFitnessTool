@@ -21,8 +21,7 @@ function paceCv(paces: number[]): number | null {
   if (paces.length < 3) return null;
   const mean = paces.reduce((a, b) => a + b, 0) / paces.length;
   if (mean === 0) return null;
-  const variance =
-    paces.reduce((s, p) => s + (p - mean) ** 2, 0) / paces.length;
+  const variance = paces.reduce((s, p) => s + (p - mean) ** 2, 0) / paces.length;
   return Math.sqrt(variance) / mean;
 }
 
@@ -52,7 +51,7 @@ export function computeLateFadePct(fit: FitRunDetail | null): number | null {
 export function scoreSessionExecution(
   run: RunActivity,
   fit: FitRunDetail | null,
-  workout: WorkoutClassification
+  workout: WorkoutClassification,
 ): SessionExecutionScore {
   const insights: ExecutionInsight[] = [];
   let quality = 62;
@@ -84,9 +83,7 @@ export function scoreSessionExecution(
   }
 
   const lapPaces =
-    fit?.laps
-      .map((l) => l.avgPaceSecPerKm)
-      .filter((p): p is number => p != null && p > 0) ?? [];
+    fit?.laps.map((l) => l.avgPaceSecPerKm).filter((p): p is number => p != null && p > 0) ?? [];
   const cv = paceCv(lapPaces);
   if (cv !== null) {
     pacingStability = Math.round(Math.max(0, Math.min(100, 100 - cv * 400)));

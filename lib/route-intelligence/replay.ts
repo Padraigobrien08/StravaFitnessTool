@@ -13,10 +13,7 @@ export function createReplayState(durationSec: number): ReplayState {
   };
 }
 
-export function advanceReplay(
-  state: ReplayState,
-  deltaMs: number
-): ReplayState {
+export function advanceReplay(state: ReplayState, deltaMs: number): ReplayState {
   if (!state.playing) return state;
   const advance = (deltaMs / 1000) * state.speed;
   const next = state.currentSec + advance;

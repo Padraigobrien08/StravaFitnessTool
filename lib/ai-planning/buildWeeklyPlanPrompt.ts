@@ -23,7 +23,7 @@ export function buildWeeklyPlanPrompt(
     availableDays?: string[];
     extraConstraints?: string[];
     planningContext?: string;
-  }
+  },
 ): OpenAIMessage[] {
   const contextBlock = serializeCoachingContextForLLM(context, {
     maxChars: 20000,
@@ -41,9 +41,7 @@ export function buildWeeklyPlanPrompt(
     `min easy day(s) between hard runs: ${guardrails.minEasyDaysBetweenHard}`,
     `no hard strength within ${guardrails.noHardStrengthHoursBeforeRace}h of race`,
     `raceWeek: ${guardrails.raceWeek}`,
-    guardrails.daysUntilRace != null
-      ? `daysUntilRace: ${guardrails.daysUntilRace}`
-      : "",
+    guardrails.daysUntilRace != null ? `daysUntilRace: ${guardrails.daysUntilRace}` : "",
     `avoidIntensityStacking: ${guardrails.avoidIntensityStacking}`,
     "",
     "Constraint notes:",
@@ -55,9 +53,7 @@ export function buildWeeklyPlanPrompt(
     .filter(Boolean)
     .join("\n");
 
-  const prefNote = opts?.planPreference
-    ? `Athlete preference: ${opts.planPreference}.`
-    : "";
+  const prefNote = opts?.planPreference ? `Athlete preference: ${opts.planPreference}.` : "";
   const daysNote = opts?.availableDays?.length
     ? `Only schedule workouts on: ${opts.availableDays.join(", ")}.`
     : "";

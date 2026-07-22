@@ -29,6 +29,6 @@ export const useSettingsStore = create<SettingsState>()(
       setDefaultWeeklyRuns: (defaultWeeklyRuns) => set({ defaultWeeklyRuns }),
       setMaxWeeklyKm: (maxWeeklyKm) => set({ maxWeeklyKm }),
     }),
-    { name: "strideiq-settings-v1" }
-  )
+    { name: "strideiq-settings-v1" },
+  ),
 );

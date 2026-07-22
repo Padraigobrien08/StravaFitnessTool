@@ -1,8 +1,5 @@
 import type { PlanModificationKind } from "./planningIntent";
-import type {
-  WeeklyPlanGuardrails,
-  WeeklyTrainingPlan,
-} from "./types";
+import type { WeeklyPlanGuardrails, WeeklyTrainingPlan } from "./types";
 
 function normalizeDay(day: string): string {
   return day.slice(0, 3).charAt(0).toUpperCase() + day.slice(1, 3).toLowerCase();
@@ -15,8 +12,7 @@ function recalcTotals(plan: WeeklyTrainingPlan): WeeklyTrainingPlan {
   const hardSessionCount = plan.workouts.filter(
     (w) =>
       w.modality === "run" &&
-      (w.intensity === "hard" ||
-        /\btempo|interval|threshold|race\b/i.test(`${w.type} ${w.title}`))
+      (w.intensity === "hard" || /\btempo|interval|threshold|race\b/i.test(`${w.type} ${w.title}`)),
   ).length;
   return {
     ...plan,
@@ -29,7 +25,7 @@ export function applyPlanModification(
   plan: WeeklyTrainingPlan,
   modification: PlanModificationKind,
   guardrails: WeeklyPlanGuardrails,
-  opts?: { availableDays?: string[] }
+  opts?: { availableDays?: string[] },
 ): WeeklyTrainingPlan {
   let workouts = [...plan.workouts];
 
@@ -59,12 +55,9 @@ export function applyPlanModification(
           ? {
               ...w,
               distanceKm: Math.round(w.distanceKm * 0.85 * 10) / 10,
-              constraintsApplied: [
-                ...w.constraintsApplied,
-                "Volume reduced ~15%",
-              ],
+              constraintsApplied: [...w.constraintsApplied, "Volume reduced ~15%"],
             }
-          : w
+          : w,
       );
       break;
     case "more_conservative":
@@ -76,10 +69,7 @@ export function applyPlanModification(
             intensity: "moderate" as const,
             type: "steady",
             title: w.title.replace(/hard|tempo|interval/gi, "steady"),
-            constraintsApplied: [
-              ...w.constraintsApplied,
-              "Softened for conservative adjustment",
-            ],
+            constraintsApplied: [...w.constraintsApplied, "Softened for conservative adjustment"],
           };
         }
         return w;
@@ -111,7 +101,7 @@ export function applyPlanModification(
       break;
     case "more_aggressive": {
       const easyRun = workouts.find(
-        (w) => w.modality === "run" && w.intensity === "easy" && w.type !== "race"
+        (w) => w.modality === "run" && w.intensity === "easy" && w.type !== "race",
       );
       if (
         easyRun &&
@@ -131,15 +121,13 @@ export function applyPlanModification(
                   "Aggressive-but-safe: one quality upgrade",
                 ],
               }
-            : w
+            : w,
         );
       }
       break;
     }
     case "limit_days": {
-      const allowed = new Set(
-        (opts?.availableDays ?? []).map(normalizeDay)
-      );
+      const allowed = new Set((opts?.availableDays ?? []).map(normalizeDay));
       if (allowed.size > 0) {
         workouts = workouts
           .filter((w) => {
@@ -169,10 +157,7 @@ export function applyPlanModification(
     limitations: [...new Set(limitations)].slice(0, 8),
     rationale: {
       ...plan.rationale,
-      tradeoffs: [
-        ...plan.rationale.tradeoffs,
-        `Follow-up modification applied: ${modification}`,
-      ],
+      tradeoffs: [...plan.rationale.tradeoffs, `Follow-up modification applied: ${modification}`],
     },
   });
 }

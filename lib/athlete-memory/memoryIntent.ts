@@ -23,7 +23,7 @@ const MEMORY_QUESTION_PATTERNS: {
 ];
 
 export function classifyMemoryQuestion(
-  text: string
+  text: string,
 ): { kind: "memory"; topic: "all" | BeliefCategory } | null {
   const t = text.trim();
   for (const { pattern, topic } of MEMORY_QUESTION_PATTERNS) {

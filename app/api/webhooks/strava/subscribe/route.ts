@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUserId } from "@/lib/auth/session";
-import {
-  createPushSubscription,
-  listPushSubscriptions,
-} from "@/lib/strava/webhooks/subscribe";
+import { createPushSubscription, listPushSubscriptions } from "@/lib/strava/webhooks/subscribe";
 
 export async function GET() {
   const subs = await listPushSubscriptions();
@@ -25,7 +22,7 @@ export async function POST() {
         error:
           "Set STRAVA_WEBHOOK_CALLBACK_URL (public HTTPS …/api/webhooks/strava) and STRAVA_WEBHOOK_VERIFY_TOKEN in .env.local",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

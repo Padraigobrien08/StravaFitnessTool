@@ -11,11 +11,7 @@ const toneBorder = {
   warning: "border-l-amber-500/45",
 };
 
-export function ExecutionAnalysisPanel({
-  data,
-}: {
-  data: ExecutionAnalysisView;
-}) {
+export function ExecutionAnalysisPanel({ data }: { data: ExecutionAnalysisView }) {
   return (
     <PanelChrome title="Session execution analysis" accent elevated>
       <div className="mb-4 flex flex-wrap gap-6">
@@ -43,13 +39,11 @@ export function ExecutionAnalysisPanel({
             key={i}
             className={cn(
               "rounded-lg border border-white/[0.04] border-l-[3px] bg-white/[0.02] px-3.5 py-3",
-              toneBorder[ins.tone]
+              toneBorder[ins.tone],
             )}
           >
             <h4 className="text-sm font-semibold text-zinc-200">{ins.title}</h4>
-            <p className="mt-1 text-xs leading-relaxed text-zinc-500">
-              {ins.body}
-            </p>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-500">{ins.body}</p>
           </div>
         ))}
       </div>

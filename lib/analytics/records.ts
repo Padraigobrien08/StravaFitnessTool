@@ -36,10 +36,7 @@ function runById(runs: RunActivity[], id: string): RunActivity | undefined {
 }
 
 /** Compare PR candidates — fastest time at nominal distance wins. */
-function pickBetter(
-  a: PersonalRecord | null,
-  b: PersonalRecord | null
-): PersonalRecord | null {
+function pickBetter(a: PersonalRecord | null, b: PersonalRecord | null): PersonalRecord | null {
   if (!a) return b;
   if (!b) return a;
   return a.timeSec < b.timeSec ? a : b;
@@ -47,7 +44,7 @@ function pickBetter(
 
 export function findPersonalRecords(
   runs: RunActivity[],
-  fitDetails: FitRunDetail[] = []
+  fitDetails: FitRunDetail[] = [],
 ): PersonalRecord[] {
   const prs: PersonalRecord[] = [];
 
@@ -129,11 +126,7 @@ export function findPersonalRecords(
 }
 
 /** Riegel: T2 = T1 * (D2/D1)^1.06 */
-export function predictRaceTime(
-  distanceM1: number,
-  timeSec1: number,
-  distanceM2: number
-): number {
+export function predictRaceTime(distanceM1: number, timeSec1: number, distanceM2: number): number {
   const ratio = distanceM2 / distanceM1;
   return timeSec1 * Math.pow(ratio, 1.06);
 }
@@ -147,18 +140,14 @@ export interface RacePrediction {
 
 export function racePredictions(
   runs: RunActivity[],
-  fitDetails: FitRunDetail[] = []
+  fitDetails: FitRunDetail[] = [],
 ): RacePrediction[] {
   const prs = findPersonalRecords(runs, fitDetails);
-  const anchor =
-    prs.find((p) => p.bucket === "10k") ?? prs.find((p) => p.bucket === "5k");
+  const anchor = prs.find((p) => p.bucket === "10k") ?? prs.find((p) => p.bucket === "5k");
   if (!anchor) return [];
 
   const anchorDistM = anchor.distanceKm * 1000;
-  const sourceLabel =
-    anchor.source === "full_run"
-      ? anchor.label
-      : `${anchor.label} best effort`;
+  const sourceLabel = anchor.source === "full_run" ? anchor.label : `${anchor.label} best effort`;
   const targets = [
     { label: "5K", km: 5 },
     { label: "10K", km: 10 },

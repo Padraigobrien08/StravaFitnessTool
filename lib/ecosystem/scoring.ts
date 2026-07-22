@@ -14,13 +14,13 @@ function clamp(n: number, lo: number, hi: number): number {
 
 export function scoreAerobicSupport(
   activities: NormalizedActivity[],
-  runKm28: number
+  runKm28: number,
 ): { score: number; signals: TrainingSupportSignal[] } {
   const aerobic = activities.filter(
     (a) =>
       isAerobicSupportModality(a.modality) &&
       inWindow(a.startDate, 28) &&
-      a.perceivedIntensity !== "high"
+      a.perceivedIntensity !== "high",
   );
   const bikeMin = aerobic
     .filter((a) => a.modality === "bike")
@@ -64,18 +64,15 @@ export function scoreAerobicSupport(
   return { score: clamp(score, 0, 100), signals };
 }
 
-export function scoreStrength(
-  activities: NormalizedActivity[]
-): { score: number; signals: TrainingSupportSignal[] } {
-  const strength = activities.filter(
-    (a) => a.modality === "strength" && inWindow(a.startDate, 14)
-  );
+export function scoreStrength(activities: NormalizedActivity[]): {
+  score: number;
+  signals: TrainingSupportSignal[];
+} {
+  const strength = activities.filter((a) => a.modality === "strength" && inWindow(a.startDate, 14));
   const count = strength.length;
   let score = count === 0 ? 15 : count === 1 ? 45 : count >= 2 ? 75 : 50;
   if (count >= 3) score = 85;
-  const weeksWith = new Set(
-    strength.map((s) => format(parseISO(s.startDate), "yyyy-'W'ww"))
-  ).size;
+  const weeksWith = new Set(strength.map((s) => format(parseISO(s.startDate), "yyyy-'W'ww"))).size;
 
   return {
     score: clamp(score, 0, 100),
@@ -92,10 +89,9 @@ export function scoreStrength(
               trend: count >= 2 ? "positive" : "neutral",
               evidence: [
                 `${count} WeightTraining sessions in 14 days`,
-                ...strength.slice(-2).map(
-                  (s) =>
-                    `${format(parseISO(s.startDate), "d MMM")}: ${s.name}`
-                ),
+                ...strength
+                  .slice(-2)
+                  .map((s) => `${format(parseISO(s.startDate), "d MMM")}: ${s.name}`),
               ],
               confidence: count >= 2 ? "medium" : "low",
               limitations: [
@@ -110,12 +106,10 @@ export function scoreStrength(
 
 export function scoreMobility(
   activities: NormalizedActivity[],
-  runKm28: number
+  runKm28: number,
 ): { score: number; signals: TrainingSupportSignal[] } {
   const mob = activities.filter(
-    (a) =>
-      (a.modality === "mobility" || a.modality === "recovery") &&
-      inWindow(a.startDate, 14)
+    (a) => (a.modality === "mobility" || a.modality === "recovery") && inWindow(a.startDate, 14),
   );
   const count = mob.length;
   let score = count === 0 ? 20 : count === 1 ? 50 : count >= 2 ? 78 : 55;
@@ -149,11 +143,9 @@ export function scoreMobility(
 
 export function scoreRecoveryBehavior(
   activities: NormalizedActivity[],
-  interference: InterferenceFlag[]
+  interference: InterferenceFlag[],
 ): { score: number; signals: TrainingSupportSignal[] } {
-  const hardRuns = activities.filter(
-    (a) => isQualityRun(a) && inWindow(a.startDate, 21)
-  );
+  const hardRuns = activities.filter((a) => isQualityRun(a) && inWindow(a.startDate, 21));
   let positive = 0;
   let opportunities = 0;
   for (const run of hardRuns) {
@@ -173,9 +165,7 @@ export function scoreRecoveryBehavior(
   }
 
   const score =
-    opportunities === 0
-      ? 50
-      : clamp(Math.round((positive / opportunities) * 100), 0, 100);
+    opportunities === 0 ? 50 : clamp(Math.round((positive / opportunities) * 100), 0, 100);
 
   const signals: TrainingSupportSignal[] = [];
   if (opportunities > 0 && positive / opportunities >= 0.5) {
@@ -191,9 +181,7 @@ export function scoreRecoveryBehavior(
     });
   }
 
-  const near = interference.filter(
-    (f) => f.kind === "near_quality_run" && f.severity !== "low"
-  );
+  const near = interference.filter((f) => f.kind === "near_quality_run" && f.severity !== "low");
   if (near.length > 0) {
     signals.push({
       id: "recovery-interference",
@@ -221,7 +209,7 @@ export function scoreDurability(
   strengthScore: number,
   mobilityScore: number,
   runKm28: number,
-  fatigueNote: string | null
+  fatigueNote: string | null,
 ): { score: number; signals: TrainingSupportSignal[] } {
   let adj = strengthScore * 0.55 + mobilityScore * 0.45;
   if (runKm28 > 55 && strengthScore < 50) adj -= 15;
@@ -252,7 +240,7 @@ export function scoreDurability(
 
 export function scoreModalityBalance(
   runPct: number,
-  nonRunSessions: number
+  nonRunSessions: number,
 ): { score: number; signals: TrainingSupportSignal[] } {
   let score = 70;
   if (runPct > 90 && nonRunSessions < 2) score = 45;
@@ -283,7 +271,7 @@ export function computeEcosystemScores(
   interferenceFlags: InterferenceFlag[],
   runKm28: number,
   runSessionPct: number,
-  nonRunSessions28: number
+  nonRunSessions28: number,
 ): {
   scores: EcosystemScores;
   supportSignals: TrainingSupportSignal[];
@@ -298,12 +286,7 @@ export function computeEcosystemScores(
     interferenceRisk >= 50
       ? "Non-run intensity near key runs could increase fatigue beyond run TSB."
       : null;
-  const durability = scoreDurability(
-    strength.score,
-    mobility.score,
-    runKm28,
-    fatigueContext
-  );
+  const durability = scoreDurability(strength.score, mobility.score, runKm28, fatigueContext);
   const balance = scoreModalityBalance(runSessionPct, nonRunSessions28);
 
   return {

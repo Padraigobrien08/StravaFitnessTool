@@ -2,16 +2,7 @@
 
 import type { CoachingDomain } from "@/lib/coach/types";
 import { cn } from "@/lib/utils";
-import {
-  Activity,
-  Bike,
-  Brain,
-  Gauge,
-  History,
-  Target,
-  TrendingUp,
-  Zap,
-} from "lucide-react";
+import { Activity, Bike, Brain, Gauge, History, Target, TrendingUp, Zap } from "lucide-react";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   readiness: Gauge,
@@ -83,14 +74,12 @@ export function CoachDomains({
             >
               <div className="mb-2 flex items-center gap-2">
                 <Icon className="h-3.5 w-3.5 text-teal-500/60" />
-                <span className="text-sm font-semibold text-zinc-200">
-                  {d.title}
-                </span>
+                <span className="text-sm font-semibold text-zinc-200">{d.title}</span>
                 {d.trendBadge ? (
                   <span
                     className={cn(
                       "ml-auto rounded border px-1.5 py-0.5 text-[9px] font-medium",
-                      badgeTone[d.trendBadge.tone]
+                      badgeTone[d.trendBadge.tone],
                     )}
                   >
                     {d.trendBadge.label}
@@ -114,31 +103,18 @@ export function CoachDomains({
   );
 }
 
-function DomainCardInner({
-  domain,
-  featured,
-}: {
-  domain: CoachingDomain;
-  featured?: boolean;
-}) {
+function DomainCardInner({ domain, featured }: { domain: CoachingDomain; featured?: boolean }) {
   const Icon = ICONS[domain.id] ?? Brain;
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        <Icon
-          className={cn(
-            "h-4 w-4",
-            featured ? "text-teal-400/90" : "text-teal-500/60"
-          )}
-        />
-        <span className="font-display text-lg font-semibold text-white">
-          {domain.title}
-        </span>
+        <Icon className={cn("h-4 w-4", featured ? "text-teal-400/90" : "text-teal-500/60")} />
+        <span className="font-display text-lg font-semibold text-white">{domain.title}</span>
         {domain.trendBadge ? (
           <span
             className={cn(
               "rounded-md border px-2 py-0.5 text-[10px] font-medium",
-              badgeTone[domain.trendBadge.tone]
+              badgeTone[domain.trendBadge.tone],
             )}
           >
             {domain.trendBadge.label}
@@ -146,9 +122,7 @@ function DomainCardInner({
         ) : null}
       </div>
       <p className="mt-1 text-xs text-zinc-500">{domain.subtitle}</p>
-      <p className="mt-3 text-sm leading-relaxed text-zinc-300">
-        {domain.liveInsight}
-      </p>
+      <p className="mt-3 text-sm leading-relaxed text-zinc-300">{domain.liveInsight}</p>
       {domain.memoryRef ? (
         <p className="mt-3 text-xs text-zinc-500 border-l-2 border-teal-500/30 pl-3">
           {domain.memoryRef}

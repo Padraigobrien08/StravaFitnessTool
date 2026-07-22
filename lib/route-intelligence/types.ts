@@ -1,13 +1,7 @@
 import type { GpsPoint } from "@/lib/strava/fitTypes";
 
 export type OverlayKind =
-  | "interval"
-  | "recovery"
-  | "fade"
-  | "pause"
-  | "pace_spike"
-  | "climb"
-  | "descent";
+  "interval" | "recovery" | "fade" | "pause" | "pace_spike" | "climb" | "descent";
 
 export interface TimelinePoint {
   elapsedSec: number;

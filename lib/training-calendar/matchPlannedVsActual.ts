@@ -57,7 +57,7 @@ function plannedLabel(w: CalendarWorkout): string {
 
 function distanceMatch(
   plannedKm: number | undefined,
-  actualKm: number
+  actualKm: number,
 ): "matched" | "partial" | "missed" {
   if (plannedKm == null || plannedKm <= 0) {
     return actualKm > 0 ? "matched" : "missed";
@@ -68,11 +68,7 @@ function distanceMatch(
   return "missed";
 }
 
-function classifyDay(
-  w: CalendarWorkout,
-  runs: RunActivity[],
-  todayIso: string
-): DayExecutionRow {
+function classifyDay(w: CalendarWorkout, runs: RunActivity[], todayIso: string): DayExecutionRow {
   const dateIso = dayIso(w.date);
   const planned = plannedLabel(w);
 
@@ -181,7 +177,7 @@ function classifyDay(
 export function matchPlannedVsActual(
   week: TrainingCalendarWeek,
   runs: RunActivity[],
-  today: Date = new Date()
+  today: Date = new Date(),
 ): WeekExecutionSummary {
   const todayIso = today.toISOString().slice(0, 10);
   const weekStart = parseISO(week.weekStart);
@@ -193,25 +189,20 @@ export function matchPlannedVsActual(
   });
 
   const rows = week.workouts.map((w) =>
-    classifyDay(w, runsOnDate(weekRuns, dayIso(w.date)), todayIso)
+    classifyDay(w, runsOnDate(weekRuns, dayIso(w.date)), todayIso),
   );
 
   const scorable = rows.filter(
-    (r) =>
-      r.status !== "future" &&
-      r.workout.modality !== "rest" &&
-      r.status !== "skipped"
+    (r) => r.status !== "future" && r.workout.modality !== "rest" && r.status !== "skipped",
   );
   const matchedDays = scorable.filter(
-    (r) => r.status === "matched" || r.status === "marked_done"
+    (r) => r.status === "matched" || r.status === "marked_done",
   ).length;
   const missedDays = scorable.filter((r) => r.status === "missed").length;
   const partialDays = scorable.filter((r) => r.status === "partial").length;
 
   const adherencePct =
-    scorable.length > 0
-      ? Math.round((matchedDays / scorable.length) * 100)
-      : null;
+    scorable.length > 0 ? Math.round((matchedDays / scorable.length) * 100) : null;
 
   return {
     rows,
