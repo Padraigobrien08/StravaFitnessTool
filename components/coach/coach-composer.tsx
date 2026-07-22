@@ -83,6 +83,7 @@ export function CoachComposer({
             size="sm"
             disabled={!canSend}
             onClick={onSubmit}
+            aria-label="Send message"
             className="mb-0.5 h-9 w-9 shrink-0 rounded-lg bg-zinc-200 p-0 text-zinc-900 hover:bg-white disabled:bg-zinc-700 disabled:text-zinc-500"
           >
             {loading ? (

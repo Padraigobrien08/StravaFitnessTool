@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RunActivity } from "@/lib/strava/types";
@@ -105,7 +105,6 @@ export function RunExplorer({
   const [groupByMonth, setGroupByMonth] = useState(true);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => new Set());
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const intelCache = useRef(new Map<string, SessionIntelligence>());
   const tableTopRef = useRef<HTMLDivElement>(null);
 
   const runsById = useMemo(() => new Map(runs.map((r) => [r.id, r])), [runs]);
@@ -138,21 +137,18 @@ export function RunExplorer({
     return groupExplorerRows(pageRows, "month");
   }, [groupByMonth, pageRows]);
 
-  const getIntel = useCallback(
-    (row: RunExplorerRow): SessionIntelligence | null => {
-      const cached = intelCache.current.get(row.runId);
-      if (cached) return cached;
-      const run = runsById.get(row.runId);
-      if (!run) return null;
-      const intel = evaluateSessionExecution(run, getFitForRun(row.runId) ?? null, row.workout, {
-        analytics,
-        historicalRuns: runs,
-      });
-      intelCache.current.set(row.runId, intel);
-      return intel;
-    },
-    [runsById, getFitForRun, analytics, runs],
-  );
+  // Only the expanded row needs session intelligence; compute it in a memo
+  // (keyed on the expanded id) rather than caching in a ref read during render.
+  const expandedIntel = useMemo<SessionIntelligence | null>(() => {
+    if (!expandedId) return null;
+    const run = runsById.get(expandedId);
+    const row = rows.find((r) => r.runId === expandedId);
+    if (!run || !row) return null;
+    return evaluateSessionExecution(run, getFitForRun(expandedId) ?? null, row.workout, {
+      analytics,
+      historicalRuns: runs,
+    });
+  }, [expandedId, runsById, rows, getFitForRun, analytics, runs]);
 
   function toggleSort(key: ExplorerSortKey) {
     if (sortKey === key) setSortAsc(!sortAsc);
@@ -321,7 +317,7 @@ export function RunExplorer({
                         row={row}
                         expanded={expandedId === row.runId}
                         onToggle={() => setExpandedId(expandedId === row.runId ? null : row.runId)}
-                        intel={expandedId === row.runId ? getIntel(row) : null}
+                        intel={expandedId === row.runId ? expandedIntel : null}
                       />
                     ))
                   : null}

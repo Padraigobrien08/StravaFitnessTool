@@ -164,7 +164,13 @@ export function Nav({
       <nav className={cn("flex min-w-0 flex-1 items-center gap-1", className)} aria-label="Main">
         <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto scrollbar-none">
           {primaryLinks.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className={linkClass(href, href === "/plan")}>
+            <Link
+              key={href}
+              href={href}
+              className={linkClass(href, href === "/plan")}
+              aria-label={label}
+              title={label}
+            >
               <Icon className="h-3.5 w-3.5" />
               <span className="hidden md:inline">{label}</span>
             </Link>
