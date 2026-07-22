@@ -75,7 +75,7 @@ Both paths converge on the same **in-memory analytics** shape (`DashboardInsight
 | `/report`              | What changed? (printable)                                |
 | `/import`, `/settings` | Data load and preferences                                |
 
-Legacy routes (`/dashboard`, `/trends`, `/effort`, `/records`, `/context`, `/activity-mix`) remain for bookmarks.
+`/context` (cross-training / activity ecosystem) is available under the **Advanced** menu.
 
 ### Intelligence + Coach (reasoning layer)
 

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function AdaptationTrendsPanel({ trends }: { trends: AdaptationTrendView[] }) {
   return (
-    <PanelChrome title="Adaptation trends" href="/trends">
+    <PanelChrome title="Adaptation trends">
       <p className={cn(dash.muted, "mb-4 max-w-2xl")}>
         Signals that explain whether you are getting faster — charts support the narrative, not the
         other way around.

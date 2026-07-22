@@ -9,7 +9,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -46,21 +45,12 @@ const advancedLinks = [
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
-const legacyLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/trends", label: "Trends" },
-  { href: "/effort", label: "Effort" },
-  { href: "/records", label: "Records" },
-  { href: "/activity-mix", label: "Activity mix" },
-] as const;
-
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function AdvancedMenu({ pathname }: { pathname: string }) {
   const advancedActive = advancedLinks.some((l) => isActive(pathname, l.href));
-  const legacyActive = legacyLinks.some((l) => pathname === l.href);
 
   return (
     <DropdownMenu>
@@ -73,9 +63,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
               "h-auto shrink-0 gap-1.5 px-2.5 py-1.5 text-xs font-medium",
               advancedActive
                 ? "bg-teal-500/12 text-teal-300 hover:bg-teal-500/12 hover:text-teal-300"
-                : legacyActive
-                  ? "bg-white/[0.06] text-zinc-300 hover:bg-white/[0.06] hover:text-zinc-300"
-                  : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
+                : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
             )}
           />
         }
@@ -106,27 +94,6 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
             nativeButton={false}
           >
             <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
-            {label}
-          </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator className="bg-white/[0.08]" />
-        <DropdownMenuLabel className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-          Legacy pages
-        </DropdownMenuLabel>
-        {legacyLinks.map(({ href, label }) => (
-          <DropdownMenuItem
-            key={href}
-            render={
-              <Link
-                href={href}
-                className={cn(
-                  "block w-full",
-                  pathname === href ? "text-zinc-200" : "text-zinc-400",
-                )}
-              />
-            }
-            nativeButton={false}
-          >
             {label}
           </DropdownMenuItem>
         ))}
