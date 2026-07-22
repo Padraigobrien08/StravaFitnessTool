@@ -75,7 +75,7 @@ Fallback rule-based plan generation works without OpenAI when the API route allo
 - Hosted user auth / billing (Phase 6 in [PRODUCT.md](../PRODUCT.md))
 - Unit conversion on all charts (preference saved only)
 - Plan week synced to Neon (plan is `localStorage` today)
-- Deep differentiation roadmap ([DIFFERENTIATION_NORTH_STAR.md](DIFFERENTIATION_NORTH_STAR.md))
+- Deep differentiation roadmap ([internal/DIFFERENTIATION_NORTH_STAR.md](internal/DIFFERENTIATION_NORTH_STAR.md))
 - Legacy route removal (`/dashboard`, `/trends`, …)
 
 ---

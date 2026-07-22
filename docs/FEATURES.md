@@ -585,13 +585,13 @@ npm run build
 
 ## Related documentation
 
-| Document                                                       | Contents                 |
-| -------------------------------------------------------------- | ------------------------ |
-| [ARCHITECTURE.md](ARCHITECTURE.md)                             | Layers, data flow, API   |
-| [COACH_AND_INTELLIGENCE.md](COACH_AND_INTELLIGENCE.md)         | Intelligence vs Coach UX |
-| [PRODUCT.md](../PRODUCT.md)                                    | Product contract         |
-| [DIFFERENTIATION_NORTH_STAR.md](DIFFERENTIATION_NORTH_STAR.md) | Future moat features     |
-| [ROADMAP_10_FEATURES.md](ROADMAP_10_FEATURES.md)               | Planned feature waves    |
+| Document                                                                         | Contents                 |
+| -------------------------------------------------------------------------------- | ------------------------ |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                                               | Layers, data flow, API   |
+| [COACH_AND_INTELLIGENCE.md](COACH_AND_INTELLIGENCE.md)                           | Intelligence vs Coach UX |
+| [PRODUCT.md](../PRODUCT.md)                                                      | Product contract         |
+| [internal/DIFFERENTIATION_NORTH_STAR.md](internal/DIFFERENTIATION_NORTH_STAR.md) | Future moat features     |
+| [internal/ROADMAP_10_FEATURES.md](internal/ROADMAP_10_FEATURES.md)               | Planned feature waves    |
 
 ---
 
