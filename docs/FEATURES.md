@@ -272,16 +272,13 @@ See [§6 Goals & race forecasting](#6-goals--race-forecasting).
 | Import quality report | Warnings and completeness     |
 | Sync status           | Run counts, stream counts     |
 
-### 5.8 Legacy / chart routes
+### 5.8 Activity ecosystem route
 
-| Route           | Purpose                       |
-| --------------- | ----------------------------- |
-| `/dashboard`    | Redirects or legacy dashboard |
-| `/trends`       | Pace/volume trend charts      |
-| `/effort`       | Effort distribution           |
-| `/records`      | PR table and timeline         |
-| `/context`      | Activity mix                  |
-| `/activity-mix` | Sport type breakdown          |
+| Route      | Purpose                                             |
+| ---------- | --------------------------------------------------- |
+| `/context` | Cross-training / activity ecosystem (Advanced menu) |
+
+The former legacy chart routes (`/dashboard`, `/trends`, `/effort`, `/records`, `/activity-mix`) were retired in favor of `/home` and `/performance`.
 
 ---
 
@@ -563,23 +560,23 @@ npm run build
 
 ## 17. Feature index by route
 
-| Route                                                                       | Features                                                    |
-| --------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `/`                                                                         | Landing / redirect                                          |
-| `/home`                                                                     | Hero, week ops, insights, progression, goal mission, sync   |
-| `/training`                                                                 | Volume, blocks, efficiency, fatigue, ecosystem, plan        |
-| `/performance`                                                              | Trends, records, projections, insights                      |
-| `/goals`                                                                    | Race briefing (V2), readiness, execution, trajectory, risks |
-| `/runs`                                                                     | Activity list                                               |
-| `/runs/[id]`                                                                | Workout detail                                              |
-| `/runs/[id]/route`                                                          | Map replay, pace/HR/elevation                               |
-| `/intelligence`                                                             | Athlete belief model, signals, memory, ecosystem            |
-| `/coach`                                                                    | Investigation chat, tools, threads                          |
-| `/report`                                                                   | Printable change report                                     |
-| `/import`                                                                   | CSV, FIT, OAuth, quality                                    |
-| `/settings`                                                                 | Units, goal, webhooks, privacy                              |
-| `/dev/forecast-lab`                                                         | Forecast V2 validation workbench                            |
-| `/dashboard`, `/trends`, `/effort`, `/records`, `/context`, `/activity-mix` | Legacy chart views                                          |
+| Route               | Features                                                    |
+| ------------------- | ----------------------------------------------------------- |
+| `/`                 | Landing / redirect                                          |
+| `/home`             | Hero, week ops, insights, progression, goal mission, sync   |
+| `/training`         | Volume, blocks, efficiency, fatigue, ecosystem, plan        |
+| `/performance`      | Trends, records, projections, insights                      |
+| `/goals`            | Race briefing (V2), readiness, execution, trajectory, risks |
+| `/runs`             | Activity list                                               |
+| `/runs/[id]`        | Workout detail                                              |
+| `/runs/[id]/route`  | Map replay, pace/HR/elevation                               |
+| `/intelligence`     | Athlete belief model, signals, memory, ecosystem            |
+| `/coach`            | Investigation chat, tools, threads                          |
+| `/report`           | Printable change report                                     |
+| `/import`           | CSV, FIT, OAuth, quality                                    |
+| `/settings`         | Units, goal, webhooks, privacy                              |
+| `/dev/forecast-lab` | Forecast V2 validation workbench                            |
+| `/context`          | Cross-training / activity ecosystem                         |
 
 ---
 

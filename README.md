@@ -317,8 +317,6 @@ Hosted stack: **Vercel** (app) + **Neon** (database) + **Strava** (OAuth + optio
 | `/import`          | CSV, FIT, Strava OAuth                            |
 | `/settings`        | Units, privacy, webhooks, data quality            |
 
-Legacy chart routes (`/dashboard`, `/trends`, `/effort`, `/records`, `/context`) remain for compatibility.
-
 Coach deep links from Intelligence: `?domain=…`, `?q=…`, `?topic=…`, `&investigate=1`.
 
 ---

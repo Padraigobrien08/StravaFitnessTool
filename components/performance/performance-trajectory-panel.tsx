@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { ProgressionViewModel } from "@/lib/home/dashboardData";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { TrendChart } from "@/components/home/primitives/sparkline";
@@ -117,12 +116,6 @@ export function PerformanceTrajectoryPanel({
           </div>
         </div>
       </div>
-
-      <p className="mt-4 text-xs text-zinc-600">
-        <Link href="/records" className="text-teal-400/90 hover:text-teal-300">
-          Full records table →
-        </Link>
-      </p>
     </PanelChrome>
   );
 }

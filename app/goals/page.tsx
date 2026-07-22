@@ -154,7 +154,7 @@ export default function GoalsPage() {
           <GoalsExplainability data={view.explain} confidence={analytics.dataConfidence} />
 
           <p className="text-center text-xs text-zinc-600">
-            <Link href="/records" className="text-teal-400/90 hover:underline">
+            <Link href="/performance" className="text-teal-400/90 hover:underline">
               View all records & PR timeline →
             </Link>
             {" · "}

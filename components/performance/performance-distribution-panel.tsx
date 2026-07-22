@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import type { PerformanceDistributionView } from "@/lib/performance/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
 
 export function PerformanceDistributionPanel({ data }: { data: PerformanceDistributionView }) {
   return (
-    <PanelChrome title="Performance distribution" href="/effort" subdued>
+    <PanelChrome title="Performance distribution" subdued>
       <p className="text-sm leading-relaxed text-zinc-400">{data.interpretation}</p>
 
       <div className="mt-4 flex flex-wrap gap-6 text-xs">
@@ -50,12 +49,6 @@ export function PerformanceDistributionPanel({ data }: { data: PerformanceDistri
           <li key={i}>· {c}</li>
         ))}
       </ul>
-
-      <p className="mt-3 text-xs">
-        <Link href="/effort" className="text-teal-400/90 hover:text-teal-300">
-          Full effort advisor →
-        </Link>
-      </p>
     </PanelChrome>
   );
 }

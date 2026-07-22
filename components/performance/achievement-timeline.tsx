@@ -18,7 +18,7 @@ export function AchievementTimeline({ milestones }: { milestones: AchievementMil
   const grouped = ["speed", "endurance", "consistency", "race_execution"] as const;
 
   return (
-    <PanelChrome title="Achievement timeline" href="/records">
+    <PanelChrome title="Achievement timeline">
       <p className={cn(dash.muted, "mb-4")}>
         PRs and milestones with context — not a flat results table.
       </p>
