@@ -4,6 +4,7 @@ import { formatDuration, formatPace } from "@/lib/utils";
 import { countRunsMissingStreams, countStreamsForUser } from "@/lib/db/activity-streams";
 import { buildGoalsPageView } from "@/lib/goals/viewModels";
 import { buildTrainingPageView } from "@/lib/training/viewModels";
+import { recommendTodaySession, buildTodaySessionInput } from "@/lib/training/todaySession";
 import {
   buildFullEcosystemCoachPayload,
   compareModalityBlocks,
@@ -158,6 +159,24 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
             ? `Race in ${analytics.raceReadiness.daysUntilRace} days`
             : "No race goal on server",
         ],
+      );
+    }
+
+    case "recommend_today_session": {
+      const rec = recommendTodaySession(buildTodaySessionInput(analytics));
+      return wrapIntelligence(
+        {
+          kind: rec.kind,
+          typeLabel: rec.typeLabel,
+          headline: rec.headline,
+          distanceKmRange: rec.distanceKmRange,
+          intensity: rec.intensity,
+          rationale: rec.rationale,
+          alternatives: rec.alternatives,
+          confidence: rec.confidence,
+        },
+        quality,
+        rec.evidence,
       );
     }
 
@@ -429,6 +448,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_week_plan",
     description: "Recommended next week sessions (deterministic plan engine).",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "recommend_today_session",
+    description:
+      "Recommend a single session for today (rest, recovery, easy, long, tempo, or interval) from current fatigue, recent intensity balance, time since the last quality/long run, and race proximity. Use for 'what should I run today?'.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
