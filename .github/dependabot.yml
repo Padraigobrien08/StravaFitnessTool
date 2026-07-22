@@ -6,10 +6,17 @@ updates:
       interval: weekly
     open-pull-requests-limit: 10
     groups:
-      # Batch low-risk updates into single PRs to cut noise.
+      # Batch only minor/patch updates into single PRs to cut noise. Major
+      # bumps intentionally arrive as individual PRs so each can be evaluated
+      # (a grouped major once swept in unsupported TS 7 / ESLint 10 and broke
+      # the build).
       dev-dependencies:
         dependency-type: development
-      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+      production-minor-patch:
+        dependency-type: production
         update-types:
           - minor
           - patch
