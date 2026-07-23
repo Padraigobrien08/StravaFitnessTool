@@ -6,6 +6,7 @@ import { buildGoalsPageView } from "@/lib/goals/viewModels";
 import { buildTrainingPageView } from "@/lib/training/viewModels";
 import { recommendTodaySession, buildTodaySessionInput } from "@/lib/training/todaySession";
 import { computeGoalScenarios } from "@/lib/goals/goalScenarios";
+import { buildLimiterProtocol } from "@/lib/goals/limiterProtocols";
 import { buildRaceForecastInput } from "@/lib/forecasting-v2/buildInput";
 import { buildRaceForecastV2 } from "@/lib/forecasting-v2/forecastEngine";
 import { computeForecastSensitivity } from "@/lib/forecasting-v2/sensitivity";
@@ -16,6 +17,7 @@ import {
 import {
   evaluateRecommendationOutcomes,
   logGoalScenarioRecommendation,
+  logLimiterProtocolRecommendation,
   logTodaySessionRecommendation,
   logWeekPlanRecommendations,
 } from "@/lib/recommendation-outcomes/service";
@@ -525,6 +527,37 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_limiter_protocols": {
+      const result = buildLimiterProtocol({
+        analytics,
+        goal: raceGoal,
+        runs: bundle.runs,
+        fitDetails: bundle.fitDetails,
+      });
+      if (result.available) {
+        // Record it so adherence/outcome can be evaluated later (fire-and-forget).
+        void logLimiterProtocolRecommendation(ctx.userId, result);
+      }
+      return wrapIntelligence(
+        {
+          limiter: result.limiter
+            ? { capability: result.limiter.label, score: result.limiter.score }
+            : null,
+          protocol: result.protocol,
+          leverSummary: result.leverSummary,
+          baseline: result.baselineTimeLabel,
+          projected: result.projectedTimeLabel,
+          projectedGainSec: result.projectedGainSec,
+          probabilityPct: result.probabilityPct,
+          target: result.targetLabel,
+          rationale: result.rationale,
+        },
+        quality,
+        result.evidence,
+        result.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -934,6 +967,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_capability_radar",
     description:
       "The athlete's capability profile across six axes — aerobic base, threshold, top-end speed, durability, economy, consistency — each scored 0–100 vs their OWN history (50 ≈ personal baseline), plus how much each matters for the goal race (demand profile) and the auto-flagged biggest limiter (the axis that matters for the race and is weakest). Use for 'what's my biggest limiter?', 'where am I strong or weak?', 'what should I work on for my race?', or a capability overview. This is the diagnosis; pair with goal scenarios for the prescription.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_limiter_protocols",
+    description:
+      "Turn the diagnosed biggest limiter into a targeted training block (protocol) with its PREDICTED outcome: the projected race time, seconds gained vs baseline, and — if a target time is set — the probability of hitting it, all from the goal-scenario forecast engine. Use for 'what should I do about my limiter?', 'what training block do I need?', 'how much faster would a VO2 block make me?'. This is the prescription that follows get_capability_radar's diagnosis; the recommendation is logged so its adherence and outcome can be measured later.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

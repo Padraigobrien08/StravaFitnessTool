@@ -4,6 +4,7 @@ import type { TodaySessionRecommendation } from "@/lib/training/todaySession";
 import { startOfWeek, format } from "date-fns";
 import type { WeekPlan } from "@/lib/training/planEngine";
 import type { GoalScenarioResult } from "@/lib/goals/goalScenarios";
+import type { LimiterProtocolResult } from "@/lib/goals/limiterProtocols";
 import { dateForWeekDay } from "@/lib/training-calendar";
 import { getRecommendations, logRecommendation, saveEvaluation } from "@/lib/db/recommendation-log";
 import { evaluateRecommendationOutcome } from "@/lib/recommendation-learning/evaluateRecommendationOutcome";
@@ -149,6 +150,36 @@ export async function logGoalScenarioRecommendation(
   }
 }
 
+/** Record the per-limiter protocol recommendation (one per ISO week). */
+export async function logLimiterProtocolRecommendation(
+  userId: string,
+  result: LimiterProtocolResult,
+): Promise<void> {
+  if (!result.available || !result.limiter || !result.protocol) return;
+  const now = new Date();
+  const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
+  const gain =
+    result.projectedGainSec != null && result.projectedGainSec > 0
+      ? ` (projected −${result.projectedGainSec}s)`
+      : "";
+  const logged: LoggedRecommendation = {
+    recommendationId: `limiter_protocol:${weekStart}`,
+    producer: "limiter_protocol",
+    issuedAt: now.toISOString(),
+    targetDate: weekStart,
+    kind: `improve_${result.limiter.key}`,
+    headline: `${result.protocol.title} for ${result.limiter.label}${gain}`,
+    distanceKmMin: null,
+    distanceKmMax: null,
+    targetWeeklyKm: result.targetWeeklyKm,
+  };
+  try {
+    await logRecommendation(userId, logged);
+  } catch {
+    /* non-fatal */
+  }
+}
+
 export interface RecommendationOutcomesResult {
   recommendations: LoggedRecommendation[];
   summary: {
@@ -190,7 +221,7 @@ export async function evaluateRecommendationOutcomes(
 
     if (!alreadyResolved) {
       const res =
-        rec.producer === "goal_scenario"
+        rec.producer === "goal_scenario" || rec.producer === "limiter_protocol"
           ? evaluateVolumeTrendAdherence(rec, runs, todayIso)
           : evaluateAdherence(rec, runs, typeByRunId, todayIso);
       updated = {
@@ -207,6 +238,7 @@ export async function evaluateRecommendationOutcomes(
     const signalEligible =
       updated.adherence === "followed" &&
       updated.producer !== "goal_scenario" &&
+      updated.producer !== "limiter_protocol" &&
       signal != null &&
       !updated.outcomeSignal &&
       daysBetween(updated.targetDate, todayIso) >= SIGNAL_MIN_AGE_DAYS;
