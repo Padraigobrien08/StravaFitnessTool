@@ -37,7 +37,14 @@ export async function getSavedWeeks(userId: string): Promise<TrainingCalendarWee
   }
 }
 
-export async function upsertSavedWeek(userId: string, week: TrainingCalendarWeek): Promise<void> {
+/**
+ * The persistence layer stores the whole week as an opaque JSONB blob and only
+ * reads its `weekStart`/`revision` — so it accepts any validated week-shaped
+ * object (a full `TrainingCalendarWeek` or a route-validated passthrough).
+ */
+export type PersistableWeek = { weekStart: string; revision?: number | null };
+
+export async function upsertSavedWeek(userId: string, week: PersistableWeek): Promise<void> {
   await ensureTrainingCalendarSchema();
   const sql = getSql();
   await sql`

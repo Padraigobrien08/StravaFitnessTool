@@ -38,7 +38,7 @@ export function verboseActivityStreams(
     if (cad?.[i] != null) p.cadence = cad[i];
     const alt = streams.altitude?.data as number[] | undefined;
     if (alt?.[i] != null) p.altitude_m = alt[i];
-    const latlng = streams.latlng?.data as unknown as [number, number][] | undefined;
+    const latlng = streams.latlng?.data as [number, number][] | undefined;
     if (latlng?.[i]) {
       p.lat = latlng[i][0];
       p.lng = latlng[i][1];

@@ -46,7 +46,8 @@ export interface StravaTokenResponse {
 }
 
 export interface StravaStreamSeries {
-  data: number[];
+  /** Numeric for most streams; `latlng` is an array of [lat, lng] pairs. */
+  data: number[] | [number, number][];
   series_type: string;
   original_size: number;
   resolution: string;

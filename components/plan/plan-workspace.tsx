@@ -42,6 +42,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CalendarPlus, RefreshCw } from "lucide-react";
+import type { RunActivity } from "@/lib/strava/types";
+
+// Stable empty reference so the `weekExecution` memo below doesn't re-run every
+// render when there's no import data (a fresh `[]` literal would break memoization).
+const EMPTY_RUNS: RunActivity[] = [];
 
 export function PlanWorkspace() {
   const searchParams = useSearchParams();
@@ -139,7 +144,7 @@ export function PlanWorkspace() {
   const integrityItems = displayWeek ? buildIntegrityItems(displayWeek, preview) : [];
   const explainLines = displayWeek ? sessionExplainability(displayWeek) : [];
 
-  const runs = importData?.runs ?? [];
+  const runs = importData?.runs ?? EMPTY_RUNS;
   const weekExecution = useMemo(() => {
     const week = calendar.savedWeek;
     if (!week || showingPreview) return null;

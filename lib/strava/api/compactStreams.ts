@@ -25,9 +25,9 @@ export interface CompactActivityStreams {
 function seriesData(series: StravaStreamSet[string]): number[] | [number, number][] {
   const d = series.data;
   if (d.length > 0 && Array.isArray(d[0])) {
-    return d as unknown as [number, number][];
+    return d as [number, number][];
   }
-  return d;
+  return d as number[];
 }
 
 /** Compact stream payload for MCP / LLM (~smaller than verbose Strava objects). */
