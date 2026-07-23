@@ -55,9 +55,7 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
           </div>
           <p className="mt-0.5 text-[13px] leading-snug text-zinc-300">
             Exponent{" "}
-            <span className="font-medium tabular-nums text-zinc-100">
-              {fr.exponent.toFixed(2)}
-            </span>{" "}
+            <span className="font-medium tabular-nums text-zinc-100">{fr.exponent.toFixed(2)}</span>{" "}
             <span className="text-zinc-600">vs ~{fr.referenceExponent} reference</span>
             {fr.extraFadePerDoublingPct != null && fr.extraFadePerDoublingPct !== 0 ? (
               <span className="text-zinc-500">
@@ -76,7 +74,9 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
       ) : null}
 
       <Link
-        href={signalCoachLink("Explain my critical speed, anaerobic reserve, and fatigue resistance.")}
+        href={signalCoachLink(
+          "Explain my critical speed, anaerobic reserve, and fatigue resistance.",
+        )}
         className="mt-2 inline-block text-[10px] text-zinc-600 hover:text-zinc-400"
       >
         Ask Coach
