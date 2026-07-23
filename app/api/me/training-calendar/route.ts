@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getSessionUserId } from "@/lib/auth/session";
 import { deleteSavedWeek, getSavedWeeks, upsertSavedWeek } from "@/lib/db/training-calendar";
-import type { TrainingCalendarWeek } from "@/lib/training-calendar/types";
 
 // The saved week is a client-owned object; validate the identity/shape fields
 // we key and render on, and pass the rest through into JSONB.
@@ -47,7 +46,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await upsertSavedWeek(userId, parsed.data.week as unknown as TrainingCalendarWeek);
+    // Validated at the boundary above (weekSchema); persisted verbatim as a
+    // JSONB blob — no cast needed (upsertSavedWeek accepts a PersistableWeek).
+    await upsertSavedWeek(userId, parsed.data.week);
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json(

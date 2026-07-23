@@ -36,7 +36,7 @@ export function mapStravaStreamsToFitDetail(
   streams: StravaStreamSet | null,
   laps: StravaLap[],
 ): FitRunDetail | null {
-  const time = streams?.time?.data;
+  const time = streams?.time?.data as number[] | undefined;
   if (!time?.length) {
     const lapOnly = mapStravaLaps(laps);
     if (lapOnly.length === 0) return null;
@@ -57,11 +57,11 @@ export function mapStravaStreamsToFitDetail(
     };
   }
 
-  const hrData = streams?.heartrate?.data ?? [];
-  const velData = streams?.velocity_smooth?.data ?? [];
-  const cadData = streams?.cadence?.data ?? [];
-  const altData = streams?.altitude?.data ?? [];
-  const latlngRaw = streams?.latlng?.data as [number, number][] | number[] | undefined;
+  const hrData = (streams?.heartrate?.data ?? []) as number[];
+  const velData = (streams?.velocity_smooth?.data ?? []) as number[];
+  const cadData = (streams?.cadence?.data ?? []) as number[];
+  const altData = (streams?.altitude?.data ?? []) as number[];
+  const latlngRaw = streams?.latlng?.data as [number, number][] | undefined;
 
   const hrStream: { elapsedSec: number; hr: number }[] = [];
   const paceStream: { elapsedSec: number; paceSecPerKm: number }[] = [];
@@ -92,15 +92,10 @@ export function mapStravaStreamsToFitDetail(
 
     let lat: number | undefined;
     let lon: number | undefined;
-    if (Array.isArray(latlngRaw?.[0])) {
-      const pair = (latlngRaw as [number, number][])[i];
-      if (pair) {
-        lat = pair[0];
-        lon = pair[1];
-      }
-    } else if (latlngRaw && latlngRaw.length >= (i + 1) * 2) {
-      lat = (latlngRaw as number[])[i * 2];
-      lon = (latlngRaw as number[])[i * 2 + 1];
+    const pair = latlngRaw?.[i];
+    if (pair) {
+      lat = pair[0];
+      lon = pair[1];
     }
     if (lat != null && lon != null && Math.abs(lat) <= 90) {
       gpsStream.push({
