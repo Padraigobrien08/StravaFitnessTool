@@ -553,6 +553,39 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_session_zscores": {
+      const z = analytics.personalZScores;
+      if (!z.available) {
+        return wrapIntelligence(
+          { error: "Not enough comparable sessions to score against your own distribution yet." },
+          quality,
+          [],
+          z.limitations,
+        );
+      }
+      const fmt = (s: (typeof z.sessions)[number]) => ({
+        date: s.date.slice(0, 10),
+        type: s.typeLabel,
+        sigma: s.primaryZ,
+        metric: s.primaryMetric,
+        cohortSize: s.cohortSize,
+        confidence: s.confidence,
+        headline: s.headline,
+      });
+      return wrapIntelligence(
+        {
+          standouts: {
+            best: z.standouts.best ? fmt(z.standouts.best) : null,
+            worst: z.standouts.worst ? fmt(z.standouts.worst) : null,
+          },
+          recent: z.sessions.slice(0, 10).map(fmt),
+        },
+        quality,
+        z.evidence,
+        z.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -968,6 +1001,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_progression_burndown",
     description:
       "Are the athlete's build metrics on pace to be race-ready? For long run and weekly volume, gives current vs the race-distance target, the dated deadline (race day minus taper), the required weekly ramp vs their recent rate, and how many weeks ahead/behind (or stalled) they are. Use for 'am I on track for my race?', 'is my long run where it needs to be?', 'am I behind on volume?'. Complements the limiter protocol (what to build) with pacing (are you building fast enough).",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_session_zscores",
+    description:
+      "How each recent session stacks up against the athlete's OWN distribution for that workout type, as a z-score ('this tempo was +1.8σ — faster-per-HR than your typical tempo'). Returns the standout best/worst recent sessions plus recent scores, each with cohort size and confidence. Use for 'was that a good tempo/long run?', 'how does this session compare to my usual?', 'which recent session stood out?'. Personal, not population — a small cohort reads as directional.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

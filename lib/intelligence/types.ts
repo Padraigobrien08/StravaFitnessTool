@@ -106,6 +106,7 @@ export type IntelligenceToolName =
   | "get_physiology"
   | "get_capability_radar"
   | "get_progression_burndown"
+  | "get_session_zscores"
   | "get_forecast_accuracy"
   | "get_recommendation_outcomes"
   | "get_risk_patterns"
