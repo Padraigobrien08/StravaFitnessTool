@@ -39,6 +39,8 @@ export interface GoalScenario {
   /** P(finish ≤ target) from the perturbed prediction interval; null if no target. */
   probabilityPct: number | null;
   meetsTarget: boolean;
+  /** Sustained weekly volume this scenario implies (km). */
+  targetWeeklyKm: number;
   rationale: string[];
 }
 
@@ -48,7 +50,11 @@ export interface GoalScenarioResult {
   targetLabel: string | null;
   baselineTimeSec: number;
   baselineProbabilityPct: number | null;
+  /** Current sustained weekly volume (km). */
+  currentWeeklyKm: number;
   scenarios: GoalScenario[];
+  /** The scenario the `recommendation` points at (its id). */
+  recommendedScenarioId: string;
   recommendation: string;
   confidence: "low" | "medium" | "high";
   evidence: string[];
@@ -205,9 +211,17 @@ export function computeGoalScenarios(input: RaceForecastInput): GoalScenarioResu
       projectedTimeLabel: formatDuration(forecast.mostLikelyTimeSec),
       probabilityPct: p,
       meetsTarget: p != null && p >= LIKELY_PCT,
+      targetWeeklyKm: round1(currentWeeklyKm * s.lever.volumeMultiplier),
       rationale: s.rationale,
     };
   });
+
+  // The scenario the recommendation points at (same rule as buildRecommendation).
+  let recommendedScenarioId = "maintain";
+  if (hasTarget && !(baselineProbabilityPct != null && baselineProbabilityPct >= LIKELY_PCT)) {
+    const lift = scenarios.find((s) => s.id !== "maintain" && s.meetsTarget);
+    recommendedScenarioId = lift ? lift.id : "full-block";
+  }
 
   const recommendation = buildRecommendation(
     hasTarget,
@@ -236,7 +250,9 @@ export function computeGoalScenarios(input: RaceForecastInput): GoalScenarioResu
     targetLabel: hasTarget ? formatDuration(targetTimeSec!) : null,
     baselineTimeSec: baseline.mostLikelyTimeSec,
     baselineProbabilityPct,
+    currentWeeklyKm,
     scenarios,
+    recommendedScenarioId,
     recommendation,
     confidence,
     evidence,

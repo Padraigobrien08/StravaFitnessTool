@@ -21,6 +21,8 @@ export interface LoggedRecommendation {
   headline: string;
   distanceKmMin: number | null;
   distanceKmMax: number | null;
+  /** For strategic (goal-scenario) recs: the sustained weekly volume advised (km). */
+  targetWeeklyKm?: number | null;
 
   // Adherence (lazily filled once the target day has passed).
   adherence?: Adherence;

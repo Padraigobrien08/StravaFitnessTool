@@ -9,7 +9,9 @@ import { computeGoalScenarios } from "@/lib/goals/goalScenarios";
 import { buildRaceForecastInput } from "@/lib/forecasting-v2/buildInput";
 import {
   evaluateRecommendationOutcomes,
+  logGoalScenarioRecommendation,
   logTodaySessionRecommendation,
+  logWeekPlanRecommendations,
 } from "@/lib/recommendation-outcomes/service";
 import {
   buildFullEcosystemCoachPayload,
@@ -143,6 +145,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
 
     case "get_week_plan": {
       const plan = analytics.nextWeekPlan;
+      void logWeekPlanRecommendations(ctx.userId, plan);
       return wrapIntelligence(
         {
           weekLabel: plan.weekLabel,
@@ -212,6 +215,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         );
       }
       const result = computeGoalScenarios(forecastInput);
+      void logGoalScenarioRecommendation(ctx.userId, result);
       return wrapIntelligence(
         {
           target: result.targetLabel,
