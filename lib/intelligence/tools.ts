@@ -238,6 +238,45 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_monthly_narrative": {
+      const n = analytics.monthlyNarrative;
+      return wrapIntelligence(
+        {
+          month: n.monthLabel,
+          headline: n.headline,
+          narrative: n.paragraphs.join(" "),
+          highlights: n.highlights,
+          severity: n.severity,
+        },
+        quality,
+        n.highlights,
+      );
+    }
+
+    case "get_pre_race_narrative": {
+      const n = analytics.preRaceNarrative;
+      if (!n) {
+        return wrapIntelligence(
+          { error: "No upcoming race within the taper window (set a race goal within ~3 weeks)." },
+          quality,
+          [],
+          ["Pre-race narrative activates when a race goal is 21 or fewer days out."],
+        );
+      }
+      return wrapIntelligence(
+        {
+          headline: n.headline,
+          daysUntilRace: n.daysUntilRace,
+          narrative: n.paragraphs.join(" "),
+          gamePlan: n.gamePlan,
+          highlights: n.highlights,
+          severity: n.severity,
+        },
+        quality,
+        n.highlights,
+      );
+    }
+
     case "get_risk_patterns": {
       const patterns = analytics.riskPatterns;
       return wrapIntelligence(
@@ -578,6 +617,18 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_goal_scenarios",
     description:
       "Adaptive goal scenarios: the probability of hitting the target race time under different training changes (maintain, build volume, add quality, full block), each with its projected time. Use for 'what would it take to hit my goal?', 'can I run <time>?', or 'how do I get faster for my race?'.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_monthly_narrative",
+    description:
+      "A prose summary of the athlete's training month — volume trajectory, best 4-week block, PRs, efficiency, consistency, and intensity mix. Use for 'how did my month go?', 'summarize my last month', or a monthly recap.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_pre_race_narrative",
+    description:
+      "A pre-race lead-in summary (only within ~3 weeks of a race goal): readiness, taper/freshness status, projected finish, top limiter, and a one-line game plan. Use for 'how's my race prep?', 'am I ready for race day?'.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

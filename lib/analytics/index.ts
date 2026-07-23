@@ -30,12 +30,20 @@ import {
 import { elevationPerKm, avgElevationPerKm } from "./elevation";
 import { rollingFourWeekBlocks, bestTrainingBlock } from "./block";
 import { buildCurrentAndPreviousWeek, type WeekSnapshot } from "./week";
-import { buildWeeklyNarrative, type WeeklyNarrative } from "./narrative";
+import {
+  buildWeeklyNarrative,
+  buildMonthlyNarrative,
+  buildPreRaceNarrative,
+  type WeeklyNarrative,
+  type MonthlyNarrative,
+  type PreRaceNarrative,
+} from "./narrative";
 import { buildConsistencyScore, type ConsistencyScore } from "./consistency";
 import { buildIntensityAdvice, type IntensityAdvice } from "./intensityAdvisor";
 import {
   buildPrTimeline,
   buildPredictionTimeline,
+  recentPrHighlights,
   type PrTimelinePoint,
   type PredictionTimelinePoint,
 } from "./progression";
@@ -91,6 +99,8 @@ export interface DashboardInsights {
   currentWeek: WeekSnapshot;
   previousWeek: WeekSnapshot | null;
   weeklyNarrative: WeeklyNarrative;
+  monthlyNarrative: MonthlyNarrative;
+  preRaceNarrative: PreRaceNarrative | null;
   consistencyScore: ConsistencyScore;
   intensityAdvice: IntensityAdvice;
   prTimeline: PrTimelinePoint[];
@@ -195,6 +205,24 @@ export function computeInsights(
     ),
   );
 
+  const monthly = monthlyVolume(runs);
+  const monthlyNarrative = buildMonthlyNarrative({
+    monthlyVolume: monthly,
+    efficiencyMoM,
+    trainingBlocks: blocks,
+    bestBlock: bestTrainingBlock(blocks),
+    recentPrs: recentPrHighlights(prTimeline, 35),
+    consistencyScore,
+    workoutTypeMix,
+    dataConfidence,
+  });
+  const preRaceNarrative = buildPreRaceNarrative({
+    raceReadiness: raceReadinessResult,
+    fatigue,
+    raceStrategy: raceStrategyResult,
+    dataConfidence,
+  });
+
   return {
     summary: {
       runCount: runs.length,
@@ -206,7 +234,7 @@ export function computeInsights(
       last7DaysRuns: last7.runCount,
     },
     weeklyVolume: weeks,
-    monthlyVolume: monthlyVolume(runs),
+    monthlyVolume: monthly,
     paceTrend: pacePoints,
     rollingPace: rollingAveragePace(pacePoints),
     hrTrend: hrTrend(runs),
@@ -232,6 +260,8 @@ export function computeInsights(
     currentWeek,
     previousWeek,
     weeklyNarrative,
+    monthlyNarrative,
+    preRaceNarrative,
     consistencyScore,
     intensityAdvice,
     prTimeline,
