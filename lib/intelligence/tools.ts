@@ -7,6 +7,7 @@ import { buildTrainingPageView } from "@/lib/training/viewModels";
 import { recommendTodaySession, buildTodaySessionInput } from "@/lib/training/todaySession";
 import { computeGoalScenarios } from "@/lib/goals/goalScenarios";
 import { buildRaceForecastInput } from "@/lib/forecasting-v2/buildInput";
+import { buildRaceForecastV2 } from "@/lib/forecasting-v2/forecastEngine";
 import {
   evaluateRecommendationOutcomes,
   logGoalScenarioRecommendation,
@@ -316,6 +317,60 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         quality,
         patterns.slice(0, 5).map((p) => `${p.name} (${p.severity}): ${p.evidence[0]}`),
         patterns.length === 0 ? ["No elevated training-risk patterns detected."] : [],
+      );
+    }
+
+    case "explain_prediction": {
+      if (!raceGoal) {
+        return wrapIntelligence(
+          { error: "No race goal set — set a goal on the Goals page or sync preferences." },
+          quality,
+          [],
+          ["Prediction explanation requires a race goal with a distance."],
+        );
+      }
+      const input = buildRaceForecastInput({
+        analytics,
+        goal: raceGoal,
+        runs: bundle.runs,
+        fitDetails: bundle.fitDetails,
+      });
+      if (!input || input.efforts.length === 0) {
+        return wrapIntelligence(
+          { error: "Not enough race-quality efforts to forecast yet." },
+          quality,
+          [],
+          ["A prediction needs at least one race-quality effort on record."],
+        );
+      }
+      const f = buildRaceForecastV2(input);
+      return wrapIntelligence(
+        {
+          mostLikely: formatDuration(f.mostLikelyTimeSec),
+          range: `${formatDuration(f.predictionIntervalSec.p25)}–${formatDuration(f.predictionIntervalSec.p75)}`,
+          confidence: f.confidence,
+          capabilityBase: formatDuration(f.capabilityBaseTimeSec),
+          derivation: f.derivation.map((s) => ({
+            step: s.label,
+            deltaSec: s.deltaSec,
+            cumulative: formatDuration(s.cumulativeSec),
+            factor: s.factor ?? null,
+            why: s.evidence ?? null,
+          })),
+          models: f.modelEstimates.map((m) => ({
+            name: m.modelName,
+            time: formatDuration(m.predictedTimeSec),
+            weight: Math.round(m.weight * 100) / 100,
+          })),
+        },
+        quality,
+        f.derivation
+          .filter((s) => s.deltaSec !== 0)
+          .map(
+            (s) =>
+              `${s.label}: ${s.deltaSec > 0 ? "+" : ""}${s.deltaSec}s${s.evidence ? ` — ${s.evidence}` : ""}`,
+          ),
+        f.limitations.map((l) => l.detail).slice(0, 3),
       );
     }
 
@@ -663,6 +718,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_risk_patterns",
     description:
       "Detect dangerous training patterns from the athlete's series — acute-load spikes (ACWR), rapid volume ramps, overreaching streaks, excessive intensity, long-run jumps — each with severity, evidence, and a mitigation. Use for 'am I at risk of injury/overtraining?', 'is my ramp too aggressive?', or a safety check.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "explain_prediction",
+    description:
+      "Explain WHY the race prediction is what it is — the step-by-step derivation from raw capability through durability, specificity, and freshness/taper adjustments to the most-likely time, plus each capability model's estimate and weight. Use for 'why do you think I'll run that?', 'how did you get that time?', or a forecast breakdown.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

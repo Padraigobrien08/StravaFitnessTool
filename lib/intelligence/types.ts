@@ -102,6 +102,7 @@ export type IntelligenceToolName =
   | "get_week_plan"
   | "recommend_today_session"
   | "get_goal_scenarios"
+  | "explain_prediction"
   | "get_recommendation_outcomes"
   | "get_risk_patterns"
   | "get_monthly_narrative"
