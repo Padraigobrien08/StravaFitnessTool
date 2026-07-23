@@ -404,6 +404,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       const fr = phys.fatigueResistance;
       const dur = phys.durability;
       const te = phys.thresholdEconomy;
+      const cn = phys.conditionNormalization;
       return wrapIntelligence(
         {
           criticalSpeed: cs.available
@@ -454,10 +455,37 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
                 interpretation: te.interpretation,
               }
             : null,
+          conditionNormalization: cn.available
+            ? {
+                referenceTempC: cn.referenceTempC,
+                tempCoveragePct: Math.round(cn.tempCoveragePct * 100),
+                hotRuns: cn.hotRunCount,
+                normalizedEfficiencyTrend: cn.normalizedEfficiencyTrend,
+                example: cn.example
+                  ? {
+                      run: cn.example.runName,
+                      date: cn.example.date.slice(0, 10),
+                      tempC: cn.example.tempC,
+                      rawPace: formatPace(cn.example.rawPaceSecPerKm),
+                      coolEquivalentPace: formatPace(cn.example.normalizedPaceSecPerKm),
+                      rawZScore: cn.example.rawZScore,
+                      normalizedZScore: cn.example.normalizedZScore,
+                    }
+                  : null,
+                confidence: cn.confidence,
+                interpretation: cn.interpretation,
+              }
+            : null,
         },
         quality,
-        [...cs.evidence, ...fr.evidence, ...dur.evidence, ...te.evidence],
-        [...cs.limitations, ...fr.limitations, ...dur.limitations, ...te.limitations],
+        [...cs.evidence, ...fr.evidence, ...dur.evidence, ...te.evidence, ...cn.evidence],
+        [
+          ...cs.limitations,
+          ...fr.limitations,
+          ...dur.limitations,
+          ...te.limitations,
+          ...cn.limitations,
+        ],
       );
     }
 
@@ -863,7 +891,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_physiology",
     description:
-      "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance — the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend; (3) durability — a 0–100 score for how well efficiency (HR drift) and pace hold up deep into long runs, with a trend; (4) threshold/economy — estimated lactate-threshold pace and HR from tempo/threshold sessions, plus running economy as a grade-adjusted pace-per-HR trend. Each with confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how durable is my aerobic engine?', 'what's my threshold pace/HR?', 'is my running economy improving?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
+      "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance — the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend; (3) durability — a 0–100 score for how well efficiency (HR drift) and pace hold up deep into long runs, with a trend; (4) threshold/economy — estimated lactate-threshold pace and HR from tempo/threshold sessions, plus running economy as a grade-adjusted pace-per-HR trend; (5) condition normalization — efficiency adjusted for heat (weather temperature) and grade so trends are apples-to-apples, including an example where accounting for heat changes how a session reads. Each with confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how durable is my aerobic engine?', 'what's my threshold pace/HR?', 'is my running economy improving?', 'was that hot run actually bad?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

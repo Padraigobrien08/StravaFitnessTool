@@ -39,6 +39,12 @@ import { computeLateFadePct } from "@/lib/reasoning/executionScore";
  *   the HR that rides with it), plus running economy as a grade-adjusted
  *   pace-per-HR trend (GAP-at-HR) — faster GAP at the same HR means a more
  *   economical engine.
+ *
+ * P5 — Condition normalization:
+ *   Heat (weatherTempC) + grade (GAP) normalization so efficiency trends are
+ *   apples-to-apples. Removes the heat tax from pace so a hot-day session is
+ *   compared on cool-equivalent terms ("that 'bad' tempo was actually fine,
+ *   adjusted for 28°C"), and reports how much the read changes.
  */
 
 export interface CriticalSpeedFit {
@@ -122,11 +128,40 @@ export interface ThresholdEconomyAssessment {
   limitations: string[];
 }
 
+export interface ConditionNormalizedRun {
+  runName: string;
+  date: string;
+  tempC: number;
+  rawPaceSecPerKm: number;
+  normalizedPaceSecPerKm: number;
+  /** Raw efficiency z-score (higher = looked worse) vs normalized z-score. */
+  rawZScore: number;
+  normalizedZScore: number;
+}
+
+export interface ConditionNormalizationAssessment {
+  available: boolean;
+  referenceTempC: number;
+  /** Share of runs carrying a weather temperature (0–1). */
+  tempCoveragePct: number;
+  /** Runs run in heat above the reference temperature. */
+  hotRunCount: number;
+  /** Whether normalized efficiency is trending better/worse/flat. */
+  normalizedEfficiencyTrend: "improving" | "declining" | "stable" | null;
+  /** The run whose read most changes once heat is accounted for. */
+  example: ConditionNormalizedRun | null;
+  confidence: "low" | "medium" | "high";
+  interpretation: string;
+  evidence: string[];
+  limitations: string[];
+}
+
 export interface AthletePhysiology {
   criticalSpeed: CriticalSpeedAssessment;
   fatigueResistance: FatigueResistanceAssessment;
   durability: DurabilityScoreAssessment;
   thresholdEconomy: ThresholdEconomyAssessment;
+  conditionNormalization: ConditionNormalizationAssessment;
 }
 
 /** Optional context that unlocks threshold/economy (P4) estimation. */
@@ -664,6 +699,178 @@ export function assessThresholdEconomy(
   };
 }
 
+/** Reference temperature (°C) below which no heat penalty applies. */
+export const CONDITION_REFERENCE_TEMP_C = 15;
+/** Fractional pace slowdown per °C above the reference (≈2% at +7°C). */
+const HEAT_PENALTY_PER_C = 0.003;
+
+/**
+ * Cool-equivalent pace: strip the estimated heat tax from a grade-adjusted pace.
+ * Above the reference temperature, endurance pace slows ~`HEAT_PENALTY_PER_C`/°C;
+ * dividing it back out gives what the pace would likely have been in cool air.
+ */
+export function heatAdjustedPaceSecPerKm(
+  basePaceSecPerKm: number,
+  tempC: number,
+  referenceTempC = CONDITION_REFERENCE_TEMP_C,
+): number {
+  const over = Math.max(0, tempC - referenceTempC);
+  const penalty = over * HEAT_PENALTY_PER_C;
+  return basePaceSecPerKm / (1 + penalty);
+}
+
+function mean(xs: number[]): number {
+  return xs.reduce((a, b) => a + b, 0) / xs.length;
+}
+
+function stdDev(xs: number[], m: number): number {
+  if (xs.length < 2) return 0;
+  return Math.sqrt(xs.reduce((s, x) => s + (x - m) ** 2, 0) / xs.length);
+}
+
+/**
+ * Normalize efficiency for heat + grade so trends compare like with like.
+ * Surfaces the run whose read changes most once conditions are accounted for.
+ */
+export function assessConditionNormalization(
+  runs: RunActivity[],
+): ConditionNormalizationAssessment {
+  const ref = CONDITION_REFERENCE_TEMP_C;
+  const withTemp = runs.filter((r) => r.weatherTempC != null);
+  const tempCoveragePct =
+    runs.length > 0 ? Math.round((withTemp.length / runs.length) * 100) / 100 : 0;
+
+  // Comparable points: HR present, and a grade-adjusted (or raw) pace.
+  interface Pt {
+    run: RunActivity;
+    tempC: number;
+    rawPace: number;
+    normPace: number;
+    rawEff: number;
+    normEff: number;
+  }
+  const pts: Pt[] = [];
+  for (const r of withTemp) {
+    if (r.avgHr == null || r.avgHr < 90) continue;
+    const base = r.gradeAdjustedPaceSecPerKm ?? paceSecPerKm(r);
+    if (base == null || base <= 0 || base > 480) continue;
+    const tempC = r.weatherTempC as number;
+    const normPace = heatAdjustedPaceSecPerKm(base, tempC, ref);
+    pts.push({
+      run: r,
+      tempC,
+      rawPace: Math.round(base),
+      normPace: Math.round(normPace),
+      rawEff: base / r.avgHr,
+      normEff: normPace / r.avgHr,
+    });
+  }
+
+  if (pts.length < 6 || tempCoveragePct < 0.3) {
+    return {
+      available: false,
+      referenceTempC: ref,
+      tempCoveragePct,
+      hotRunCount: pts.filter((p) => p.tempC > ref).length,
+      normalizedEfficiencyTrend: null,
+      example: null,
+      confidence: "low",
+      interpretation: "Not enough runs carry a weather temperature to normalize for heat yet.",
+      evidence: [],
+      limitations: [
+        withTemp.length < 6
+          ? "Fewer than 6 runs have weather temperature — heat normalization needs richer weather coverage."
+          : "Weather-temperature coverage is thin — treat heat adjustments as approximate.",
+      ],
+    };
+  }
+
+  const byDate = [...pts].sort((a, b) => a.run.date.localeCompare(b.run.date));
+  const normEffs = byDate.map((p) => p.normEff);
+  // The heat-adjusted distribution is the fair yardstick: we score each run's
+  // raw vs normalized efficiency against the SAME baseline, so a hot day's raw
+  // number reads high but its normalized number sits back with the pack.
+  const normMean = mean(normEffs);
+  const normSd = stdDev(normEffs, normMean);
+
+  // Normalized-efficiency trend (lower = more economical).
+  let normalizedEfficiencyTrend: ConditionNormalizationAssessment["normalizedEfficiencyTrend"] =
+    null;
+  if (byDate.length >= 6) {
+    const recent = normEffs.slice(-4);
+    const older = normEffs.slice(-8, -4);
+    if (older.length >= 2) {
+      const delta = mean(recent) - mean(older);
+      normalizedEfficiencyTrend =
+        delta < -0.002 ? "improving" : delta > 0.002 ? "declining" : "stable";
+    }
+  }
+
+  // Example: the run whose read improves most once heat is removed (recent tiebreak).
+  const hotRunCount = byDate.filter((p) => p.tempC > ref).length;
+  let example: ConditionNormalizedRun | null = null;
+  if (normSd > 0) {
+    let bestGain = 0;
+    for (const p of byDate) {
+      const rawZ = (p.rawEff - normMean) / normSd;
+      const normZ = (p.normEff - normMean) / normSd;
+      const gain = rawZ - normZ; // positive = looked worse raw than it really was
+      if (p.tempC > ref && gain >= bestGain) {
+        bestGain = gain;
+        example = {
+          runName: p.run.name,
+          date: p.run.date,
+          tempC: Math.round(p.tempC),
+          rawPaceSecPerKm: p.rawPace,
+          normalizedPaceSecPerKm: p.normPace,
+          rawZScore: Math.round(rawZ * 100) / 100,
+          normalizedZScore: Math.round(normZ * 100) / 100,
+        };
+      }
+    }
+  }
+
+  const confidence: "low" | "medium" | "high" =
+    pts.length >= 12 && tempCoveragePct >= 0.6
+      ? "high"
+      : pts.length >= 8 || tempCoveragePct >= 0.45
+        ? "medium"
+        : "low";
+
+  const evidence: string[] = [
+    `Heat-normalized ${pts.length} runs with weather data (reference ${ref}°C, ~${Math.round(HEAT_PENALTY_PER_C * 1000) / 10}%/°C above it) on grade-adjusted pace.`,
+  ];
+  if (example) {
+    evidence.push(
+      `${example.runName} at ${example.tempC}°C: ${paceStr(example.rawPaceSecPerKm)} raw → ${paceStr(example.normalizedPaceSecPerKm)} cool-equivalent (${example.rawZScore >= 0 ? "+" : ""}${example.rawZScore}σ → ${example.normalizedZScore >= 0 ? "+" : ""}${example.normalizedZScore}σ).`,
+    );
+  }
+  if (normalizedEfficiencyTrend && normalizedEfficiencyTrend !== "stable") {
+    evidence.push(`Condition-adjusted efficiency is ${normalizedEfficiencyTrend}.`);
+  }
+
+  const limitations: string[] = [];
+  if (confidence === "low") {
+    limitations.push("Weather coverage is modest — heat adjustments are approximate.");
+  }
+  limitations.push("Humidity, wind, and sun are not modeled — temperature only.");
+
+  return {
+    available: true,
+    referenceTempC: ref,
+    tempCoveragePct,
+    hotRunCount,
+    normalizedEfficiencyTrend,
+    example,
+    confidence,
+    interpretation: example
+      ? `Adjusted for heat, ${example.runName} (${example.tempC}°C) reads ${example.normalizedZScore >= 0 ? "+" : ""}${example.normalizedZScore}σ, not ${example.rawZScore >= 0 ? "+" : ""}${example.rawZScore}σ.`
+      : "Efficiency trends normalized for heat and grade.",
+    evidence,
+    limitations,
+  };
+}
+
 /** Compute the athlete's physiology profile from runs + FIT detail. */
 export function computePhysiology(
   runs: RunActivity[],
@@ -677,5 +884,6 @@ export function computePhysiology(
     fatigueResistance: assessFatigueResistance(efforts),
     durability: assessDurability(runs, fitDetails),
     thresholdEconomy: assessThresholdEconomy(runs, ctx),
+    conditionNormalization: assessConditionNormalization(runs),
   };
 }

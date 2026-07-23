@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  assessConditionNormalization,
   assessCriticalSpeed,
   assessDurability,
   assessFatigueResistance,
@@ -7,6 +8,7 @@ import {
   computePhysiology,
   criticalSpeedPredictSec,
   fitCriticalSpeed,
+  heatAdjustedPaceSecPerKm,
 } from "../physiology";
 import type { EffortPoint } from "../predictions";
 import type { RunActivity } from "@/lib/strava/types";
@@ -344,6 +346,62 @@ describe("assessThresholdEconomy", () => {
     expect(a.ltPaceSecPerKm).toBeNull();
     expect(a.economyIndex).not.toBeNull();
     expect(a.limitations.some((l) => /tempo\/threshold/i.test(l))).toBe(true);
+  });
+});
+
+function runTemp(
+  id: string,
+  km: number,
+  paceMinPerKm: number,
+  avgHr: number,
+  tempC: number,
+  date: string,
+): RunActivity {
+  return { ...mockRun(id, km, paceMinPerKm, date), avgHr, weatherTempC: tempC };
+}
+
+describe("heatAdjustedPaceSecPerKm", () => {
+  it("leaves pace unchanged at the reference temperature", () => {
+    expect(heatAdjustedPaceSecPerKm(300, 15, 15)).toBeCloseTo(300, 5);
+  });
+
+  it("credits heat above the reference (cool-equivalent is faster)", () => {
+    const adj = heatAdjustedPaceSecPerKm(300, 28, 15); // 13°C over → /1.039
+    expect(adj).toBeLessThan(300);
+    expect(adj).toBeCloseTo(300 / (1 + 13 * 0.003), 3);
+  });
+});
+
+describe("assessConditionNormalization", () => {
+  it("normalizes for heat and surfaces a hot-run example", () => {
+    const runs: RunActivity[] = [];
+    // 6 cool runs at 5:00/km, HR 150.
+    for (let i = 0; i < 6; i++) {
+      runs.push(runTemp(`c${i}`, 10, 5.0, 150, 15, `2025-05-0${i + 1}`));
+    }
+    // 2 hot runs at 30°C, slower raw pace (heat tax), same HR.
+    runs.push(runTemp("h1", 10, 5.25, 150, 30, "2025-05-20"));
+    runs.push(runTemp("h2", 10, 5.25, 150, 30, "2025-05-21"));
+
+    const a = assessConditionNormalization(runs);
+    expect(a.available).toBe(true);
+    expect(a.hotRunCount).toBeGreaterThanOrEqual(2);
+    expect(a.example).not.toBeNull();
+    expect(a.example!.tempC).toBe(30);
+    // Once heat is removed, the hot run reads better (lower z) than raw.
+    expect(a.example!.normalizedZScore).toBeLessThan(a.example!.rawZScore);
+    expect(a.example!.normalizedPaceSecPerKm).toBeLessThan(a.example!.rawPaceSecPerKm);
+  });
+
+  it("is unavailable when weather coverage is thin", () => {
+    const runs = [
+      runTemp("t1", 10, 5.0, 150, 18, "2025-05-01"),
+      runTemp("t2", 10, 5.0, 150, 18, "2025-05-02"),
+      mockRun("n1", 10, 5.0, "2025-05-03"), // no temp
+    ];
+    const a = assessConditionNormalization(runs);
+    expect(a.available).toBe(false);
+    expect(a.limitations.length).toBeGreaterThan(0);
   });
 });
 
