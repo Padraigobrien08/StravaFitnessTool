@@ -22,9 +22,17 @@ export interface LoggedRecommendation {
   distanceKmMin: number | null;
   distanceKmMax: number | null;
 
-  // Evaluation (lazily filled).
+  // Adherence (lazily filled once the target day has passed).
   adherence?: Adherence;
   matchedRunIds?: string[];
   evaluationNote?: string;
   evaluatedAt?: string;
+
+  // Outcome signal (filled for followed recommendations old enough for the
+  // physiological effect to show in analytics). Did the advice actually work?
+  outcomeSignal?: OutcomeSignal;
+  outcomeNote?: string;
 }
+
+/** Whether current analytics support the recommendation's intended effect. */
+export type OutcomeSignal = "supported" | "partially_supported" | "contradicted" | "inconclusive";

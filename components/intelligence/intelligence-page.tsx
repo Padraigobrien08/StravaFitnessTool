@@ -18,11 +18,14 @@ import {
   IntelligenceCoachEntries,
 } from "./intelligence-sections";
 import { IntelligenceRecentlyLearned } from "./intelligence-recently-learned";
+import { IntelligenceRecommendationOutcomes } from "./intelligence-recommendation-outcomes";
+import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { coachUrl } from "@/lib/coach/domainLinks";
 
 export function IntelligencePage() {
   const intel = useAthleteIntelligence();
   const { dataSourceLabel, importData } = useStrava();
+  const outcomes = useRecommendationOutcomes(!!intel.state);
 
   const evolution = useMemo(
     () => (intel.analytics ? getStateEvolutionStrip(intel.analytics) : []),
@@ -112,6 +115,8 @@ export function IntelligencePage() {
             items={intel.recentlyLearned}
             adaptationSignals={intel.adaptationSignals}
           />
+
+          {outcomes ? <IntelligenceRecommendationOutcomes data={outcomes} /> : null}
 
           <IntelligenceMemoryGrouped memory={intel.memory} beliefsById={beliefsById} />
 

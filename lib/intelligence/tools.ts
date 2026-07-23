@@ -238,12 +238,18 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         ctx.userId,
         bundle.runs,
         analytics.workoutLabels,
+        {
+          freshness: analytics.fatigue.freshness,
+          tsb: analytics.fatigue.tsb,
+          readinessScore: analytics.raceReadiness?.score,
+          hardRuns14d: analytics.intensityAdvice.hardRunsLast14d,
+        },
       );
       const evidence = result.recommendations
         .slice(0, 8)
         .map(
           (r) =>
-            `${r.targetDate} ${r.kind}: ${r.adherence ?? "pending"}${r.evaluationNote ? ` — ${r.evaluationNote}` : ""}`,
+            `${r.targetDate} ${r.kind}: ${r.adherence ?? "pending"}${r.outcomeSignal ? ` / ${r.outcomeSignal}` : ""}${r.evaluationNote ? ` — ${r.evaluationNote}` : ""}`,
         );
       return wrapIntelligence(
         {
@@ -254,7 +260,9 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
             kind: r.kind,
             headline: r.headline,
             adherence: r.adherence ?? "pending",
+            outcomeSignal: r.outcomeSignal ?? null,
             note: r.evaluationNote ?? null,
+            outcomeNote: r.outcomeNote ?? null,
           })),
         },
         quality,
