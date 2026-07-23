@@ -644,6 +644,34 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_correlations": {
+      const c = analytics.correlations;
+      if (!c.available) {
+        return wrapIntelligence(
+          { error: "Not enough data to explore correlations yet." },
+          quality,
+          [],
+          c.limitations,
+        );
+      }
+      return wrapIntelligence(
+        {
+          correlations: c.correlations.map((x) => ({
+            pair: x.label,
+            r: x.r,
+            n: x.n,
+            strength: x.strength,
+            direction: x.direction,
+            interpretation: x.interpretation,
+            caveat: x.caveat,
+          })),
+        },
+        quality,
+        c.evidence,
+        c.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -1077,6 +1105,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_uncertainty",
     description:
       "Descriptive metrics as intervals, not points — aerobic efficiency, typical weekly volume, and easy-run pace each bootstrapped from the athlete's own recent runs into a 90% confidence interval with sample size. Use for 'what's my current efficiency/volume, and how sure are we?', 'how variable is my easy pace?', or when a point number needs its honest range. Bootstrap of the athlete's own data — no population assumptions.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_correlations",
+    description:
+      "Honest personal correlations between the athlete's own metrics — cadence vs efficiency, prior-week load vs efficiency/pace, temperature vs pace — each with Pearson r, sample size n, a conservative strength label, and a plain reading. Use for 'does higher cadence help my efficiency?', 'does training load affect my pace?', 'what's associated with my good/bad runs?'. Always association, never causation — confounders overlap; report the caveats.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
