@@ -586,6 +586,34 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_anomalies": {
+      const report = analytics.anomalies;
+      if (!report.available) {
+        return wrapIntelligence(
+          { anomalies: [], note: report.limitations[0] ?? "No anomalies detected." },
+          quality,
+          [],
+          report.limitations,
+        );
+      }
+      return wrapIntelligence(
+        {
+          anomalies: report.anomalies.map((a) => ({
+            date: a.date.slice(0, 10),
+            type: a.typeLabel,
+            sigma: a.z,
+            direction: a.direction,
+            causes: a.likelyCauses.map((c) => ({ cause: c.cause, detail: c.detail })),
+            confidence: a.confidence,
+            headline: a.headline,
+          })),
+        },
+        quality,
+        report.evidence,
+        report.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -1007,6 +1035,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_session_zscores",
     description:
       "How each recent session stacks up against the athlete's OWN distribution for that workout type, as a z-score ('this tempo was +1.8σ — faster-per-HR than your typical tempo'). Returns the standout best/worst recent sessions plus recent scores, each with cohort size and confidence. Use for 'was that a good tempo/long run?', 'how does this session compare to my usual?', 'which recent session stood out?'. Personal, not population — a small cohort reads as directional.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_anomalies",
+    description:
+      "Recent runs that don't fit the athlete's personal model (large personal z-score), each flagged with a likely cause — heat (weather temp), terrain (elevation per km), or fatigue (heavy preceding load) — or marked 'unexplained' when none of those account for it. Use for 'why was that run off?', 'any weird sessions lately?', 'was that a bad day or just conditions?'. Causes are contextual associations, not proven explanations.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

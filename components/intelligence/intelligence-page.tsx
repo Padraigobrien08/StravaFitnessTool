@@ -26,6 +26,7 @@ import { IntelligencePhysiology } from "./intelligence-physiology";
 import { IntelligenceCapabilityRadar } from "./intelligence-capability-radar";
 import { IntelligenceProgressionBurndown } from "./intelligence-progression-burndown";
 import { IntelligenceStandoutSessions } from "./intelligence-standout-sessions";
+import { IntelligenceAnomalies } from "./intelligence-anomalies";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { useForecastAccuracy } from "@/hooks/use-forecast-accuracy";
 import { coachUrl } from "@/lib/coach/domainLinks";
@@ -145,6 +146,8 @@ export function IntelligencePage() {
           <IntelligencePhysiology data={intel.analytics.physiology} />
 
           <IntelligenceStandoutSessions data={intel.analytics.personalZScores} />
+
+          <IntelligenceAnomalies data={intel.analytics.anomalies} />
 
           <IntelligenceMemoryGrouped memory={intel.memory} beliefsById={beliefsById} />
 
