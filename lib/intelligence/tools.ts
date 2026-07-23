@@ -614,6 +614,36 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_uncertainty": {
+      const u = analytics.uncertaintyEstimates;
+      if (!u.available) {
+        return wrapIntelligence(
+          { error: "Not enough recent data to bootstrap confidence intervals yet." },
+          quality,
+          [],
+          u.limitations,
+        );
+      }
+      return wrapIntelligence(
+        {
+          estimates: u.estimates.map((e) => ({
+            metric: e.label,
+            unit: e.unit,
+            point: e.point,
+            ciLow: e.lo,
+            ciHigh: e.hi,
+            ciPct: e.ciPct,
+            sampleSize: e.n,
+            confidence: e.confidence,
+            interpretation: e.interpretation,
+          })),
+        },
+        quality,
+        u.evidence,
+        u.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -1041,6 +1071,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_anomalies",
     description:
       "Recent runs that don't fit the athlete's personal model (large personal z-score), each flagged with a likely cause — heat (weather temp), terrain (elevation per km), or fatigue (heavy preceding load) — or marked 'unexplained' when none of those account for it. Use for 'why was that run off?', 'any weird sessions lately?', 'was that a bad day or just conditions?'. Causes are contextual associations, not proven explanations.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_uncertainty",
+    description:
+      "Descriptive metrics as intervals, not points — aerobic efficiency, typical weekly volume, and easy-run pace each bootstrapped from the athlete's own recent runs into a 90% confidence interval with sample size. Use for 'what's my current efficiency/volume, and how sure are we?', 'how variable is my easy pace?', or when a point number needs its honest range. Bootstrap of the athlete's own data — no population assumptions.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
