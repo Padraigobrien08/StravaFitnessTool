@@ -20,6 +20,7 @@ import {
 import { IntelligenceRecentlyLearned } from "./intelligence-recently-learned";
 import { IntelligenceRecommendationOutcomes } from "./intelligence-recommendation-outcomes";
 import { IntelligenceRiskPatterns } from "./intelligence-risk-patterns";
+import { IntelligencePeriodNarratives } from "./intelligence-period-narratives";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { coachUrl } from "@/lib/coach/domainLinks";
 
@@ -105,6 +106,11 @@ export function IntelligencePage() {
           />
 
           {evolution.length > 0 ? <IntelligenceStateEvolution items={evolution} /> : null}
+
+          <IntelligencePeriodNarratives
+            monthly={intel.analytics.monthlyNarrative}
+            preRace={intel.analytics.preRaceNarrative}
+          />
 
           <IntelligenceDecisionSupport
             risks={risks}

@@ -104,6 +104,8 @@ export type IntelligenceToolName =
   | "get_goal_scenarios"
   | "get_recommendation_outcomes"
   | "get_risk_patterns"
+  | "get_monthly_narrative"
+  | "get_pre_race_narrative"
   | "get_race_strategy"
   | "get_fatigue_load"
   | "list_recent_runs"
