@@ -124,8 +124,9 @@ Apply in order on Neon:
 3. `003_route_geometry.sql` — route/GPS storage (PostGIS-ready)
 4. `004_training_calendar.sql` — saved weekly plan (calendar week) per user
 5. `005_recommendation_log.sql` — recommendation-outcome tracking (adherence log)
+6. `006_athlete_memory.sql` — persisted athlete-memory beliefs (accumulating history)
 
-Coach preferences, the training calendar, and the recommendation log auto-ensure via `lib/db/ensure-coach-schema.ts`, `lib/db/training-calendar.ts`, and `lib/db/recommendation-log.ts` when their tables are missing.
+Coach preferences, the training calendar, the recommendation log, and athlete memory auto-ensure via their `lib/db/*` modules (`ensure-coach-schema.ts`, `training-calendar.ts`, `recommendation-log.ts`, `athlete-memory.ts`) when their tables are missing.
 
 ## Frontend conventions
 
