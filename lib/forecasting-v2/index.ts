@@ -1,6 +1,11 @@
 export { buildRaceForecastV2 } from "./forecastEngine";
 export { computeForecastSensitivity } from "./sensitivity";
 export type { SensitivityFactor } from "./sensitivity";
+export { scoreForecast, summarizeCalibration } from "./calibration";
+export type { LoggedForecast, CalibrationSummary } from "./calibration";
+// NOTE: calibrationService touches the DB client (postgres) — import it directly
+// from "@/lib/forecasting-v2/calibrationService" on server-only paths, never via
+// this barrel (the barrel is pulled into client bundles through the goals view-model).
 export {
   evaluateForecastV2,
   evaluateForecastFixture,
