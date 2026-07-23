@@ -24,8 +24,10 @@ import { IntelligencePeriodNarratives } from "./intelligence-period-narratives";
 import { IntelligenceForecastAccuracy } from "./intelligence-forecast-accuracy";
 import { IntelligencePhysiology } from "./intelligence-physiology";
 import { IntelligenceCapabilityRadar } from "./intelligence-capability-radar";
+import { IntelligenceLimiterProtocol } from "./intelligence-limiter-protocol";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { useForecastAccuracy } from "@/hooks/use-forecast-accuracy";
+import { useLimiterProtocol } from "@/hooks/use-limiter-protocol";
 import { coachUrl } from "@/lib/coach/domainLinks";
 
 export function IntelligencePage() {
@@ -33,6 +35,7 @@ export function IntelligencePage() {
   const { dataSourceLabel, importData } = useStrava();
   const outcomes = useRecommendationOutcomes(!!intel.state);
   const forecastAccuracy = useForecastAccuracy(!!intel.state);
+  const limiterProtocol = useLimiterProtocol(!!intel.state);
 
   const evolution = useMemo(
     () => (intel.analytics ? getStateEvolutionStrip(intel.analytics) : []),
@@ -137,6 +140,8 @@ export function IntelligencePage() {
           {forecastAccuracy ? <IntelligenceForecastAccuracy data={forecastAccuracy} /> : null}
 
           <IntelligenceCapabilityRadar data={intel.analytics.capabilityRadar} />
+
+          {limiterProtocol ? <IntelligenceLimiterProtocol data={limiterProtocol} /> : null}
 
           <IntelligencePhysiology data={intel.analytics.physiology} />
 

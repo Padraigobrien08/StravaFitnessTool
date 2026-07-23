@@ -1,5 +1,5 @@
 export type RecommendationProducer =
-  "today_session" | "week_plan" | "goal_scenario" | "coach_brief";
+  "today_session" | "week_plan" | "goal_scenario" | "limiter_protocol" | "coach_brief";
 
 /** Was the recommendation acted on? */
 export type Adherence = "followed" | "partial" | "skipped" | "pending" | "unknown";
