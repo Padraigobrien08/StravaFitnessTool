@@ -10,9 +10,11 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
   const cs = data.criticalSpeed;
   const fr = data.fatigueResistance;
   const dur = data.durability;
+  const te = data.thresholdEconomy;
   // Nothing to show until the athlete has enough spread of efforts to fit.
-  if (!cs.available && !fr.available && !dur.available) return null;
+  if (!cs.available && !fr.available && !dur.available && !te.available) return null;
   const showDivider = cs.available || fr.available;
+  const showDividerBeforeTe = cs.available || fr.available || dur.available;
 
   return (
     <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
@@ -106,9 +108,43 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
         </div>
       ) : null}
 
+      {te.available ? (
+        <div className={showDividerBeforeTe ? "mt-3 border-t border-white/[0.05] pt-3" : "mt-2"}>
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="text-[10px] text-zinc-600">Threshold &amp; economy</p>
+            {te.economyTrend ? <TrendGlyph trend={te.economyTrend} /> : null}
+          </div>
+          <p className="mt-0.5 text-[13px] leading-snug text-zinc-300">
+            {te.ltPaceSecPerKm != null ? (
+              <>
+                Threshold{" "}
+                <span className="font-medium tabular-nums text-zinc-100">
+                  {formatPace(te.ltPaceSecPerKm)}
+                </span>
+                {te.ltHr != null ? <span className="text-zinc-600"> @ {te.ltHr} bpm</span> : null}
+                {te.ltPctMaxHr != null ? (
+                  <span className="text-zinc-600"> ({Math.round(te.ltPctMaxHr * 100)}% max)</span>
+                ) : null}
+              </>
+            ) : (
+              <span className="text-zinc-500">Economy tracked; threshold pending tempo work</span>
+            )}
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 text-[10px] text-zinc-600">
+            {te.economyIndex != null ? (
+              <span>
+                economy {te.economyIndex.toFixed(3)}
+                {te.economyTrend ? ` · ${te.economyTrend}` : ""}
+              </span>
+            ) : null}
+            <span className="capitalize">· {te.confidence} confidence</span>
+          </div>
+        </div>
+      ) : null}
+
       <Link
         href={signalCoachLink(
-          "Explain my critical speed, anaerobic reserve, fatigue resistance, and durability.",
+          "Explain my critical speed, anaerobic reserve, fatigue resistance, durability, and threshold.",
         )}
         className="mt-2 inline-block text-[10px] text-zinc-600 hover:text-zinc-400"
       >
