@@ -36,7 +36,7 @@ The 17 `react-hooks/set-state-in-effect` warnings are intentional lifecycle patt
 | ~~F2~~ | ✅ Apply unit preferences app-wide — **done** (#41)                                                                                | S–M      | High     | `lib/units.ts` core + `useUnitFormat`; formatters read the saved unit. Follow-ups: race-strategy/execution split charts + plan-engine text stay metric                           |
 | ~~F3~~ | ✅ Persist the weekly Plan to the DB — **done** (#43)                                                                              | M        | Med–high | `training_calendar_weeks` table + `/api/me/training-calendar` (GET/POST/DELETE); `useTrainingCalendar` hydrates from server + debounced sync; localStorage kept as offline cache |
 | ~~F4~~ | ✅ Adaptive goal-scenario engine — **done** (#42)                                                                                  | M–L      | High     | `lib/goals/goalScenarios.ts` + `get_goal_scenarios` tool + Goals panel; probability reuses the v2 forecast prediction interval (no invented numbers)                             |
-| F5     | Workout-quality v2 — interval repeatability, aerobic decoupling, threshold control                                                 | M        | Med–high | Blocks "compare my last 3 thresholds"                                                                                                                                            |
+| ~~F5~~ | ✅ Workout-quality v2 — **done** (#44)                                                                                             | M        | Med–high | `lib/analytics/workoutQuality.ts` (repeatability, NEW aerobic decoupling, threshold control); extends `compare_sessions` + run-detail execution panel                            |
 | F6     | Risk-pattern matching · monthly/pre-race narratives · phase-catalog UI · recommendation-outcome tracking · persisted AthleteMemory | M–L each | Med      | Longer-horizon differentiation depth                                                                                                                                             |
 
 ## Progress
@@ -47,8 +47,9 @@ The 17 `react-hooks/set-state-in-effect` warnings are intentional lifecycle patt
 - ✅ **F2** — unit preferences app-wide (#41)
 - ✅ **F4** — adaptive goal-scenario engine (#42)
 - ✅ **F3** — persist weekly plan to DB (#43)
+- ✅ **F5** — workout-quality v2 (#44)
 
-**Remaining:** C4 (low urgency) and features **F5, F6**. Suggested next: **F5** (workout-quality v2 — interval repeatability, aerobic decoupling, threshold control).
+**Remaining:** C4 (low urgency) and **F6** (longer-horizon differentiation bundle). Plus fast-follows: Home "Today" card + MCP parity (F1), race-strategy split charts in miles (F2), integration tests for `executeIntelligenceTool` (C3).
 
 ## Confirmed solid — no action
 
