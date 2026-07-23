@@ -8,6 +8,10 @@ import { recommendTodaySession, buildTodaySessionInput } from "@/lib/training/to
 import { computeGoalScenarios } from "@/lib/goals/goalScenarios";
 import { buildRaceForecastInput } from "@/lib/forecasting-v2/buildInput";
 import {
+  evaluateRecommendationOutcomes,
+  logTodaySessionRecommendation,
+} from "@/lib/recommendation-outcomes/service";
+import {
   buildFullEcosystemCoachPayload,
   compareModalityBlocks,
   getAthleteArchetypePayload,
@@ -166,6 +170,8 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
 
     case "recommend_today_session": {
       const rec = recommendTodaySession(buildTodaySessionInput(analytics));
+      // Record it so adherence can be evaluated later (fire-and-forget).
+      void logTodaySessionRecommendation(ctx.userId, rec);
       return wrapIntelligence(
         {
           kind: rec.kind,
@@ -224,6 +230,38 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         quality,
         result.evidence,
         result.limitations,
+      );
+    }
+
+    case "get_recommendation_outcomes": {
+      const result = await evaluateRecommendationOutcomes(
+        ctx.userId,
+        bundle.runs,
+        analytics.workoutLabels,
+      );
+      const evidence = result.recommendations
+        .slice(0, 8)
+        .map(
+          (r) =>
+            `${r.targetDate} ${r.kind}: ${r.adherence ?? "pending"}${r.evaluationNote ? ` — ${r.evaluationNote}` : ""}`,
+        );
+      return wrapIntelligence(
+        {
+          summary: result.summary,
+          recommendations: result.recommendations.map((r) => ({
+            date: r.targetDate,
+            producer: r.producer,
+            kind: r.kind,
+            headline: r.headline,
+            adherence: r.adherence ?? "pending",
+            note: r.evaluationNote ?? null,
+          })),
+        },
+        quality,
+        evidence,
+        result.summary.total === 0
+          ? ["No recommendations recorded yet — they log as the Coach makes them."]
+          : [],
       );
     }
 
@@ -507,6 +545,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_goal_scenarios",
     description:
       "Adaptive goal scenarios: the probability of hitting the target race time under different training changes (maintain, build volume, add quality, full block), each with its projected time. Use for 'what would it take to hit my goal?', 'can I run <time>?', or 'how do I get faster for my race?'.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_recommendation_outcomes",
+    description:
+      "Track whether past recommendations were followed: for each recorded recommendation, its adherence (followed, partial, skipped, pending) vs the athlete's actual runs, plus an overall adherence rate. Use for 'did I follow your advice?', 'how consistent have I been with the plan?', or to self-assess coaching effectiveness.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
