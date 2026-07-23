@@ -672,6 +672,34 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_change_points": {
+      const cp = analytics.changePoints;
+      if (!cp.available) {
+        return wrapIntelligence(
+          { changePoints: [], note: cp.limitations[0] ?? "No fitness change-points detected." },
+          quality,
+          [],
+          cp.limitations,
+        );
+      }
+      return wrapIntelligence(
+        {
+          metric: cp.metricLabel,
+          changePoints: cp.changePoints.map((c) => ({
+            week: c.label,
+            kind: c.kind,
+            slopeBefore: c.slopeBefore,
+            slopeAfter: c.slopeAfter,
+            deltaPerWeek: c.deltaPerWeek,
+            interpretation: c.interpretation,
+          })),
+        },
+        quality,
+        cp.evidence,
+        cp.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -1111,6 +1139,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_correlations",
     description:
       "Honest personal correlations between the athlete's own metrics — cadence vs efficiency, prior-week load vs efficiency/pace, temperature vs pace — each with Pearson r, sample size n, a conservative strength label, and a plain reading. Use for 'does higher cadence help my efficiency?', 'does training load affect my pace?', 'what's associated with my good/bad runs?'. Always association, never causation — confounders overlap; report the caveats.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_change_points",
+    description:
+      "Inflection points in the athlete's fitness trajectory (weekly CTL) where the slope meaningfully changed — a build taking hold (reversal_up), a peak then decline or break/setback (reversal_down), a ramp steepening (acceleration), or gains flattening (deceleration) — each dated with a plain reading. Use for 'when did my fitness turn around?', 'did that block work?', 'when did things drop off?'. CTL is a load-based proxy; these are descriptive markers, not diagnoses.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

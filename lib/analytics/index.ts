@@ -18,6 +18,7 @@ import { computePersonalZScores, type PersonalZScores } from "./personalZScores"
 import { computeAnomalies, type AnomalyReport } from "./anomalies";
 import { computeUncertaintyEstimates, type UncertaintyEstimates } from "./uncertaintyEstimates";
 import { computeCorrelations, type CorrelationReport } from "./correlations";
+import { computeFitnessChangePoints, type ChangePointReport } from "./changePoints";
 import { fitnessIndex, loadByRun } from "./trainingLoad";
 import { hrTrend, paceTrend, rollingAveragePace } from "./trends";
 import { lastNDaysVolume, monthlyVolume, weeklyVolume } from "./volume";
@@ -101,6 +102,7 @@ export interface DashboardInsights {
   anomalies: AnomalyReport;
   uncertaintyEstimates: UncertaintyEstimates;
   correlations: CorrelationReport;
+  changePoints: ChangePointReport;
   goalProgress: ReturnType<typeof runGoalProgress>;
   trainingLoadByRun: ReturnType<typeof loadByRun>;
   fitnessIndex: ReturnType<typeof fitnessIndex>;
@@ -228,6 +230,7 @@ export function computeInsights(
   const anomalies = computeAnomalies(runs, personalZScores);
   const uncertaintyEstimates = computeUncertaintyEstimates(runs, workoutLabels);
   const correlations = computeCorrelations(runs);
+  const changePoints = computeFitnessChangePoints(fitnessIndexPoints);
 
   const nextWeekPlan = buildNextWeekPlan(
     buildPlanContextFromInsights(
@@ -294,6 +297,7 @@ export function computeInsights(
     anomalies,
     uncertaintyEstimates,
     correlations,
+    changePoints,
     racePredictions: racePredictions(runs, fitDetails),
     goalProgress,
     trainingLoadByRun: loadByRun(runs),
@@ -366,6 +370,7 @@ export * from "./anomalies";
 export * from "./bootstrap";
 export * from "./uncertaintyEstimates";
 export * from "./correlations";
+export * from "./changePoints";
 export * from "./week";
 export * from "./narrative";
 export * from "./consistency";
