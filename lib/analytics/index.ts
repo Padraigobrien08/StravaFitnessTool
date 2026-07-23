@@ -250,7 +250,7 @@ export function computeInsights(
     easyHard,
     personalRecords,
     racePredictionAnalysis,
-    physiology: computePhysiology(runs, fitDetails),
+    physiology: computePhysiology(runs, fitDetails, { workoutLabels, athleteMaxHr }),
     racePredictions: racePredictions(runs, fitDetails),
     goalProgress,
     trainingLoadByRun: loadByRun(runs),

@@ -403,6 +403,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       const cs = phys.criticalSpeed;
       const fr = phys.fatigueResistance;
       const dur = phys.durability;
+      const te = phys.thresholdEconomy;
       return wrapIntelligence(
         {
           criticalSpeed: cs.available
@@ -440,10 +441,23 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
                 interpretation: dur.interpretation,
               }
             : null,
+          thresholdEconomy: te.available
+            ? {
+                thresholdPace: te.ltPaceSecPerKm != null ? formatPace(te.ltPaceSecPerKm) : null,
+                thresholdHr: te.ltHr,
+                thresholdPctMaxHr: te.ltPctMaxHr != null ? Math.round(te.ltPctMaxHr * 100) : null,
+                thresholdSessions: te.thresholdSampleSize,
+                economyIndex: te.economyIndex,
+                economyTrend: te.economyTrend,
+                economyRuns: te.economySampleSize,
+                confidence: te.confidence,
+                interpretation: te.interpretation,
+              }
+            : null,
         },
         quality,
-        [...cs.evidence, ...fr.evidence, ...dur.evidence],
-        [...cs.limitations, ...fr.limitations, ...dur.limitations],
+        [...cs.evidence, ...fr.evidence, ...dur.evidence, ...te.evidence],
+        [...cs.limitations, ...fr.limitations, ...dur.limitations, ...te.limitations],
       );
     }
 
@@ -849,7 +863,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_physiology",
     description:
-      "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance — the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend; (3) durability — a 0–100 score for how well efficiency (HR drift) and pace hold up deep into long runs, with a trend. Each with confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how durable is my aerobic engine?', 'how's my endurance holding?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
+      "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance — the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend; (3) durability — a 0–100 score for how well efficiency (HR drift) and pace hold up deep into long runs, with a trend; (4) threshold/economy — estimated lactate-threshold pace and HR from tempo/threshold sessions, plus running economy as a grade-adjusted pace-per-HR trend. Each with confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how durable is my aerobic engine?', 'what's my threshold pace/HR?', 'is my running economy improving?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

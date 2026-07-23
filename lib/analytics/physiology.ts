@@ -1,7 +1,9 @@
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
+import type { RunWorkoutLabel } from "./workoutType";
 import { collectEffortPoints, fitPowerLawRegression, type EffortPoint } from "./predictions";
 import { findPersonalRecords } from "./records";
+import { paceSecPerKm } from "./pace";
 import { computeLateFadePct } from "@/lib/reasoning/executionScore";
 
 /**
@@ -30,6 +32,13 @@ import { computeLateFadePct } from "@/lib/reasoning/executionScore";
  *   the modern differentiator, and is DISTINCT from the forecaster's
  *   `assessDurability` (that scores long-run *distance* support for a specific
  *   race; this is a longitudinal *physiological* metric independent of any goal).
+ *
+ * P4 — Threshold / economy estimation:
+ *   Lactate-threshold pace and HR estimated from the athlete's own tempo /
+ *   threshold sessions (the pace they actually hold at a threshold effort, and
+ *   the HR that rides with it), plus running economy as a grade-adjusted
+ *   pace-per-HR trend (GAP-at-HR) — faster GAP at the same HR means a more
+ *   economical engine.
  */
 
 export interface CriticalSpeedFit {
@@ -93,10 +102,37 @@ export interface DurabilityScoreAssessment {
   limitations: string[];
 }
 
+export interface ThresholdEconomyAssessment {
+  available: boolean;
+  /** Estimated lactate-threshold pace (sec/km) from tempo/threshold sessions. */
+  ltPaceSecPerKm: number | null;
+  /** HR that rides with threshold efforts. */
+  ltHr: number | null;
+  /** LT HR as a fraction of max HR (0–1). */
+  ltPctMaxHr: number | null;
+  /** Number of tempo/threshold sessions behind the LT estimate. */
+  thresholdSampleSize: number;
+  /** Latest running-economy index (grade-adjusted sec/km per HR beat; lower = better). */
+  economyIndex: number | null;
+  economyTrend: "improving" | "declining" | "stable" | null;
+  economySampleSize: number;
+  confidence: "low" | "medium" | "high";
+  interpretation: string;
+  evidence: string[];
+  limitations: string[];
+}
+
 export interface AthletePhysiology {
   criticalSpeed: CriticalSpeedAssessment;
   fatigueResistance: FatigueResistanceAssessment;
   durability: DurabilityScoreAssessment;
+  thresholdEconomy: ThresholdEconomyAssessment;
+}
+
+/** Optional context that unlocks threshold/economy (P4) estimation. */
+export interface PhysiologyContext {
+  workoutLabels?: RunWorkoutLabel[];
+  athleteMaxHr?: number | null;
 }
 
 /** Riegel's classic endurance-scaling exponent — the reference to compare against. */
@@ -470,10 +506,169 @@ export function assessDurability(
   };
 }
 
+/** Grade-adjusted pace for economy — prefer GAP, fall back to raw pace. */
+function gapPace(run: RunActivity): number | null {
+  if (run.gradeAdjustedPaceSecPerKm != null && run.gradeAdjustedPaceSecPerKm > 0) {
+    return run.gradeAdjustedPaceSecPerKm;
+  }
+  return paceSecPerKm(run);
+}
+
+function unavailableThresholdEconomy(reason: string): ThresholdEconomyAssessment {
+  return {
+    available: false,
+    ltPaceSecPerKm: null,
+    ltHr: null,
+    ltPctMaxHr: null,
+    thresholdSampleSize: 0,
+    economyIndex: null,
+    economyTrend: null,
+    economySampleSize: 0,
+    confidence: "low",
+    interpretation: "Not enough classified tempo/threshold work with HR to estimate threshold.",
+    evidence: [],
+    limitations: [reason],
+  };
+}
+
+/**
+ * Estimate lactate threshold (pace + HR) from the athlete's tempo/threshold
+ * sessions, and running economy as a grade-adjusted pace-per-HR trend.
+ */
+export function assessThresholdEconomy(
+  runs: RunActivity[],
+  ctx: PhysiologyContext,
+): ThresholdEconomyAssessment {
+  const { workoutLabels, athleteMaxHr } = ctx;
+  if (!workoutLabels || workoutLabels.length === 0) {
+    return unavailableThresholdEconomy(
+      "Workout classification unavailable for threshold estimate.",
+    );
+  }
+
+  const typeById = new Map(workoutLabels.map((l) => [l.runId, l.classification.type]));
+  const runById = new Map(runs.map((r) => [r.id, r]));
+
+  // LT pace/HR from tempo (which includes threshold) efforts with HR.
+  const thresholdPaces: number[] = [];
+  const thresholdHrs: number[] = [];
+  for (const label of workoutLabels) {
+    if (label.classification.type !== "tempo") continue;
+    const run = runById.get(label.runId);
+    if (!run) continue;
+    const pace = paceSecPerKm(run);
+    if (pace == null || pace <= 0 || pace > 480) continue;
+    thresholdPaces.push(pace);
+    if (run.avgHr != null && run.avgHr >= 90) thresholdHrs.push(run.avgHr);
+  }
+
+  // Economy: GAP-at-HR across steady aerobic runs (easy/long/tempo), over time.
+  const economyPoints: { date: string; index: number }[] = [];
+  for (const run of runs) {
+    const type = typeById.get(run.id);
+    if (type === "interval" || type === "recovery") continue; // not steady-state efficiency
+    const gap = gapPace(run);
+    if (gap == null || run.avgHr == null || run.avgHr < 90) continue;
+    economyPoints.push({ date: run.date, index: Math.round((gap / run.avgHr) * 1000) / 1000 });
+  }
+  economyPoints.sort((a, b) => a.date.localeCompare(b.date));
+
+  let economyIndex: number | null = null;
+  let economyTrend: ThresholdEconomyAssessment["economyTrend"] = null;
+  if (economyPoints.length >= 1) {
+    economyIndex = economyPoints[economyPoints.length - 1].index;
+  }
+  if (economyPoints.length >= 6) {
+    const recent = economyPoints.slice(-4).map((p) => p.index);
+    const older = economyPoints.slice(-8, -4).map((p) => p.index);
+    if (older.length >= 2) {
+      const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+      const olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
+      const delta = recentAvg - olderAvg;
+      // Lower GAP-per-HR = more economical.
+      economyTrend = delta < -0.002 ? "improving" : delta > 0.002 ? "declining" : "stable";
+    }
+  }
+
+  const hasThreshold = thresholdPaces.length >= 2;
+  if (!hasThreshold && economyIndex == null) {
+    return unavailableThresholdEconomy(
+      "Need ≥2 tempo/threshold runs (or steady runs with HR) to estimate threshold and economy.",
+    );
+  }
+
+  const ltPaceSecPerKm = hasThreshold ? Math.round(median(thresholdPaces)) : null;
+  const ltHr = thresholdHrs.length ? Math.round(median(thresholdHrs)) : null;
+  const ltPctMaxHr =
+    ltHr != null && athleteMaxHr && athleteMaxHr > 0
+      ? Math.round((ltHr / athleteMaxHr) * 1000) / 1000
+      : null;
+
+  const confidence: "low" | "medium" | "high" =
+    thresholdPaces.length >= 5 && economyPoints.length >= 8
+      ? "high"
+      : thresholdPaces.length >= 3 || economyPoints.length >= 6
+        ? "medium"
+        : "low";
+
+  const evidence: string[] = [];
+  if (ltPaceSecPerKm != null) {
+    evidence.push(
+      `Threshold pace ≈ ${paceStr(ltPaceSecPerKm)} from ${thresholdPaces.length} tempo/threshold session${thresholdPaces.length === 1 ? "" : "s"}${
+        ltHr != null
+          ? ` at ~${ltHr} bpm${ltPctMaxHr != null ? ` (${Math.round(ltPctMaxHr * 100)}% max HR)` : ""}`
+          : ""
+      }.`,
+    );
+  }
+  if (economyIndex != null) {
+    evidence.push(
+      `Running economy (grade-adjusted pace per HR beat) at ${economyIndex.toFixed(3)}${
+        economyTrend ? ` and ${economyTrend}` : ""
+      }, from ${economyPoints.length} steady runs.`,
+    );
+  }
+
+  const limitations: string[] = [];
+  if (!hasThreshold) {
+    limitations.push("No tempo/threshold sessions classified yet — LT pace not estimated.");
+  }
+  if (ltHr == null && hasThreshold) {
+    limitations.push("Threshold sessions lack HR — LT heart rate not estimated.");
+  }
+  if (economyTrend == null && economyIndex != null) {
+    limitations.push("Not enough steady runs across periods for an economy trend.");
+  }
+  if (confidence === "low") {
+    limitations.push("Sparse threshold/economy data — treat these as directional.");
+  }
+
+  const interpretation =
+    ltPaceSecPerKm != null
+      ? `Threshold ≈ ${paceStr(ltPaceSecPerKm)}${ltHr != null ? ` @ ${ltHr} bpm` : ""}.`
+      : "Running economy tracked; threshold pace pending tempo/threshold sessions.";
+
+  return {
+    available: true,
+    ltPaceSecPerKm,
+    ltHr,
+    ltPctMaxHr,
+    thresholdSampleSize: thresholdPaces.length,
+    economyIndex,
+    economyTrend,
+    economySampleSize: economyPoints.length,
+    confidence,
+    interpretation,
+    evidence,
+    limitations,
+  };
+}
+
 /** Compute the athlete's physiology profile from runs + FIT detail. */
 export function computePhysiology(
   runs: RunActivity[],
   fitDetails: FitRunDetail[] = [],
+  ctx: PhysiologyContext = {},
 ): AthletePhysiology {
   const prs = findPersonalRecords(runs, fitDetails);
   const efforts = collectEffortPoints(runs, fitDetails, prs);
@@ -481,5 +676,6 @@ export function computePhysiology(
     criticalSpeed: assessCriticalSpeed(efforts),
     fatigueResistance: assessFatigueResistance(efforts),
     durability: assessDurability(runs, fitDetails),
+    thresholdEconomy: assessThresholdEconomy(runs, ctx),
   };
 }

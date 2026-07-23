@@ -3,6 +3,7 @@ import {
   assessCriticalSpeed,
   assessDurability,
   assessFatigueResistance,
+  assessThresholdEconomy,
   computePhysiology,
   criticalSpeedPredictSec,
   fitCriticalSpeed,
@@ -10,6 +11,7 @@ import {
 import type { EffortPoint } from "../predictions";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
+import type { RunWorkoutLabel, WorkoutType } from "../workoutType";
 
 /** Build a distance–time point on the line distance = cs·t + dPrime. */
 function pointOnLine(timeSec: number, cs: number, dPrime: number) {
@@ -54,6 +56,25 @@ function mockRun(id: string, km: number, paceMinPerKm: number, date = "2025-06-0
     avgCadence: null,
     totalSteps: null,
     weatherTempC: null,
+  };
+}
+
+function runHr(
+  id: string,
+  km: number,
+  paceMinPerKm: number,
+  avgHr: number,
+  date = "2025-06-01",
+): RunActivity {
+  return { ...mockRun(id, km, paceMinPerKm, date), avgHr };
+}
+
+function label(runId: string, type: WorkoutType, date = "2025-06-01"): RunWorkoutLabel {
+  return {
+    runId,
+    date,
+    runName: `Run ${runId}`,
+    classification: { type, confidence: "high", signals: [] },
   };
 }
 
@@ -266,6 +287,63 @@ describe("assessDurability", () => {
     ];
     const a = assessDurability(runs, fits);
     expect(a.trend).toBe("declining");
+  });
+});
+
+describe("assessThresholdEconomy", () => {
+  it("estimates LT pace/HR from tempo sessions", () => {
+    const runs = [
+      runHr("t1", 8, 4.0, 170, "2025-05-01"),
+      runHr("t2", 6, 4.05, 172, "2025-05-10"),
+      runHr("t3", 7, 3.95, 168, "2025-05-20"),
+    ];
+    const labels = [
+      label("t1", "tempo", "2025-05-01"),
+      label("t2", "tempo", "2025-05-10"),
+      label("t3", "tempo", "2025-05-20"),
+    ];
+    const a = assessThresholdEconomy(runs, { workoutLabels: labels, athleteMaxHr: 190 });
+    expect(a.available).toBe(true);
+    expect(a.ltPaceSecPerKm).toBeCloseTo(240, -1); // ~4:00/km
+    expect(a.ltHr).toBe(170);
+    expect(a.ltPctMaxHr).toBeCloseTo(170 / 190, 2);
+    expect(a.thresholdSampleSize).toBe(3);
+  });
+
+  it("detects an improving economy trend (faster GAP at same HR)", () => {
+    const runs: RunActivity[] = [];
+    const labels: RunWorkoutLabel[] = [];
+    // 4 older easy runs at 5:00/km, 4 recent at 4:45/km — same HR → economy improves.
+    for (let i = 0; i < 4; i++) {
+      const d = `2025-01-0${i + 1}`;
+      runs.push(runHr(`o${i}`, 10, 5.0, 150, d));
+      labels.push(label(`o${i}`, "easy", d));
+    }
+    for (let i = 0; i < 4; i++) {
+      const d = `2025-06-0${i + 1}`;
+      runs.push(runHr(`r${i}`, 10, 4.75, 150, d));
+      labels.push(label(`r${i}`, "easy", d));
+    }
+    const a = assessThresholdEconomy(runs, { workoutLabels: labels, athleteMaxHr: 190 });
+    expect(a.economyTrend).toBe("improving");
+    expect(a.economySampleSize).toBe(8);
+  });
+
+  it("is unavailable without workout labels", () => {
+    const runs = [runHr("t1", 8, 4.0, 170)];
+    const a = assessThresholdEconomy(runs, {});
+    expect(a.available).toBe(false);
+    expect(a.limitations.length).toBeGreaterThan(0);
+  });
+
+  it("tracks economy but flags missing threshold when no tempo work", () => {
+    const runs = [runHr("e1", 10, 5.0, 150, "2025-05-01"), runHr("e2", 10, 5.1, 151, "2025-05-08")];
+    const labels = [label("e1", "easy", "2025-05-01"), label("e2", "easy", "2025-05-08")];
+    const a = assessThresholdEconomy(runs, { workoutLabels: labels, athleteMaxHr: 190 });
+    expect(a.available).toBe(true);
+    expect(a.ltPaceSecPerKm).toBeNull();
+    expect(a.economyIndex).not.toBeNull();
+    expect(a.limitations.some((l) => /tempo\/threshold/i.test(l))).toBe(true);
   });
 });
 
