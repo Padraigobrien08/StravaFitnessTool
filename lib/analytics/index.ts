@@ -61,6 +61,11 @@ import {
 import { simulateRaceStrategy, type RaceStrategy } from "./raceStrategy";
 import { computeTrainingEcosystem, type TrainingEcosystemAnalysis } from "@/lib/ecosystem";
 import { detectRiskPatterns, recentLongRunsKm, type RiskPattern } from "./riskPatterns";
+import {
+  detectTrainingPhases,
+  buildTrainingPhasesInput,
+  type TrainingPhase,
+} from "./trainingPhases";
 
 export interface DashboardInsights {
   summary: {
@@ -115,6 +120,7 @@ export interface DashboardInsights {
   raceStrategy: RaceStrategy | null;
   trainingEcosystem: TrainingEcosystemAnalysis;
   riskPatterns: RiskPattern[];
+  trainingPhases: TrainingPhase[];
 }
 
 const DEFAULT_MAX_HR = 190;
@@ -282,6 +288,14 @@ export function computeInsights(
       fatigue,
       recentLongRunsKm: recentLongRunsKm(runs, workoutLabels),
     }),
+    trainingPhases: detectTrainingPhases(
+      buildTrainingPhasesInput({
+        weeklyVolume: weeks,
+        loadHistory,
+        workoutLabels,
+        raceReadiness: raceReadinessResult,
+      }),
+    ),
   };
 }
 
@@ -303,6 +317,7 @@ export * from "./narrative";
 export * from "./consistency";
 export * from "./intensityAdvisor";
 export * from "./riskPatterns";
+export * from "./trainingPhases";
 export * from "./progression";
 export * from "./fatigue";
 export * from "./workoutType";
