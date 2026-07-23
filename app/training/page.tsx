@@ -10,6 +10,7 @@ import { TrainingStateHero } from "@/components/training/training-state-hero";
 import { LoadIntelligencePanel } from "@/components/training/load-intelligence-panel";
 import { CoachingExplainability } from "@/components/training/coaching-explainability";
 import { AdaptationSignalsPanel } from "@/components/training/adaptation-signals-panel";
+import { PhaseCatalogPanel } from "@/components/training/phase-catalog-panel";
 import { SupportingAnalytics } from "@/components/training/supporting-analytics";
 import { TrainingEcosystemPanel } from "@/components/training/training-ecosystem-panel";
 import { ops } from "@/components/home/primitives/tokens";
@@ -66,6 +67,7 @@ export default function TrainingPage() {
             <CoachingExplainability data={view.explain} className={cn(ops.intelSide)} />
           </div>
           <AdaptationSignalsPanel data={view.adaptation} />
+          <PhaseCatalogPanel phases={analytics.trainingPhases} />
           <TrainingEcosystemPanel data={view.ecosystem} />
           <SupportingAnalytics data={view.supporting} defaultCollapsed />
         </TrainingWorkspace>

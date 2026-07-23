@@ -277,6 +277,28 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_training_phases": {
+      const phases = analytics.trainingPhases;
+      return wrapIntelligence(
+        {
+          count: phases.length,
+          current: phases[phases.length - 1]?.label ?? null,
+          phases: phases.map((p) => ({
+            type: p.type,
+            label: p.label,
+            startWeek: p.startWeek,
+            endWeek: p.endWeek,
+            weeks: p.weeks,
+            avgWeeklyKm: p.avgWeeklyKm,
+            characterization: p.characterization,
+          })),
+        },
+        quality,
+        phases.map((p) => `${p.label} (${p.weeks}w): ${p.characterization}`),
+        phases.length === 0 ? ["Not enough history to segment training phases yet."] : [],
+      );
+    }
+
     case "get_risk_patterns": {
       const patterns = analytics.riskPatterns;
       return wrapIntelligence(
@@ -629,6 +651,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_pre_race_narrative",
     description:
       "A pre-race lead-in summary (only within ~3 weeks of a race goal): readiness, taper/freshness status, projected finish, top limiter, and a one-line game plan. Use for 'how's my race prep?', 'am I ready for race day?'.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_training_phases",
+    description:
+      "A catalog of the athlete's recent training phases (base, build, sharpening, taper, recovery, off) as a timeline — each with its week span, average weekly volume, and a one-line characterization. Use for 'what phases have I been through?', 'am I in a build or base phase?', or a training-history overview. Distinct from get_race_strategy; this segments history, it does not pick a single best block.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

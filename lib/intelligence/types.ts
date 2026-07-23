@@ -106,6 +106,7 @@ export type IntelligenceToolName =
   | "get_risk_patterns"
   | "get_monthly_narrative"
   | "get_pre_race_narrative"
+  | "get_training_phases"
   | "get_race_strategy"
   | "get_fatigue_load"
   | "list_recent_runs"
