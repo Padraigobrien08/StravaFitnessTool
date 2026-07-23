@@ -238,6 +238,26 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_risk_patterns": {
+      const patterns = analytics.riskPatterns;
+      return wrapIntelligence(
+        {
+          count: patterns.length,
+          highestSeverity: patterns[0]?.severity ?? null,
+          patterns: patterns.map((p) => ({
+            name: p.name,
+            severity: p.severity,
+            evidence: p.evidence,
+            mitigation: p.mitigation,
+            confidence: p.confidence,
+          })),
+        },
+        quality,
+        patterns.slice(0, 5).map((p) => `${p.name} (${p.severity}): ${p.evidence[0]}`),
+        patterns.length === 0 ? ["No elevated training-risk patterns detected."] : [],
+      );
+    }
+
     case "get_recommendation_outcomes": {
       const result = await evaluateRecommendationOutcomes(
         ctx.userId,
@@ -558,6 +578,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_goal_scenarios",
     description:
       "Adaptive goal scenarios: the probability of hitting the target race time under different training changes (maintain, build volume, add quality, full block), each with its projected time. Use for 'what would it take to hit my goal?', 'can I run <time>?', or 'how do I get faster for my race?'.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_risk_patterns",
+    description:
+      "Detect dangerous training patterns from the athlete's series — acute-load spikes (ACWR), rapid volume ramps, overreaching streaks, excessive intensity, long-run jumps — each with severity, evidence, and a mitigation. Use for 'am I at risk of injury/overtraining?', 'is my ramp too aggressive?', or a safety check.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
