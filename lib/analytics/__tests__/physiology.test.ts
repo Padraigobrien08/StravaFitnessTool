@@ -177,8 +177,20 @@ describe("assessFatigueResistance", () => {
 function paceStream(firstPace: number, lastPace: number) {
   const midPace = (firstPace + lastPace) / 2;
   const out: { elapsedSec: number; paceSecPerKm: number }[] = [];
-  const paces = [firstPace, firstPace, firstPace, firstPace, midPace, midPace, midPace, midPace,
-    lastPace, lastPace, lastPace, lastPace];
+  const paces = [
+    firstPace,
+    firstPace,
+    firstPace,
+    firstPace,
+    midPace,
+    midPace,
+    midPace,
+    midPace,
+    lastPace,
+    lastPace,
+    lastPace,
+    lastPace,
+  ];
   paces.forEach((p, i) => out.push({ elapsedSec: i * 60, paceSecPerKm: p }));
   return out;
 }
