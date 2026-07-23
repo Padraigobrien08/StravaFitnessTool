@@ -1,6 +1,6 @@
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
-import { collectEffortPoints, type EffortPoint } from "./predictions";
+import { collectEffortPoints, fitPowerLawRegression, type EffortPoint } from "./predictions";
 import { findPersonalRecords } from "./records";
 
 /**
@@ -14,8 +14,14 @@ import { findPersonalRecords } from "./records";
  *   fixed distance bank spendable above CS). Fitting the athlete's own best
  *   efforts turns "how fast are you?" into two independently trainable numbers.
  *
- * Later pillars extend AthletePhysiology with fatigue-resistance (P2) and a
- * durability score (P3).
+ * P2 — Personalized fatigue-resistance:
+ *   The exponent of the athlete's own power-law time–distance fit *is* their
+ *   fatigue-resistance number. Riegel's textbook exponent is ~1.06; a higher
+ *   personal exponent means pace fades faster as distance grows. Surfaced with
+ *   a plain-English "how much more you fade per doubling" and a direction of
+ *   travel over recent vs older efforts.
+ *
+ * A later pillar extends AthletePhysiology with a durability score (P3).
  */
 
 export interface CriticalSpeedFit {
@@ -42,9 +48,32 @@ export interface CriticalSpeedAssessment {
   limitations: string[];
 }
 
+export interface FatigueResistanceAssessment {
+  available: boolean;
+  /** Personal power-law exponent (time ∝ distance^exponent). */
+  exponent: number | null;
+  /** Textbook Riegel reference exponent. */
+  referenceExponent: number;
+  /** Extra % of time added per doubling of distance vs the reference. */
+  extraFadePerDoublingPct: number | null;
+  rSquared: number | null;
+  n: number;
+  /** Direction of the exponent over recent vs older efforts. */
+  trend: "improving" | "declining" | "stable" | null;
+  trendDetail: string | null;
+  confidence: "low" | "medium" | "high";
+  interpretation: string;
+  evidence: string[];
+  limitations: string[];
+}
+
 export interface AthletePhysiology {
   criticalSpeed: CriticalSpeedAssessment;
+  fatigueResistance: FatigueResistanceAssessment;
 }
+
+/** Riegel's classic endurance-scaling exponent — the reference to compare against. */
+export const RIEGEL_REFERENCE_EXPONENT = 1.06;
 
 /** Duration band where the two-parameter CS model is physiologically valid. */
 const CS_MIN_SEC = 120; // ~2 min — below this, non-CS energetics dominate
@@ -176,6 +205,105 @@ export function assessCriticalSpeed(efforts: EffortPoint[]): CriticalSpeedAssess
   };
 }
 
+/** Extra % of time added per doubling of distance for `exponent` vs `reference`. */
+function extraFadePerDoubling(exponent: number, reference: number): number {
+  const pct = (Math.pow(2, exponent) / Math.pow(2, reference) - 1) * 100;
+  return Math.round(pct * 10) / 10;
+}
+
+function frConfidence(n: number, rSquared: number): "low" | "medium" | "high" {
+  if (n >= 6 && rSquared >= 0.9) return "high";
+  if (n >= 4 && rSquared >= 0.75) return "medium";
+  return "low";
+}
+
+/**
+ * Assess personalized fatigue-resistance from the power-law fit of the athlete's
+ * efforts. The exponent is the metric; the reference contextualizes it.
+ */
+export function assessFatigueResistance(efforts: EffortPoint[]): FatigueResistanceAssessment {
+  const ref = RIEGEL_REFERENCE_EXPONENT;
+  const fit = fitPowerLawRegression(efforts);
+  if (!fit) {
+    return {
+      available: false,
+      exponent: null,
+      referenceExponent: ref,
+      extraFadePerDoublingPct: null,
+      rSquared: null,
+      n: efforts.length,
+      trend: null,
+      trendDetail: null,
+      confidence: "low",
+      interpretation:
+        "Not enough efforts across distances to fit a personal fatigue-resistance curve.",
+      evidence: [],
+      limitations: ["Need ≥3 efforts spread across 3–30 km for a power-law fit."],
+    };
+  }
+
+  const exponent = Math.round(fit.exponent * 1000) / 1000;
+  const extra = extraFadePerDoubling(exponent, ref);
+  const confidence = frConfidence(fit.pointCount, fit.rSquared);
+
+  // Trend: fit the exponent on the recent half vs the older half of efforts.
+  let trend: FatigueResistanceAssessment["trend"] = null;
+  let trendDetail: string | null = null;
+  const byDate = [...efforts].sort((a, b) => a.date.localeCompare(b.date));
+  const mid = Math.floor(byDate.length / 2);
+  const olderFit = fitPowerLawRegression(byDate.slice(0, mid));
+  const recentFit = fitPowerLawRegression(byDate.slice(mid));
+  if (olderFit && recentFit) {
+    const delta = recentFit.exponent - olderFit.exponent;
+    if (delta <= -0.02) {
+      trend = "improving";
+      trendDetail = `Exponent eased ${olderFit.exponent.toFixed(2)} → ${recentFit.exponent.toFixed(2)} — you're fading less over distance.`;
+    } else if (delta >= 0.02) {
+      trend = "declining";
+      trendDetail = `Exponent rose ${olderFit.exponent.toFixed(2)} → ${recentFit.exponent.toFixed(2)} — fade over distance has grown.`;
+    } else {
+      trend = "stable";
+      trendDetail = `Exponent held near ${recentFit.exponent.toFixed(2)}.`;
+    }
+  }
+
+  const vsRef =
+    exponent > ref + 0.005
+      ? `above the ~${ref} reference — you fade ${extra > 0 ? `~${extra}%` : "slightly"} more per doubling of distance`
+      : exponent < ref - 0.005
+        ? `below the ~${ref} reference — you hold pace ${Math.abs(extra)}% better per doubling than the textbook runner`
+        : `right at the ~${ref} reference`;
+
+  const evidence = [
+    `Power-law fit through ${fit.pointCount} efforts (R²=${fit.rSquared.toFixed(2)}): time ∝ distance^${exponent.toFixed(2)}.`,
+    `Your exponent ${exponent.toFixed(2)} is ${vsRef}.`,
+    ...(trendDetail ? [trendDetail] : []),
+  ];
+
+  const limitations: string[] = [];
+  if (confidence === "low") {
+    limitations.push("Sparse or noisy efforts — the exponent is directional, not precise.");
+  }
+  if (trend == null) {
+    limitations.push("Not enough efforts in each period to establish a trend yet.");
+  }
+
+  return {
+    available: true,
+    exponent,
+    referenceExponent: ref,
+    extraFadePerDoublingPct: extra,
+    rSquared: fit.rSquared,
+    n: fit.pointCount,
+    trend,
+    trendDetail,
+    confidence,
+    interpretation: `Fatigue-resistance exponent ${exponent.toFixed(2)} (${vsRef}).`,
+    evidence,
+    limitations,
+  };
+}
+
 /** Compute the athlete's physiology profile from runs + FIT detail. */
 export function computePhysiology(
   runs: RunActivity[],
@@ -185,5 +313,6 @@ export function computePhysiology(
   const efforts = collectEffortPoints(runs, fitDetails, prs);
   return {
     criticalSpeed: assessCriticalSpeed(efforts),
+    fatigueResistance: assessFatigueResistance(efforts),
   };
 }

@@ -401,6 +401,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
     case "get_physiology": {
       const phys = analytics.physiology;
       const cs = phys.criticalSpeed;
+      const fr = phys.fatigueResistance;
       return wrapIntelligence(
         {
           criticalSpeed: cs.available
@@ -414,10 +415,22 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
                 interpretation: cs.interpretation,
               }
             : null,
+          fatigueResistance: fr.available
+            ? {
+                exponent: fr.exponent,
+                referenceExponent: fr.referenceExponent,
+                extraFadePerDoublingPct: fr.extraFadePerDoublingPct,
+                trend: fr.trend,
+                rSquared: fr.rSquared,
+                effortsUsed: fr.n,
+                confidence: fr.confidence,
+                interpretation: fr.interpretation,
+              }
+            : null,
         },
         quality,
-        cs.evidence,
-        cs.limitations,
+        [...cs.evidence, ...fr.evidence],
+        [...cs.limitations, ...fr.limitations],
       );
     }
 
@@ -823,7 +836,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_physiology",
     description:
-      "Elite physiology fitted to this athlete: Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve), from the two-parameter critical-speed model fitted to their own 2–30 min best efforts — with R², efforts used, and confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'how big is my anaerobic reserve?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
+      "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance — the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend. Each with R², efforts used, and confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how's my endurance holding?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
