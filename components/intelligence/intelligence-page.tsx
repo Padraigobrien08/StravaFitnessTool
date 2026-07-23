@@ -19,6 +19,7 @@ import {
 } from "./intelligence-sections";
 import { IntelligenceRecentlyLearned } from "./intelligence-recently-learned";
 import { IntelligenceRecommendationOutcomes } from "./intelligence-recommendation-outcomes";
+import { IntelligenceRiskPatterns } from "./intelligence-risk-patterns";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { coachUrl } from "@/lib/coach/domainLinks";
 
@@ -110,6 +111,10 @@ export function IntelligencePage() {
             opportunities={opportunities}
             recommendation={intel.primaryRecommendation}
           />
+
+          {intel.analytics.riskPatterns.length > 0 ? (
+            <IntelligenceRiskPatterns patterns={intel.analytics.riskPatterns} />
+          ) : null}
 
           <IntelligenceRecentlyLearned
             items={intel.recentlyLearned}
