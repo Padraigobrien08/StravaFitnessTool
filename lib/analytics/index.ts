@@ -11,6 +11,7 @@ import {
 } from "./readiness";
 import { findPersonalRecords, racePredictions } from "./records";
 import { buildRacePredictionAnalysis, type RacePredictionAnalysis } from "./predictions";
+import { computePhysiology, type AthletePhysiology } from "./physiology";
 import { fitnessIndex, loadByRun } from "./trainingLoad";
 import { hrTrend, paceTrend, rollingAveragePace } from "./trends";
 import { lastNDaysVolume, monthlyVolume, weeklyVolume } from "./volume";
@@ -87,6 +88,7 @@ export interface DashboardInsights {
   personalRecords: ReturnType<typeof findPersonalRecords>;
   racePredictions: ReturnType<typeof racePredictions>;
   racePredictionAnalysis: RacePredictionAnalysis;
+  physiology: AthletePhysiology;
   goalProgress: ReturnType<typeof runGoalProgress>;
   trainingLoadByRun: ReturnType<typeof loadByRun>;
   fitnessIndex: ReturnType<typeof fitnessIndex>;
@@ -248,6 +250,7 @@ export function computeInsights(
     easyHard,
     personalRecords,
     racePredictionAnalysis,
+    physiology: computePhysiology(runs, fitDetails),
     racePredictions: racePredictions(runs, fitDetails),
     goalProgress,
     trainingLoadByRun: loadByRun(runs),
@@ -312,6 +315,7 @@ export * from "./efficiency";
 export * from "./elevation";
 export * from "./block";
 export * from "./predictions";
+export * from "./physiology";
 export * from "./week";
 export * from "./narrative";
 export * from "./consistency";
