@@ -174,7 +174,11 @@ export function buildCapabilityModelEstimates(input: RaceForecastInput): Forecas
         weight: 0,
         anchorEfforts: [`${csFit.n} efforts (2–30 min)`],
         assumptions: [
-          `distance = CS·t + D′ (R²=${csFit.rSquared.toFixed(2)}); CS ${(1000 / csFit.csMetersPerSec / 60).toFixed(0)}:${Math.round((1000 / csFit.csMetersPerSec) % 60).toString().padStart(2, "0")}/km, D′ ${Math.round(csFit.dPrimeMeters)} m`,
+          `distance = CS·t + D′ (R²=${csFit.rSquared.toFixed(2)}); CS ${(1000 / csFit.csMetersPerSec / 60).toFixed(0)}:${Math.round(
+            (1000 / csFit.csMetersPerSec) % 60,
+          )
+            .toString()
+            .padStart(2, "0")}/km, D′ ${Math.round(csFit.dPrimeMeters)} m`,
         ],
         limitations: targetBeyondBand
           ? ["CS model extrapolates optimistically beyond ~25 km — durability confounds the line."]

@@ -63,12 +63,7 @@ describe("capability models", () => {
     const input: RaceForecastInput = {
       activities: [],
       runs: [],
-      efforts: [
-        eff(1.5, 300, "1.5K"),
-        eff(3, 640, "3K"),
-        eff(5, 1090, "5K"),
-        eff(8, 1760, "8K"),
-      ],
+      efforts: [eff(1.5, 300, "1.5K"), eff(3, 640, "3K"), eff(5, 1090, "5K"), eff(8, 1760, "8K")],
       recentBlocks: [],
       goal: { distanceMeters: 10000, distanceKey: "10k" },
     };

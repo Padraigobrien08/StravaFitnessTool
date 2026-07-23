@@ -123,9 +123,7 @@ function paceStr(secPerKm: number): string {
 export function assessCriticalSpeed(efforts: EffortPoint[]): CriticalSpeedAssessment {
   const fit = fitCriticalSpeed(efforts);
   if (!fit) {
-    const inBand = efforts.filter(
-      (e) => e.timeSec >= CS_MIN_SEC && e.timeSec <= CS_MAX_SEC,
-    ).length;
+    const inBand = efforts.filter((e) => e.timeSec >= CS_MIN_SEC && e.timeSec <= CS_MAX_SEC).length;
     return {
       available: false,
       csMetersPerSec: null,
