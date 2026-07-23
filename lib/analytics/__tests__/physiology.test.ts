@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   assessCriticalSpeed,
+  assessFatigueResistance,
   computePhysiology,
   criticalSpeedPredictSec,
   fitCriticalSpeed,
@@ -13,15 +14,20 @@ function pointOnLine(timeSec: number, cs: number, dPrime: number) {
   return { timeSec, distanceKm: (cs * timeSec + dPrime) / 1000 };
 }
 
-function effort(distanceKm: number, timeSec: number, id = "e"): EffortPoint {
+function effort(distanceKm: number, timeSec: number, id = "e", date = "2025-06-01"): EffortPoint {
   return {
     distanceKm,
     timeSec,
     runId: id,
     runName: `Effort ${id}`,
-    date: "2025-06-01",
+    date,
     source: "Best effort",
   };
+}
+
+/** Efforts on the power-law curve time = k·distance^exponent. */
+function powerLawEfforts(exponent: number, k: number, distancesKm: number[], date: string) {
+  return distancesKm.map((d, i) => effort(d, k * Math.pow(d, exponent), `${date}-${i}`, date));
 }
 
 function mockRun(id: string, km: number, paceMinPerKm: number, date = "2025-06-01"): RunActivity {
@@ -124,6 +130,43 @@ describe("assessCriticalSpeed", () => {
     const a = assessCriticalSpeed(efforts);
     expect(a.available).toBe(false);
     expect(a.csMetersPerSec).toBeNull();
+    expect(a.limitations.length).toBeGreaterThan(0);
+  });
+});
+
+describe("assessFatigueResistance", () => {
+  it("recovers the personal exponent and compares to the reference", () => {
+    const efforts = powerLawEfforts(1.1, 240, [5, 8, 10, 15, 21], "2025-05-01");
+    const a = assessFatigueResistance(efforts);
+    expect(a.available).toBe(true);
+    expect(a.exponent).toBeCloseTo(1.1, 1);
+    expect(a.referenceExponent).toBe(1.06);
+    // Exponent above 1.06 → fades more per doubling than the reference.
+    expect(a.extraFadePerDoublingPct).toBeGreaterThan(0);
+    expect(a.evidence.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("reports a positive extra-fade when the athlete holds pace better", () => {
+    const efforts = powerLawEfforts(1.02, 260, [5, 8, 10, 15, 21], "2025-05-01");
+    const a = assessFatigueResistance(efforts);
+    expect(a.exponent!).toBeLessThan(1.06);
+    // Below reference → negative extra-fade (holds pace better).
+    expect(a.extraFadePerDoublingPct!).toBeLessThan(0);
+  });
+
+  it("classifies a declining trend when recent efforts fade more", () => {
+    const older = powerLawEfforts(1.04, 250, [5, 10, 15], "2025-01-01");
+    const recent = powerLawEfforts(1.16, 230, [5, 10, 15], "2025-06-01");
+    const a = assessFatigueResistance([...older, ...recent]);
+    expect(a.trend).toBe("declining");
+    expect(a.trendDetail).not.toBeNull();
+  });
+
+  it("is unavailable with a limitation when efforts are too few", () => {
+    const a = assessFatigueResistance([effort(5, 1200), effort(10, 2600)]);
+    expect(a.available).toBe(false);
+    expect(a.exponent).toBeNull();
+    expect(a.trend).toBeNull();
     expect(a.limitations.length).toBeGreaterThan(0);
   });
 });
