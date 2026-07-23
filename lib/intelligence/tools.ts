@@ -525,6 +525,34 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_progression_burndown": {
+      const b = analytics.progressionBurndown;
+      if (!b.available) {
+        return wrapIntelligence({ error: b.headline }, quality, [], b.limitations);
+      }
+      return wrapIntelligence(
+        {
+          goalDistance: b.goalDistanceLabel,
+          deadline: b.deadlineLabel,
+          headline: b.headline,
+          metrics: b.metrics.map((m) => ({
+            metric: m.label,
+            unit: m.unit,
+            current: m.current,
+            target: m.target,
+            neededPerWeek: m.neededPerWeek,
+            recentRatePerWeek: m.recentRatePerWeek,
+            weeksToDeadline: m.weeksToDeadline,
+            status: m.status,
+            weeksBehind: m.weeksBehind,
+          })),
+        },
+        quality,
+        b.evidence,
+        b.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -934,6 +962,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_capability_radar",
     description:
       "The athlete's capability profile across six axes — aerobic base, threshold, top-end speed, durability, economy, consistency — each scored 0–100 vs their OWN history (50 ≈ personal baseline), plus how much each matters for the goal race (demand profile) and the auto-flagged biggest limiter (the axis that matters for the race and is weakest). Use for 'what's my biggest limiter?', 'where am I strong or weak?', 'what should I work on for my race?', or a capability overview. This is the diagnosis; pair with goal scenarios for the prescription.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_progression_burndown",
+    description:
+      "Are the athlete's build metrics on pace to be race-ready? For long run and weekly volume, gives current vs the race-distance target, the dated deadline (race day minus taper), the required weekly ramp vs their recent rate, and how many weeks ahead/behind (or stalled) they are. Use for 'am I on track for my race?', 'is my long run where it needs to be?', 'am I behind on volume?'. Complements the limiter protocol (what to build) with pacing (are you building fast enough).",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
