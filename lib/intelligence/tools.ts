@@ -565,7 +565,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "compare_sessions",
     description:
-      "Compare recent sessions of a workout type (tempo, interval, long, race) with execution quality scores.",
+      "Compare recent sessions of a workout type (tempo, interval, long, race) with execution quality metrics: quality, pacing stability, interval repeatability, aerobic decoupling, and threshold control. Use for 'compare my last 3 thresholds/tempos/intervals'.",
     input_schema: {
       type: "object",
       properties: {

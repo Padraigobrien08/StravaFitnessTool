@@ -1,4 +1,5 @@
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
+import { computeWorkoutQuality } from "@/lib/analytics/workoutQuality";
 import { paceSecPerKm } from "@/lib/analytics/pace";
 import { formatPace } from "@/lib/utils";
 import { confidenceFromRuns } from "@/lib/intelligence/envelope";
@@ -27,6 +28,9 @@ export function compareSessions(
     pacingStabilityScore: number;
     lateFadePct: number | null;
     hrDriftPct: number | null;
+    repeatabilityScore: number | null;
+    decouplingPct: number | null;
+    thresholdControlScore: number | null;
     topInsights: string[];
   }[];
   summary: string;
@@ -47,6 +51,7 @@ export function compareSessions(
       signals: [],
     };
     const exec = scoreSessionExecution(run, fit, workout);
+    const wq = computeWorkoutQuality(run, fit, workout);
     const pace = paceSecPerKm(run);
     return {
       runId: run.id,
@@ -59,6 +64,9 @@ export function compareSessions(
       pacingStabilityScore: exec.pacingStabilityScore,
       lateFadePct: exec.lateFadePct,
       hrDriftPct: exec.hrDriftPct,
+      repeatabilityScore: wq.repeatabilityScore,
+      decouplingPct: wq.decouplingPct,
+      thresholdControlScore: wq.thresholdControlScore,
       topInsights: exec.insights.slice(0, 2).map((i) => i.title),
     };
   });
@@ -69,12 +77,21 @@ export function compareSessions(
     limitations.push(`No ${WORKOUT_TYPE_LABELS[type]} sessions found in your history.`);
   } else {
     for (const s of sessions) {
+      const extras = [
+        s.repeatabilityScore != null ? `repeatability ${s.repeatabilityScore}` : null,
+        s.decouplingPct != null
+          ? `decoupling ${s.decouplingPct > 0 ? "+" : ""}${s.decouplingPct}%`
+          : null,
+        s.thresholdControlScore != null ? `threshold control ${s.thresholdControlScore}` : null,
+      ].filter(Boolean);
       evidence.push(
-        `${s.name} (${s.date.slice(0, 10)}): quality ${s.qualityScore}, pacing stability ${s.pacingStabilityScore}`,
+        `${s.name} (${s.date.slice(0, 10)}): quality ${s.qualityScore}, pacing stability ${s.pacingStabilityScore}${extras.length ? `, ${extras.join(", ")}` : ""}`,
       );
     }
     if (sessions.some((s) => s.lateFadePct == null)) {
-      limitations.push("Some sessions lack FIT pace streams — fade metrics may be missing.");
+      limitations.push(
+        "Some sessions lack FIT pace streams — fade/decoupling metrics may be missing.",
+      );
     }
   }
 

@@ -7,6 +7,7 @@ import { formatWorkoutTitle, type FormattedWorkoutTitle } from "./formatWorkoutN
 import { formatDistanceKm, formatDuration, formatKm, formatPace } from "@/lib/utils";
 import { paceSecPerKm } from "@/lib/analytics/pace";
 import { scoreSessionExecution, thirdAvgPace } from "@/lib/reasoning/executionScore";
+import { computeWorkoutQuality } from "@/lib/analytics/workoutQuality";
 import { parseISO, subDays } from "date-fns";
 
 export type ExecutionGrade = "strong" | "steady" | "mixed" | "limited";
@@ -41,6 +42,10 @@ export interface ExecutionAnalysisView {
   pacingStabilityScore: number;
   fatigueInterpretation: string;
   insights: ExecutionInsightView[];
+  /** Workout-quality v2 metrics; null when data or workout type doesn't support them. */
+  repeatabilityScore: number | null;
+  decouplingPct: number | null;
+  thresholdControlScore: number | null;
 }
 
 export interface StreamAnnotationView {
@@ -180,11 +185,15 @@ function buildExecution(
   workout: WorkoutClassification,
 ): ExecutionAnalysisView {
   const scored = scoreSessionExecution(run, fit, workout);
+  const wq = computeWorkoutQuality(run, fit, workout);
   return {
     qualityScore: scored.qualityScore,
     pacingStabilityScore: scored.pacingStabilityScore,
     fatigueInterpretation: scored.fatigueInterpretation,
     insights: scored.insights,
+    repeatabilityScore: wq.applicable ? wq.repeatabilityScore : null,
+    decouplingPct: wq.decouplingPct,
+    thresholdControlScore: wq.thresholdControlScore,
   };
 }
 
