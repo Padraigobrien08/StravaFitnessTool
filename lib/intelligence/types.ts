@@ -110,6 +110,7 @@ export type IntelligenceToolName =
   | "get_anomalies"
   | "get_uncertainty"
   | "get_correlations"
+  | "get_change_points"
   | "get_forecast_accuracy"
   | "get_recommendation_outcomes"
   | "get_risk_patterns"

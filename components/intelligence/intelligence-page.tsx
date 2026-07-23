@@ -29,6 +29,7 @@ import { IntelligenceStandoutSessions } from "./intelligence-standout-sessions";
 import { IntelligenceAnomalies } from "./intelligence-anomalies";
 import { IntelligenceUncertainty } from "./intelligence-uncertainty";
 import { IntelligenceCorrelations } from "./intelligence-correlations";
+import { IntelligenceChangePoints } from "./intelligence-change-points";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { useForecastAccuracy } from "@/hooks/use-forecast-accuracy";
 import { coachUrl } from "@/lib/coach/domainLinks";
@@ -154,6 +155,8 @@ export function IntelligencePage() {
           <IntelligenceUncertainty data={intel.analytics.uncertaintyEstimates} />
 
           <IntelligenceCorrelations data={intel.analytics.correlations} />
+
+          <IntelligenceChangePoints data={intel.analytics.changePoints} />
 
           <IntelligenceMemoryGrouped memory={intel.memory} beliefsById={beliefsById} />
 
