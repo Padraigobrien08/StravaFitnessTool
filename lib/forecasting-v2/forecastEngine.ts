@@ -319,6 +319,8 @@ export function buildRaceForecastV2(input: RaceForecastInput): RaceForecastV2 {
     modelAgreement: agreement,
     contributors,
     uncertaintyDrivers: uncertainty.drivers,
+    uncertaintyWidthSec: uncertainty.intervalWidthSec,
+    uncertaintyBaseWidthSec: uncertainty.baseWidthSec,
     observability,
     derivation,
     scenarios,

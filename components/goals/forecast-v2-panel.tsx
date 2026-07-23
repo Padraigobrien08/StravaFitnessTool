@@ -252,18 +252,33 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
             </ul>
           </>
         ) : null}
-        {forecast.uncertaintyDrivers.length > 0 ? (
-          <>
-            <p className={`${dash.label} mt-4`}>Uncertainty drivers</p>
-            <ul className="mt-2 space-y-2">
-              {forecast.uncertaintyDrivers.map((u) => (
-                <li key={u.label} className="text-xs text-zinc-600">
-                  <span className="text-zinc-400">{u.label}</span> ({u.impact}) — {u.explanation}
+        <>
+          <p className={`${dash.label} mt-4`}>Why your range is this wide</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            Prediction spread ±{formatDuration(Math.round(forecast.raw.uncertaintyWidthSec / 2))},
+            built from:
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            <li className="flex items-baseline gap-3 text-xs">
+              <span className="w-16 shrink-0 tabular-nums text-zinc-500">
+                +{forecast.raw.uncertaintyBaseWidthSec}s
+              </span>
+              <span className="text-zinc-500">Baseline model variability (irreducible)</span>
+            </li>
+            {[...forecast.raw.uncertaintyDrivers]
+              .sort((a, b) => b.widthSec - a.widthSec)
+              .map((u) => (
+                <li key={u.label} className="flex items-baseline gap-3 text-xs">
+                  <span className="w-16 shrink-0 tabular-nums text-amber-400/85">
+                    +{u.widthSec}s
+                  </span>
+                  <span className="text-zinc-500">
+                    <span className="text-zinc-400">{u.label}</span> — {u.explanation}
+                  </span>
                 </li>
               ))}
-            </ul>
-          </>
-        ) : null}
+          </ul>
+        </>
         {forecast.targetPath ? (
           <p className="mt-4 text-sm text-teal-400/85">{forecast.targetPath}</p>
         ) : null}

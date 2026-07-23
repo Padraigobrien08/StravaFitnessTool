@@ -19,14 +19,26 @@ export function buildUncertaintyAssessment(
     mostLikelyTimeSec: number;
   },
 ): UncertaintyAssessment {
-  const drivers: ForecastUncertaintyDriver[] = [];
+  // Each driver contributes a raw seconds amount to the interval width; we scale
+  // the whole width by distance/specificity at the end, then attribute the final
+  // width back to the base + each driver so the decomposition reconciles.
+  const raw: { driver: Omit<ForecastUncertaintyDriver, "widthSec">; rawWidth: number }[] = [];
   let score = 72;
-  let width = Math.max(60, opts.modelSpreadSec * 0.55);
+  const baseWidthRaw = Math.max(60, opts.modelSpreadSec * 0.55);
+  let width = baseWidthRaw;
+
+  const add = (
+    rawWidth: number,
+    scorePenalty: number,
+    driver: Omit<ForecastUncertaintyDriver, "widthSec">,
+  ) => {
+    score -= scorePenalty;
+    width += rawWidth;
+    raw.push({ driver, rawWidth });
+  };
 
   if (input.efforts.length < 3) {
-    score -= 18;
-    width += 45;
-    drivers.push({
+    add(45, 18, {
       label: "Few race-quality efforts",
       impact: "high",
       explanation: "Capability models rely on sparse anchors.",
@@ -34,9 +46,7 @@ export function buildUncertaintyAssessment(
   }
 
   if (opts.modelCount < 2) {
-    score -= 12;
-    width += 35;
-    drivers.push({
+    add(35, 12, {
       label: "Single model estimate",
       impact: "medium",
       explanation: "No cross-model agreement check possible.",
@@ -44,9 +54,7 @@ export function buildUncertaintyAssessment(
   }
 
   if (opts.agreementScore < 55) {
-    score -= 14;
-    width += opts.modelSpreadSec * 0.35;
-    drivers.push({
+    add(opts.modelSpreadSec * 0.35, 14, {
       label: "Model disagreement",
       impact: "high",
       explanation: `Spread of ${Math.round(opts.modelSpreadSec)}s across capability models.`,
@@ -54,9 +62,7 @@ export function buildUncertaintyAssessment(
   }
 
   if (opts.specificity.label === "low") {
-    score -= 16;
-    width += 50;
-    drivers.push({
+    add(50, 16, {
       label: "Low target specificity",
       impact: "high",
       explanation: "Anchors are far from race distance or volume support is thin.",
@@ -64,9 +70,7 @@ export function buildUncertaintyAssessment(
   }
 
   if (opts.durability.label === "weak" && input.goal.distanceMeters >= 21000) {
-    score -= 12;
-    width += 40;
-    drivers.push({
+    add(40, 12, {
       label: "Durability gap",
       impact: "high",
       explanation: "Long-run support may not sustain extrapolated capability.",
@@ -74,9 +78,7 @@ export function buildUncertaintyAssessment(
   }
 
   if (opts.freshness.label === "fatigued") {
-    score -= 8;
-    width += 25;
-    drivers.push({
+    add(25, 8, {
       label: "Fatigue / freshness instability",
       impact: "medium",
       explanation: "Race-day performance may vary with current load.",
@@ -85,9 +87,7 @@ export function buildUncertaintyAssessment(
 
   const hrCount = input.efforts.filter((e) => e.hasHr).length;
   if (hrCount === 0) {
-    score -= 6;
-    width += 15;
-    drivers.push({
+    add(15, 6, {
       label: "Missing HR on anchors",
       impact: "low",
       explanation: "Effort quality harder to validate without heart rate.",
@@ -97,9 +97,7 @@ export function buildUncertaintyAssessment(
   const targetKm = input.goal.distanceMeters / 1000;
   const maxAnchor = input.efforts.reduce((m, e) => Math.max(m, e.distanceKm), 0);
   if (maxAnchor < targetKm * 0.35 && targetKm >= 15) {
-    score -= 10;
-    width += 55;
-    drivers.push({
+    add(55, 10, {
       label: "Short-distance extrapolation",
       impact: "high",
       explanation: "Long race predicted from short anchors.",
@@ -109,9 +107,13 @@ export function buildUncertaintyAssessment(
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   const distanceFactor = targetKm >= 35 ? 1.35 : targetKm >= 18 ? 1.15 : 1;
-  const intervalWidthSec = Math.round(
-    width * distanceFactor * (1 + (100 - opts.specificity.score) / 200),
-  );
+  const scale = distanceFactor * (1 + (100 - opts.specificity.score) / 200);
+  const intervalWidthSec = Math.round(width * scale);
+  const baseWidthSec = Math.round(baseWidthRaw * scale);
+  const drivers: ForecastUncertaintyDriver[] = raw.map((r) => ({
+    ...r.driver,
+    widthSec: Math.round(r.rawWidth * scale),
+  }));
 
   let confidenceLabel: UncertaintyAssessment["confidenceLabel"] = "medium";
   if (score >= 78) confidenceLabel = "high";
@@ -121,6 +123,7 @@ export function buildUncertaintyAssessment(
   return {
     score,
     intervalWidthSec,
+    baseWidthSec,
     drivers,
     confidenceLabel,
   };

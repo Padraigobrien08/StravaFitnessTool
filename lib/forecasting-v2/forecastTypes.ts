@@ -91,11 +91,15 @@ export type ForecastUncertaintyDriver = {
   label: string;
   impact: "low" | "medium" | "high";
   explanation: string;
+  /** Seconds this driver adds to the prediction-interval width. */
+  widthSec: number;
 };
 
 export type UncertaintyAssessment = {
   score: number;
   intervalWidthSec: number;
+  /** Irreducible width from model spread alone, before any driver adds to it. */
+  baseWidthSec: number;
   drivers: ForecastUncertaintyDriver[];
   confidenceLabel: "low" | "medium" | "medium_high" | "high";
 };
@@ -209,6 +213,9 @@ export type RaceForecastV2 = {
   };
 
   uncertaintyDrivers: ForecastUncertaintyDriver[];
+  /** Prediction-interval width (sec) and its irreducible base (from model spread). */
+  uncertaintyWidthSec: number;
+  uncertaintyBaseWidthSec: number;
 
   observability: ForecastObservability;
   /** Step-by-step derivation from capability base to most-likely time. */
