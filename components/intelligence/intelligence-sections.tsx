@@ -64,6 +64,12 @@ const COACH_INVESTIGATIONS: {
     query: "How durable am I — do I hold efficiency and pace deep into long runs?",
   },
   {
+    topic: "capability-limiter",
+    label: "What's my biggest limiter for this race?",
+    hypothesis: "Your weakest capability that actually matters for the goal distance.",
+    query: "What's my biggest limiter for my race, and what should I work on?",
+  },
+  {
     topic: "race-prep",
     label: "Race prep execution",
     hypothesis: "Taper specificity and freshness alignment matter most now.",

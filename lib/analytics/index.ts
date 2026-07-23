@@ -12,6 +12,7 @@ import {
 import { findPersonalRecords, racePredictions } from "./records";
 import { buildRacePredictionAnalysis, type RacePredictionAnalysis } from "./predictions";
 import { computePhysiology, type AthletePhysiology } from "./physiology";
+import { computeCapabilityRadar, type CapabilityRadar } from "./capabilityRadar";
 import { fitnessIndex, loadByRun } from "./trainingLoad";
 import { hrTrend, paceTrend, rollingAveragePace } from "./trends";
 import { lastNDaysVolume, monthlyVolume, weeklyVolume } from "./volume";
@@ -89,6 +90,7 @@ export interface DashboardInsights {
   racePredictions: ReturnType<typeof racePredictions>;
   racePredictionAnalysis: RacePredictionAnalysis;
   physiology: AthletePhysiology;
+  capabilityRadar: CapabilityRadar;
   goalProgress: ReturnType<typeof runGoalProgress>;
   trainingLoadByRun: ReturnType<typeof loadByRun>;
   fitnessIndex: ReturnType<typeof fitnessIndex>;
@@ -192,6 +194,19 @@ export function computeInsights(
     ? simulateRaceStrategy(raceGoal, racePredictionAnalysis, fatigue, raceReadinessResult, "even")
     : null;
 
+  const physiology = computePhysiology(runs, fitDetails, { workoutLabels, athleteMaxHr });
+  const fitnessIndexPoints = fitnessIndex(runs);
+  const capabilityRadar = computeCapabilityRadar(
+    {
+      physiology,
+      consistencyScore,
+      efficiencyTrend: efficiencyPoints,
+      fitnessIndex: fitnessIndexPoints,
+      predictionTimeline,
+    },
+    raceGoal,
+  );
+
   const nextWeekPlan = buildNextWeekPlan(
     buildPlanContextFromInsights(
       {
@@ -250,11 +265,12 @@ export function computeInsights(
     easyHard,
     personalRecords,
     racePredictionAnalysis,
-    physiology: computePhysiology(runs, fitDetails, { workoutLabels, athleteMaxHr }),
+    physiology,
+    capabilityRadar,
     racePredictions: racePredictions(runs, fitDetails),
     goalProgress,
     trainingLoadByRun: loadByRun(runs),
-    fitnessIndex: fitnessIndex(runs),
+    fitnessIndex: fitnessIndexPoints,
     halfMarathonReadiness: hmReadiness,
     activityMix: activityTypeMix(allActivities),
     athleteMaxHr,
@@ -316,6 +332,7 @@ export * from "./elevation";
 export * from "./block";
 export * from "./predictions";
 export * from "./physiology";
+export * from "./capabilityRadar";
 export * from "./week";
 export * from "./narrative";
 export * from "./consistency";

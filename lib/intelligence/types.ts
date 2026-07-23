@@ -104,6 +104,7 @@ export type IntelligenceToolName =
   | "get_goal_scenarios"
   | "explain_prediction"
   | "get_physiology"
+  | "get_capability_radar"
   | "get_forecast_accuracy"
   | "get_recommendation_outcomes"
   | "get_risk_patterns"
