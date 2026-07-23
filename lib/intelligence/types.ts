@@ -109,6 +109,7 @@ export type IntelligenceToolName =
   | "get_session_zscores"
   | "get_anomalies"
   | "get_uncertainty"
+  | "get_correlations"
   | "get_forecast_accuracy"
   | "get_recommendation_outcomes"
   | "get_risk_patterns"
