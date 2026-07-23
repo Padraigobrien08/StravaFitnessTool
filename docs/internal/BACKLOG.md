@@ -50,7 +50,9 @@ The 17 `react-hooks/set-state-in-effect` warnings are intentional lifecycle patt
 - ✅ **F5** — workout-quality v2 (#44)
 - ✅ **F6 (slice)** — recommendation-outcome tracking (#45)
 
-**Remaining:** C4 (low urgency) and the rest of **F6** (risk-pattern matching, monthly/pre-race narratives, phase-catalog UI, persisted AthleteMemory). Plus fast-follows: Home "Today" card + MCP parity (F1), race-strategy split charts in miles (F2), `executeIntelligenceTool` integration tests (C3), recommendation-outcome signal integration + Intelligence panel (F6).
+- ✅ **F6 (outcome tracking, complete)** — adherence + outcome-signal + Intelligence panel (#45, #46); week-plan & goal-scenario producers logged (#47)
+
+**Remaining:** C4 (low urgency) and the rest of **F6** (risk-pattern matching, monthly/pre-race narratives, phase-catalog UI, persisted AthleteMemory). Plus fast-follows: Home "Today" card + MCP parity (F1), race-strategy split charts in miles (F2), `executeIntelligenceTool` integration tests (C3).
 
 ## Confirmed solid — no action
 

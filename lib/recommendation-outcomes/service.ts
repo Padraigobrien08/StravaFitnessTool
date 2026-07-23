@@ -1,9 +1,14 @@
 import type { RunActivity } from "@/lib/strava/types";
 import type { RunWorkoutLabel } from "@/lib/analytics/workoutType";
 import type { TodaySessionRecommendation } from "@/lib/training/todaySession";
+import { startOfWeek, format } from "date-fns";
+import type { WeekPlan } from "@/lib/training/planEngine";
+import type { GoalScenarioResult } from "@/lib/goals/goalScenarios";
+import { dateForWeekDay } from "@/lib/training-calendar";
 import { getRecommendations, logRecommendation, saveEvaluation } from "@/lib/db/recommendation-log";
 import { evaluateRecommendationOutcome } from "@/lib/recommendation-learning/evaluateRecommendationOutcome";
 import { evaluateAdherence } from "./evaluateAdherence";
+import { evaluateVolumeTrendAdherence } from "./evaluateVolumeTrend";
 import type { Adherence, LoggedRecommendation } from "./types";
 
 /** Current analytics signals used to judge whether a followed recommendation worked. */
@@ -92,6 +97,58 @@ export async function logTodaySessionRecommendation(
   }
 }
 
+/** Record each dated session of a generated week plan (one row per day). */
+export async function logWeekPlanRecommendations(userId: string, plan: WeekPlan): Promise<void> {
+  const issuedAt = new Date().toISOString();
+  const sessions = plan.sessions.filter((s) => s.day && s.type !== "unknown");
+  for (const s of sessions) {
+    const targetDate = dateForWeekDay(plan.weekStart, s.day!);
+    const logged: LoggedRecommendation = {
+      recommendationId: `week_plan:${targetDate}`,
+      producer: "week_plan",
+      issuedAt,
+      targetDate,
+      kind: s.type,
+      headline: s.description,
+      distanceKmMin: s.distanceKmRange?.[0] ?? null,
+      distanceKmMax: s.distanceKmRange?.[1] ?? null,
+    };
+    try {
+      await logRecommendation(userId, logged);
+    } catch {
+      /* non-fatal */
+    }
+  }
+}
+
+/** Record the actionable goal-scenario recommendation (one per ISO week). */
+export async function logGoalScenarioRecommendation(
+  userId: string,
+  result: GoalScenarioResult,
+): Promise<void> {
+  const now = new Date();
+  const weekStart = format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd");
+  const chosen =
+    result.scenarios.find((s) => s.id === result.recommendedScenarioId) ?? result.scenarios[0];
+  if (!chosen) return;
+  const logged: LoggedRecommendation = {
+    recommendationId: `goal_scenario:${weekStart}`,
+    producer: "goal_scenario",
+    issuedAt: now.toISOString(),
+    targetDate: weekStart,
+    kind: chosen.id === "maintain" ? "hold_volume" : "build_volume",
+    headline: result.recommendation,
+    distanceKmMin: null,
+    distanceKmMax: null,
+    targetWeeklyKm: chosen.targetWeeklyKm,
+  };
+  try {
+    await logRecommendation(userId, logged);
+  } catch {
+    /* non-fatal */
+  }
+}
+
 export interface RecommendationOutcomesResult {
   recommendations: LoggedRecommendation[];
   summary: {
@@ -132,7 +189,10 @@ export async function evaluateRecommendationOutcomes(
     const alreadyResolved = !!rec.adherence && RESOLVED.has(rec.adherence);
 
     if (!alreadyResolved) {
-      const res = evaluateAdherence(rec, runs, typeByRunId, todayIso);
+      const res =
+        rec.producer === "goal_scenario"
+          ? evaluateVolumeTrendAdherence(rec, runs, todayIso)
+          : evaluateAdherence(rec, runs, typeByRunId, todayIso);
       updated = {
         ...rec,
         adherence: res.adherence,
@@ -142,9 +202,11 @@ export async function evaluateRecommendationOutcomes(
       };
     }
 
-    // Judge the signal once: followed, aged enough, snapshot available, not yet scored.
+    // Judge the freshness/effort signal once: for a followed single session
+    // (not the multi-week goal-scenario), aged enough, with a snapshot available.
     const signalEligible =
       updated.adherence === "followed" &&
+      updated.producer !== "goal_scenario" &&
       signal != null &&
       !updated.outcomeSignal &&
       daysBetween(updated.targetDate, todayIso) >= SIGNAL_MIN_AGE_DAYS;
