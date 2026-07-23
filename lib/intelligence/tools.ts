@@ -8,6 +8,7 @@ import { recommendTodaySession, buildTodaySessionInput } from "@/lib/training/to
 import { computeGoalScenarios } from "@/lib/goals/goalScenarios";
 import { buildRaceForecastInput } from "@/lib/forecasting-v2/buildInput";
 import { buildRaceForecastV2 } from "@/lib/forecasting-v2/forecastEngine";
+import { computeForecastSensitivity } from "@/lib/forecasting-v2/sensitivity";
 import {
   evaluateRecommendationOutcomes,
   logGoalScenarioRecommendation,
@@ -366,6 +367,12 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
             label: f.modelAgreement.label,
             spread: formatDuration(f.modelAgreement.spreadSec),
           },
+          sensitivity: computeForecastSensitivity(input).map((s) => ({
+            lever: s.label,
+            change: s.change,
+            deltaSec: s.deltaSec,
+            direction: s.direction,
+          })),
           rangeWidth: formatDuration(f.uncertaintyWidthSec),
           whyRangeIsWide: [
             { factor: "Baseline model variability", addsSec: f.uncertaintyBaseWidthSec },
@@ -734,7 +741,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "explain_prediction",
     description:
-      "Explain WHY the race prediction is what it is — the step-by-step derivation from raw capability through durability, specificity, and freshness/taper adjustments to the most-likely time, plus each capability model's estimate and weight. Use for 'why do you think I'll run that?', 'how did you get that time?', or a forecast breakdown.",
+      "Explain WHY the race prediction is what it is — the step-by-step derivation from raw capability through durability, specificity, and freshness/taper adjustments to the most-likely time; each capability model's estimate and weight; what widens the prediction range; and which training levers (long run, volume, quality, freshness) would move the time most. Use for 'why do you think I'll run that?', 'how did you get that time?', or 'what would make me faster?'.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

@@ -107,6 +107,56 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
         </ul>
       </PanelChrome>
 
+      {forecast.sensitivity.some((s) => s.direction !== "none") ? (
+        <PanelChrome title="What would move your time most" subdued>
+          <p className="mb-3 text-xs text-zinc-500">
+            Each lever changed on its own, holding everything else fixed.
+          </p>
+          {(() => {
+            const maxAbs = Math.max(...forecast.sensitivity.map((s) => Math.abs(s.deltaSec)), 1);
+            return (
+              <ul className="space-y-2">
+                {forecast.sensitivity.map((s) => {
+                  const pct = (Math.abs(s.deltaSec) / maxAbs) * 100;
+                  const faster = s.deltaSec < 0;
+                  return (
+                    <li key={s.id} className="flex items-center gap-3 text-xs">
+                      <span className="w-36 shrink-0 text-zinc-400">
+                        {s.label}
+                        <span className="ml-1 text-zinc-600">{s.change}</span>
+                      </span>
+                      <div className="relative h-3 flex-1 rounded bg-white/[0.03]">
+                        <div
+                          className={cn(
+                            "absolute top-0 h-full rounded",
+                            faster ? "bg-teal-500/55" : "bg-amber-500/55",
+                          )}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span
+                        className={cn(
+                          "w-16 shrink-0 text-right tabular-nums",
+                          s.direction === "none"
+                            ? "text-zinc-600"
+                            : faster
+                              ? "text-teal-400/90"
+                              : "text-amber-400/85",
+                        )}
+                      >
+                        {s.direction === "none"
+                          ? "—"
+                          : `${faster ? "−" : "+"}${formatDuration(Math.abs(s.deltaSec))}`}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()}
+        </PanelChrome>
+      ) : null}
+
       <PanelChrome title="Performance state breakdown" subdued>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {forecast.components.map((c) => (
