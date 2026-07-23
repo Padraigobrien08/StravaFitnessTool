@@ -1,4 +1,6 @@
 export { buildRaceForecastV2 } from "./forecastEngine";
+export { computeForecastSensitivity } from "./sensitivity";
+export type { SensitivityFactor } from "./sensitivity";
 export {
   evaluateForecastV2,
   evaluateForecastFixture,

@@ -5,8 +5,10 @@ import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import {
   buildRaceForecastInput,
   buildRaceForecastV2,
+  computeForecastSensitivity,
   distanceRelevanceWeight,
   type RaceForecastV2,
+  type SensitivityFactor,
 } from "@/lib/forecasting-v2";
 import { differenceInDays, parseISO } from "date-fns";
 import { formatDuration } from "@/lib/utils";
@@ -63,6 +65,7 @@ export interface ForecastV2View {
     changeDrivers: string[] | null;
   };
   uncertaintyDrivers: { label: string; impact: string; explanation: string }[];
+  sensitivity: SensitivityFactor[];
   limitations: string[];
   recommendation: string;
   raw: RaceForecastV2;
@@ -146,6 +149,7 @@ export function buildForecastV2View(opts: {
   return {
     enabled: true,
     distanceLabel: raw.distanceLabel,
+    sensitivity: computeForecastSensitivity(input),
     keyEfforts: buildKeyEfforts(input),
     capabilityBase: formatDuration(raw.capabilityBaseTimeSec),
     mostLikely: formatDuration(raw.mostLikelyTimeSec),
