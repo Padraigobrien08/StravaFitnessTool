@@ -14,6 +14,7 @@ import { buildRacePredictionAnalysis, type RacePredictionAnalysis } from "./pred
 import { computePhysiology, type AthletePhysiology } from "./physiology";
 import { computeCapabilityRadar, type CapabilityRadar } from "./capabilityRadar";
 import { computeProgressionBurndown, type ProgressionBurndown } from "./burndown";
+import { computePersonalZScores, type PersonalZScores } from "./personalZScores";
 import { fitnessIndex, loadByRun } from "./trainingLoad";
 import { hrTrend, paceTrend, rollingAveragePace } from "./trends";
 import { lastNDaysVolume, monthlyVolume, weeklyVolume } from "./volume";
@@ -93,6 +94,7 @@ export interface DashboardInsights {
   physiology: AthletePhysiology;
   capabilityRadar: CapabilityRadar;
   progressionBurndown: ProgressionBurndown;
+  personalZScores: PersonalZScores;
   goalProgress: ReturnType<typeof runGoalProgress>;
   trainingLoadByRun: ReturnType<typeof loadByRun>;
   fitnessIndex: ReturnType<typeof fitnessIndex>;
@@ -216,6 +218,7 @@ export function computeInsights(
     },
     raceGoal,
   );
+  const personalZScores = computePersonalZScores(runs, workoutLabels);
 
   const nextWeekPlan = buildNextWeekPlan(
     buildPlanContextFromInsights(
@@ -278,6 +281,7 @@ export function computeInsights(
     physiology,
     capabilityRadar,
     progressionBurndown,
+    personalZScores,
     racePredictions: racePredictions(runs, fitDetails),
     goalProgress,
     trainingLoadByRun: loadByRun(runs),
@@ -345,6 +349,7 @@ export * from "./predictions";
 export * from "./physiology";
 export * from "./capabilityRadar";
 export * from "./burndown";
+export * from "./personalZScores";
 export * from "./week";
 export * from "./narrative";
 export * from "./consistency";
