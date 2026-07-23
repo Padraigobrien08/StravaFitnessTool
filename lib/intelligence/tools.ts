@@ -489,6 +489,42 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_capability_radar": {
+      const radar = analytics.capabilityRadar;
+      if (!radar.available) {
+        return wrapIntelligence(
+          { error: "Not enough history to profile capabilities yet." },
+          quality,
+          [],
+          radar.limitations,
+        );
+      }
+      return wrapIntelligence(
+        {
+          goalDistance: radar.goalDistanceLabel,
+          biggestLimiter: radar.biggestLimiter
+            ? {
+                capability: radar.biggestLimiter.label,
+                score: radar.biggestLimiter.score,
+                why: radar.biggestLimiter.evidence,
+              }
+            : null,
+          interpretation: radar.interpretation,
+          axes: radar.axes.map((a) => ({
+            capability: a.label,
+            score: a.score,
+            demandImportance: a.demandImportance,
+            isLimiter: a.isLimiter,
+            confidence: a.confidence,
+            basis: a.basis,
+          })),
+        },
+        quality,
+        radar.evidence,
+        radar.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -892,6 +928,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "get_physiology",
     description:
       "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance — the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend; (3) durability — a 0–100 score for how well efficiency (HR drift) and pace hold up deep into long runs, with a trend; (4) threshold/economy — estimated lactate-threshold pace and HR from tempo/threshold sessions, plus running economy as a grade-adjusted pace-per-HR trend; (5) condition normalization — efficiency adjusted for heat (weather temperature) and grade so trends are apples-to-apples, including an example where accounting for heat changes how a session reads. Each with confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how durable is my aerobic engine?', 'what's my threshold pace/HR?', 'is my running economy improving?', 'was that hot run actually bad?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_capability_radar",
+    description:
+      "The athlete's capability profile across six axes — aerobic base, threshold, top-end speed, durability, economy, consistency — each scored 0–100 vs their OWN history (50 ≈ personal baseline), plus how much each matters for the goal race (demand profile) and the auto-flagged biggest limiter (the axis that matters for the race and is weakest). Use for 'what's my biggest limiter?', 'where am I strong or weak?', 'what should I work on for my race?', or a capability overview. This is the diagnosis; pair with goal scenarios for the prescription.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

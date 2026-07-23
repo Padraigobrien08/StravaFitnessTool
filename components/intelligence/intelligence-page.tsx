@@ -23,6 +23,7 @@ import { IntelligenceRiskPatterns } from "./intelligence-risk-patterns";
 import { IntelligencePeriodNarratives } from "./intelligence-period-narratives";
 import { IntelligenceForecastAccuracy } from "./intelligence-forecast-accuracy";
 import { IntelligencePhysiology } from "./intelligence-physiology";
+import { IntelligenceCapabilityRadar } from "./intelligence-capability-radar";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { useForecastAccuracy } from "@/hooks/use-forecast-accuracy";
 import { coachUrl } from "@/lib/coach/domainLinks";
@@ -134,6 +135,8 @@ export function IntelligencePage() {
           {outcomes ? <IntelligenceRecommendationOutcomes data={outcomes} /> : null}
 
           {forecastAccuracy ? <IntelligenceForecastAccuracy data={forecastAccuracy} /> : null}
+
+          <IntelligenceCapabilityRadar data={intel.analytics.capabilityRadar} />
 
           <IntelligencePhysiology data={intel.analytics.physiology} />
 
