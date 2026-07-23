@@ -5,6 +5,7 @@ import {
   type EffortPoint,
 } from "@/lib/analytics/predictions";
 import { predictRaceTime, findPersonalRecords } from "@/lib/analytics/records";
+import { fitCriticalSpeed, criticalSpeedPredictSec } from "@/lib/analytics/physiology";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { ForecastModelEstimate, RaceForecastInput, RaceQualityEffort } from "./forecastTypes";
@@ -158,6 +159,34 @@ export function buildCapabilityModelEstimates(input: RaceForecastInput): Forecas
     });
   }
 
+  // Critical-speed model (P1): separates aerobic ceiling (CS) from anaerobic
+  // reserve (D′), fitted to the athlete's own 2–30 min efforts.
+  const csFit = fitCriticalSpeed(efforts);
+  if (csFit) {
+    const csTime = criticalSpeedPredictSec(csFit, targetM);
+    if (csTime != null && csTime > 0) {
+      const confidence = Math.max(0.4, Math.min(0.9, 0.5 + csFit.rSquared * 0.4));
+      const targetBeyondBand = targetKm > 25;
+      estimates.push({
+        modelName: "Critical Speed model",
+        predictedTimeSec: Math.round(csTime),
+        confidence,
+        weight: 0,
+        anchorEfforts: [`${csFit.n} efforts (2–30 min)`],
+        assumptions: [
+          `distance = CS·t + D′ (R²=${csFit.rSquared.toFixed(2)}); CS ${(1000 / csFit.csMetersPerSec / 60).toFixed(0)}:${Math.round(
+            (1000 / csFit.csMetersPerSec) % 60,
+          )
+            .toString()
+            .padStart(2, "0")}/km, D′ ${Math.round(csFit.dPrimeMeters)} m`,
+        ],
+        limitations: targetBeyondBand
+          ? ["CS model extrapolates optimistically beyond ~25 km — durability confounds the line."]
+          : [],
+      });
+    }
+  }
+
   return estimates;
 }
 
@@ -183,6 +212,11 @@ export function computeWeightedCapability(
     }
     if (est.modelName.includes("Riegel") && targetKm < 15) {
       w *= 1.05;
+    }
+    if (est.modelName.includes("Critical Speed")) {
+      // CS is sharpest at 3k–15k; discount it as the race outruns the fit band.
+      if (targetKm > 25) w *= 0.55;
+      else if (targetKm > 15) w *= 0.8;
     }
     if (anchor && est.anchorEfforts.some((a) => a.includes(anchor.runName))) {
       const rel = distanceRelevanceWeight(anchor.distanceKm, targetKm);

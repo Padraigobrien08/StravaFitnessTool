@@ -11,6 +11,7 @@ import { assessSpecificity } from "../specificityModel";
 import { buildPredictionInterval } from "../uncertaintyModel";
 import { buildScenarios } from "../scenarioModel";
 import { buildRaceForecastV2 } from "../forecastEngine";
+import type { RaceForecastInput } from "../forecastTypes";
 import {
   fatigueHeavyRunner,
   hmReadyRunner,
@@ -48,6 +49,26 @@ describe("capability models", () => {
   it("returns sparse models for low-data runner", () => {
     const estimates = buildCapabilityModelEstimates(lowDataRunner);
     expect(estimates.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("adds a Critical Speed model when efforts span the 2–30 min band", () => {
+    const eff = (distanceKm: number, timeSec: number, name: string) => ({
+      distanceKm,
+      timeSec,
+      runId: name,
+      runName: name,
+      date: "2026-04-01",
+      source: "Best effort",
+    });
+    const input: RaceForecastInput = {
+      activities: [],
+      runs: [],
+      efforts: [eff(1.5, 300, "1.5K"), eff(3, 640, "3K"), eff(5, 1090, "5K"), eff(8, 1760, "8K")],
+      recentBlocks: [],
+      goal: { distanceMeters: 10000, distanceKey: "10k" },
+    };
+    const estimates = buildCapabilityModelEstimates(input);
+    expect(estimates.some((e) => e.modelName === "Critical Speed model")).toBe(true);
   });
 });
 

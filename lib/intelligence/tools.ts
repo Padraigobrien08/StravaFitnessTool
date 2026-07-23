@@ -398,6 +398,29 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
     }
 
+    case "get_physiology": {
+      const phys = analytics.physiology;
+      const cs = phys.criticalSpeed;
+      return wrapIntelligence(
+        {
+          criticalSpeed: cs.available
+            ? {
+                cs: cs.csPaceSecPerKm != null ? formatPace(cs.csPaceSecPerKm) : null,
+                csMetersPerSec: cs.csMetersPerSec,
+                dPrimeMeters: cs.dPrimeMeters,
+                rSquared: cs.rSquared,
+                effortsUsed: cs.n,
+                confidence: cs.confidence,
+                interpretation: cs.interpretation,
+              }
+            : null,
+        },
+        quality,
+        cs.evidence,
+        cs.limitations,
+      );
+    }
+
     case "get_forecast_accuracy": {
       const result = await evaluateForecastCalibration(
         ctx.userId,
@@ -795,6 +818,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "explain_prediction",
     description:
       "Explain WHY the race prediction is what it is — the step-by-step derivation from raw capability through durability, specificity, and freshness/taper adjustments to the most-likely time; each capability model's estimate and weight; what widens the prediction range; and which training levers (long run, volume, quality, freshness) would move the time most. Use for 'why do you think I'll run that?', 'how did you get that time?', or 'what would make me faster?'.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_physiology",
+    description:
+      "Elite physiology fitted to this athlete: Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve), from the two-parameter critical-speed model fitted to their own 2–30 min best efforts — with R², efforts used, and confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'how big is my anaerobic reserve?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
