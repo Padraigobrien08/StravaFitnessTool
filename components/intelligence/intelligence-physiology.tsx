@@ -9,8 +9,10 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
   const cs = data.criticalSpeed;
   const fr = data.fatigueResistance;
+  const dur = data.durability;
   // Nothing to show until the athlete has enough spread of efforts to fit.
-  if (!cs.available && !fr.available) return null;
+  if (!cs.available && !fr.available && !dur.available) return null;
+  const showDivider = cs.available || fr.available;
 
   return (
     <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
@@ -73,9 +75,40 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
         </div>
       ) : null}
 
+      {dur.available && dur.score != null ? (
+        <div className={showDivider ? "mt-3 border-t border-white/[0.05] pt-3" : "mt-2"}>
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="text-[10px] text-zinc-600">Durability</p>
+            <TrendGlyph trend={dur.trend} />
+          </div>
+          <p className="mt-0.5 text-[13px] leading-snug text-zinc-300">
+            <span className="font-medium tabular-nums text-zinc-100">{dur.score}</span>
+            <span className="text-zinc-600">/100</span>
+            <span className="ml-1.5 capitalize text-zinc-500">{dur.label}</span>
+            <span className="text-zinc-600"> · holding pace deep into long runs</span>
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 text-[10px] text-zinc-600">
+            {dur.decouplingMedianPct != null ? (
+              <span>
+                HR drift {dur.decouplingMedianPct > 0 ? "+" : ""}
+                {dur.decouplingMedianPct}%
+              </span>
+            ) : null}
+            {dur.lateFadeMedianPct != null ? (
+              <span>
+                · late fade {dur.lateFadeMedianPct > 0 ? "+" : ""}
+                {dur.lateFadeMedianPct}%
+              </span>
+            ) : null}
+            <span className="capitalize">· {dur.confidence} confidence</span>
+            <span>· {dur.sampleSize} runs</span>
+          </div>
+        </div>
+      ) : null}
+
       <Link
         href={signalCoachLink(
-          "Explain my critical speed, anaerobic reserve, and fatigue resistance.",
+          "Explain my critical speed, anaerobic reserve, fatigue resistance, and durability.",
         )}
         className="mt-2 inline-block text-[10px] text-zinc-600 hover:text-zinc-400"
       >

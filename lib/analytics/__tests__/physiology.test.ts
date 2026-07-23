@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   assessCriticalSpeed,
+  assessDurability,
   assessFatigueResistance,
   computePhysiology,
   criticalSpeedPredictSec,
@@ -8,6 +9,7 @@ import {
 } from "../physiology";
 import type { EffortPoint } from "../predictions";
 import type { RunActivity } from "@/lib/strava/types";
+import type { FitRunDetail } from "@/lib/strava/fitTypes";
 
 /** Build a distance–time point on the line distance = cs·t + dPrime. */
 function pointOnLine(timeSec: number, cs: number, dPrime: number) {
@@ -168,6 +170,90 @@ describe("assessFatigueResistance", () => {
     expect(a.exponent).toBeNull();
     expect(a.trend).toBeNull();
     expect(a.limitations.length).toBeGreaterThan(0);
+  });
+});
+
+/** Pace stream with a controllable first→last-third fade (12 points). */
+function paceStream(firstPace: number, lastPace: number) {
+  const midPace = (firstPace + lastPace) / 2;
+  const out: { elapsedSec: number; paceSecPerKm: number }[] = [];
+  const paces = [firstPace, firstPace, firstPace, firstPace, midPace, midPace, midPace, midPace,
+    lastPace, lastPace, lastPace, lastPace];
+  paces.forEach((p, i) => out.push({ elapsedSec: i * 60, paceSecPerKm: p }));
+  return out;
+}
+
+function mockFit(
+  activityId: string,
+  hrDriftPct: number | null,
+  fade: { first: number; last: number } | null,
+): FitRunDetail {
+  return {
+    activityId,
+    bestEfforts: [],
+    laps: [],
+    hrStream: [],
+    paceStream: fade ? paceStream(fade.first, fade.last) : [],
+    cadenceStream: [],
+    gpsStream: [],
+    hrDriftPct,
+    avgCadence: null,
+  };
+}
+
+describe("assessDurability", () => {
+  it("scores strong when HR drift is low and pace holds", () => {
+    const runs = [mockRun("1", 12, 5), mockRun("2", 14, 5.1), mockRun("3", 16, 5.2)];
+    const fits = [
+      mockFit("1", 2, { first: 300, last: 300 }),
+      mockFit("2", 3, { first: 300, last: 301 }),
+      mockFit("3", 1, { first: 300, last: 299 }),
+    ];
+    const a = assessDurability(runs, fits);
+    expect(a.available).toBe(true);
+    expect(a.label).toBe("strong");
+    expect(a.score!).toBeGreaterThanOrEqual(72);
+    expect(a.sampleSize).toBe(3);
+  });
+
+  it("scores weak when HR drift and late fade are high", () => {
+    const runs = [mockRun("1", 12, 5), mockRun("2", 14, 5.1), mockRun("3", 16, 5.2)];
+    const fits = [
+      mockFit("1", 12, { first: 300, last: 324 }), // +8% fade
+      mockFit("2", 13, { first: 300, last: 327 }),
+      mockFit("3", 11, { first: 300, last: 321 }),
+    ];
+    const a = assessDurability(runs, fits);
+    expect(a.available).toBe(true);
+    expect(a.label).toBe("weak");
+    expect(a.score!).toBeLessThan(48);
+    expect(a.decouplingMedianPct!).toBeGreaterThan(0);
+    expect(a.lateFadeMedianPct!).toBeGreaterThan(0);
+  });
+
+  it("is unavailable when there are no long runs with streams", () => {
+    const runs = [mockRun("1", 5, 5)]; // too short to qualify
+    const a = assessDurability(runs, [mockFit("1", 3, null)]);
+    expect(a.available).toBe(false);
+    expect(a.score).toBeNull();
+    expect(a.limitations.length).toBeGreaterThan(0);
+  });
+
+  it("detects a declining trend when recent long runs fade more", () => {
+    const runs = [
+      mockRun("1", 14, 5, "2025-01-01"),
+      mockRun("2", 14, 5, "2025-02-01"),
+      mockRun("3", 14, 5, "2025-06-01"),
+      mockRun("4", 14, 5, "2025-07-01"),
+    ];
+    const fits = [
+      mockFit("1", 2, { first: 300, last: 300 }),
+      mockFit("2", 2, { first: 300, last: 301 }),
+      mockFit("3", 12, { first: 300, last: 327 }),
+      mockFit("4", 13, { first: 300, last: 330 }),
+    ];
+    const a = assessDurability(runs, fits);
+    expect(a.trend).toBe("declining");
   });
 });
 

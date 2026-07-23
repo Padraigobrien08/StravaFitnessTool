@@ -58,6 +58,12 @@ const COACH_INVESTIGATIONS: {
     query: "What training patterns historically improve my pace?",
   },
   {
+    topic: "durability",
+    label: "How durable is my aerobic engine?",
+    hypothesis: "HR drift and late-run pace fade show how well you hold up under fatigue.",
+    query: "How durable am I — do I hold efficiency and pace deep into long runs?",
+  },
+  {
     topic: "race-prep",
     label: "Race prep execution",
     hypothesis: "Taper specificity and freshness alignment matter most now.",
