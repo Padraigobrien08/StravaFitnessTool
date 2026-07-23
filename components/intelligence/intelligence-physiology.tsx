@@ -11,10 +11,13 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
   const fr = data.fatigueResistance;
   const dur = data.durability;
   const te = data.thresholdEconomy;
+  const cn = data.conditionNormalization;
   // Nothing to show until the athlete has enough spread of efforts to fit.
-  if (!cs.available && !fr.available && !dur.available && !te.available) return null;
+  if (!cs.available && !fr.available && !dur.available && !te.available && !cn.available)
+    return null;
   const showDivider = cs.available || fr.available;
   const showDividerBeforeTe = cs.available || fr.available || dur.available;
+  const showDividerBeforeCn = showDividerBeforeTe || te.available;
 
   return (
     <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
@@ -142,9 +145,44 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
         </div>
       ) : null}
 
+      {cn.available ? (
+        <div className={showDividerBeforeCn ? "mt-3 border-t border-white/[0.05] pt-3" : "mt-2"}>
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="text-[10px] text-zinc-600">Condition-adjusted</p>
+            {cn.normalizedEfficiencyTrend ? (
+              <TrendGlyph trend={cn.normalizedEfficiencyTrend} />
+            ) : null}
+          </div>
+          {cn.example ? (
+            <p className="mt-0.5 text-[13px] leading-snug text-zinc-300">
+              {cn.example.runName} at{" "}
+              <span className="tabular-nums text-zinc-100">{cn.example.tempC}°C</span> reads{" "}
+              <span className="font-medium tabular-nums text-zinc-100">
+                {cn.example.normalizedZScore >= 0 ? "+" : ""}
+                {cn.example.normalizedZScore}σ
+              </span>{" "}
+              <span className="text-zinc-600">
+                (not {cn.example.rawZScore >= 0 ? "+" : ""}
+                {cn.example.rawZScore}σ) once heat is removed
+              </span>
+            </p>
+          ) : (
+            <p className="mt-0.5 text-[13px] leading-snug text-zinc-500">
+              Efficiency normalized for heat &amp; grade
+            </p>
+          )}
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 text-[10px] text-zinc-600">
+            <span>
+              {cn.hotRunCount} runs above {cn.referenceTempC}°C
+            </span>
+            <span className="capitalize">· {cn.confidence} confidence</span>
+          </div>
+        </div>
+      ) : null}
+
       <Link
         href={signalCoachLink(
-          "Explain my critical speed, anaerobic reserve, fatigue resistance, durability, and threshold.",
+          "Explain my physiology: critical speed, fatigue resistance, durability, threshold, and heat-adjusted efficiency.",
         )}
         className="mt-2 inline-block text-[10px] text-zinc-600 hover:text-zinc-400"
       >
