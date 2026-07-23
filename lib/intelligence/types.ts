@@ -103,6 +103,7 @@ export type IntelligenceToolName =
   | "recommend_today_session"
   | "get_goal_scenarios"
   | "explain_prediction"
+  | "get_forecast_accuracy"
   | "get_recommendation_outcomes"
   | "get_risk_patterns"
   | "get_monthly_narrative"

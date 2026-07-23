@@ -10,6 +10,10 @@ import { buildRaceForecastInput } from "@/lib/forecasting-v2/buildInput";
 import { buildRaceForecastV2 } from "@/lib/forecasting-v2/forecastEngine";
 import { computeForecastSensitivity } from "@/lib/forecasting-v2/sensitivity";
 import {
+  evaluateForecastCalibration,
+  logForecastForCalibration,
+} from "@/lib/forecasting-v2/calibrationService";
+import {
   evaluateRecommendationOutcomes,
   logGoalScenarioRecommendation,
   logTodaySessionRecommendation,
@@ -345,6 +349,8 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         );
       }
       const f = buildRaceForecastV2(input);
+      // Record it so the forecaster can be scored against reality later (G5).
+      void logForecastForCalibration(ctx.userId, f, raceGoal.distance);
       return wrapIntelligence(
         {
           mostLikely: formatDuration(f.mostLikelyTimeSec),
@@ -389,6 +395,53 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
               `${s.label}: ${s.deltaSec > 0 ? "+" : ""}${s.deltaSec}s${s.evidence ? ` — ${s.evidence}` : ""}`,
           ),
         f.limitations.map((l) => l.detail).slice(0, 3),
+      );
+    }
+
+    case "get_forecast_accuracy": {
+      const result = await evaluateForecastCalibration(
+        ctx.userId,
+        analytics.racePredictionAnalysis.efforts,
+      );
+      const s = result.summary;
+      const scored = result.forecasts.filter((f) => f.actualTimeSec != null);
+      return wrapIntelligence(
+        {
+          summary: {
+            logged: s.logged,
+            evaluated: s.evaluated,
+            withinIntervalPct: s.withinIntervalPct,
+            withinP25P75Pct: s.withinP25P75Pct,
+            bias:
+              s.medianSignedErrorSec == null
+                ? null
+                : s.medianSignedErrorSec > 5
+                  ? `runs ~${s.medianSignedErrorSec}s slower than predicted (model optimistic)`
+                  : s.medianSignedErrorSec < -5
+                    ? `runs ~${Math.abs(s.medianSignedErrorSec)}s faster than predicted (model conservative)`
+                    : "well-centered",
+            meanAbsErrorSec: s.meanAbsErrorSec,
+          },
+          scored: scored.slice(0, 8).map((f) => ({
+            distance: f.distanceKey,
+            issued: f.issuedAt.slice(0, 10),
+            predicted: formatDuration(f.mostLikelyTimeSec),
+            actual: f.actualTimeSec != null ? formatDuration(f.actualTimeSec) : null,
+            withinInterval: f.withinInterval ?? null,
+          })),
+        },
+        quality,
+        s.evaluated > 0
+          ? [
+              `${s.withinIntervalPct}% of forecasts landed in the p10–p90 range (well-calibrated ≈ 80%)`,
+              `Mean absolute error ${s.meanAbsErrorSec}s across ${s.evaluated} scored forecasts`,
+            ]
+          : [],
+        s.evaluated === 0
+          ? [
+              "No forecasts have been scored yet — they're graded once you race that distance again.",
+            ]
+          : [],
       );
     }
 
@@ -742,6 +795,12 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
     name: "explain_prediction",
     description:
       "Explain WHY the race prediction is what it is — the step-by-step derivation from raw capability through durability, specificity, and freshness/taper adjustments to the most-likely time; each capability model's estimate and weight; what widens the prediction range; and which training levers (long run, volume, quality, freshness) would move the time most. Use for 'why do you think I'll run that?', 'how did you get that time?', or 'what would make me faster?'.",
+    input_schema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "get_forecast_accuracy",
+    description:
+      "How well-calibrated the race forecaster has been — of past predictions that a real effort later tested, what share landed in the predicted p10–p90 range, the model's bias (optimistic/conservative), and mean absolute error. Use for 'how accurate are your predictions?', 'can I trust your forecast?', or a calibration check.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
