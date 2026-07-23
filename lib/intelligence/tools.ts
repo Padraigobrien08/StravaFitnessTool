@@ -362,6 +362,17 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
             time: formatDuration(m.predictedTimeSec),
             weight: Math.round(m.weight * 100) / 100,
           })),
+          modelAgreement: {
+            label: f.modelAgreement.label,
+            spread: formatDuration(f.modelAgreement.spreadSec),
+          },
+          rangeWidth: formatDuration(f.uncertaintyWidthSec),
+          whyRangeIsWide: [
+            { factor: "Baseline model variability", addsSec: f.uncertaintyBaseWidthSec },
+            ...[...f.uncertaintyDrivers]
+              .sort((a, b) => b.widthSec - a.widthSec)
+              .map((u) => ({ factor: u.label, addsSec: u.widthSec })),
+          ],
         },
         quality,
         f.derivation

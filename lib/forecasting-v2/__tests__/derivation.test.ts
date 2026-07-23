@@ -42,3 +42,24 @@ describe("forecast derivation waterfall", () => {
     expect(dur.factor!).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("confidence decomposition (G4)", () => {
+  it("attributes the interval width to base + each driver (reconciles)", () => {
+    for (const input of [hmReadyRunnerInput, marathonUnderpreparedInput, lowDataRunnerInput]) {
+      const f = buildRaceForecastV2(input);
+      const summed =
+        f.uncertaintyBaseWidthSec + f.uncertaintyDrivers.reduce((s, d) => s + d.widthSec, 0);
+      // Rounding per component can drift by at most 1s each.
+      expect(Math.abs(summed - f.uncertaintyWidthSec)).toBeLessThanOrEqual(
+        f.uncertaintyDrivers.length + 1,
+      );
+    }
+  });
+
+  it("gives every uncertainty driver a positive width contribution", () => {
+    const f = buildRaceForecastV2(lowDataRunnerInput);
+    for (const d of f.uncertaintyDrivers) {
+      expect(d.widthSec).toBeGreaterThan(0);
+    }
+  });
+});
