@@ -3,7 +3,7 @@
 import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { dash } from "@/components/home/primitives/tokens";
 import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
-import { cn } from "@/lib/utils";
+import { cn, formatDuration } from "@/lib/utils";
 
 const effectStyle = {
   improves: "text-teal-400/90",
@@ -62,6 +62,49 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
             </div>
           ) : null}
         </div>
+      </PanelChrome>
+
+      <PanelChrome title="How we got this number" subdued>
+        <p className="mb-3 text-xs text-zinc-500">
+          From raw capability to the most-likely time — each step and what it added.
+        </p>
+        <ul className="space-y-1.5">
+          {forecast.raw.derivation.map((step, i) => {
+            const delta = step.deltaSec;
+            const deltaLabel =
+              i === 0
+                ? "base"
+                : `${delta > 0 ? "+" : delta < 0 ? "−" : "±"}${formatDuration(Math.abs(delta))}${delta > 0 ? " slower" : delta < 0 ? " faster" : ""}`;
+            return (
+              <li key={step.key} className="flex items-baseline gap-3 text-xs">
+                <span className="w-32 shrink-0 font-medium text-zinc-300">
+                  {step.label}
+                  {step.factor != null ? (
+                    <span className="ml-1 text-zinc-600">×{step.factor.toFixed(3)}</span>
+                  ) : null}
+                </span>
+                <span
+                  className={cn(
+                    "w-28 shrink-0 tabular-nums",
+                    i === 0
+                      ? "text-zinc-500"
+                      : delta > 0
+                        ? "text-amber-400/85"
+                        : delta < 0
+                          ? "text-teal-400/90"
+                          : "text-zinc-500",
+                  )}
+                >
+                  {deltaLabel}
+                </span>
+                <span className="w-20 shrink-0 tabular-nums font-semibold text-zinc-200">
+                  {formatDuration(step.cumulativeSec)}
+                </span>
+                {step.evidence ? <span className="text-zinc-600">{step.evidence}</span> : null}
+              </li>
+            );
+          })}
+        </ul>
       </PanelChrome>
 
       <PanelChrome title="Performance state breakdown" subdued>

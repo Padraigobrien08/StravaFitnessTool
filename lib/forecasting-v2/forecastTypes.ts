@@ -116,6 +116,23 @@ export type ForecastScenario = {
   description: string;
 };
 
+/**
+ * One step of the prediction waterfall — how the forecast moves from raw
+ * capability to the most-likely time. Step deltas sum exactly to
+ * (mostLikelyTimeSec − capabilityBaseTimeSec).
+ */
+export type ForecastDerivationStep = {
+  key: "capability" | "durability" | "specificity" | "freshness" | "bounds";
+  label: string;
+  /** Seconds this step added (+, slower) or removed (−, faster); 0 for the base. */
+  deltaSec: number;
+  /** Running total after this step. */
+  cumulativeSec: number;
+  /** Multiplier applied, where the step is multiplicative. */
+  factor?: number;
+  evidence?: string;
+};
+
 export type ForecastEvidence = {
   label: string;
   detail: string;
@@ -194,6 +211,8 @@ export type RaceForecastV2 = {
   uncertaintyDrivers: ForecastUncertaintyDriver[];
 
   observability: ForecastObservability;
+  /** Step-by-step derivation from capability base to most-likely time. */
+  derivation: ForecastDerivationStep[];
   scenarios: ForecastScenario[];
 
   evidence: ForecastEvidence[];

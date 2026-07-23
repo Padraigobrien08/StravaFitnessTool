@@ -159,6 +159,55 @@ export function buildRaceForecastV2(input: RaceForecastInput): RaceForecastV2 {
   if (nearRaceCap != null && mostLikelyTimeSec > nearRaceCap) {
     mostLikelyTimeSec = nearRaceCap;
   }
+  // Prediction waterfall — the same math (base × durability × specificity +
+  // freshness, then bounds/near-race cap), exposed step by step. Cumulatives are
+  // rounded so consecutive deltas sum exactly to (mostLikely − base).
+  const cBase = baseTimeSec;
+  const cDur = Math.round(baseTimeSec * durability.timeMultiplier);
+  const cSpec = Math.round(baseTimeSec * durability.timeMultiplier * specificity.timeMultiplier);
+  const cFresh = adjustedBase; // = round(base·dur·spec + freshnessAdj)
+  const derivation: RaceForecastV2["derivation"] = [
+    {
+      key: "capability",
+      label: "Capability base",
+      deltaSec: 0,
+      cumulativeSec: cBase,
+      evidence: `Weighted from ${weightedEstimates.length} model${weightedEstimates.length === 1 ? "" : "s"} across ${input.efforts.length} efforts`,
+    },
+    {
+      key: "durability",
+      label: "Durability",
+      deltaSec: cDur - cBase,
+      cumulativeSec: cDur,
+      factor: durability.timeMultiplier,
+      evidence: durability.explanation,
+    },
+    {
+      key: "specificity",
+      label: "Specificity",
+      deltaSec: cSpec - cDur,
+      cumulativeSec: cSpec,
+      factor: specificity.timeMultiplier,
+      evidence: specificity.evidence[0] ?? specificity.gaps[0],
+    },
+    {
+      key: "freshness",
+      label: "Freshness / taper",
+      deltaSec: cFresh - cSpec,
+      cumulativeSec: cFresh,
+      evidence: freshness.evidence[0],
+    },
+  ];
+  if (mostLikelyTimeSec !== cFresh) {
+    derivation.push({
+      key: "bounds",
+      label: "Model bounds & race-day cap",
+      deltaSec: mostLikelyTimeSec - cFresh,
+      cumulativeSec: mostLikelyTimeSec,
+      evidence: "Constrained to the ensemble range and any near-race effort ceiling.",
+    });
+  }
+
   const conservativeTimeSec = Math.round(mostLikelyTimeSec + execution.conservativePaddingSec);
   const optimisticTimeSec = Math.round(
     Math.max(60, mostLikelyTimeSec - execution.conservativePaddingSec * 0.6),
@@ -271,6 +320,7 @@ export function buildRaceForecastV2(input: RaceForecastInput): RaceForecastV2 {
     contributors,
     uncertaintyDrivers: uncertainty.drivers,
     observability,
+    derivation,
     scenarios,
     evidence,
     limitations: limitationObjs,
