@@ -18,6 +18,10 @@ export interface AthleteBelief {
   lastUpdated: string;
   stability: BeliefStability;
   recommendedUse: string;
+  /** Persistence: how many sessions this belief has been re-observed (>=1). */
+  timesConfirmed?: number;
+  /** Persistence: ISO of the most recent session that re-observed it. */
+  lastConfirmed?: string;
 }
 
 export interface RecommendationOutcome {

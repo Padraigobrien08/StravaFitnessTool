@@ -39,7 +39,8 @@ import {
   findBestPhase,
   prContext,
 } from "@/lib/reasoning";
-import { buildAthleteMemoryProfile, serializeMemoryForCoachAnswer } from "@/lib/athlete-memory";
+import { serializeMemoryForCoachAnswer } from "@/lib/athlete-memory";
+import { getPersistedAthleteMemory } from "@/lib/db/athlete-memory";
 import { executeGenerateNextWeekTrainingPlan, planToolPayload } from "@/lib/ai-planning/planTool";
 import { buildRunCoachDetail } from "@/lib/coaching-context";
 import { buildIntelligenceBrief } from "./brief";
@@ -477,7 +478,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
     }
 
     case "get_athlete_memory": {
-      const profile = buildAthleteMemoryProfile(analytics, ctx.userId);
+      const profile = await getPersistedAthleteMemory(ctx.userId, analytics);
       const topic = (call.arguments as { topic?: string })?.topic;
       const answer = serializeMemoryForCoachAnswer(
         profile,
