@@ -109,7 +109,7 @@ See [COACH_AND_INTELLIGENCE.md](COACH_AND_INTELLIGENCE.md).
 
 Registered in `lib/intelligence/tools.ts` and exposed to Coach chat and MCP:
 
-**Core:** `get_coach_brief`, `get_readiness`, `get_predictions`, `get_week_plan`, `get_race_strategy`, `get_fatigue_load`, `list_recent_runs`, `get_data_quality`, `get_connection_status`
+**Core:** `get_coach_brief`, `get_readiness`, `get_predictions`, `get_week_plan`, `recommend_today_session`, `get_goal_scenarios`, `get_recommendation_outcomes`, `get_race_strategy`, `get_fatigue_load`, `list_recent_runs`, `get_data_quality`, `get_connection_status`
 
 **Reasoning:** `compare_sessions`, `explain_readiness_delta`, `find_best_phase`, `attribute_improvement`, `analyze_fade_pattern`, `pr_context`
 
@@ -123,8 +123,9 @@ Apply in order on Neon:
 2. `002_coach.sql` — preferences, race goals
 3. `003_route_geometry.sql` — route/GPS storage (PostGIS-ready)
 4. `004_training_calendar.sql` — saved weekly plan (calendar week) per user
+5. `005_recommendation_log.sql` — recommendation-outcome tracking (adherence log)
 
-Coach preferences and the training calendar auto-ensure via `lib/db/ensure-coach-schema.ts` and `lib/db/training-calendar.ts` when their tables are missing.
+Coach preferences, the training calendar, and the recommendation log auto-ensure via `lib/db/ensure-coach-schema.ts`, `lib/db/training-calendar.ts`, and `lib/db/recommendation-log.ts` when their tables are missing.
 
 ## Frontend conventions
 

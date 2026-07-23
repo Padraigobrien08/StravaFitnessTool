@@ -102,6 +102,7 @@ export type IntelligenceToolName =
   | "get_week_plan"
   | "recommend_today_session"
   | "get_goal_scenarios"
+  | "get_recommendation_outcomes"
   | "get_race_strategy"
   | "get_fatigue_load"
   | "list_recent_runs"
