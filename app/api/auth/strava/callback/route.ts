@@ -5,7 +5,6 @@ import { resolveRedirectUri } from "@/lib/strava/api/config";
 import { upsertStravaConnection } from "@/lib/db/strava-connection";
 import { createUser, findUserByStravaAthleteId } from "@/lib/db/users";
 import { setSessionCookie } from "@/lib/auth/session";
-import { syncStravaActivitiesForUser } from "@/lib/sync/stravaSync";
 
 const STATE_COOKIE = "strideiq_oauth_state";
 
@@ -70,14 +69,9 @@ export async function GET(request: NextRequest) {
     return fail("db");
   }
 
-  // Initial sync is best-effort — rate limits shouldn't block a successful
-  // connection; the user can retry the sync from Import.
-  try {
-    const userId = await findUserByStravaAthleteId(tokens.athlete.id);
-    if (userId) await syncStravaActivitiesForUser(userId, { streamMaxRuns: 20 });
-  } catch (err) {
-    console.warn("[strava/callback] initial sync failed (non-fatal):", err);
-  }
-
+  // Redirect immediately — the initial activity sync is intentionally NOT done
+  // here. Syncing hundreds of activities (paginated + rate-limited) would block
+  // this callback for many seconds and make Connect appear to hang. The Import
+  // page kicks off the sync client-side with visible progress on ?strava=connected.
   return NextResponse.redirect(new URL(`/import?strava=connected`, request.url));
 }
