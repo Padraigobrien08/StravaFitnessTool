@@ -70,7 +70,7 @@ export function TrainingStateHero({ hero }: { hero: TrainingStateHeroView }) {
             ))}
           </dl>
 
-          <Link href="/goals">
+          <Link href="/plan?tab=goal">
             <Button size="sm" className="h-9">
               Review goals & readiness
               <ArrowRight className="ml-2 h-4 w-4" />

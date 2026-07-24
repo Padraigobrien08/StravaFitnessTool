@@ -70,7 +70,7 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
             ))}
           </dl>
 
-          <Link href="/goals">
+          <Link href="/plan?tab=goal">
             <Button size="sm" className="h-9">
               Race goals & strategy
               <ArrowRight className="ml-2 h-4 w-4" />

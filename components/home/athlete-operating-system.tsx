@@ -11,6 +11,7 @@ import { OsDecisionSupport } from "./os/os-decision-support";
 import { OsTrajectory } from "./os/os-trajectory";
 import { OsMemory } from "./os/os-memory";
 import { OsInvestigations } from "./os/os-investigations";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 export function AthleteOperatingSystem({
   vm,
@@ -53,12 +54,19 @@ export function AthleteOperatingSystem({
         primaryActionBullets={vm.primaryActionBullets}
       />
 
-      {/* Supporting context — separated from the actionable dashboard above for rhythm. */}
-      <div className="mt-1 flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-4 sm:gap-3.5">
+      {/* Supporting context — collapsed by default so Home opens on the
+          actionable core. Each panel also has a full destination of its own
+          (Performance, Intelligence, Coach). */}
+      <CollapsibleSection
+        variant="card"
+        title="More context"
+        summary="trajectory · what StrideIQ learned · questions for Coach"
+        className="mt-1"
+      >
         <OsTrajectory items={vm.trajectory} />
         <OsMemory memory={vm.memory} />
         <OsInvestigations />
-      </div>
+      </CollapsibleSection>
     </div>
   );
 }

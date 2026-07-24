@@ -339,7 +339,7 @@ export function buildKpis(analytics: DashboardInsights): KpiViewModel[] {
       },
       sparkline: ctlSpark,
       sparkPositive: ctlUp,
-      href: "/goals",
+      href: "/plan?tab=goal",
     },
     {
       label: "Consistency",
@@ -810,7 +810,7 @@ export function buildGoalMission(analytics: DashboardInsights): GoalMissionViewM
       confidence: analytics.dataConfidence,
       segments,
       focusAreas: r.gaps.slice(0, 2).map((g) => `${g.metric}: ${g.current} → ${g.target}`),
-      href: "/goals",
+      href: "/plan?tab=goal",
     };
   }
 
@@ -823,7 +823,7 @@ export function buildGoalMission(analytics: DashboardInsights): GoalMissionViewM
       `Long ${formatKmValue(hm.longestRunKm)} km (${Math.round(hm.longestRunPct)}% HM)`,
       `4wk ${formatKm(hm.fourWeekVolumeKm)}`,
     ],
-    href: "/goals",
+    href: "/plan?tab=goal",
   };
 }
 
