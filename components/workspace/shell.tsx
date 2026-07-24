@@ -7,8 +7,9 @@ import { Nav } from "@/components/nav";
 import { useStrava } from "@/lib/context/strava-context";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { CommandPalette, openCommandPalette } from "@/components/command-palette";
 import { cn } from "@/lib/utils";
-import { Settings } from "lucide-react";
+import { Settings, Search } from "lucide-react";
 
 /** Usable workspace width on large displays */
 export const WORKSPACE_MAX = "max-w-[1500px]";
@@ -94,6 +95,18 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
             Stride<span className="text-teal-400">IQ</span>
           </Link>
           <Nav variant="app" className="min-w-0 flex-1" />
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            aria-label="Open command palette"
+            title="Search — ⌘K"
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-200"
+          >
+            <Search className="h-4 w-4" />
+            <kbd className="hidden rounded border border-white/[0.08] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 sm:inline">
+              ⌘K
+            </kbd>
+          </button>
           <Link
             href="/settings"
             aria-label="Settings"
@@ -125,6 +138,8 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
           {children}
         </WorkspaceFrame>
       </main>
+
+      <CommandPalette />
     </div>
   );
 }
