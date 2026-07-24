@@ -17,7 +17,6 @@ import {
   Footprints,
   FileText,
   Target,
-  Settings,
   Upload,
   MessageCircle,
   Brain,
@@ -42,7 +41,6 @@ const advancedLinks = [
   { href: "/training", label: "Training", icon: Dumbbell },
   { href: "/report", label: "Reports", icon: FileText },
   { href: "/context", label: "Activity context", icon: Layers },
-  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -68,7 +66,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
           />
         }
       >
-        <span className="hidden md:inline">Advanced</span>
+        <span className="hidden md:inline">Analytics</span>
         <span className="md:hidden">More</span>
         <ChevronDown className="h-3 w-3" />
       </DropdownMenuTrigger>
@@ -77,7 +75,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
         className="max-h-[min(70vh,420px)] min-w-[200px] overflow-y-auto border-white/[0.1] bg-[#0c0d10] ring-black/40"
       >
         <DropdownMenuLabel className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-          Analytics
+          Deeper analysis
         </DropdownMenuLabel>
         {advancedLinks.map(({ href, label, icon: Icon }) => (
           <DropdownMenuItem
@@ -158,7 +156,7 @@ export function Nav({
             className={cn(
               "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive(pathname, href)
-                ? "bg-emerald-500/15 text-emerald-300"
+                ? "bg-teal-500/15 text-teal-300"
                 : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200",
             )}
           >

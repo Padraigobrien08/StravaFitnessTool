@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { AthletePhysiology } from "@/lib/analytics/physiology";
 import { formatPace } from "@/lib/utils";
 import { signalCoachLink } from "@/lib/coach/domainLinks";
+import { JargonTerm } from "@/components/jargon-term";
+import { Panel } from "@/components/ui/panel";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
 export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
@@ -20,22 +23,17 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
   const showDividerBeforeCn = showDividerBeforeTe || te.available;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Physiology
-        <span className="ml-1.5 text-zinc-600">fitted to your own efforts, not a lookup table</span>
-      </p>
-
+    <Panel title="Physiology" hint="fitted to your own efforts, not a lookup table">
       {cs.available ? (
         <>
           <div className="mt-2 grid grid-cols-2 gap-2">
             <Metric
-              label="Critical speed"
+              label={<JargonTerm term="cs">Critical speed</JargonTerm>}
               value={cs.csPaceSecPerKm != null ? formatPace(cs.csPaceSecPerKm) : "—"}
               sub="aerobic ceiling"
             />
             <Metric
-              label="Anaerobic reserve D′"
+              label={<JargonTerm term="dprime">Anaerobic reserve D′</JargonTerm>}
               value={cs.dPrimeMeters != null ? `${cs.dPrimeMeters} m` : "—"}
               sub="distance bank above CS"
             />
@@ -45,7 +43,11 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
           </p>
           <div className="mt-1.5 flex items-center gap-2 text-[10px] text-zinc-600">
             <span className="capitalize">{cs.confidence} confidence</span>
-            {cs.rSquared != null ? <span>· R²={cs.rSquared.toFixed(2)}</span> : null}
+            {cs.rSquared != null && cs.rSquared >= 0 ? (
+              <span>
+                · <JargonTerm term="rsquared">R²</JargonTerm>={cs.rSquared.toFixed(2)}
+              </span>
+            ) : null}
             <span>· {cs.n} efforts</span>
           </div>
           {cs.limitations.length > 0 ? (
@@ -74,7 +76,11 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
           </p>
           <div className="mt-1 flex items-center gap-2 text-[10px] text-zinc-600">
             <span className="capitalize">{fr.confidence} confidence</span>
-            {fr.rSquared != null ? <span>· R²={fr.rSquared.toFixed(2)}</span> : null}
+            {fr.rSquared != null && fr.rSquared >= 0 ? (
+              <span>
+                · <JargonTerm term="rsquared">R²</JargonTerm>={fr.rSquared.toFixed(2)}
+              </span>
+            ) : null}
             <span>· {fr.n} efforts</span>
           </div>
         </div>
@@ -188,7 +194,7 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
       >
         Ask Coach
       </Link>
-    </section>
+    </Panel>
   );
 }
 
@@ -199,7 +205,7 @@ function TrendGlyph({ trend }: { trend: "improving" | "declining" | "stable" | n
   return null;
 }
 
-function Metric({ label, value, sub }: { label: string; value: string; sub: string }) {
+function Metric({ label, value, sub }: { label: ReactNode; value: string; sub: string }) {
   return (
     <div className="rounded-md bg-white/[0.025] px-2.5 py-2">
       <p className="text-[10px] text-zinc-600">{label}</p>

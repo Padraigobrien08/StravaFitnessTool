@@ -28,7 +28,7 @@ const MODES: { id: StrategyMode; label: string }[] = [
 ];
 
 const fadeColor = {
-  low: "text-emerald-400",
+  low: "text-teal-400",
   medium: "text-amber-400",
   high: "text-red-400",
 };
@@ -130,7 +130,7 @@ export function RaceStrategyPanel({
                   <td className="py-2 pr-4 tabular-nums text-zinc-500">
                     {formatDuration(s.segmentSec)}
                   </td>
-                  <td className="py-2 tabular-nums text-emerald-400/90">
+                  <td className="py-2 tabular-nums text-teal-400/90">
                     {formatPace(s.paceSecPerKm)}
                   </td>
                 </tr>

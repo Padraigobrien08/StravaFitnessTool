@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { HomeHeroView } from "@/lib/home/operatingSystemView";
 import { coachUrl } from "@/lib/coach/domainLinks";
 import {
@@ -117,12 +116,11 @@ export function OsHero({
           ) : null}
           <StateChip label="Readiness" value={String(hero.readinessScore)} />
           <StateChip label="Freshness" value={String(hero.freshness)} />
-          <div className="col-span-2 flex flex-wrap items-center gap-2 rounded-lg bg-[var(--surface)] px-2.5 py-2 lg:col-span-1">
-            <ConfidenceBadge level={hero.confidence} />
-            {hero.taperActive ? (
+          {hero.taperActive ? (
+            <div className="col-span-2 flex flex-wrap items-center gap-2 rounded-lg bg-[var(--surface)] px-2.5 py-2 lg:col-span-1">
               <span className="text-[10px] text-teal-500/80">Taper active</span>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </aside>
       </div>
     </section>

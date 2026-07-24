@@ -3,6 +3,8 @@
 import Link from "next/link";
 import type { Anomaly, AnomalyReport } from "@/lib/analytics/anomalies";
 import { signalCoachLink } from "@/lib/coach/domainLinks";
+import { JargonTerm } from "@/components/jargon-term";
+import { Panel } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
 const CAUSE_LABEL: Record<Anomaly["likelyCauses"][number]["cause"], string> = {
@@ -17,12 +19,7 @@ export function IntelligenceAnomalies({ data }: { data: AnomalyReport }) {
   if (!data.available || data.anomalies.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Anomalies
-        <span className="ml-1.5 text-zinc-600">runs that don&apos;t fit your model — and why</span>
-      </p>
-
+    <Panel title="Anomalies" hint="runs that don't fit your model — and why">
       <ul className="mt-2 space-y-2">
         {data.anomalies.slice(0, 5).map((a) => (
           <AnomalyRow key={a.runId} anomaly={a} />
@@ -39,7 +36,7 @@ export function IntelligenceAnomalies({ data }: { data: AnomalyReport }) {
       >
         Ask Coach
       </Link>
-    </section>
+    </Panel>
   );
 }
 
@@ -50,7 +47,8 @@ function AnomalyRow({ anomaly }: { anomaly: Anomaly }) {
     <li className="flex items-baseline gap-2 text-[12px] leading-snug">
       <span className={cn("w-12 shrink-0 font-medium tabular-nums", sigmaColor)}>
         {z >= 0 ? "+" : "−"}
-        {Math.abs(z).toFixed(1)}σ
+        {Math.abs(z).toFixed(1)}
+        <JargonTerm term="sigma">σ</JargonTerm>
       </span>
       <div className="min-w-0">
         <p className="text-zinc-300">

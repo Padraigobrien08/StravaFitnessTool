@@ -1,6 +1,7 @@
 "use client";
 
 import type { Correlation, CorrelationReport } from "@/lib/analytics/correlations";
+import { Panel } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
 const STRENGTH_STYLE: Record<Correlation["strength"], string> = {
@@ -14,12 +15,7 @@ export function IntelligenceCorrelations({ data }: { data: CorrelationReport }) 
   if (!data.available || data.correlations.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Correlation explorer
-        <span className="ml-1.5 text-zinc-600">associations in your own data</span>
-      </p>
-
+    <Panel title="Correlation explorer" hint="associations in your own data">
       <ul className="mt-2 space-y-1.5">
         {data.correlations.slice(0, 6).map((c) => (
           <CorrelationRow key={c.key} c={c} />
@@ -29,7 +25,7 @@ export function IntelligenceCorrelations({ data }: { data: CorrelationReport }) 
       <p className="mt-2 text-[10px] leading-snug text-zinc-700">
         {data.limitations[0] ?? "Correlation is not causation."}
       </p>
-    </section>
+    </Panel>
   );
 }
 

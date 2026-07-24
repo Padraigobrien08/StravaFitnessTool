@@ -19,7 +19,7 @@ const KIND_DOT: Record<string, string> = {
   fade: "bg-amber-400",
   pause: "bg-zinc-600",
   pace_spike: "bg-violet-400",
-  climb: "bg-emerald-400",
+  climb: "bg-teal-400",
   descent: "bg-blue-400",
 };
 

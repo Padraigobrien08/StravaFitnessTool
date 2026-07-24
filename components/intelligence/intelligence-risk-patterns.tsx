@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { RiskPattern, RiskSeverity } from "@/lib/analytics/riskPatterns";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Panel } from "@/components/ui/panel";
 
 const severityStyle: Record<RiskSeverity, string> = {
   high: "border-rose-500/25 bg-rose-500/[0.04]",
@@ -22,12 +23,7 @@ export function IntelligenceRiskPatterns({ patterns }: { patterns: RiskPattern[]
   if (patterns.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Risk patterns
-        <span className="ml-1.5 text-zinc-600">{patterns.length} flagged · ranked by severity</span>
-      </p>
-
+    <Panel title="Risk patterns" hint={<>{patterns.length} flagged · ranked by severity</>}>
       <ul className="mt-2 space-y-2">
         {patterns.map((p) => {
           const open = expandedId === p.id;
@@ -76,6 +72,6 @@ export function IntelligenceRiskPatterns({ patterns }: { patterns: RiskPattern[]
           );
         })}
       </ul>
-    </section>
+    </Panel>
   );
 }

@@ -6,6 +6,7 @@ import type { Insight } from "@/lib/insights/types";
 import type { ImportQualityReport } from "@/lib/quality/assessImport";
 import { buildProgressionView, type ProgressionViewModel } from "@/lib/home/dashboardData";
 import { formatDuration, formatPace } from "@/lib/utils";
+import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
 import { parseISO } from "date-fns";
 
 export type PerformanceSeverity = "positive" | "neutral" | "warning";
@@ -509,10 +510,68 @@ function buildIntegrity(
   };
 }
 
+/** Parse a formatDuration string ("1h 37m", "23m 46s", "4h 16m") back to seconds. */
+function parseDurationToSec(display: string): number | null {
+  const h = display.match(/(\d+)\s*h/);
+  const m = display.match(/(\d+)\s*m/);
+  const s = display.match(/(\d+)\s*s/);
+  if (!h && !m && !s) return null;
+  return (h ? Number(h[1]) * 3600 : 0) + (m ? Number(m[1]) * 60 : 0) + (s ? Number(s[1]) : 0);
+}
+
+function forecastConfidenceLevel(label: string): "low" | "medium" | "high" {
+  const l = label.toLowerCase();
+  if (l.includes("high")) return "high";
+  if (l.startsWith("medium")) return "medium";
+  return "low";
+}
+
+/**
+ * Race forecasts must agree across surfaces. When the canonical forecastV2 (the
+ * same engine the Goals page uses) is available, it overrides the older
+ * Riegel/consensus projection so Performance and Goals never show different
+ * finish times for the same race.
+ */
+function applyCanonicalForecast(
+  projection: RaceProjectionView,
+  forecast: ForecastV2View,
+  goalDistanceKm: number | null,
+): RaceProjectionView {
+  const totalSec = parseDurationToSec(forecast.mostLikely);
+  const paceDisplay =
+    totalSec != null && goalDistanceKm && goalDistanceKm > 0
+      ? `${formatPace(totalSec / goalDistanceKm)}`
+      : (projection.primary?.paceDisplay ?? "");
+
+  const primary: RaceProjectionView["primary"] = {
+    label: forecast.distanceLabel,
+    distanceKm: goalDistanceKm ?? projection.primary?.distanceKm ?? 0,
+    timeDisplay: forecast.mostLikely,
+    rangeDisplay: forecast.rangeDisplay,
+    // forecastV2 communicates uncertainty via the p25–p75 band (rangeDisplay),
+    // not a symmetric ± spread — so no separate spread token.
+    spreadDisplay: "",
+    confidence: forecastConfidenceLevel(forecast.confidence),
+    confidenceLabel: forecast.confidence,
+    paceDisplay,
+  };
+
+  // Keep the cross-distance table consistent with the canonical headline
+  // (labels differ in case: "Half Marathon" vs forecast's "Half marathon").
+  const allDistances = projection.allDistances.map((d) =>
+    d.label.toLowerCase() === forecast.distanceLabel.toLowerCase()
+      ? { ...d, timeDisplay: forecast.mostLikely, rangeDisplay: forecast.rangeDisplay }
+      : d,
+  );
+
+  return { ...projection, primary, allDistances };
+}
+
 export function buildPerformancePageView(
   analytics: DashboardInsights,
   insights: Insight[] = [],
   quality: ImportQualityReport | null = null,
+  opts?: { forecast?: ForecastV2View | null; goalDistanceKm?: number | null },
 ): PerformancePageView {
   const related = performanceInsights(insights);
   const top = related[0];
@@ -520,7 +579,10 @@ export function buildPerformancePageView(
   const traj = trajectoryScore(analytics);
   const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   const progression = buildProgressionView(analytics, insights);
-  const projection = buildProjectionView(analytics);
+  let projection = buildProjectionView(analytics);
+  if (opts?.forecast?.enabled) {
+    projection = applyCanonicalForecast(projection, opts.forecast, opts.goalDistanceKm ?? null);
+  }
 
   const effMom = analytics.efficiencyMoM;
   const strongestSignal =

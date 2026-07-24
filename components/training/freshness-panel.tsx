@@ -7,7 +7,7 @@ import type { FatigueSnapshot } from "@/lib/analytics/fatigue";
 import type { AcuteChronicLoad } from "@/lib/analytics/fatigue";
 
 const labelColor: Record<string, string> = {
-  Fresh: "text-emerald-400",
+  Fresh: "text-teal-400",
   Neutral: "text-zinc-300",
   Fatigued: "text-amber-400",
 };

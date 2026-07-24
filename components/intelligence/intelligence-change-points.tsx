@@ -2,6 +2,8 @@
 
 import type { ChangePoint, ChangePointReport } from "@/lib/analytics/changePoints";
 import { cn } from "@/lib/utils";
+import { JargonTerm } from "@/components/jargon-term";
+import { Panel } from "@/components/ui/panel";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
 const KIND_META: Record<ChangePoint["kind"], { label: string; tone: string }> = {
@@ -15,14 +17,10 @@ export function IntelligenceChangePoints({ data }: { data: ChangePointReport }) 
   if (!data.available || data.changePoints.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Fitness change-points
-        <span className="ml-1.5 text-zinc-600">
-          where your {data.metricLabel} trajectory turned
-        </span>
-      </p>
-
+    <Panel
+      title="Fitness change-points"
+      hint={<>where your {data.metricLabel} trajectory turned</>}
+    >
       <ul className="mt-2 space-y-2">
         {data.changePoints.map((c, i) => (
           <ChangePointRow key={`${c.weekStart}-${i}`} cp={c} />
@@ -32,7 +30,7 @@ export function IntelligenceChangePoints({ data }: { data: ChangePointReport }) 
       {data.limitations.length > 0 ? (
         <p className="mt-2 text-[10px] leading-snug text-zinc-700">{data.limitations[0]}</p>
       ) : null}
-    </section>
+    </Panel>
   );
 }
 
@@ -56,7 +54,7 @@ function ChangePointRow({ cp }: { cp: ChangePoint }) {
         <p className="text-[10px] tabular-nums text-zinc-600">
           slope {cp.slopeBefore >= 0 ? "+" : ""}
           {cp.slopeBefore} → {cp.slopeAfter >= 0 ? "+" : ""}
-          {cp.slopeAfter} CTL/wk
+          {cp.slopeAfter} <JargonTerm term="ctl">CTL</JargonTerm>/wk
         </p>
       </div>
     </li>

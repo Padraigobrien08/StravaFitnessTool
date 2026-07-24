@@ -10,7 +10,7 @@ export function ConfidenceBadge({ level }: { level: "low" | "medium" | "high" })
   const colors = {
     low: "border-amber-500/30 bg-amber-500/10 text-amber-400/90",
     medium: "border-sky-500/30 bg-sky-500/10 text-sky-400/90",
-    high: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400/90",
+    high: "border-teal-500/30 bg-teal-500/10 text-teal-400/90",
   };
 
   return (

@@ -69,7 +69,7 @@ export function FitUploadZone({
             {totalRuns > 0 && (
               <p className="mt-2 text-sm text-zinc-400">
                 FIT data loaded:{" "}
-                <span className="font-medium text-emerald-400">
+                <span className="font-medium text-teal-400">
                   {runsWithFit} / {totalRuns}
                 </span>{" "}
                 runs
@@ -114,7 +114,7 @@ export function FitUploadZone({
       )}
 
       {success && (
-        <div className="flex items-start gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+        <div className="flex items-start gap-2 rounded-lg border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm text-teal-200">
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
           {success}
         </div>

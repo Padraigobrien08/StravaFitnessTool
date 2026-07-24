@@ -91,7 +91,7 @@ export function StravaWebhookCard({ apiConnected }: { apiConnected: boolean }) {
         ) : (
           <p className="text-zinc-500">No push subscription registered yet.</p>
         )}
-        {message ? <p className="text-emerald-400/90">{message}</p> : null}
+        {message ? <p className="text-teal-400/90">{message}</p> : null}
         {error ? <p className="text-amber-400/90">{error}</p> : null}
         <Button
           variant="outline"
