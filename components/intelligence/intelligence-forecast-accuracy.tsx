@@ -3,6 +3,7 @@
 import type { ForecastCalibrationResult } from "@/lib/forecasting-v2/calibrationService";
 import { formatDuration } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { Panel } from "@/components/ui/panel";
 
 export function IntelligenceForecastAccuracy({ data }: { data: ForecastCalibrationResult }) {
   const { summary } = data;
@@ -19,12 +20,7 @@ export function IntelligenceForecastAccuracy({ data }: { data: ForecastCalibrati
           : "well-centered";
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Forecast accuracy
-        <span className="ml-1.5 text-zinc-600">how well predictions have held up</span>
-      </p>
-
+    <Panel title="Forecast accuracy" hint="how well predictions have held up">
       {summary.evaluated === 0 ? (
         <p className="mt-1 text-[12px] text-zinc-500">
           {summary.logged} forecast{summary.logged === 1 ? "" : "s"} logged — graded once you race
@@ -68,6 +64,6 @@ export function IntelligenceForecastAccuracy({ data }: { data: ForecastCalibrati
           </ul>
         </>
       )}
-    </section>
+    </Panel>
   );
 }

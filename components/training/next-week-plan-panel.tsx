@@ -59,7 +59,7 @@ export function NextWeekPlanPanel({
   );
 
   return (
-    <Card className={compact ? "" : "border-emerald-500/20"}>
+    <Card className={compact ? "" : "border-teal-500/20"}>
       <CardHeader>
         <CardTitle>
           Recommended next week
@@ -82,9 +82,7 @@ export function NextWeekPlanPanel({
             <li
               key={`${s.day}-${i}`}
               className={`flex gap-3 rounded-lg border px-3 py-3 ${
-                checked[i]
-                  ? "border-emerald-500/30 bg-emerald-500/5"
-                  : "border-white/10 bg-white/[0.02]"
+                checked[i] ? "border-teal-500/30 bg-teal-500/5" : "border-white/10 bg-white/[0.02]"
               }`}
             >
               <Checkbox

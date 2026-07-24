@@ -14,7 +14,7 @@ export function ConsistencyCard({ score }: { score: ConsistencyScore }) {
           {score.overall}
           <span className="text-lg text-zinc-500"> / 100</span>
         </p>
-        <p className="mt-1 text-sm text-emerald-400/90">{score.label}</p>
+        <p className="mt-1 text-sm text-teal-400/90">{score.label}</p>
         <ul className="mt-3 space-y-1 text-xs text-zinc-500">
           <li>Frequency: {score.frequency}/100</li>
           <li>Volume stability: {score.volumeStability}/100</li>

@@ -100,7 +100,7 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
           ) : null}
 
           <div className="flex items-center gap-4">
-            <ReadinessRing score={hero.trajectoryScore} size={88} showGlow />
+            <ReadinessRing score={hero.trajectoryScore} size={88} showGlow label="Trajectory" />
             <div className="min-w-0 flex-1">
               <p className="text-sm text-zinc-400">{hero.trajectoryLabel}</p>
               <p className="mt-0.5 text-xs text-zinc-600">

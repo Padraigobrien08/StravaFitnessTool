@@ -2,6 +2,7 @@
 
 import type { CoachWorkspaceState } from "@/lib/coach/types";
 import { cn, formatKm } from "@/lib/utils";
+import { JargonTerm } from "@/components/jargon-term";
 import { ChevronRight, Target } from "lucide-react";
 
 function ContextRow({
@@ -11,7 +12,7 @@ function ContextRow({
 }: {
   label: string;
   value: React.ReactNode;
-  sub?: string;
+  sub?: React.ReactNode;
 }) {
   return (
     <div className="rounded-md bg-white/[0.025] px-2.5 py-2">
@@ -78,9 +79,14 @@ export function CoachMiniContext({
               label="Freshness"
               value={Math.round(snapshot.freshness)}
               sub={
-                snapshot.tsb != null
-                  ? `TSB ${snapshot.tsb > 0 ? "+" : ""}${Math.round(snapshot.tsb)}`
-                  : (snapshot.fatigueLabel ?? undefined)
+                snapshot.tsb != null ? (
+                  <>
+                    <JargonTerm term="tsb">TSB</JargonTerm> {snapshot.tsb > 0 ? "+" : ""}
+                    {Math.round(snapshot.tsb)}
+                  </>
+                ) : (
+                  (snapshot.fatigueLabel ?? undefined)
+                )
               }
             />
           ) : null}
@@ -107,14 +113,14 @@ export function CoachMiniContext({
         </p>
 
         {topRisk ? (
-          <div className="mt-3 rounded-md border-l-2 border-amber-500/25 bg-amber-500/[0.04] px-2.5 py-2">
+          <div className="mt-3 rounded-md border border-amber-500/15 bg-amber-500/[0.04] px-2.5 py-2">
             <p className="text-[11px] text-amber-200/50">Risk</p>
             <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">{topRisk.text}</p>
           </div>
         ) : null}
 
         {topOpp ? (
-          <div className="mt-2 rounded-md border-l-2 border-teal-500/20 bg-teal-500/[0.03] px-2.5 py-2">
+          <div className="mt-2 rounded-md border border-teal-500/15 bg-teal-500/[0.03] px-2.5 py-2">
             <p className="text-[11px] text-teal-400/50">Opportunity</p>
             <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">{topOpp.text}</p>
           </div>

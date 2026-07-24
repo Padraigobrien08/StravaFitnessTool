@@ -22,9 +22,9 @@ function TrainingEvidenceBanner() {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
       <div>
-        <p className={dash.labelAccent}>Supporting evidence</p>
+        <p className={dash.labelAccent}>Training · Am I training correctly?</p>
         <p className="mt-0.5 text-xs text-zinc-600">
-          Audit load and adaptation behind your plan — not the primary workspace.
+          Load, intensity mix, phase, and cross-training — how your training is structured.
         </p>
       </div>
       <Link

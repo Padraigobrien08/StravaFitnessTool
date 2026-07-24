@@ -3,6 +3,8 @@
 import Link from "next/link";
 import type { PersonalZScores, SessionZScore } from "@/lib/analytics/personalZScores";
 import { signalCoachLink } from "@/lib/coach/domainLinks";
+import { JargonTerm } from "@/components/jargon-term";
+import { Panel } from "@/components/ui/panel";
 import { cn } from "@/lib/utils";
 
 export function IntelligenceStandoutSessions({ data }: { data: PersonalZScores }) {
@@ -11,12 +13,7 @@ export function IntelligenceStandoutSessions({ data }: { data: PersonalZScores }
   if (!best && !worst) return null;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Standout sessions
-        <span className="ml-1.5 text-zinc-600">each vs your own distribution for that type</span>
-      </p>
-
+    <Panel title="Standout sessions" hint="each vs your own distribution for that type">
       <div className="mt-2 space-y-2">
         {best ? <SessionRow session={best} tone="good" /> : null}
         {worst ? <SessionRow session={worst} tone="bad" /> : null}
@@ -32,7 +29,7 @@ export function IntelligenceStandoutSessions({ data }: { data: PersonalZScores }
       >
         Ask Coach
       </Link>
-    </section>
+    </Panel>
   );
 }
 
@@ -43,7 +40,8 @@ function SessionRow({ session, tone }: { session: SessionZScore; tone: "good" | 
     <div className="flex items-baseline gap-2 text-[12px] leading-snug">
       <span className={cn("w-12 shrink-0 tabular-nums font-medium", sigmaColor)}>
         {z >= 0 ? "+" : "−"}
-        {Math.abs(z).toFixed(1)}σ
+        {Math.abs(z).toFixed(1)}
+        <JargonTerm term="sigma">σ</JargonTerm>
       </span>
       <div className="min-w-0">
         <p className="text-zinc-300">

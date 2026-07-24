@@ -9,11 +9,13 @@ export function ReadinessRing({
   size = 120,
   className,
   showGlow = false,
+  label = "Ready",
 }: {
   score: number;
   size?: number;
   className?: string;
   showGlow?: boolean;
+  label?: string;
 }) {
   const clamped = Math.min(100, Math.max(0, score));
   const [progress, setProgress] = useState(0);
@@ -34,7 +36,7 @@ export function ReadinessRing({
       className={cn("relative inline-flex items-center justify-center", className)}
       style={{ width: size, height: size }}
       role="img"
-      aria-label={`Readiness ${clamped} out of 100`}
+      aria-label={`${label} ${clamped} out of 100`}
     >
       {showGlow ? (
         <div
@@ -72,7 +74,7 @@ export function ReadinessRing({
       <div className="absolute z-10 flex flex-col items-center">
         <AnimatedMetric value={clamped} className="font-display text-3xl font-bold text-white" />
         <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500">
-          ready
+          {label}
         </span>
       </div>
     </div>

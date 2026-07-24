@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Panel } from "@/components/ui/panel";
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -25,16 +26,14 @@ export function IntelligenceCapabilityRadar({ data }: { data: CapabilityRadar })
   const hasDemand = chartData.some((d) => d.demand != null);
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Capability radar
-        <span className="ml-1.5 text-zinc-600">
-          {data.goalDistanceLabel
-            ? `scored vs your history, weighted for your ${data.goalDistanceLabel}`
-            : "scored vs your own history"}
-        </span>
-      </p>
-
+    <Panel
+      title="Capability radar"
+      hint={
+        data.goalDistanceLabel
+          ? `scored vs your history, weighted for your ${data.goalDistanceLabel}`
+          : "scored vs your own history"
+      }
+    >
       <div className="mt-1 h-[240px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={chartData} outerRadius="72%">
@@ -98,6 +97,6 @@ export function IntelligenceCapabilityRadar({ data }: { data: CapabilityRadar })
       >
         Ask Coach
       </Link>
-    </section>
+    </Panel>
   );
 }

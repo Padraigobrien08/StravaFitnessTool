@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils";
 
 const styles: Record<WorkoutType, string> = {
-  easy: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+  easy: "bg-teal-500/15 text-teal-400 border-teal-500/25",
   recovery: "bg-sky-500/15 text-sky-400 border-sky-500/25",
   long: "bg-indigo-500/15 text-indigo-300 border-indigo-500/25",
   tempo: "bg-amber-500/15 text-amber-400 border-amber-500/25",

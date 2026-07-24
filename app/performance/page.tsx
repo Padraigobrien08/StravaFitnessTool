@@ -4,34 +4,43 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
+import { useStrava } from "@/lib/context/strava-context";
+import { useGoalStore } from "@/stores/goal-store";
 import { buildPerformancePageView } from "@/lib/performance/viewModels";
-import {
-  PerformanceWorkspace,
-  PerformanceIntelRow,
-} from "@/components/performance/performance-workspace";
+import { buildForecastV2View } from "@/lib/goals/forecastV2ViewModel";
+import type { RaceDistance } from "@/lib/analytics/readiness";
+import { PerformanceWorkspace } from "@/components/performance/performance-workspace";
 import { PerformanceStateHero } from "@/components/performance/performance-state-hero";
 import { PerformanceTrajectoryPanel } from "@/components/performance/performance-trajectory-panel";
 import { RaceProjectionPanel } from "@/components/performance/race-projection-panel";
 import { AdaptationTrendsPanel } from "@/components/performance/adaptation-trends-panel";
-import { PerformanceDistributionPanel } from "@/components/performance/performance-distribution-panel";
 import { PerformanceIntegrityPanel } from "@/components/performance/performance-integrity-panel";
 import { dash } from "@/components/home/primitives/tokens";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const RACE_DISTANCE_KM: Record<RaceDistance, number> = {
+  "5k": 5,
+  "10k": 10,
+  hm: 21.0975,
+  marathon: 42.195,
+};
+
 function PerformanceEvidenceBanner() {
   return (
     <div className="border-b border-white/[0.04] pb-3">
-      <p className={dash.labelAccent}>Performance evidence</p>
+      <p className={dash.labelAccent}>Performance · Am I improving?</p>
       <p className="mt-0.5 text-xs text-zinc-600">
-        Validate forecasts and trends behind recommendations —{" "}
-        <Link href="/plan" className="text-zinc-500 hover:text-zinc-400">
-          plan
+        Trajectory, adaptation, and projected outcome — the evidence you&apos;re getting fitter. For
+        intensity &amp; load see{" "}
+        <Link href="/training" className="text-zinc-500 hover:text-zinc-400">
+          Training
         </Link>
-        {" · "}
-        <Link href="/intelligence" className="text-zinc-500 hover:text-zinc-400">
-          intelligence
+        , for race strategy see{" "}
+        <Link href="/goals" className="text-zinc-500 hover:text-zinc-400">
+          Goals
         </Link>
+        .
       </p>
     </div>
   );
@@ -39,12 +48,23 @@ function PerformanceEvidenceBanner() {
 
 export default function PerformancePage() {
   const { analytics, insights, quality, loading } = useTrainingIntelligence();
+  const { importData, fitDetails } = useStrava();
+  const raceGoal = useGoalStore((s) => s.raceGoal);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const view = useMemo(() => {
     if (!analytics) return null;
-    return buildPerformancePageView(analytics, insights, quality);
-  }, [analytics, insights, quality]);
+    // Use the canonical forecastV2 (same engine as Goals) so the headline race
+    // projection agrees across surfaces instead of diverging from Goals.
+    const forecast = buildForecastV2View({
+      analytics,
+      goal: raceGoal,
+      runs: importData?.runs,
+      fitDetails,
+    });
+    const goalDistanceKm = raceGoal ? RACE_DISTANCE_KM[raceGoal.distance] : null;
+    return buildPerformancePageView(analytics, insights, quality, { forecast, goalDistanceKm });
+  }, [analytics, insights, quality, raceGoal, importData?.runs, fitDetails]);
 
   if (loading && !view) {
     return (
@@ -75,7 +95,7 @@ export default function PerformancePage() {
               aria-expanded={advancedOpen}
             >
               <span className="text-[12px] text-zinc-500">
-                Advanced analytics (distribution, integrity, detailed trends)
+                Advanced analytics (integrity, detailed trends)
               </span>
               <ChevronDown
                 className={cn(
@@ -87,14 +107,14 @@ export default function PerformancePage() {
             {advancedOpen ? (
               <div className="space-y-4 border-t border-white/[0.04] px-4 pb-4 pt-3">
                 <AdaptationTrendsPanel trends={view.adaptationTrends} />
-                <PerformanceIntelRow>
-                  <div className="lg:col-span-7">
-                    <PerformanceDistributionPanel data={view.distribution} />
-                  </div>
-                  <div className="lg:col-span-5">
-                    <PerformanceIntegrityPanel data={view.integrity} />
-                  </div>
-                </PerformanceIntelRow>
+                <PerformanceIntegrityPanel data={view.integrity} />
+                <p className="text-[11px] text-zinc-600">
+                  Intensity &amp; load distribution lives on{" "}
+                  <Link href="/training" className="text-teal-400/90 hover:text-teal-300">
+                    Training
+                  </Link>
+                  .
+                </p>
               </div>
             ) : null}
           </div>

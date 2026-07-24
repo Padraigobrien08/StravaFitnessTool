@@ -1,14 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
 import { buildRunsPageView } from "@/lib/runs/viewModels";
 import { RunsWorkspace } from "@/components/runs/runs-workspace";
-import { ActivityStateSummary } from "@/components/runs/activity-state-summary";
 import { RunHistoryHero } from "@/components/runs/run-history-hero";
-import { TrainingDistributionSummary } from "@/components/runs/training-distribution-summary";
 import { HistoricalContextPanel } from "@/components/runs/historical-context-panel";
 import { RunExplorer } from "@/components/runs/run-explorer";
 import { NotableSessionsFeed } from "@/components/runs/notable-sessions-feed";
@@ -52,10 +51,13 @@ export default function RunsPage() {
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.04] pb-3">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-wider text-teal-500/70">
-                Session intelligence workspace
+                Activities · Explore your sessions
               </p>
               <p className="text-[11px] text-zinc-600">
-                Interpret · explore · compare
+                Interpret, explore, and compare individual runs · intensity &amp; load breakdown on{" "}
+                <Link href="/training" className="text-zinc-500 hover:text-zinc-400">
+                  Training
+                </Link>
                 {dataSourceLabel ? ` · ${dataSourceLabel}` : ""}
               </p>
             </div>
@@ -70,9 +72,7 @@ export default function RunsPage() {
           </header>
 
           <div className="space-y-3">
-            <ActivityStateSummary data={view.activityState} />
             <RunHistoryHero hero={view.hero} />
-            <TrainingDistributionSummary data={view.distribution} />
             <HistoricalContextPanel data={view.historical} />
 
             {mode === "intelligence" ? (

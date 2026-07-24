@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const segmentColors: Record<string, string> = {
   endurance: "bg-blue-400/90",
   pacing: "bg-teal-400/90",
-  consistency: "bg-emerald-400/90",
+  consistency: "bg-teal-400/90",
   freshness: "bg-violet-400/90",
 };
 
@@ -56,7 +56,7 @@ export function GoalMissionControl({ goal }: { goal: GoalMissionViewModel }) {
             >
               <div
                 className={cn(
-                  "h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500",
+                  "h-full rounded-full bg-gradient-to-r from-teal-500 to-teal-500 transition-all duration-500",
                   goal.score < 50 && "from-amber-500 to-amber-600",
                   goal.score < 35 && "from-red-500 to-red-600",
                 )}

@@ -4,7 +4,7 @@ import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { WeeklyNarrative } from "@/lib/analytics/narrative";
 
 const severityBorder: Record<WeeklyNarrative["severity"], string> = {
-  positive: "border-emerald-500/25 bg-emerald-500/5",
+  positive: "border-teal-500/25 bg-teal-500/5",
   neutral: "border-white/10 bg-white/[0.02]",
   warning: "border-amber-500/25 bg-amber-500/5",
 };

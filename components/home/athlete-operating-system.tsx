@@ -53,11 +53,12 @@ export function AthleteOperatingSystem({
         primaryActionBullets={vm.primaryActionBullets}
       />
 
-      <OsTrajectory items={vm.trajectory} />
-
-      <OsMemory memory={vm.memory} />
-
-      <OsInvestigations />
+      {/* Supporting context — separated from the actionable dashboard above for rhythm. */}
+      <div className="mt-1 flex flex-col gap-3 border-t border-[var(--border-subtle)] pt-4 sm:gap-3.5">
+        <OsTrajectory items={vm.trajectory} />
+        <OsMemory memory={vm.memory} />
+        <OsInvestigations />
+      </div>
     </div>
   );
 }

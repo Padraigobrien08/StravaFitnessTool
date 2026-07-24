@@ -51,7 +51,7 @@ export function RunHistoryHero({ hero }: { hero: RunsHeroView }) {
           <dl className="mt-2 space-y-2 text-[11px]">
             <StateRow label="Readiness" value={hero.stateCard.readiness} />
             <StateRow label="Consistency" value={hero.stateCard.consistency} />
-            <StateRow label="Easy share" value={hero.stateCard.easyShare} />
+            <StateRow label="Low-intensity" value={hero.stateCard.easyShare} />
             <StateRow label="Frequency" value={hero.stateCard.frequency} />
             <StateRow label="Volume" value={hero.stateCard.volumeTrend} />
             <StateRow label="Phase" value={hero.stateCard.phase} />

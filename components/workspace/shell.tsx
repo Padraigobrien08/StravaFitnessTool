@@ -8,6 +8,7 @@ import { useStrava } from "@/lib/context/strava-context";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { cn } from "@/lib/utils";
+import { Settings } from "lucide-react";
 
 /** Usable workspace width on large displays */
 export const WORKSPACE_MAX = "max-w-[1500px]";
@@ -93,6 +94,19 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
             Stride<span className="text-teal-400">IQ</span>
           </Link>
           <Nav variant="app" className="min-w-0 flex-1" />
+          <Link
+            href="/settings"
+            aria-label="Settings"
+            title="Settings"
+            className={cn(
+              "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
+              pathname === "/settings" || pathname.startsWith("/settings/")
+                ? "bg-teal-500/12 text-teal-300"
+                : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
+            )}
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
           <ThemeToggle className="shrink-0" />
           <WorkspaceMeta />
         </WorkspaceFrame>

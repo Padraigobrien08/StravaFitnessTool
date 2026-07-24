@@ -602,7 +602,7 @@ export function buildRunsPageView(
     stateCard: {
       readiness: `${readinessScore}/100 · ${(analytics.raceReadiness?.label ?? analytics.halfMarathonReadiness.label).toLowerCase()}`,
       consistency: `${analytics.consistencyScore.overall}/100 · ${analytics.consistencyScore.label.toLowerCase()}`,
-      easyShare: `${roundPct(analytics.intensityAdvice.currentEasyPct)}% easy`,
+      easyShare: `${roundPct(analytics.intensityAdvice.currentEasyPct)}%`,
       frequency: `${Math.round(recent.length / 8) || recent.length} runs/wk (56d)`,
       volumeTrend: volTrend,
       phase: analytics.raceReadiness

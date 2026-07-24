@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Panel } from "@/components/ui/panel";
 import type { RecommendationOutcomesResult } from "@/lib/recommendation-outcomes/service";
 import type { Adherence, OutcomeSignal } from "@/lib/recommendation-outcomes/types";
 import { coachUrl } from "@/lib/coach/domainLinks";
@@ -43,17 +44,17 @@ export function IntelligenceRecommendationOutcomes({
   const hiddenCount = data.recommendations.length - visible.length;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] font-medium text-zinc-500">Recommendation outcomes</p>
+    <Panel
+      title="Recommendation outcomes"
+      headerRight={
         <Link
           href={coachUrl({ q: "Did I follow your recent advice?" })}
           className="text-[10px] text-zinc-600 hover:text-zinc-400"
         >
           Ask Coach
         </Link>
-      </div>
-
+      }
+    >
       <p className="mt-1 text-[11px] text-zinc-600">
         {summary.adherenceRatePct != null
           ? `${summary.adherenceRatePct}% adherence across ${summary.resolved} evaluated`
@@ -96,6 +97,6 @@ export function IntelligenceRecommendationOutcomes({
           {expanded ? "Show less" : `Show ${hiddenCount} more`}
         </button>
       ) : null}
-    </section>
+    </Panel>
   );
 }

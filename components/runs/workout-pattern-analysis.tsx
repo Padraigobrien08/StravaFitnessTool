@@ -45,7 +45,7 @@ export function WorkoutPatternAnalysis({ patterns }: { patterns: PatternInsightV
                   href={coachUrl({ q: p.coachQuery })}
                   className="mt-1.5 inline-block text-[10px] text-zinc-600 hover:text-teal-400/80"
                 >
-                  Investigate with Coach →
+                  Ask Coach →
                 </Link>
               ) : null}
             </li>

@@ -205,7 +205,7 @@ export default function SettingsPage() {
           <CardTitle>Activity mix</CardTitle>
         </CardHeader>
         <CardContent>
-          <Link href="/context" className="text-sm text-emerald-400">
+          <Link href="/context" className="text-sm text-teal-400">
             View cross-training breakdown →
           </Link>
         </CardContent>

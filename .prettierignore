@@ -16,3 +16,6 @@ public/
 
 # SQL migrations — keep as authored
 db/migrations/
+
+# Design tooling artifacts (impeccable critique snapshots)
+.impeccable/

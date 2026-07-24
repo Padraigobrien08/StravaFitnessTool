@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { BurndownMetric, ProgressionBurndown } from "@/lib/analytics/burndown";
 import { signalCoachLink } from "@/lib/coach/domainLinks";
 import { cn } from "@/lib/utils";
+import { Panel } from "@/components/ui/panel";
 
 const STATUS_STYLE: Record<BurndownMetric["status"], { label: string; cls: string }> = {
   met: { label: "met", cls: "text-teal-400/90" },
@@ -17,14 +18,14 @@ export function IntelligenceProgressionBurndown({ data }: { data: ProgressionBur
   if (!data.available || data.metrics.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-3">
-      <p className="text-[11px] font-medium text-zinc-500">
-        Progression burn-down
-        <span className="ml-1.5 text-zinc-600">
+    <Panel
+      title="Progression burn-down"
+      hint={
+        <>
           on pace for your {data.goalDistanceLabel}? · targets by {data.deadlineLabel}
-        </span>
-      </p>
-
+        </>
+      }
+    >
       <p className="mt-1 text-[12px] leading-snug text-zinc-400">{data.headline}</p>
 
       <div className="mt-2 space-y-2.5">
@@ -43,7 +44,7 @@ export function IntelligenceProgressionBurndown({ data }: { data: ProgressionBur
       >
         Ask Coach
       </Link>
-    </section>
+    </Panel>
   );
 }
 

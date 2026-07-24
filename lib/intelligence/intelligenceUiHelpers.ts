@@ -72,40 +72,63 @@ export function buildSystemConfidenceSummary(analytics: DashboardInsights): {
   };
 }
 
+/**
+ * Join label segments with " · " while dropping empties and case-insensitive
+ * duplicates. Prevents the "Stable · Stable · nearly there" /
+ * "Improving · Improving · MoM gain" repetition when a segment (direction) is
+ * already echoed by the interpretation string.
+ */
+function cleanSegments(...parts: (string | undefined | null)[]): string {
+  const seen = new Set<string>();
+  const segs: string[] = [];
+  for (const part of parts) {
+    if (!part) continue;
+    for (const raw of part.split("·")) {
+      const s = raw.trim();
+      if (!s) continue;
+      const key = s.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      segs.push(s);
+    }
+  }
+  return segs.join(" · ");
+}
+
 export function formatTrajectoryDisplay(item: StateEvolutionItem): {
   headline: string;
   sub: string;
 } {
-  const sub = item.interpretation.replace(/^·\s*/, "").trim();
-  let headline = item.direction;
+  const interp = item.interpretation.replace(/^·\s*/, "").trim();
+  const dir = item.direction.trim();
 
   if (item.id === "readiness") {
-    headline = item.trend === "flat" ? "Stable" : item.direction;
+    const level = item.trend === "flat" ? "Stable" : dir;
     return {
-      headline: `${headline} · ${sub || "race ready"}`,
+      headline: cleanSegments(level, interp || "race ready"),
       sub: "",
     };
   }
   if (item.id === "freshness") {
-    const [level, ctx] = item.interpretation.split("·").map((x) => x.trim());
     return {
-      headline: `${level || item.direction} · ${ctx || "quality window"}`,
+      headline: cleanSegments(interp || dir, "quality window"),
       sub: "",
     };
   }
   if (item.id === "efficiency") {
     return {
-      headline: `${item.direction} · ${sub || "aerobic signal"}`,
-      sub: sub || "efficiency",
+      headline: cleanSegments(dir, interp || "aerobic signal"),
+      sub: "",
     };
   }
   if (item.id === "volume") {
+    // `dir` may already read "Down this week" — don't append the phrase twice.
+    const headline = /week/i.test(dir) ? dir : cleanSegments(dir, "this week");
     const volSub =
-      item.trend === "down" ? "taper effect" : item.trend === "up" ? "build phase" : sub;
-    return {
-      headline: `${item.direction} this week`,
-      sub: volSub || "weekly load",
-    };
+      item.trend === "down" ? "taper effect" : item.trend === "up" ? "build phase" : interp;
+    const sub =
+      volSub && !headline.toLowerCase().includes(volSub.toLowerCase()) ? volSub : "weekly load";
+    return { headline, sub };
   }
   if (item.id === "intensity") {
     return {
@@ -114,7 +137,7 @@ export function formatTrajectoryDisplay(item: StateEvolutionItem): {
     };
   }
 
-  return { headline: `${item.direction} · ${item.label}`, sub };
+  return { headline: cleanSegments(dir, item.label), sub: interp };
 }
 
 export type MemoryGroup = "stable" | "emerging" | "watchlist";

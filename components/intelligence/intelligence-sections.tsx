@@ -342,7 +342,7 @@ export function IntelligenceDecisionSupport({
             href={topicCoachLink("recommendation", recommendation)}
             className="mt-3 inline-flex items-center gap-0.5 text-[11px] text-zinc-500 hover:text-zinc-300"
           >
-            Investigate with Coach <ArrowRight className="h-3 w-3" />
+            Ask Coach <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
       </div>
@@ -399,7 +399,7 @@ function DecisionColumn({
         href={topicCoachLink(topic, query)}
         className="mt-2.5 inline-flex items-center gap-0.5 text-[11px] text-zinc-500 hover:text-zinc-300"
       >
-        Investigate with Coach <ArrowRight className="h-3 w-3" />
+        Ask Coach <ArrowRight className="h-3 w-3" />
       </Link>
     </div>
   );
@@ -598,7 +598,7 @@ export function IntelligenceEcosystemCompact({
         )}
         className="mt-3 inline-flex items-center gap-0.5 text-[11px] text-zinc-600 hover:text-zinc-400"
       >
-        Investigate with Coach <ArrowRight className="h-3 w-3" />
+        Ask Coach <ArrowRight className="h-3 w-3" />
       </Link>
     </>
   );

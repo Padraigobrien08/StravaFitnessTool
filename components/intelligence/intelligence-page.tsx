@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { RequireData } from "@/components/require-data";
 import { useStrava } from "@/lib/context/strava-context";
 import { useAthleteIntelligence } from "@/hooks/use-athlete-intelligence";
@@ -25,11 +25,8 @@ import { IntelligenceForecastAccuracy } from "./intelligence-forecast-accuracy";
 import { IntelligencePhysiology } from "./intelligence-physiology";
 import { IntelligenceCapabilityRadar } from "./intelligence-capability-radar";
 import { IntelligenceProgressionBurndown } from "./intelligence-progression-burndown";
-import { IntelligenceStandoutSessions } from "./intelligence-standout-sessions";
-import { IntelligenceAnomalies } from "./intelligence-anomalies";
-import { IntelligenceUncertainty } from "./intelligence-uncertainty";
-import { IntelligenceCorrelations } from "./intelligence-correlations";
-import { IntelligenceChangePoints } from "./intelligence-change-points";
+import { IntelligenceDeepDive } from "./intelligence-deep-dive";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { useForecastAccuracy } from "@/hooks/use-forecast-accuracy";
 import { coachUrl } from "@/lib/coach/domainLinks";
@@ -39,6 +36,7 @@ export function IntelligencePage() {
   const { dataSourceLabel, importData } = useStrava();
   const outcomes = useRecommendationOutcomes(!!intel.state);
   const forecastAccuracy = useForecastAccuracy(!!intel.state);
+  const [evidenceTab, setEvidenceTab] = useState<"fitness" | "physiology" | "memory">("fitness");
 
   const evolution = useMemo(
     () => (intel.analytics ? getStateEvolutionStrip(intel.analytics) : []),
@@ -109,6 +107,7 @@ export function IntelligencePage() {
             </div>
           </div>
 
+          {/* The answer: what the system believes and what to do. */}
           <IntelligenceHero
             state={intel.state}
             analytics={intel.analytics}
@@ -118,51 +117,81 @@ export function IntelligencePage() {
 
           {evolution.length > 0 ? <IntelligenceStateEvolution items={evolution} /> : null}
 
-          <IntelligencePeriodNarratives
-            monthly={intel.analytics.monthlyNarrative}
-            preRace={intel.analytics.preRaceNarrative}
-          />
-
           <IntelligenceDecisionSupport
             risks={risks}
             opportunities={opportunities}
             recommendation={intel.primaryRecommendation}
           />
 
-          {intel.analytics.riskPatterns.length > 0 ? (
-            <IntelligenceRiskPatterns patterns={intel.analytics.riskPatterns} />
-          ) : null}
-
           <IntelligenceRecentlyLearned
             items={intel.recentlyLearned}
             adaptationSignals={intel.adaptationSignals}
           />
 
-          {outcomes ? <IntelligenceRecommendationOutcomes data={outcomes} /> : null}
+          {/* The evidence behind the belief, grouped so the page never becomes a wall. */}
+          <div className="pt-1">
+            <p className="mb-2 text-[10px] font-medium uppercase tracking-eyebrow text-zinc-600">
+              Evidence
+            </p>
+            <Tabs
+              value={evidenceTab}
+              onValueChange={(value) =>
+                setEvidenceTab(value as "fitness" | "physiology" | "memory")
+              }
+              className="gap-3"
+            >
+              <TabsList className="w-full">
+                <TabsTrigger value="fitness">Fitness</TabsTrigger>
+                <TabsTrigger value="physiology">Physiology</TabsTrigger>
+                <TabsTrigger value="memory">Memory</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-          {forecastAccuracy ? <IntelligenceForecastAccuracy data={forecastAccuracy} /> : null}
+            <div className="mt-3 space-y-3">
+              {evidenceTab === "fitness" ? (
+                <>
+                  <IntelligencePeriodNarratives
+                    monthly={intel.analytics.monthlyNarrative}
+                    preRace={intel.analytics.preRaceNarrative}
+                  />
+                  {intel.analytics.riskPatterns.length > 0 ? (
+                    <IntelligenceRiskPatterns patterns={intel.analytics.riskPatterns} />
+                  ) : null}
+                  <IntelligenceCapabilityRadar data={intel.analytics.capabilityRadar} />
+                  <IntelligenceProgressionBurndown data={intel.analytics.progressionBurndown} />
+                  {outcomes ? <IntelligenceRecommendationOutcomes data={outcomes} /> : null}
+                  {forecastAccuracy ? (
+                    <IntelligenceForecastAccuracy data={forecastAccuracy} />
+                  ) : null}
+                </>
+              ) : null}
 
-          <IntelligenceCapabilityRadar data={intel.analytics.capabilityRadar} />
+              {evidenceTab === "physiology" ? (
+                <IntelligencePhysiology data={intel.analytics.physiology} />
+              ) : null}
 
-          <IntelligenceProgressionBurndown data={intel.analytics.progressionBurndown} />
+              {evidenceTab === "memory" ? (
+                <>
+                  <IntelligenceMemoryGrouped memory={intel.memory} beliefsById={beliefsById} />
+                  <IntelligenceSignalBoard signals={intel.signals} compact />
+                  {intel.ecosystem ? (
+                    <IntelligenceEcosystemCompact ecosystem={intel.ecosystem} />
+                  ) : null}
+                </>
+              ) : null}
+            </div>
+          </div>
 
-          <IntelligencePhysiology data={intel.analytics.physiology} />
-
-          <IntelligenceStandoutSessions data={intel.analytics.personalZScores} />
-
-          <IntelligenceAnomalies data={intel.analytics.anomalies} />
-
-          <IntelligenceUncertainty data={intel.analytics.uncertaintyEstimates} />
-
-          <IntelligenceCorrelations data={intel.analytics.correlations} />
-
-          <IntelligenceChangePoints data={intel.analytics.changePoints} />
-
-          <IntelligenceMemoryGrouped memory={intel.memory} beliefsById={beliefsById} />
-
-          <IntelligenceSignalBoard signals={intel.signals} compact />
-
-          {intel.ecosystem ? <IntelligenceEcosystemCompact ecosystem={intel.ecosystem} /> : null}
+          {/* Statistical depth, demoted: a teaser + Coach handoff, expandable on demand. */}
+          <IntelligenceDeepDive
+            data={{
+              personalZScores: intel.analytics.personalZScores,
+              anomalies: intel.analytics.anomalies,
+              uncertaintyEstimates: intel.analytics.uncertaintyEstimates,
+              correlations: intel.analytics.correlations,
+              changePoints: intel.analytics.changePoints,
+            }}
+          />
 
           <IntelligenceCoachEntries domains={intel.state.domains} />
         </div>
