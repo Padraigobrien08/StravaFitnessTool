@@ -46,34 +46,7 @@ export function useStravaConnection(
     void refreshStatus();
   }, [refreshStatus]);
 
-  useEffect(() => {
-    if (stravaQuery === "connected") {
-      if (handledOAuthReturn.current || sessionStorage.getItem(OAUTH_HANDLED_KEY)) {
-        router.replace("/import");
-        return;
-      }
-      handledOAuthReturn.current = true;
-      sessionStorage.setItem(OAUTH_HANDLED_KEY, "1");
-      setMessage("Strava connected. Loading your activities…");
-      router.replace("/import");
-      void (async () => {
-        await refreshStatus();
-        await onSynced?.();
-        setMessage("Strava connected. Activities loaded.");
-      })();
-    } else if (stravaQuery === "denied") {
-      setMessage("Strava authorization was cancelled.");
-      router.replace("/import");
-    } else if (stravaQuery === "error") {
-      setMessage(
-        (errorReason && ERROR_MESSAGES[errorReason]) ??
-          "Strava connection failed. Please try again.",
-      );
-      router.replace("/import");
-    }
-  }, [stravaQuery, errorReason, refreshStatus, onSynced, router]);
-
-  const handleSync = async () => {
+  const handleSync = useCallback(async () => {
     setSyncing(true);
     setMessage(null);
     try {
@@ -115,7 +88,32 @@ export function useStravaConnection(
     } finally {
       setSyncing(false);
     }
-  };
+  }, [refreshStatus, onSynced]);
+
+  useEffect(() => {
+    if (stravaQuery === "connected") {
+      if (handledOAuthReturn.current || sessionStorage.getItem(OAUTH_HANDLED_KEY)) {
+        router.replace("/import");
+        return;
+      }
+      handledOAuthReturn.current = true;
+      sessionStorage.setItem(OAUTH_HANDLED_KEY, "1");
+      // Auth is done; the callback redirected instantly. Kick off the activity
+      // sync here (client-side, with progress) so a large account never makes
+      // Connect appear to hang.
+      router.replace("/import");
+      void handleSync();
+    } else if (stravaQuery === "denied") {
+      setMessage("Strava authorization was cancelled.");
+      router.replace("/import");
+    } else if (stravaQuery === "error") {
+      setMessage(
+        (errorReason && ERROR_MESSAGES[errorReason]) ??
+          "Strava connection failed. Please try again.",
+      );
+      router.replace("/import");
+    }
+  }, [stravaQuery, errorReason, handleSync, router]);
 
   const handleDisconnect = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
