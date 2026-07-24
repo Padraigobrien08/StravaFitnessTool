@@ -25,8 +25,7 @@ import { GoalsRaceBrief } from "@/components/goals/goals-race-brief";
 import { GoalsEvidenceDrawer } from "@/components/goals/goals-evidence-drawer";
 import { GenerateWeekPlanButton } from "@/components/planning/generate-week-plan-button";
 import { dash } from "@/components/home/primitives/tokens";
-import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 function GoalsBriefingBar() {
   return (
@@ -43,7 +42,6 @@ export default function GoalsPage() {
   const raceGoal = useGoalStore((s) => s.raceGoal);
   const readyInsights = insights.filter((i) => i.question === "ready");
   const [showLegacyV1, setShowLegacyV1] = useState(false);
-  const [deepOpen, setDeepOpen] = useState(false);
 
   const view = useMemo(() => {
     if (!analytics) return null;
@@ -135,53 +133,35 @@ export default function GoalsPage() {
             </section>
           )}
 
-          <button
-            type="button"
-            onClick={() => setDeepOpen((v) => !v)}
-            aria-expanded={deepOpen}
-            className="flex w-full items-center justify-between gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-left hover:bg-white/[0.03]"
+          <CollapsibleSection
+            variant="card"
+            title="Deeper forecast analysis"
+            summary="trajectory, risks, and the full explanation"
           >
-            <span className="text-[12px] font-medium text-zinc-400">
-              Deeper forecast analysis
-              <span className="ml-1.5 font-normal text-zinc-600">
-                trajectory, risks, and the full explanation
-              </span>
-            </span>
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 shrink-0 text-zinc-500 transition-transform",
-                deepOpen && "rotate-180",
-              )}
+            <TrajectoryForecastPanel
+              timeline={analytics.predictionTimeline}
+              narrative={trajectoryNarrative}
+              goalDistance={raceGoal?.distance ?? null}
             />
-          </button>
 
-          {deepOpen ? (
-            <>
-              <TrajectoryForecastPanel
-                timeline={analytics.predictionTimeline}
-                narrative={trajectoryNarrative}
-                goalDistance={raceGoal?.distance ?? null}
+            {!useBriefLayout ? (
+              <ProjectionCurvePanel
+                projection={view.projection}
+                targetDistanceLabel={view.targetDistanceLabel}
               />
+            ) : null}
 
-              {!useBriefLayout ? (
-                <ProjectionCurvePanel
-                  projection={view.projection}
-                  targetDistanceLabel={view.targetDistanceLabel}
-                />
-              ) : null}
+            <GoalsIntelRow>
+              <div className="lg:col-span-7">
+                <GoalRisksPanel risks={view.risks} />
+              </div>
+              <div className="lg:col-span-5">
+                <HistoricalReadinessPanel items={view.historical} />
+              </div>
+            </GoalsIntelRow>
 
-              <GoalsIntelRow>
-                <div className="lg:col-span-7">
-                  <GoalRisksPanel risks={view.risks} />
-                </div>
-                <div className="lg:col-span-5">
-                  <HistoricalReadinessPanel items={view.historical} />
-                </div>
-              </GoalsIntelRow>
-
-              <GoalsExplainability data={view.explain} confidence={analytics.dataConfidence} />
-            </>
-          ) : null}
+            <GoalsExplainability data={view.explain} confidence={analytics.dataConfidence} />
+          </CollapsibleSection>
 
           <p className="text-center text-xs text-zinc-600">
             <Link href="/performance" className="text-teal-400/90 hover:underline">

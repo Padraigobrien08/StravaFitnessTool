@@ -7,45 +7,9 @@ import { useTrainingChart } from "./charts/chart-theme";
 import { useUnitFormat } from "@/hooks/use-unit-format";
 import type { SupportingAnalyticsView } from "@/lib/training/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
-
-function CollapsibleSection({
-  title,
-  summary,
-  children,
-  defaultOpen = false,
-}: {
-  title: string;
-  summary?: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-
-  return (
-    <div className="border-t border-white/[0.04] pt-4 first:border-0 first:pt-0">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between gap-2 text-left"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-      >
-        <div>
-          <p className="text-xs font-semibold text-zinc-400">{title}</p>
-          {summary && !open ? <p className="mt-0.5 text-[11px] text-zinc-600">{summary}</p> : null}
-        </div>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 shrink-0 text-zinc-600 transition-transform",
-            open && "rotate-180",
-          )}
-        />
-      </button>
-      {open ? <div className="mt-3">{children}</div> : null}
-    </div>
-  );
-}
 
 export function SupportingAnalytics({
   data,
