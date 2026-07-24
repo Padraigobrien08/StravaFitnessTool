@@ -14,9 +14,20 @@ export interface MeStatus {
 
 const OAUTH_HANDLED_KEY = "strideiq_oauth_connected_handled";
 
+const ERROR_MESSAGES: Record<string, string> = {
+  state:
+    "Your connect link expired or your browser blocked the cookie. Please click Connect and finish within a few minutes.",
+  token:
+    "Strava rejected the connection. In your Strava API settings (strava.com/settings/api), set the “Authorization Callback Domain” to “localhost”, then try again.",
+  db: "Connected to Strava, but saving your account failed. Check that DATABASE_URL points to a reachable, migrated database.",
+  noathlete: "Strava didn’t return your athlete profile. Please try connecting again.",
+  nocode: "Strava didn’t return an authorization code. Please try connecting again.",
+};
+
 export function useStravaConnection(
   stravaQuery: string | null | undefined,
   onSynced?: () => void | Promise<void>,
+  errorReason?: string | null,
 ) {
   const router = useRouter();
   const [status, setStatus] = useState<MeStatus | null>(null);
@@ -54,10 +65,13 @@ export function useStravaConnection(
       setMessage("Strava authorization was cancelled.");
       router.replace("/import");
     } else if (stravaQuery === "error") {
-      setMessage("Strava connection failed. Check env vars and try again.");
+      setMessage(
+        (errorReason && ERROR_MESSAGES[errorReason]) ??
+          "Strava connection failed. Please try again.",
+      );
       router.replace("/import");
     }
-  }, [stravaQuery, refreshStatus, onSynced, router]);
+  }, [stravaQuery, errorReason, refreshStatus, onSynced, router]);
 
   const handleSync = async () => {
     setSyncing(true);

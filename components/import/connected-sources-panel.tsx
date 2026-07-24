@@ -76,6 +76,23 @@ export function ConnectedSourcesPanel({
               ) : null}
             </div>
 
+            {source.id === "strava" && !status?.connected ? (
+              <p className="mt-2 text-[11px] leading-snug text-zinc-600">
+                Connecting on localhost? In your{" "}
+                <a
+                  href="https://www.strava.com/settings/api"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-400/90 hover:text-teal-300"
+                >
+                  Strava API settings
+                </a>
+                , set <span className="text-zinc-400">Authorization Callback Domain</span> to{" "}
+                <code className="rounded bg-white/[0.06] px-1 text-zinc-300">localhost</code> — no
+                “http://”, no port.
+              </p>
+            ) : null}
+
             {source.runsSynced > 0 || source.activitiesAvailable > 0 ? (
               <p className="mt-3 text-xs text-zinc-500">
                 {source.runsSynced > 0 ? `${source.runsSynced} runs synced` : null}

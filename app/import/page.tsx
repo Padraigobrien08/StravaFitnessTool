@@ -72,6 +72,7 @@ function ImportBriefingBar() {
 function ImportPageContent() {
   const searchParams = useSearchParams();
   const stravaQuery = searchParams.get("strava");
+  const stravaErrorReason = searchParams.get("reason");
   const {
     importData,
     loading,
@@ -88,7 +89,7 @@ function ImportPageContent() {
     dataSources,
   } = useStrava();
   const { quality: intelQuality } = useTrainingIntelligence();
-  const connection = useStravaConnection(stravaQuery, refreshFromStravaApi);
+  const connection = useStravaConnection(stravaQuery, refreshFromStravaApi, stravaErrorReason);
 
   const report = useMemo(() => {
     if (intelQuality) return intelQuality;
