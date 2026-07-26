@@ -384,7 +384,7 @@ export function buildTrainingPageView(
       },
       {
         label: "Easy %",
-        value: `${analytics.intensityAdvice.currentEasyPct}%`,
+        value: `${Math.round(analytics.intensityAdvice.currentEasyPct)}%`,
         hint: `target ~${analytics.intensityAdvice.easyTargetPct}%`,
       },
       {

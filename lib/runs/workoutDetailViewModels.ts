@@ -223,7 +223,7 @@ function buildStreamAnnotations(
       text:
         fit.hrDriftPct <= 5
           ? "HR stabilized relative to first half — limited cardiac drift."
-          : `HR drift +${fit.hrDriftPct}% — expect higher perceived effort late.`,
+          : `HR drift +${Math.round(fit.hrDriftPct)}% — expect higher perceived effort late.`,
     });
   }
   if (fit && fit.paceStream.length > 20) {
