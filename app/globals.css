@@ -53,6 +53,21 @@ html.dark {
   --destructive: #ef4444;
   --input: rgba(255, 255, 255, 0.1);
   --ring: rgba(20, 184, 166, 0.45);
+
+  /* Home console (instrument direction) — scoped tokens, do not affect other routes */
+  --home-signal: #f0864a;
+  --home-signal-strong: #ff9a5c;
+  --home-signal-wash: rgba(240, 134, 74, 0.12);
+  --home-signal-line: rgba(240, 134, 74, 0.42);
+  --home-signal-ink: #1a0d04;
+  --home-redline: #ff5e4d;
+  --home-good: #4ec48a;
+  /* effort scale — mirrors CalendarIntensity */
+  --hz-easy: #5f8fb0;
+  --hz-recovery: #4aa88a;
+  --hz-moderate: #d0982e;
+  --hz-hard: #ff5e4d;
+  --hz-rest: rgba(255, 255, 255, 0.16);
 }
 
 html.light {
@@ -98,6 +113,20 @@ html.light {
   --destructive: #dc2626;
   --input: rgba(0, 0, 0, 0.12);
   --ring: rgba(13, 148, 136, 0.35);
+
+  /* Home console (instrument direction) — scoped tokens, do not affect other routes */
+  --home-signal: #d95d24;
+  --home-signal-strong: #b84e18;
+  --home-signal-wash: rgba(217, 93, 36, 0.1);
+  --home-signal-line: rgba(217, 93, 36, 0.35);
+  --home-signal-ink: #fff6f0;
+  --home-redline: #d63a2a;
+  --home-good: #1f9d63;
+  --hz-easy: #3f77a0;
+  --hz-recovery: #2f8f72;
+  --hz-moderate: #b07d16;
+  --hz-hard: #d63a2a;
+  --hz-rest: rgba(0, 0, 0, 0.16);
 }
 
 html.coach-route,
