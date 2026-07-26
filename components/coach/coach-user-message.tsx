@@ -6,9 +6,7 @@ import { cn } from "@/lib/utils";
 export function CoachUserMessage({ content, index = 0 }: { content: string; index?: number }) {
   return (
     <div
-      className={cn(
-        "coach-investigation-prompt coach-msg-enter border-l-2 border-teal-500/35 pl-3",
-      )}
+      className={cn("coach-investigation-prompt coach-msg-enter border-l-2 border-accent/35 pl-3")}
       style={{ animationDelay: `${index * 40}ms` }}
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600">

@@ -22,13 +22,13 @@ function Metric({ label, value, sub }: { label: string; value: string; sub?: str
 }
 
 const riskColors = {
-  low: "text-teal-400/90 border-teal-500/20 bg-teal-500/5",
+  low: "text-accent/90 border-accent/20 bg-accent/5",
   moderate: "text-amber-200/90 border-amber-500/20 bg-amber-500/5",
   elevated: "text-red-300/90 border-red-500/20 bg-red-500/5",
 };
 
 const adaptColors = {
-  improving: "text-teal-400",
+  improving: "text-accent",
   stable: "text-zinc-400",
   strained: "text-amber-400",
   unknown: "text-zinc-600",
@@ -81,8 +81,8 @@ export function CoachContextRail({
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        <div className="rounded-lg border border-teal-500/15 bg-teal-500/[0.04] px-3 py-3">
-          <p className="text-[10px] uppercase tracking-wider text-teal-500/80">Current focus</p>
+        <div className="rounded-lg border border-accent/15 bg-accent/[0.04] px-3 py-3">
+          <p className="text-[10px] uppercase tracking-wider text-accent/80">Current focus</p>
           <p className="mt-1 font-display text-sm font-semibold text-white">
             {snapshot.currentFocus}
           </p>
@@ -152,7 +152,7 @@ export function CoachContextRail({
         {snapshot.raceLabel ? (
           <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-3">
             <div className="flex items-center gap-2">
-              <Target className="h-3.5 w-3.5 text-teal-500/70" />
+              <Target className="h-3.5 w-3.5 text-accent/70" />
               <span className={dash.label}>Race timeline</span>
             </div>
             <p className="mt-1 font-display text-sm font-semibold text-white">
@@ -169,14 +169,14 @@ export function CoachContextRail({
             ) : null}
             <Link
               href="/goals"
-              className="mt-2 inline-block text-[11px] text-teal-400/90 hover:underline"
+              className="mt-2 inline-block text-[11px] text-accent/90 hover:underline"
             >
               Adjust goal
             </Link>
           </div>
         ) : (
           <p className="text-xs text-zinc-600">
-            <Link href="/goals" className="text-teal-400/90 hover:underline">
+            <Link href="/goals" className="text-accent/90 hover:underline">
               Set a race goal
             </Link>{" "}
             for race-specific coaching.
@@ -213,7 +213,7 @@ export function CoachContextRail({
                   <Area
                     type="monotone"
                     dataKey="dist"
-                    stroke="rgb(45,212,191)"
+                    stroke="rgb(240, 134, 74)"
                     strokeWidth={1.5}
                     fill="url(#coachVol)"
                   />

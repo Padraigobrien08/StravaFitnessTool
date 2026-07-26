@@ -20,7 +20,7 @@ import {
 function confidenceTone(c: string | null): string {
   if (!c) return "text-zinc-500";
   const l = c.toLowerCase();
-  if (l.includes("high")) return "text-teal-300/95";
+  if (l.includes("high")) return "text-accent/95";
   if (l.includes("medium")) return "text-amber-200/90";
   return "text-zinc-400";
 }
@@ -46,7 +46,7 @@ function Section({
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-2 text-left"
       >
-        {Icon ? <Icon className="h-3.5 w-3.5 shrink-0 text-teal-500/70" /> : null}
+        {Icon ? <Icon className="h-3.5 w-3.5 shrink-0 text-accent/70" /> : null}
         <span className={dash.label}>{title}</span>
         {open ? (
           <ChevronDown className="ml-auto h-3.5 w-3.5 text-zinc-600" />
@@ -64,7 +64,7 @@ function BulletList({ items }: { items: string[] }) {
     <ul className="space-y-2">
       {items.map((item, i) => (
         <li key={i} className="flex gap-2 text-[13px] leading-relaxed text-zinc-300/95">
-          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-teal-500/50" />
+          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent/50" />
           <span>{item}</span>
         </li>
       ))}
@@ -114,8 +114,8 @@ export function CoachIntelligenceCard({
     >
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-500/10 ring-1 ring-teal-500/20">
-            <Brain className="h-3.5 w-3.5 text-teal-400/90" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 ring-1 ring-accent/20">
+            <Brain className="h-3.5 w-3.5 text-accent/90" />
           </div>
           <span className="font-display text-sm font-semibold text-white">Analysis</span>
         </div>
@@ -148,7 +148,7 @@ export function CoachIntelligenceCard({
 
         {showSection(2) && parsed.recommendation ? (
           <Section title="Recommendation" icon={Sparkles} defaultOpen>
-            <p className="text-[13px] leading-relaxed text-teal-100/85">{parsed.recommendation}</p>
+            <p className="text-[13px] leading-relaxed text-accent/85">{parsed.recommendation}</p>
           </Section>
         ) : null}
 
@@ -208,7 +208,7 @@ export function CoachIntelligenceCard({
                 key={q}
                 type="button"
                 onClick={() => onFollowUp(q)}
-                className="rounded-lg border border-teal-500/15 bg-teal-500/[0.06] px-2.5 py-1.5 text-left text-xs text-teal-100/80 transition-colors hover:border-teal-500/30 hover:bg-teal-500/10"
+                className="rounded-lg border border-accent/15 bg-accent/[0.06] px-2.5 py-1.5 text-left text-xs text-accent/80 transition-colors hover:border-accent/30 hover:bg-accent/10"
               >
                 {q}
               </button>

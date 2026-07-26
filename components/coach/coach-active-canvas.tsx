@@ -90,7 +90,7 @@ function CoachMemoryPanel({ memory }: { memory: CoachWorkspaceState["memory"] })
       <ul className="grid gap-3 sm:grid-cols-2">
         {memory.map((m) => (
           <li key={m.id} className="rounded-lg border border-white/[0.04] bg-black/25 px-3 py-3">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-teal-500/70">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-accent/70">
               {m.label}
             </p>
             <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">{m.text}</p>

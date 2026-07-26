@@ -21,7 +21,7 @@ export function CoachInvestigations({
     <section className={cn("coach-investigations", compact && "space-y-2")}>
       <div className={cn(!compact && "mb-3")}>
         <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-          <Microscope className="h-3 w-3 text-teal-500/60" />
+          <Microscope className="h-3 w-3 text-accent/60" />
           Active investigations
         </p>
         {!compact ? (
@@ -39,9 +39,9 @@ export function CoachInvestigations({
               onClick={() => onSelect(inv.question)}
               className={cn(
                 "group w-full rounded-lg border border-white/[0.06] bg-white/[0.02] text-left transition-all",
-                "hover:border-teal-500/25 hover:bg-teal-500/[0.04] disabled:opacity-40",
+                "hover:border-accent/25 hover:bg-accent/[0.04] disabled:opacity-40",
                 compact ? "px-2.5 py-2" : "px-3 py-3",
-                !compact && i === 0 && "sm:col-span-2 border-teal-500/15 bg-teal-500/[0.03]",
+                !compact && i === 0 && "sm:col-span-2 border-accent/15 bg-accent/[0.03]",
               )}
             >
               <p
@@ -61,7 +61,7 @@ export function CoachInvestigations({
                 {inv.rationale}
               </p>
               {!compact ? (
-                <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-teal-400/70 opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-accent/70 opacity-0 transition-opacity group-hover:opacity-100">
                   Investigate
                   <ArrowRight className="h-3 w-3" />
                 </span>

@@ -42,7 +42,7 @@ export function CoachRisksOpportunities({ items }: { items: RiskOpportunity[] })
         ) : null}
         {opps.length > 0 ? (
           <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-teal-500/70">
+            <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-accent/70">
               <Sparkles className="h-3 w-3" />
               Opportunities
             </p>
@@ -51,10 +51,10 @@ export function CoachRisksOpportunities({ items }: { items: RiskOpportunity[] })
                 <li
                   key={o.id}
                   className={cn(
-                    "rounded-lg border border-teal-500/15 bg-teal-500/[0.05] px-3 py-2 text-xs leading-snug text-teal-100/85",
+                    "rounded-lg border border-accent/15 bg-accent/[0.05] px-3 py-2 text-xs leading-snug text-accent/85",
                   )}
                 >
-                  <span className="text-[10px] text-teal-500/50">{o.domain}</span>
+                  <span className="text-[10px] text-accent/50">{o.domain}</span>
                   <p className="mt-0.5">{o.text}</p>
                 </li>
               ))}

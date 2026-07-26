@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Radio, Sparkles } from "lucide-react";
 
 const toneStyles = {
-  positive: "border-teal-500/15 bg-teal-500/[0.06] text-teal-100/90",
+  positive: "border-accent/15 bg-accent/[0.06] text-accent/90",
   neutral: "border-white/[0.06] bg-white/[0.02] text-zinc-400",
   warning: "border-amber-500/20 bg-amber-500/[0.05] text-amber-100/85",
   opportunity: "border-blue-500/15 bg-blue-500/[0.05] text-blue-100/85",
@@ -21,16 +21,16 @@ export function CoachActivePresence({
   return (
     <section
       className={cn(
-        "coach-presence relative overflow-hidden rounded-2xl border border-teal-500/10",
+        "coach-presence relative overflow-hidden rounded-2xl border border-accent/10",
         compact ? "p-4" : "p-5 sm:p-6",
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-teal-500/[0.08] via-transparent to-transparent"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/[0.08] via-transparent to-transparent"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-teal-400/[0.04] blur-3xl"
+        className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-accent/[0.04] blur-3xl"
         aria-hidden
       />
 
@@ -38,10 +38,10 @@ export function CoachActivePresence({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal-400 opacity-40" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-400/90" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-40" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent/90" />
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-teal-400/80">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent/80">
               Active coaching focus
             </span>
           </div>
@@ -57,7 +57,7 @@ export function CoachActivePresence({
             <span className="text-[10px] uppercase tracking-wider text-zinc-600">
               Continuous reasoning
             </span>
-            <span className="font-mono text-xs text-teal-400/70">
+            <span className="font-mono text-xs text-accent/70">
               {state.observations.length} live signals
             </span>
           </div>
@@ -98,7 +98,7 @@ export function CoachObservationStream({
   return (
     <div className="space-y-2">
       <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
-        <Radio className="h-3 w-3 text-teal-500/60" />
+        <Radio className="h-3 w-3 text-accent/60" />
         Active observations
       </p>
       <ul className="space-y-1.5">
@@ -111,7 +111,7 @@ export function CoachObservationStream({
               className={cn(
                 "mt-0.5 h-3 w-3 shrink-0",
                 o.tone === "positive"
-                  ? "text-teal-500/70"
+                  ? "text-accent/70"
                   : o.tone === "warning"
                     ? "text-amber-500/70"
                     : "text-zinc-600",

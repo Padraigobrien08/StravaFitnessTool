@@ -26,7 +26,7 @@ export function CoachDomainChips({
             "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors",
             "disabled:opacity-40",
             activeDomainId === d.id
-              ? "border-teal-500/35 bg-teal-500/15 text-teal-100"
+              ? "border-accent/35 bg-accent/15 text-accent"
               : "border-white/[0.08] bg-white/[0.02] text-zinc-500 hover:border-white/[0.14] hover:text-zinc-300",
           )}
         >

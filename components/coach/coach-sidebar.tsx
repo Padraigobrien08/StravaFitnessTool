@@ -36,7 +36,7 @@ export function CoachSidebar({
         <button
           type="button"
           onClick={onNewThread}
-          className="mt-2 rounded-lg p-2 text-teal-500/80 hover:bg-teal-500/10"
+          className="mt-2 rounded-lg p-2 text-accent/80 hover:bg-accent/10"
           aria-label="New analysis"
         >
           <MessageSquarePlus className="h-4 w-4" />
@@ -63,7 +63,7 @@ export function CoachSidebar({
         <button
           type="button"
           onClick={onNewThread}
-          className="flex w-full items-center gap-2 rounded-lg border border-teal-500/20 bg-teal-500/[0.08] px-3 py-2 text-xs font-medium text-teal-100/90 transition-colors hover:bg-teal-500/12"
+          className="flex w-full items-center gap-2 rounded-lg border border-accent/20 bg-accent/[0.08] px-3 py-2 text-xs font-medium text-accent/90 transition-colors hover:bg-accent/12"
         >
           <MessageSquarePlus className="h-3.5 w-3.5" />
           New analysis

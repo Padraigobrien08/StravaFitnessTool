@@ -17,7 +17,7 @@ function ContextRow({
   return (
     <div className="rounded-md bg-white/[0.025] px-2.5 py-2">
       <p className="text-[11px] text-zinc-600">{label}</p>
-      <p className="mt-0.5 text-[13px] font-medium tabular-nums text-zinc-300">{value}</p>
+      <p className="mt-0.5 font-mono text-[13px] font-medium tabular-nums text-zinc-300">{value}</p>
       {sub ? <p className="mt-0.5 text-[11px] text-zinc-600">{sub}</p> : null}
     </div>
   );
@@ -120,8 +120,8 @@ export function CoachMiniContext({
         ) : null}
 
         {topOpp ? (
-          <div className="mt-2 rounded-md border border-teal-500/15 bg-teal-500/[0.03] px-2.5 py-2">
-            <p className="text-[11px] text-teal-400/50">Opportunity</p>
+          <div className="mt-2 rounded-md border border-accent/15 bg-accent/[0.03] px-2.5 py-2">
+            <p className="text-[11px] text-accent/70">Opportunity</p>
             <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">{topOpp.text}</p>
           </div>
         ) : null}
