@@ -19,7 +19,7 @@ const riskColors = {
 
 export function CoachOperationalStrip({ snapshot }: { snapshot: CoachContextSnapshot }) {
   return (
-    <div className="coach-ops-strip shrink-0 border-b border-white/[0.05] bg-[#08090c]/90 px-3 py-2.5">
+    <div className="coach-ops-strip shrink-0 border-b border-white/[0.05] bg-[var(--surface-subdued)] px-3 py-2.5">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px]">
         <div className="flex min-w-0 items-center gap-2">
           <span className="relative flex h-1.5 w-1.5 shrink-0">

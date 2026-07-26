@@ -58,7 +58,7 @@ export function CoachContextRail({
       <button
         type="button"
         onClick={onToggleCollapse}
-        className="hidden h-full w-10 shrink-0 items-center justify-center border-l border-white/[0.06] bg-[#0a0b0e]/80 lg:flex"
+        className="hidden h-full w-10 shrink-0 items-center justify-center border-l border-white/[0.06] bg-[var(--surface-subdued)] lg:flex"
         aria-label="Expand context panel"
       >
         <ChevronLeft className="h-4 w-4 text-zinc-500" />
@@ -67,7 +67,7 @@ export function CoachContextRail({
   }
 
   return (
-    <aside className="coach-rail hidden w-[280px] shrink-0 flex-col border-l border-white/[0.06] bg-[#0a0b0e]/80 backdrop-blur-sm lg:flex xl:w-[320px]">
+    <aside className="coach-rail hidden w-[280px] shrink-0 flex-col border-l border-white/[0.06] bg-[var(--surface-subdued)] backdrop-blur-sm lg:flex xl:w-[320px]">
       <div className="flex items-center justify-between border-b border-white/[0.05] px-4 py-3">
         <span className={dash.labelAccent}>Operational context</span>
         <button

@@ -24,7 +24,7 @@ export function CoachSidebar({
 }) {
   if (collapsed) {
     return (
-      <div className="hidden w-12 shrink-0 flex-col items-center border-r border-white/[0.06] bg-[#0a0b0e]/80 py-3 lg:flex">
+      <div className="hidden w-12 shrink-0 flex-col items-center border-r border-white/[0.06] bg-[var(--surface-subdued)] py-3 lg:flex">
         <button
           type="button"
           onClick={onToggleCollapse}
@@ -46,7 +46,7 @@ export function CoachSidebar({
   }
 
   return (
-    <aside className="coach-sidebar hidden w-[220px] shrink-0 flex-col border-r border-white/[0.06] bg-[#0a0b0e]/80 xl:w-[240px] lg:flex">
+    <aside className="coach-sidebar hidden w-[220px] shrink-0 flex-col border-r border-white/[0.06] bg-[var(--surface-subdued)] xl:w-[240px] lg:flex">
       <div className="flex items-center justify-between border-b border-white/[0.05] px-3 py-3">
         <span className={dash.labelAccent}>Sessions</span>
         <button

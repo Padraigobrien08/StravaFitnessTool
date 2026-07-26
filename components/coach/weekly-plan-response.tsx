@@ -28,7 +28,7 @@ export function WeeklyPlanResponse({
   return (
     <article
       className={cn(
-        "weekly-plan-response rounded-xl border border-white/[0.06] bg-[#0c0d10]/80",
+        "weekly-plan-response rounded-xl border border-white/[0.06] bg-[var(--surface-elevated)]",
         className,
       )}
     >

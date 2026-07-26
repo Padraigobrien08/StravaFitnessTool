@@ -41,7 +41,7 @@ export function CoachMiniContext({
       <button
         type="button"
         onClick={onToggle}
-        className="coach-mini-context hidden h-full min-h-0 w-9 shrink-0 items-center justify-center self-stretch bg-[#0a0b0e]/80 xl:flex"
+        className="coach-mini-context hidden h-full min-h-0 w-9 shrink-0 items-center justify-center self-stretch bg-[var(--surface-subdued)] xl:flex"
         aria-label="Expand context"
       >
         <ChevronRight className="h-4 w-4 rotate-180 text-zinc-600" />
@@ -50,7 +50,7 @@ export function CoachMiniContext({
   }
 
   return (
-    <aside className="coach-mini-context hidden h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden bg-[#0a0b0e]/50 xl:flex">
+    <aside className="coach-mini-context hidden h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden bg-[var(--surface-subdued)] xl:flex">
       <div className="flex shrink-0 items-center justify-between px-3 py-2.5">
         <span className="text-[12px] font-medium text-zinc-500">Answer context</span>
         <button

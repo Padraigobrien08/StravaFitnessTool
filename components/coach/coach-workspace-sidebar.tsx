@@ -52,7 +52,7 @@ export function CoachWorkspaceSidebar({
   return (
     <aside
       className={cn(
-        "coach-sidebar flex h-full min-h-0 w-[260px] shrink-0 flex-col overflow-hidden bg-[#0a0b0e]/60 lg:bg-[#0a0b0e]/40",
+        "coach-sidebar flex h-full min-h-0 w-[260px] shrink-0 flex-col overflow-hidden bg-[var(--surface-subdued)] lg:bg-[var(--surface-subdued)]",
         className,
       )}
     >
