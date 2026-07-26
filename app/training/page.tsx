@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
@@ -16,25 +15,17 @@ import { TrainingEcosystemPanel } from "@/components/training/training-ecosystem
 import { ops } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 import { dash } from "@/components/home/primitives/tokens";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { JargonTerm } from "@/components/jargon-term";
 
 function TrainingEvidenceBanner() {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-      <div>
-        <p className={dash.labelAccent}>Training · Am I training correctly?</p>
-        <p className="mt-0.5 text-xs text-zinc-600">
-          Load, intensity mix, phase, and cross-training — how your training is structured.
-        </p>
-      </div>
-      <Link
-        href="/plan"
-        className="inline-flex items-center gap-1.5 rounded-lg bg-teal-500/10 px-3 py-2 text-[13px] font-medium text-teal-300 ring-1 ring-teal-500/20 hover:bg-teal-500/15"
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        Next week plan
-        <ArrowRight className="h-3.5 w-3.5" />
-      </Link>
+    <div className="border-b border-white/[0.04] pb-3">
+      <p className={dash.labelAccent}>Training · Am I training correctly?</p>
+      <p className="mt-0.5 text-xs text-zinc-600">
+        <JargonTerm term="load">Load</JargonTerm>, intensity mix,{" "}
+        <JargonTerm term="phase">phase</JargonTerm>, and cross-training: how your training is
+        structured.
+      </p>
     </div>
   );
 }

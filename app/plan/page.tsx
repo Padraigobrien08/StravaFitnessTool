@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { RequireData } from "@/components/require-data";
-import { PlanWorkspace } from "@/components/plan/plan-workspace";
+import { PlanTabs } from "@/components/plan/plan-tabs";
 
 function PlanPageFallback() {
   return (
@@ -20,7 +20,7 @@ export default function PlanPage() {
   return (
     <RequireData>
       <Suspense fallback={<PlanPageFallback />}>
-        <PlanWorkspace />
+        <PlanTabs />
       </Suspense>
     </RequireData>
   );

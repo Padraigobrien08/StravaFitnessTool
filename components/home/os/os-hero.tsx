@@ -1,8 +1,10 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { JargonTerm } from "@/components/jargon-term";
 import type { HomeHeroView } from "@/lib/home/operatingSystemView";
 import { coachUrl } from "@/lib/coach/domainLinks";
 import {
@@ -114,8 +116,14 @@ export function OsHero({
               value={`${hero.daysUntilRace} day${hero.daysUntilRace === 1 ? "" : "s"}`}
             />
           ) : null}
-          <StateChip label="Readiness" value={String(hero.readinessScore)} />
-          <StateChip label="Freshness" value={String(hero.freshness)} />
+          <StateChip
+            label={<JargonTerm term="readiness">Readiness</JargonTerm>}
+            value={String(hero.readinessScore)}
+          />
+          <StateChip
+            label={<JargonTerm term="freshness">Freshness</JargonTerm>}
+            value={String(hero.freshness)}
+          />
           {hero.taperActive ? (
             <div className="col-span-2 flex flex-wrap items-center gap-2 rounded-lg bg-[var(--surface)] px-2.5 py-2 lg:col-span-1">
               <span className="text-[10px] text-teal-500/80">Taper active</span>
@@ -127,7 +135,15 @@ export function OsHero({
   );
 }
 
-function StateChip({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function StateChip({
+  label,
+  value,
+  accent,
+}: {
+  label: ReactNode;
+  value: string;
+  accent?: boolean;
+}) {
   return (
     <div
       className={cn(

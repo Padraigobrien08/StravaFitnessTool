@@ -243,7 +243,7 @@ export function PlanWorkspace() {
   const histCount = calendar.savedWeek ? historyCount(calendar.savedWeek.weekStart) : 0;
 
   return (
-    <div className="plan-workspace mx-auto max-w-[1400px] space-y-3 pb-10">
+    <div className="plan-workspace space-y-3 pb-10">
       <PlanHeader
         title="Next week plan"
         weekRange={weekRange}

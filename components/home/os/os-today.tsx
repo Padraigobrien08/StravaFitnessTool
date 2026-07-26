@@ -11,12 +11,17 @@ export function OsToday({ today }: { today: HomeTodayView }) {
       id="today"
       title="Today's priority"
       action={
-        <Link
-          href={coachUrl({ q: "What should I prioritize in today's session?" })}
-          className="text-[10px] text-zinc-600 hover:text-zinc-400"
-        >
-          Coach →
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/training" className="text-[10px] text-zinc-600 hover:text-zinc-400">
+            Training →
+          </Link>
+          <Link
+            href={coachUrl({ q: "What should I prioritize in today's session?" })}
+            className="text-[10px] text-zinc-600 hover:text-zinc-400"
+          >
+            Coach →
+          </Link>
+        </div>
       }
     >
       <div className="rounded-lg border border-teal-500/15 bg-teal-500/[0.04] px-3.5 py-3 ring-1 ring-teal-500/10">

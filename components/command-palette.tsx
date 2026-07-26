@@ -9,7 +9,6 @@ import {
   Brain,
   MessageCircle,
   Footprints,
-  Target,
   Upload,
   TrendingUp,
   Dumbbell,
@@ -38,45 +37,101 @@ export function openCommandPalette() {
 interface Command {
   id: string;
   label: string;
-  group: "Navigate" | "Actions";
+  group: "Go to" | "Analysis & tools" | "Actions";
   icon: LucideIcon;
   keywords?: string;
   run: () => void;
 }
 
-const ROUTES: { href: string; label: string; icon: LucideIcon; keywords?: string }[] = [
-  { href: "/home", label: "Home", icon: LayoutDashboard, keywords: "dashboard command briefing" },
-  { href: "/plan", label: "Plan", icon: CalendarRange, keywords: "week training schedule" },
-  { href: "/intelligence", label: "Intelligence", icon: Brain, keywords: "belief model insights" },
-  { href: "/coach", label: "Coach", icon: MessageCircle, keywords: "chat ask investigate why" },
+type RouteEntry = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  group: "Go to" | "Analysis & tools";
+  keywords?: string;
+};
+
+// "Go to" mirrors the five-item top nav. "Analysis & tools" holds the depth
+// surfaces that were pulled out of the chrome: they stay fully reachable here
+// and by drilling into Home tiles, just not as always-visible nav.
+const ROUTES: RouteEntry[] = [
+  {
+    href: "/home",
+    label: "Home",
+    icon: LayoutDashboard,
+    group: "Go to",
+    keywords: "dashboard command briefing",
+  },
+  {
+    href: "/plan",
+    label: "Plan",
+    icon: CalendarRange,
+    group: "Go to",
+    keywords: "week training schedule goal race",
+  },
   {
     href: "/runs",
     label: "Activities",
     icon: Footprints,
+    group: "Go to",
     keywords: "runs sessions history explore",
   },
-  { href: "/goals", label: "Goals", icon: Target, keywords: "race forecast readiness" },
+  {
+    href: "/intelligence",
+    label: "Intelligence",
+    icon: Brain,
+    group: "Go to",
+    keywords: "belief model insights",
+  },
+  {
+    href: "/coach",
+    label: "Coach",
+    icon: MessageCircle,
+    group: "Go to",
+    keywords: "chat ask investigate why",
+  },
   {
     href: "/performance",
     label: "Performance",
     icon: TrendingUp,
-    keywords: "improving trajectory pr",
+    group: "Analysis & tools",
+    keywords: "improving trajectory pr records am i improving",
   },
   {
     href: "/training",
     label: "Training",
     icon: Dumbbell,
-    keywords: "load intensity distribution phase",
+    group: "Analysis & tools",
+    keywords: "load intensity distribution phase am i training",
   },
-  { href: "/report", label: "Reports", icon: FileText, keywords: "summary export" },
   {
-    href: "/context",
-    label: "Activity context",
-    icon: Layers,
-    keywords: "cross training modality",
+    href: "/report",
+    label: "Report / export",
+    icon: FileText,
+    group: "Analysis & tools",
+    keywords: "summary export pdf print briefing",
   },
-  { href: "/import", label: "Import", icon: Upload, keywords: "connect strava upload fit" },
-  { href: "/settings", label: "Settings", icon: Settings, keywords: "preferences theme account" },
+  {
+    href: "/runs",
+    label: "Activity mix",
+    icon: Layers,
+    group: "Analysis & tools",
+    keywords: "cross training modality mix activity context",
+  },
+  {
+    href: "/import",
+    label: "Import data",
+    icon: Upload,
+    group: "Analysis & tools",
+    keywords: "connect strava upload fit",
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    icon: Settings,
+    group: "Analysis & tools",
+    keywords: "preferences theme account",
+  },
 ];
 
 export function CommandPalette() {
@@ -117,9 +172,9 @@ export function CommandPalette() {
 
   const commands = useMemo<Command[]>(() => {
     const nav: Command[] = ROUTES.map((r) => ({
-      id: `nav:${r.href}`,
+      id: `nav:${r.href}:${r.label}`,
       label: r.label,
-      group: "Navigate",
+      group: r.group,
       icon: r.icon,
       keywords: r.keywords,
       run: () => router.push(r.href),

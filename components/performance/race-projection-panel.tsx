@@ -39,7 +39,7 @@ export function RaceProjectionPanel({
   const p = projection.primary!;
 
   return (
-    <PanelChrome title="Race performance projection" href="/goals" accent elevated>
+    <PanelChrome title="Race performance projection" href="/plan?tab=goal" accent elevated>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(200px,280px)] lg:gap-8">
         <div>
           <div className="flex flex-wrap items-end justify-between gap-3">
