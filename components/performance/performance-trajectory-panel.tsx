@@ -1,9 +1,9 @@
 "use client";
 
 import type { ProgressionViewModel } from "@/lib/home/dashboardData";
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { TrendChart } from "@/components/home/primitives/sparkline";
 import { PrProgressionChart } from "@/components/progression/pr-progression-chart";
+import { Eyebrow, Panel, PanelHeader } from "@/components/console/console-kit";
 import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 import { Trophy } from "lucide-react";
@@ -11,11 +11,11 @@ import type { PrTimelinePoint } from "@/lib/analytics/progression";
 
 function TrendBlock({ chart }: { chart: ProgressionViewModel["trends"]["efficiency"] }) {
   return (
-    <div className="rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-3">
+    <div className="rounded-lg bg-[var(--surface-subdued)] px-3 py-3 ring-1 ring-inset ring-[var(--border-subtle)]">
       <div className="flex items-baseline justify-between gap-2">
-        <span className={dash.label}>{chart.label}</span>
+        <Eyebrow>{chart.label}</Eyebrow>
         {chart.caption ? (
-          <span className="text-[10px] tabular-nums text-teal-400/80">{chart.caption}</span>
+          <span className="font-mono text-[10px] tabular-nums text-accent">{chart.caption}</span>
         ) : null}
       </div>
       <TrendChart data={chart.data} positive={chart.positive} height={44} className="mt-2" />
@@ -31,24 +31,25 @@ export function PerformanceTrajectoryPanel({
   prTimeline: PrTimelinePoint[];
 }) {
   return (
-    <PanelChrome title="Performance trajectory intelligence" accent elevated>
+    <Panel>
+      <PanelHeader title="Performance trajectory intelligence" />
       <p className={cn(dash.muted, "mb-4 max-w-3xl leading-relaxed")}>{data.trajectory}</p>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] xl:gap-6">
         <div className="space-y-4">
           <div>
-            <h4 className={dash.label}>Recent milestones</h4>
-            <ul className="mt-2 space-y-0 border-l border-teal-500/20 pl-3">
+            <Eyebrow>Recent milestones</Eyebrow>
+            <ul className="mt-2 space-y-0 border-l border-accent/25 pl-3">
               {data.achievements.length > 0 ? (
                 data.achievements.map((a, i) => (
                   <li
                     key={a.id}
                     className={cn(
                       "flex items-start gap-2 py-2.5",
-                      i < data.achievements.length - 1 && "border-b border-white/[0.04]",
+                      i < data.achievements.length - 1 && "border-b border-[var(--border-subtle)]",
                     )}
                   >
-                    <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-teal-400/70" />
+                    <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium text-zinc-200">{a.title}</span>
                       <span className={dash.muted}>{a.meta}</span>
@@ -68,7 +69,7 @@ export function PerformanceTrajectoryPanel({
               {data.milestones.map((m) => (
                 <span
                   key={m.id}
-                  className="rounded-lg bg-white/[0.03] px-2.5 py-1.5 text-xs text-zinc-400 ring-1 ring-inset ring-white/[0.05]"
+                  className="rounded-lg bg-[var(--surface-subdued)] px-2.5 py-1.5 text-xs text-zinc-400 ring-1 ring-inset ring-[var(--border-subtle)]"
                 >
                   {m.title}
                 </span>
@@ -77,8 +78,14 @@ export function PerformanceTrajectoryPanel({
           ) : null}
 
           {data.bestBlock ? (
-            <div className="rounded-lg border border-teal-500/15 bg-teal-500/[0.05] px-3 py-2.5">
-              <p className={dash.label}>Best block</p>
+            <div
+              className="rounded-lg px-3 py-2.5"
+              style={{
+                background: "var(--home-signal-wash)",
+                boxShadow: "inset 0 0 0 1px var(--home-signal-line)",
+              }}
+            >
+              <Eyebrow>Best block</Eyebrow>
               <p className="mt-1 text-sm text-zinc-300">{data.bestBlock}</p>
             </div>
           ) : null}
@@ -89,8 +96,8 @@ export function PerformanceTrajectoryPanel({
                 <span
                   key={c.label}
                   className={cn(
-                    "text-xs font-medium tabular-nums",
-                    c.positive === true && "text-teal-400/90",
+                    "font-mono text-xs font-medium tabular-nums",
+                    c.positive === true && "text-accent",
                     c.positive === false && "text-amber-400/90",
                     c.positive === null && "text-zinc-500",
                   )}
@@ -101,14 +108,14 @@ export function PerformanceTrajectoryPanel({
             </div>
           ) : null}
 
-          <div className="rounded-lg bg-white/[0.02] px-2 py-2 ring-1 ring-inset ring-white/[0.04]">
-            <p className={cn(dash.label, "px-1 pb-2")}>PR progression feed</p>
+          <div className="rounded-lg bg-[var(--surface-subdued)] px-2 py-2 ring-1 ring-inset ring-[var(--border-subtle)]">
+            <Eyebrow className="px-1 pb-2">PR progression feed</Eyebrow>
             <PrProgressionChart timeline={prTimeline} />
           </div>
         </div>
 
-        <div className="rounded-xl bg-gradient-to-b from-teal-500/[0.08] via-transparent to-transparent p-3 sm:p-4">
-          <h4 className={cn(dash.label, "mb-3")}>Momentum telemetry</h4>
+        <div className="rounded-xl bg-gradient-to-b from-accent/[0.08] via-transparent to-transparent p-3 sm:p-4">
+          <Eyebrow className="mb-3">Momentum telemetry</Eyebrow>
           <div className="grid gap-2.5 sm:grid-cols-2">
             <TrendBlock chart={data.trends.efficiency} />
             <TrendBlock chart={data.trends.pace} />
@@ -116,6 +123,6 @@ export function PerformanceTrajectoryPanel({
           </div>
         </div>
       </div>
-    </PanelChrome>
+    </Panel>
   );
 }

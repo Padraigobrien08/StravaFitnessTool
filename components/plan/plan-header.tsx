@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Copy, Loader2, MessageCircle, RefreshCw, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfidenceBadge } from "@/components/confidence-badge";
+import { Eyebrow } from "@/components/console/console-kit";
 import { cn } from "@/lib/utils";
 
 export type PlanHeaderStatus = "empty" | "saved" | "preview" | "saved_with_preview" | "modified";
@@ -53,8 +54,9 @@ export function PlanHeader({
   return (
     <header className="flex flex-col gap-3 border-b border-[var(--border-subtle)] pb-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0 space-y-1.5">
+        <Eyebrow>Week planner</Eyebrow>
         <h1 className="type-page-title">{title}</h1>
-        <p className="type-body-muted">{weekRange}</p>
+        <p className="font-mono text-[13px] tabular-nums text-muted-foreground">{weekRange}</p>
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={status} label={statusLabel} />
           <span className="text-[11px] text-zinc-600">{phaseLabel}</span>
@@ -90,7 +92,12 @@ export function PlanHeader({
 
       <div className="flex flex-wrap gap-1.5 sm:justify-end">
         {canSave ? (
-          <Button size="sm" className="h-8 gap-1 text-xs" onClick={onSave}>
+          <Button
+            size="sm"
+            className="h-8 gap-1 border-0 text-xs text-[var(--home-signal-ink)]"
+            style={{ background: "var(--home-signal)" }}
+            onClick={onSave}
+          >
             <Save className="h-3 w-3" />
             Save to calendar
           </Button>
@@ -156,14 +163,27 @@ function StatusBadge({ status, label }: { status: PlanHeaderStatus; label: strin
   return (
     <span
       className={cn(
-        "inline-flex rounded-md px-2 py-0.5 text-[11px] font-medium",
-        status === "saved" && "bg-teal-500/15 text-teal-300",
-        status === "modified" && "bg-teal-500/10 text-teal-400",
+        "inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-[0.08em]",
+        status === "saved" && "bg-accent/12 text-accent",
+        status === "modified" && "bg-accent/10 text-accent/90",
         status === "preview" && "bg-amber-500/12 text-amber-200/90",
         status === "saved_with_preview" && "bg-zinc-500/10 text-zinc-400",
         status === "empty" && "bg-[var(--surface)] text-zinc-600",
       )}
     >
+      {status !== "empty" ? (
+        <span
+          className="h-1.5 w-1.5 rounded-full"
+          style={{
+            background:
+              status === "preview"
+                ? "var(--hz-moderate)"
+                : status === "saved_with_preview"
+                  ? "var(--muted-subtle)"
+                  : "var(--home-signal)",
+          }}
+        />
+      ) : null}
       {label}
     </span>
   );

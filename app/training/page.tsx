@@ -15,21 +15,21 @@ import { SupportingAnalytics } from "@/components/training/supporting-analytics"
 import { TrainingEcosystemPanel } from "@/components/training/training-ecosystem-panel";
 import { ops } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
-import { dash } from "@/components/home/primitives/tokens";
+import { Eyebrow } from "@/components/console/console-kit";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 function TrainingEvidenceBanner() {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[var(--surface-elevated)] px-4 py-3 shadow-[var(--surface-shadow-subtle)] ring-1 ring-[var(--border-subtle)]">
       <div>
-        <p className={dash.labelAccent}>Training · Am I training correctly?</p>
+        <Eyebrow>Training · Am I training correctly?</Eyebrow>
         <p className="mt-0.5 text-xs text-zinc-600">
           Load, intensity mix, phase, and cross-training — how your training is structured.
         </p>
       </div>
       <Link
         href="/plan"
-        className="inline-flex items-center gap-1.5 rounded-lg bg-teal-500/10 px-3 py-2 text-[13px] font-medium text-teal-300 ring-1 ring-teal-500/20 hover:bg-teal-500/15"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-accent/12 px-3 py-2 text-[13px] font-medium text-accent ring-1 ring-inset ring-accent/30 hover:bg-accent/20"
       >
         <Sparkles className="h-3.5 w-3.5" />
         Next week plan

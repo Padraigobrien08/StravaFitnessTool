@@ -42,7 +42,7 @@ export function IntelligenceAnomalies({ data }: { data: AnomalyReport }) {
 
 function AnomalyRow({ anomaly }: { anomaly: Anomaly }) {
   const z = anomaly.z;
-  const sigmaColor = anomaly.direction === "over" ? "text-teal-400/90" : "text-amber-300/90";
+  const sigmaColor = anomaly.direction === "over" ? "text-[var(--home-good)]" : "text-amber-300/90";
   return (
     <li className="flex items-baseline gap-2 text-[12px] leading-snug">
       <span className={cn("w-12 shrink-0 font-medium tabular-nums", sigmaColor)}>

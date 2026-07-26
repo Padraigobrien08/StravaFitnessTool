@@ -70,7 +70,7 @@ export function StreamIntelligencePanel({
                 a.kind === "hr"
                   ? "text-red-400/70"
                   : a.kind === "pace"
-                    ? "text-teal-400/70"
+                    ? "text-accent/70"
                     : "text-zinc-600"
               }
             >
@@ -147,7 +147,7 @@ export function StreamIntelligencePanel({
                 <Line
                   type="monotone"
                   dataKey="paceSecPerKm"
-                  stroke={chart.teal}
+                  stroke="var(--home-signal)"
                   strokeWidth={1.75}
                   dot={false}
                 />

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { topicCoachLink } from "@/lib/coach/domainLinks";
+import { Eyebrow } from "@/components/console/console-kit";
 
 const PROMPTS = [
   { label: "Make more conservative", q: "Make my saved week plan more conservative" },
@@ -19,9 +20,7 @@ const PROMPTS = [
 export function PlanCoachRefine() {
   return (
     <div>
-      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-600">
-        Refine with Coach
-      </p>
+      <Eyebrow className="mb-1.5">Refine with Coach</Eyebrow>
       <div className="flex flex-wrap gap-1">
         {PROMPTS.map((p) => (
           <Link

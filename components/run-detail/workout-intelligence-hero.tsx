@@ -9,8 +9,8 @@ import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 
 const gradeBorder = {
-  strong: "border-l-teal-500/50",
-  steady: "border-l-teal-500/35",
+  strong: "border-l-accent/60",
+  steady: "border-l-accent/40",
   mixed: "border-l-amber-500/45",
   limited: "border-l-zinc-500/35",
 };
@@ -25,7 +25,7 @@ export function WorkoutIntelligenceHero({ hero }: { hero: WorkoutHeroView }) {
       className={cn(
         "border-l-[3px]",
         gradeBorder[hero.executionGrade],
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_55%_at_100%_0%,rgba(45,212,191,0.06),transparent_55%)]",
+        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_70%_55%_at_100%_0%,var(--home-signal-wash),transparent_55%)]",
       )}
     >
       <div className="relative grid gap-5 lg:grid-cols-[1fr_minmax(220px,280px)] lg:gap-8">
@@ -65,7 +65,7 @@ export function WorkoutIntelligenceHero({ hero }: { hero: WorkoutHeroView }) {
             <span className="rounded-md bg-white/[0.04] px-2.5 py-1 text-xs text-zinc-400 ring-1 ring-inset ring-white/[0.06]">
               Execution · <strong className="text-zinc-200">{hero.executionLabel}</strong>
             </span>
-            <span className="rounded-md bg-teal-500/[0.08] px-2.5 py-1 text-xs text-teal-300/90 ring-1 ring-inset ring-teal-500/20">
+            <span className="rounded-md bg-accent/[0.08] px-2.5 py-1 text-xs text-accent ring-1 ring-inset ring-accent/20">
               {hero.primaryAdaptation}
             </span>
           </div>

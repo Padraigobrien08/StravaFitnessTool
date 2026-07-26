@@ -58,7 +58,7 @@ export function IntelligenceRiskPatterns({ patterns }: { patterns: RiskPattern[]
                       </li>
                     ))}
                   </ul>
-                  <p className="text-[12px] leading-snug text-teal-300/85">
+                  <p className="text-[12px] leading-snug text-accent">
                     <span className="text-zinc-500">Mitigation: </span>
                     {p.mitigation}
                   </p>

@@ -7,8 +7,8 @@ import { Panel } from "@/components/ui/panel";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
 const KIND_META: Record<ChangePoint["kind"], { label: string; tone: string }> = {
-  reversal_up: { label: "build took hold", tone: "text-teal-400/90" },
-  acceleration: { label: "ramp steepened", tone: "text-teal-400/90" },
+  reversal_up: { label: "build took hold", tone: "text-[var(--home-good)]" },
+  acceleration: { label: "ramp steepened", tone: "text-[var(--home-good)]" },
   reversal_down: { label: "peak → decline", tone: "text-amber-300/90" },
   deceleration: { label: "gains flattened", tone: "text-amber-300/90" },
 };
@@ -41,7 +41,7 @@ function ChangePointRow({ cp }: { cp: ChangePoint }) {
     <li className="flex items-baseline gap-2 text-[12px] leading-snug">
       <span className="mt-0.5 shrink-0">
         {up ? (
-          <TrendingUp className="h-3 w-3 text-teal-400/70" />
+          <TrendingUp className="h-3 w-3 text-[var(--home-good)]" />
         ) : (
           <TrendingDown className="h-3 w-3 text-amber-400/70" />
         )}

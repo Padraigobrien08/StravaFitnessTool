@@ -35,7 +35,7 @@ export function IntelligenceStandoutSessions({ data }: { data: PersonalZScores }
 
 function SessionRow({ session, tone }: { session: SessionZScore; tone: "good" | "bad" }) {
   const z = session.primaryZ ?? 0;
-  const sigmaColor = tone === "good" ? "text-teal-400/90" : "text-amber-300/90";
+  const sigmaColor = tone === "good" ? "text-[var(--home-good)]" : "text-amber-300/90";
   return (
     <div className="flex items-baseline gap-2 text-[12px] leading-snug">
       <span className={cn("w-12 shrink-0 tabular-nums font-medium", sigmaColor)}>

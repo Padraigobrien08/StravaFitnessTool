@@ -21,7 +21,7 @@ export function RouteReplayControls({
       <button
         type="button"
         onClick={onTogglePlay}
-        className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-500/15 text-teal-300 ring-1 ring-teal-500/25 transition-colors hover:bg-teal-500/25"
+        className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/15 text-accent ring-1 ring-accent/25 transition-colors hover:bg-accent/25"
         aria-label={state.playing ? "Pause" : "Play"}
       >
         {state.playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
@@ -34,7 +34,7 @@ export function RouteReplayControls({
       >
         <RotateCcw className="h-4 w-4" />
       </button>
-      <span className="font-display text-sm font-semibold tabular-nums text-white">
+      <span className="font-mono text-sm font-semibold tabular-nums text-foreground">
         {formatReplayClock(state.currentSec)}
         <span className="text-zinc-600"> / {formatReplayClock(state.durationSec)}</span>
       </span>
@@ -46,9 +46,7 @@ export function RouteReplayControls({
             onClick={() => onSpeed(s)}
             className={cn(
               "rounded-md px-2 py-1 text-[11px] font-medium tabular-nums transition-colors",
-              state.speed === s
-                ? "bg-teal-500/20 text-teal-200"
-                : "text-zinc-500 hover:text-zinc-300",
+              state.speed === s ? "bg-accent/20 text-accent" : "text-zinc-500 hover:text-zinc-300",
             )}
           >
             {s}x

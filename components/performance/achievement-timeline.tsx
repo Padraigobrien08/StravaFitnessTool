@@ -1,24 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { AchievementMilestoneView } from "@/lib/performance/viewModels";
+import { Eyebrow, Panel, PanelHeader } from "@/components/console/console-kit";
 import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 
-const categoryAccent: Record<string, string> = {
-  speed: "border-l-teal-500/45",
-  endurance: "border-l-blue-500/40",
-  consistency: "border-l-violet-500/40",
-  race_execution: "border-l-amber-500/45",
+const categoryBar: Record<string, string> = {
+  speed: "var(--home-signal)",
+  endurance: "#3b82f6",
+  consistency: "#8b5cf6",
+  race_execution: "var(--hz-moderate)",
 };
 
 export function AchievementTimeline({ milestones }: { milestones: AchievementMilestoneView[] }) {
   const grouped = ["speed", "endurance", "consistency", "race_execution"] as const;
 
   return (
-    <PanelChrome title="Achievement timeline">
+    <Panel>
+      <PanelHeader title="Achievement timeline" />
       <p className={cn(dash.muted, "mb-4")}>
         PRs and milestones with context — not a flat results table.
       </p>
@@ -41,17 +42,15 @@ export function AchievementTimeline({ milestones }: { milestones: AchievementMil
                   {items.map((m) => (
                     <article
                       key={m.id}
-                      className={cn(
-                        "rounded-xl border border-white/[0.05] border-l-[3px] bg-white/[0.02] px-4 py-3.5 transition-colors hover:bg-white/[0.035]",
-                        categoryAccent[m.category],
-                      )}
+                      className="rounded-xl bg-[var(--surface-subdued)] px-4 py-3.5 ring-1 ring-inset ring-[var(--border-subtle)] transition-colors hover:bg-[var(--surface-hover)]"
+                      style={{ borderLeft: `3px solid ${categoryBar[m.category]}` }}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <h3 className="font-display text-base font-semibold text-zinc-50">
+                          <h3 className="font-display text-base font-semibold text-foreground">
                             {m.title}
                           </h3>
-                          <p className="mt-0.5 font-display text-lg tabular-nums text-teal-300/95">
+                          <p className="mt-0.5 font-mono text-lg tabular-nums text-accent">
                             {m.timeDisplay}
                             {m.deltaDisplay ? (
                               <span className="ml-2 text-sm font-normal text-zinc-500">
@@ -68,10 +67,7 @@ export function AchievementTimeline({ milestones }: { milestones: AchievementMil
                         {m.runName && m.runId ? (
                           <>
                             {" · "}
-                            <Link
-                              href={`/runs/${m.runId}`}
-                              className="text-teal-400/90 hover:text-teal-300"
-                            >
+                            <Link href={`/runs/${m.runId}`} className="text-accent hover:underline">
                               {m.runName}
                             </Link>
                           </>
@@ -79,7 +75,7 @@ export function AchievementTimeline({ milestones }: { milestones: AchievementMil
                       </p>
 
                       <div className="mt-2.5">
-                        <p className={dash.label}>Triggered by</p>
+                        <Eyebrow>Triggered by</Eyebrow>
                         <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-500">
                           {m.triggers.map((t, i) => (
                             <li key={i}>· {t}</li>
@@ -94,6 +90,6 @@ export function AchievementTimeline({ milestones }: { milestones: AchievementMil
           })}
         </div>
       )}
-    </PanelChrome>
+    </Panel>
   );
 }

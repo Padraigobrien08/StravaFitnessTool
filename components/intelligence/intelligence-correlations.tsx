@@ -32,7 +32,7 @@ export function IntelligenceCorrelations({ data }: { data: CorrelationReport }) 
 function CorrelationRow({ c }: { c: Correlation }) {
   const rColor =
     c.direction === "positive"
-      ? "text-teal-400/80"
+      ? "text-[var(--home-good)]"
       : c.direction === "negative"
         ? "text-amber-300/80"
         : "text-zinc-600";

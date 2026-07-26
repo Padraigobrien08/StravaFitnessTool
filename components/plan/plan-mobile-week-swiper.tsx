@@ -131,8 +131,8 @@ export function PlanMobileWeekSwiper({
             onClick={() => scrollToIndex(i)}
             className={cn(
               "h-1.5 rounded-full transition-all",
-              i === activeIndex ? "w-5 bg-teal-500/70" : "w-1.5 bg-zinc-700 hover:bg-zinc-600",
-              i === todayIndex && i !== activeIndex && "ring-1 ring-teal-500/40",
+              i === activeIndex ? "w-5 bg-accent" : "w-1.5 bg-zinc-700 hover:bg-zinc-600",
+              i === todayIndex && i !== activeIndex && "ring-1 ring-accent/40",
             )}
           />
         ))}

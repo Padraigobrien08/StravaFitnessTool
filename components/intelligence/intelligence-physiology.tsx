@@ -200,7 +200,7 @@ export function IntelligencePhysiology({ data }: { data: AthletePhysiology }) {
 
 function TrendGlyph({ trend }: { trend: "improving" | "declining" | "stable" | null }) {
   // Improving = fading less = a good direction (rendered subtly, not loud).
-  if (trend === "improving") return <TrendingDown className="h-3 w-3 text-teal-400/70" />;
+  if (trend === "improving") return <TrendingDown className="h-3 w-3 text-[var(--home-good)]" />;
   if (trend === "declining") return <TrendingUp className="h-3 w-3 text-amber-400/70" />;
   return null;
 }

@@ -9,6 +9,7 @@ import { PlanIntegrityPanel } from "./plan-integrity-panel";
 import type { PlanIntegrityItem } from "@/lib/plan/planWorkspaceView";
 import { PlanCoachRefine } from "./plan-coach-refine";
 import { PlanExplainability } from "./plan-explainability";
+import { Eyebrow, Panel } from "@/components/console/console-kit";
 
 function SidebarSection({
   title,
@@ -24,15 +25,13 @@ function SidebarSection({
   if (!items.length) return null;
   return (
     <div>
-      <p
-        className={
-          tone === "risk"
-            ? "text-[10px] font-semibold uppercase tracking-wide text-amber-400/55"
-            : "text-[10px] font-semibold uppercase tracking-wide text-zinc-600"
-        }
-      >
-        {title}
-      </p>
+      {tone === "risk" ? (
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-400/60">
+          {title}
+        </p>
+      ) : (
+        <Eyebrow>{title}</Eyebrow>
+      )}
       <ul className="mt-1.5 space-y-1">
         {items.slice(0, 4).map((item) => (
           <li
@@ -75,11 +74,11 @@ export function PlanOperationalSidebar({
   const data = week ?? (preview ? previewToMeta(preview) : null);
   if (!data) {
     return (
-      <aside className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-subdued)]/60 p-3">
+      <Panel className="p-3">
         <p className="text-[12px] text-zinc-600">
           Generate or save a plan to see week reasoning and validation.
         </p>
-      </aside>
+      </Panel>
     );
   }
 
@@ -91,7 +90,7 @@ export function PlanOperationalSidebar({
 
   return (
     <aside className="space-y-3 lg:sticky lg:top-4 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
-      <div className="space-y-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-subdued)]/80 p-3">
+      <Panel className="space-y-3 p-3">
         <SidebarSection
           title="Why this week exists"
           items={whyWeek}
@@ -106,7 +105,7 @@ export function PlanOperationalSidebar({
         />
         <PlanIntegrityPanel items={integrityItems} onHighlightWorkouts={onHighlightWorkouts} />
         {coachNotes.length > 0 ? <SidebarSection title="Coach notes" items={coachNotes} /> : null}
-      </div>
+      </Panel>
 
       <PlanExplainability lines={explainLines} />
       <PlanCoachRefine />

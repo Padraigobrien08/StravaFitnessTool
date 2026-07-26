@@ -54,7 +54,7 @@ export function IntelligenceForecastAccuracy({ data }: { data: ForecastCalibrati
                 <span
                   className={cn(
                     "text-[11px]",
-                    f.withinInterval ? "text-teal-400/90" : "text-amber-400/85",
+                    f.withinInterval ? "text-[var(--home-good)]" : "text-amber-400/85",
                   )}
                 >
                   {f.withinInterval ? "in range" : "off"}

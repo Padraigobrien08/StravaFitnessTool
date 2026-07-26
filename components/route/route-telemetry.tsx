@@ -22,7 +22,7 @@ import { useTrainingChart } from "@/components/training/charts/chart-theme";
 const chartTick = { fontSize: 9, fill: "var(--chart-tick-fill)" };
 
 const OVERLAY_FILL: Record<string, string> = {
-  interval: "rgba(45,212,191,0.12)",
+  interval: "rgba(240,134,74,0.14)",
   recovery: "rgba(82,82,91,0.08)",
   fade: "rgba(245,158,11,0.12)",
   pause: "rgba(113,113,122,0.1)",
@@ -95,7 +95,12 @@ function SyncChart({
               strokeOpacity={0}
             />
           ))}
-          <ReferenceLine x={currentSec} stroke="#5eead4" strokeWidth={2} strokeOpacity={0.9} />
+          <ReferenceLine
+            x={currentSec}
+            stroke="var(--home-signal)"
+            strokeWidth={2}
+            strokeOpacity={0.95}
+          />
           {children}
         </ComposedChart>
       </ResponsiveContainer>
@@ -134,7 +139,7 @@ export function RouteTelemetryPanel({
             <Line
               type="monotone"
               dataKey="pace"
-              stroke="#5eead4"
+              stroke="var(--home-signal)"
               strokeWidth={1.5}
               dot={false}
               isAnimationActive={false}
@@ -212,7 +217,7 @@ function Scrubber({ duration, currentSec }: { duration: number; currentSec: numb
       />
       <div className="mt-1 flex justify-between text-[10px] tabular-nums text-zinc-600">
         <span>{formatReplayClock(0)}</span>
-        <span className="text-teal-400/80">{formatReplayClock(currentSec)}</span>
+        <span className="text-accent">{formatReplayClock(currentSec)}</span>
         <span>{formatReplayClock(duration)}</span>
       </div>
     </div>

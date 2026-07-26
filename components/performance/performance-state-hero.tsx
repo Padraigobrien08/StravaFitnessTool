@@ -3,38 +3,34 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ConfidenceBadge } from "@/components/confidence-badge";
-import { DashboardPanel } from "@/components/home/primitives/dashboard-panel";
 import { ReadinessRing } from "@/components/home/primitives/readiness-ring";
 import { Sparkline } from "@/components/home/primitives/sparkline";
 import type { PerformanceHeroView } from "@/lib/performance/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
+import { Eyebrow, Panel, Readout } from "@/components/console/console-kit";
 import { cn } from "@/lib/utils";
 import { ArrowRight, TrendingUp } from "lucide-react";
 
-const severityBorder = {
-  positive: "border-l-teal-500/50",
-  neutral: "border-l-zinc-500/40",
-  warning: "border-l-amber-500/50",
+const severityBar: Record<PerformanceHeroView["severity"], string> = {
+  positive: "var(--home-signal)",
+  neutral: "var(--muted-subtle)",
+  warning: "var(--hz-moderate)",
 };
 
 export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
   return (
-    <DashboardPanel
-      variant="hero"
-      padding="hero"
-      elevated
-      hover={false}
-      className={cn(
-        "border-l-[3px]",
-        severityBorder[hero.severity],
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_50%)]",
-      )}
-    >
+    <Panel className="relative overflow-hidden">
+      <span
+        className="pointer-events-none absolute inset-y-0 left-0 w-[3px]"
+        style={{ background: severityBar[hero.severity] }}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,var(--home-signal-wash),transparent_55%)]" />
+
       <div className="relative grid gap-5 lg:grid-cols-[1fr_minmax(240px,300px)] lg:gap-8">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={dash.labelAccent}>Performance intelligence</span>
-            <span className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 ring-1 ring-inset ring-white/[0.06]">
+            <Eyebrow>Performance intelligence</Eyebrow>
+            <span className="rounded-md bg-[var(--surface-subdued)] px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-zinc-400 ring-1 ring-inset ring-[var(--border-subtle)]">
               {hero.classification}
             </span>
             <ConfidenceBadge level={hero.confidence} />
@@ -45,10 +41,16 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
             <p className={cn(dash.lead, "text-zinc-300/90")}>{hero.interpretation}</p>
           </div>
 
-          <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] px-4 py-3">
-            <p className={dash.label}>Strongest signal</p>
+          <div
+            className="rounded-lg px-4 py-3"
+            style={{
+              background: "var(--home-signal-wash)",
+              boxShadow: "inset 0 0 0 1px var(--home-signal-line)",
+            }}
+          >
+            <Eyebrow>Strongest signal</Eyebrow>
             <p className="mt-1 flex items-start gap-2 text-sm text-zinc-200">
-              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-teal-400/80" />
+              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               {hero.strongestSignal}
             </p>
           </div>
@@ -58,12 +60,14 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
             {hero.recommendation}
           </p>
 
-          <dl className="flex flex-wrap gap-x-8 gap-y-2 border-t border-white/[0.05] pt-3">
+          <dl className="flex flex-wrap gap-x-8 gap-y-2 border-t border-[var(--border-subtle)] pt-3">
             {hero.inlineMetrics.map((m) => (
               <div key={m.label} className="flex items-baseline gap-2">
                 <dt className={dash.label}>{m.label}</dt>
                 <dd className="flex items-baseline gap-2">
-                  <span className={dash.metricSm}>{m.value}</span>
+                  <span className="font-mono text-[15px] font-semibold tabular-nums text-foreground">
+                    {m.value}
+                  </span>
                   {m.hint ? <span className={dash.muted}>{m.hint}</span> : null}
                 </dd>
               </div>
@@ -71,7 +75,11 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
           </dl>
 
           <Link href="/goals">
-            <Button size="sm" className="h-9">
+            <Button
+              size="sm"
+              className="h-9 border-0 text-[var(--home-signal-ink)]"
+              style={{ background: "var(--home-signal)" }}
+            >
               Race goals & strategy
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -79,21 +87,24 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
         </div>
 
         <aside
-          className="flex flex-col gap-4 rounded-xl bg-white/[0.03] p-4"
+          className="flex flex-col gap-4 rounded-xl bg-[var(--surface-subdued)] p-4 ring-1 ring-[var(--border-subtle)]"
           aria-label="Projection and trajectory"
         >
           {hero.projection ? (
-            <div className="border-b border-white/[0.05] pb-4">
-              <p className={dash.label}>Projected {hero.projection.label}</p>
-              <p className="mt-1 font-display text-2xl font-bold tabular-nums text-white">
-                {hero.projection.timeDisplay}
+            <div className="border-b border-[var(--border-subtle)] pb-4">
+              <Eyebrow>Projected {hero.projection.label}</Eyebrow>
+              <div className="mt-1 flex items-end gap-2">
+                <Readout
+                  value={hero.projection.timeDisplay}
+                  className="text-[clamp(24px,4vw,32px)]"
+                />
                 {hero.projection.rangeDisplay ? (
-                  <span className="ml-2 text-base font-normal text-zinc-500">
+                  <span className="mb-1 font-mono text-sm text-zinc-500">
                     {hero.projection.rangeDisplay}
                   </span>
                 ) : null}
-              </p>
-              <p className="mt-1 text-xs text-zinc-500">
+              </div>
+              <p className="mt-1 font-mono text-xs text-zinc-500">
                 Confidence: {hero.projection.confidenceLabel}
               </p>
             </div>
@@ -103,7 +114,7 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
             <ReadinessRing score={hero.trajectoryScore} size={88} showGlow label="Trajectory" />
             <div className="min-w-0 flex-1">
               <p className="text-sm text-zinc-400">{hero.trajectoryLabel}</p>
-              <p className="mt-0.5 text-xs text-zinc-600">
+              <p className="mt-0.5 font-mono text-xs text-zinc-600">
                 Readiness {hero.readinessScore} · {hero.readinessLabel}
               </p>
               <Sparkline
@@ -117,6 +128,6 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
           </div>
         </aside>
       </div>
-    </DashboardPanel>
+    </Panel>
   );
 }

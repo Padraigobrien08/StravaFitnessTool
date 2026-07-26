@@ -15,13 +15,14 @@ export function PlanTodayFocus({
 }) {
   return (
     <div
+      style={{ background: "var(--home-signal-wash)" }}
       className={cn(
-        "rounded-lg border border-teal-500/15 bg-teal-500/[0.04] px-3 py-2.5 ring-1 ring-teal-500/10 backdrop-blur-md",
+        "rounded-lg px-3 py-2.5 ring-1 ring-[var(--home-signal-line)] backdrop-blur-md",
         sticky && "sticky top-[52px] z-30 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.65)]",
         className,
       )}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-teal-500/75">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
         Today in this plan
       </p>
       <p className="mt-1 text-[13px] font-medium text-zinc-200">{today.title}</p>

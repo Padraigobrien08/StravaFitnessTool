@@ -28,7 +28,7 @@ const RACE_DISTANCE_KM: Record<RaceDistance, number> = {
 
 function PerformanceEvidenceBanner() {
   return (
-    <div className="border-b border-white/[0.04] pb-3">
+    <div className="border-b border-[var(--border-subtle)] pb-3">
       <p className={dash.labelAccent}>Performance · Am I improving?</p>
       <p className="mt-0.5 text-xs text-zinc-600">
         Trajectory, adaptation, and projected outcome — the evidence you&apos;re getting fitter. For
@@ -87,14 +87,14 @@ export default function PerformancePage() {
             predictionTimeline={analytics.predictionTimeline}
           />
 
-          <div className="rounded-lg border border-white/[0.04] bg-white/[0.015]">
+          <div className="rounded-xl bg-[var(--surface-elevated)] shadow-[var(--surface-shadow)] ring-1 ring-[var(--border-subtle)]">
             <button
               type="button"
               className="flex w-full items-center justify-between px-4 py-3 text-left"
               onClick={() => setAdvancedOpen((v) => !v)}
               aria-expanded={advancedOpen}
             >
-              <span className="text-[12px] text-zinc-500">
+              <span className="font-mono text-[12px] text-zinc-500">
                 Advanced analytics (integrity, detailed trends)
               </span>
               <ChevronDown
@@ -105,12 +105,12 @@ export default function PerformancePage() {
               />
             </button>
             {advancedOpen ? (
-              <div className="space-y-4 border-t border-white/[0.04] px-4 pb-4 pt-3">
+              <div className="space-y-4 border-t border-[var(--border-subtle)] px-4 pb-4 pt-3">
                 <AdaptationTrendsPanel trends={view.adaptationTrends} />
                 <PerformanceIntegrityPanel data={view.integrity} />
                 <p className="text-[11px] text-zinc-600">
                   Intensity &amp; load distribution lives on{" "}
-                  <Link href="/training" className="text-teal-400/90 hover:text-teal-300">
+                  <Link href="/training" className="text-accent hover:underline">
                     Training
                   </Link>
                   .

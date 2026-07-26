@@ -1,18 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import type { CalendarWorkout, TrainingCalendarWeek } from "@/lib/training-calendar";
+import type { CSSProperties } from "react";
+import type {
+  CalendarIntensity,
+  CalendarWorkout,
+  TrainingCalendarWeek,
+} from "@/lib/training-calendar";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Check, MoreHorizontal, X } from "lucide-react";
+import { ZONE_COLOR } from "@/components/console/console-kit";
 
-const intensityStyles: Record<string, string> = {
-  easy: "border-teal-500/25 bg-teal-500/[0.06]",
-  moderate: "border-amber-500/25 bg-amber-500/[0.06]",
-  hard: "border-orange-500/30 bg-orange-500/[0.08]",
-  recovery: "border-zinc-500/20 bg-zinc-500/[0.05]",
-  rest: "border-white/[0.04] bg-white/[0.02]",
-};
+/** Zone-tinted card surface — mirrors the effort scale used across the console. */
+function zoneCardStyle(intensity: CalendarIntensity): CSSProperties {
+  if (intensity === "rest") {
+    return {
+      borderColor: "var(--border-subtle)",
+      background: "color-mix(in srgb, var(--surface) 30%, transparent)",
+    };
+  }
+  const c = ZONE_COLOR[intensity];
+  return {
+    borderColor: `color-mix(in srgb, ${c} 30%, transparent)`,
+    background: `color-mix(in srgb, ${c} 7%, transparent)`,
+  };
+}
 
 const statusLabel: Record<string, string> = {
   planned: "",
@@ -93,10 +106,8 @@ function DayColumn({
   const isRest = w.modality === "rest";
   return (
     <div
-      className={cn(
-        "flex min-h-[168px] flex-col rounded-lg border px-2 py-2",
-        intensityStyles[w.intensity] ?? intensityStyles.easy,
-      )}
+      style={zoneCardStyle(w.intensity)}
+      className="flex min-h-[168px] flex-col rounded-lg border px-2 py-2"
     >
       <div className="mb-1.5 flex items-center justify-between gap-1">
         <span className="text-[10px] font-medium text-zinc-500">{w.day}</span>
@@ -142,12 +153,7 @@ function DayCard({
   onDelete?: (id: string) => void;
 }) {
   return (
-    <div
-      className={cn(
-        "rounded-lg border px-3 py-2.5",
-        intensityStyles[w.intensity] ?? intensityStyles.easy,
-      )}
-    >
+    <div style={zoneCardStyle(w.intensity)} className="rounded-lg border px-3 py-2.5">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-medium text-zinc-500">
           {w.day} · {w.date.slice(5)}
@@ -232,7 +238,7 @@ function EditPopover({
       <div className="flex flex-wrap gap-1">
         <button
           type="button"
-          className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] bg-teal-500/15 text-teal-300"
+          className="inline-flex items-center gap-0.5 rounded bg-accent/15 px-1.5 py-0.5 text-[10px] text-accent"
           onClick={() => {
             onPatch?.(w.id, { status: "completed" });
             onClose();
@@ -254,7 +260,7 @@ function EditPopover({
       <div className="flex gap-2">
         <button
           type="button"
-          className="text-[10px] text-teal-400/90"
+          className="text-[10px] text-accent"
           onClick={() => {
             onPatch?.(w.id, {
               title,

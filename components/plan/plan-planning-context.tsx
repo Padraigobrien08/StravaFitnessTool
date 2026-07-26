@@ -89,7 +89,7 @@ export function PlanPlanningContext({
       </div>
 
       <Textarea
-        className="mt-2 resize-y border-[var(--border-subtle)] bg-[var(--surface)]/80 text-[12px] leading-relaxed text-zinc-200 placeholder:text-zinc-600 focus-visible:border-teal-500/40 focus-visible:ring-teal-500/25"
+        className="mt-2 resize-y border-[var(--border-subtle)] bg-[var(--surface)]/80 text-[12px] leading-relaxed text-zinc-200 placeholder:text-zinc-600 focus-visible:border-accent/40 focus-visible:ring-accent/25"
         rows={expanded ? PLAN_CONTEXT_EXPANDED_ROWS : PLAN_CONTEXT_COMPACT_ROWS}
         placeholder="e.g. I just ran a half marathon — plan my recovery for this week. No race goal for now."
         value={value}
@@ -112,7 +112,7 @@ export function PlanPlanningContext({
             variant="outline"
             size="sm"
             disabled={disabled}
-            className="h-auto rounded-md border-[var(--border-subtle)] bg-[var(--surface)]/60 px-2 py-0.5 text-left text-[10px] font-normal text-zinc-500 hover:border-teal-500/25 hover:text-zinc-300"
+            className="h-auto rounded-md border-[var(--border-subtle)] bg-[var(--surface)]/60 px-2 py-0.5 text-left text-[10px] font-normal text-zinc-500 hover:border-accent/25 hover:text-zinc-300"
             onClick={() => appendSuggestion(s)}
           >
             {s}

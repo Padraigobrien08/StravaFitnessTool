@@ -14,12 +14,12 @@ const KIND_LABELS: Record<string, string> = {
 };
 
 const KIND_DOT: Record<string, string> = {
-  interval: "bg-teal-400",
+  interval: "bg-accent",
   recovery: "bg-zinc-500",
   fade: "bg-amber-400",
   pause: "bg-zinc-600",
   pace_spike: "bg-violet-400",
-  climb: "bg-teal-400",
+  climb: "bg-[var(--home-good)]",
   descent: "bg-blue-400",
 };
 

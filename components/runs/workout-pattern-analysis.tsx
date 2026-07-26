@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useState } from "react";
 import type { PatternInsightView } from "@/lib/runs/viewModels";
 import { coachUrl } from "@/lib/coach/domainLinks";
+import { Eyebrow } from "@/components/console/console-kit";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 
 const toneBorder = {
-  positive: "border-teal-500/15",
+  positive: "border-accent/15",
   neutral: "border-white/[0.05]",
   warning: "border-amber-500/20",
 };
@@ -18,7 +19,7 @@ export function WorkoutPatternAnalysis({ patterns }: { patterns: PatternInsightV
 
   return (
     <section>
-      <p className="mb-2 text-[11px] font-medium text-zinc-500">Evolving observations</p>
+      <Eyebrow className="mb-2">Evolving observations</Eyebrow>
       <ul className="space-y-1.5">
         {patterns.map((p) => {
           const open = expanded === p.id;
@@ -43,7 +44,7 @@ export function WorkoutPatternAnalysis({ patterns }: { patterns: PatternInsightV
               {open ? (
                 <Link
                   href={coachUrl({ q: p.coachQuery })}
-                  className="mt-1.5 inline-block text-[10px] text-zinc-600 hover:text-teal-400/80"
+                  className="mt-1.5 inline-block text-[10px] text-zinc-600 hover:text-accent/80"
                 >
                   Ask Coach →
                 </Link>

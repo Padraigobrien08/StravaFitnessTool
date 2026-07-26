@@ -13,6 +13,7 @@ import { RunExplorer } from "@/components/runs/run-explorer";
 import { NotableSessionsFeed } from "@/components/runs/notable-sessions-feed";
 import { SessionIntelligencePanel } from "@/components/runs/session-intelligence-panel";
 import { RunsDataQualityPanel } from "@/components/runs/runs-data-quality-panel";
+import { Eyebrow, Panel } from "@/components/console/console-kit";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "explorer" | "intelligence";
@@ -48,20 +49,18 @@ export default function RunsPage() {
     <RequireData>
       {view && importData && analytics && (
         <RunsWorkspace className="max-w-6xl">
-          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.04] pb-3">
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-wider text-teal-500/70">
-                Activities · Explore your sessions
-              </p>
-              <p className="text-[11px] text-zinc-600">
+              <Eyebrow className="text-accent/80">Activities · Explore your sessions</Eyebrow>
+              <p className="mt-1 text-[11px] text-zinc-600">
                 Interpret, explore, and compare individual runs · intensity &amp; load breakdown on{" "}
-                <Link href="/training" className="text-zinc-500 hover:text-zinc-400">
+                <Link href="/training" className="text-zinc-500 hover:text-accent">
                   Training
                 </Link>
                 {dataSourceLabel ? ` · ${dataSourceLabel}` : ""}
               </p>
             </div>
-            <div className="flex rounded-lg border border-white/[0.06] p-0.5">
+            <div className="flex rounded-lg p-0.5 ring-1 ring-[var(--border-subtle)]">
               <ModeButton active={mode === "intelligence"} onClick={() => setMode("intelligence")}>
                 Session intelligence
               </ModeButton>
@@ -82,12 +81,10 @@ export default function RunsPage() {
               />
             ) : (
               <>
-                <section className="rounded-lg border border-white/[0.04] bg-white/[0.01] px-3 py-3">
-                  <p className="mb-2 text-[11px] font-medium text-zinc-500">
-                    Ranked notable sessions
-                  </p>
+                <Panel>
+                  <Eyebrow className="mb-2">Ranked notable sessions</Eyebrow>
                   <NotableSessionsFeed sessions={view.notableSessions} compact />
-                </section>
+                </Panel>
                 <RunExplorer
                   rows={view.explorerRows}
                   runs={importData.runs}
@@ -120,7 +117,7 @@ function ModeButton({
       onClick={onClick}
       className={cn(
         "rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors",
-        active ? "bg-teal-500/15 text-teal-200" : "text-zinc-500 hover:text-zinc-300",
+        active ? "bg-accent/15 text-accent" : "text-zinc-500 hover:text-zinc-300",
       )}
     >
       {children}

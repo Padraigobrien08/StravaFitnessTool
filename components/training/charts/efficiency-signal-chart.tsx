@@ -30,7 +30,7 @@ export function EfficiencySignalChart({
     );
   }
 
-  const stroke = positive === false ? chart.amber : chart.teal;
+  const stroke = positive === false ? chart.amber : "var(--home-signal)";
   const last = data.at(-1)!;
 
   return (

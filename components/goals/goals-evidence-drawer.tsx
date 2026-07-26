@@ -36,19 +36,19 @@ export function GoalsEvidenceDrawer({
           render={
             <Button
               variant="outline"
-              className="flex h-auto w-full items-center justify-between rounded-lg border-white/[0.06] bg-white/[0.02] px-4 py-3 text-left text-sm font-normal text-zinc-400 hover:bg-white/[0.04]"
+              className="flex h-auto w-full items-center justify-between rounded-lg bg-[var(--surface-subdued)] px-4 py-3 text-left text-sm font-normal text-zinc-400 ring-1 ring-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
             />
           }
         >
           <span>See models &amp; math</span>
           <ChevronDown
             className={cn(
-              "h-4 w-4 shrink-0 text-zinc-600 transition-transform",
+              "h-4 w-4 shrink-0 text-zinc-500 transition-transform",
               open && "rotate-180",
             )}
           />
         </CollapsibleTrigger>
-        <CollapsibleContent className="mt-3 space-y-4 rounded-xl border border-white/[0.06] bg-white/[0.015] p-4">
+        <CollapsibleContent className="mt-3 space-y-4 rounded-xl bg-[var(--surface-subdued)] p-4 ring-1 ring-[var(--border-subtle)]">
           <ForecastV2Panel forecast={forecast} />
         </CollapsibleContent>
       </Collapsible>
@@ -59,7 +59,7 @@ export function GoalsEvidenceDrawer({
             render={
               <Button
                 variant="ghost"
-                className="flex h-auto w-full items-center justify-between rounded-lg border border-dashed border-white/[0.08] px-4 py-2.5 text-left text-xs font-normal text-zinc-600 hover:text-zinc-500"
+                className="flex h-auto w-full items-center justify-between rounded-lg border border-dashed border-[var(--border-default)] px-4 py-2.5 text-left text-xs font-normal text-zinc-500 hover:text-zinc-400"
               />
             }
           >

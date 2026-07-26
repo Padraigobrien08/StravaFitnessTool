@@ -4,12 +4,16 @@ import Link from "next/link";
 import type { WeekExecutionSummary } from "@/lib/training-calendar/matchPlannedVsActual";
 import type { ExecutionMatchStatus } from "@/lib/training-calendar/matchPlannedVsActual";
 import { cn } from "@/lib/utils";
+import { Eyebrow, Panel } from "@/components/console/console-kit";
 
 const statusStyles: Record<ExecutionMatchStatus, { label: string; className: string }> = {
-  matched: { label: "Matched", className: "text-teal-400/90 bg-teal-500/10" },
+  matched: {
+    label: "Matched",
+    className: "text-[var(--home-good)] bg-[color-mix(in_srgb,var(--home-good)_12%,transparent)]",
+  },
   marked_done: {
     label: "Done",
-    className: "text-teal-400/80 bg-teal-500/10",
+    className: "text-[var(--home-good)] bg-[color-mix(in_srgb,var(--home-good)_12%,transparent)]",
   },
   partial: {
     label: "Partial",
@@ -38,15 +42,15 @@ export function PlanWeekExecution({
   }
 
   return (
-    <section className="rounded-lg border border-[var(--border-subtle)] bg-[var(--surface)]/40 px-3 py-2.5">
+    <Panel className="px-3 py-2.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
-          Planned vs actual
-        </p>
+        <Eyebrow>Planned vs actual</Eyebrow>
         {summary.adherencePct != null ? (
           <p className="text-[11px] text-zinc-400">
-            <span className="font-medium text-zinc-300">{summary.adherencePct}%</span> run sessions
-            aligned
+            <span className="font-mono font-medium tabular-nums text-zinc-300">
+              {summary.adherencePct}%
+            </span>{" "}
+            run sessions aligned
             {summary.partialDays > 0 ? (
               <span className="text-zinc-600"> · {summary.partialDays} partial</span>
             ) : null}
@@ -87,7 +91,7 @@ export function PlanWeekExecution({
                         {runId ? (
                           <Link
                             href={`/runs/${runId}`}
-                            className="text-teal-500/80 hover:text-teal-400"
+                            className="text-accent hover:text-accent/80"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {row.actualLabel}
@@ -101,7 +105,7 @@ export function PlanWeekExecution({
                   </div>
                   <span
                     className={cn(
-                      "shrink-0 rounded px-1.5 py-0.5 text-[9px] font-medium uppercase",
+                      "shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.08em]",
                       style.className,
                     )}
                   >
@@ -113,6 +117,6 @@ export function PlanWeekExecution({
           })}
         </ul>
       )}
-    </section>
+    </Panel>
   );
 }

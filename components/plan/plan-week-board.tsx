@@ -1,20 +1,33 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { CalendarWorkout, TrainingCalendarWeek } from "@/lib/training-calendar";
+import type { CSSProperties } from "react";
+import type {
+  CalendarIntensity,
+  CalendarWorkout,
+  TrainingCalendarWeek,
+} from "@/lib/training-calendar";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, ChevronDown, GripVertical, MoreHorizontal, X } from "lucide-react";
+import { ZONE_COLOR, ZoneLegend } from "@/components/console/console-kit";
 import { PlanMobileWeekSwiper } from "./plan-mobile-week-swiper";
 
-const intensityStyles: Record<string, string> = {
-  easy: "border-teal-500/30 bg-teal-500/[0.07] hover:border-teal-500/45",
-  moderate: "border-amber-500/30 bg-amber-500/[0.08] hover:border-amber-500/45",
-  hard: "border-orange-500/35 bg-orange-500/[0.1] hover:border-orange-500/50",
-  recovery: "border-zinc-500/25 bg-zinc-500/[0.05]",
-  rest: "border-[var(--border-subtle)] bg-[var(--surface)]/30 opacity-75",
-};
+/** Zone-tinted card surface — mirrors the effort scale used across the console. */
+function zoneCardStyle(intensity: CalendarIntensity): CSSProperties {
+  if (intensity === "rest") {
+    return {
+      borderColor: "var(--border-subtle)",
+      background: "color-mix(in srgb, var(--surface) 30%, transparent)",
+    };
+  }
+  const c = ZONE_COLOR[intensity];
+  return {
+    borderColor: `color-mix(in srgb, ${c} 34%, transparent)`,
+    background: `color-mix(in srgb, ${c} 8%, transparent)`,
+  };
+}
 
 type PatchFn = (
   id: string,
@@ -162,11 +175,14 @@ export function PlanWeekBoard({
         </PlanMobileWeekSwiper>
       ) : null}
 
-      {canDrag ? (
-        <p className="mt-1.5 hidden text-[10px] text-zinc-600 lg:block">
-          Drag a session onto another day to reschedule it.
-        </p>
-      ) : null}
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <ZoneLegend />
+        {canDrag ? (
+          <p className="hidden text-[10px] text-zinc-600 lg:block">
+            Drag a session onto another day to reschedule it.
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -247,20 +263,25 @@ function DayBoardColumn({
         e.preventDefault();
         onDrop?.(w.id);
       }}
+      style={zoneCardStyle(w.intensity)}
       className={cn(
         "group flex flex-col rounded-lg border px-2 py-2 transition-all",
-        intensityStyles[w.intensity] ?? intensityStyles.easy,
         columnMinH,
-        race && "ring-1 ring-teal-400/40 shadow-[0_0_20px_-8px_rgba(45,212,191,0.35)]",
+        isRest && "opacity-75",
+        race && "ring-1 ring-accent/45 shadow-[0_0_20px_-8px_var(--home-signal-line)]",
         highlighted && "ring-2 ring-amber-400/50",
         isRest && restMinH,
         isDragging && "opacity-50",
-        isDropTarget && "scale-[1.02] ring-2 ring-teal-400/60",
+        isDropTarget && "scale-[1.02] ring-2 ring-accent/60",
         canDrag && "cursor-grab active:cursor-grabbing",
       )}
     >
       <div className="mb-1 flex items-center justify-between gap-0.5">
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+        <span className="flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ background: ZONE_COLOR[w.intensity] }}
+          />
           {w.day}
         </span>
         <div className="flex items-center gap-0.5">
@@ -338,17 +359,21 @@ function DayBoardCard({
 }) {
   return (
     <div
+      style={zoneCardStyle(w.intensity)}
       className={cn(
         "rounded-lg border px-3 py-2",
-        intensityStyles[w.intensity] ?? intensityStyles.easy,
         highlighted && "ring-2 ring-amber-400/50",
-        isToday && "ring-1 ring-teal-500/35",
+        isToday && "ring-1 ring-accent/40",
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] font-medium text-zinc-500">
+        <span className="flex items-center gap-1.5 font-mono text-[11px] font-medium text-zinc-500">
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ background: ZONE_COLOR[w.intensity] }}
+          />
           {w.day} · {w.date.slice(5)}
-          {isToday ? <span className="ml-1 text-teal-500/80">· today</span> : null}
+          {isToday ? <span className="ml-1 text-accent">· today</span> : null}
         </span>
         {editable && w.modality !== "rest" ? (
           <button type="button" className="text-[10px] text-zinc-600" onClick={onEdit}>
@@ -398,20 +423,20 @@ function WorkoutBoardBody({
         className={cn(
           "font-semibold leading-tight",
           titleClass,
-          isRest ? "text-zinc-600" : race ? "text-teal-200" : "text-zinc-100",
+          isRest ? "text-zinc-600" : race ? "text-accent" : "text-zinc-100",
         )}
       >
         {w.title}
       </p>
       {!isRest ? (
         <>
-          <p className="mt-0.5 text-[10px] text-zinc-500">
+          <p className="mt-0.5 font-mono text-[10px] tabular-nums text-zinc-500">
             {w.distanceKm != null ? `${w.distanceKm} km` : null}
             {w.distanceKm != null && w.durationMin != null ? " · " : null}
             {w.durationMin != null ? `${w.durationMin} min` : null}
           </p>
           <p className="mt-1 line-clamp-2 text-[9px] leading-snug text-zinc-600">{w.purpose}</p>
-          {emphasis ? <p className="mt-1 text-[9px] text-teal-500/70">{emphasis}</p> : null}
+          {emphasis ? <p className="mt-1 text-[9px] text-accent/80">{emphasis}</p> : null}
         </>
       ) : (
         <p className="mt-0.5 text-[9px] text-zinc-700">Recovery</p>
@@ -481,7 +506,7 @@ function EditPanel({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-auto gap-0.5 rounded px-1.5 py-0.5 text-[10px] bg-teal-500/15 text-teal-300 hover:bg-teal-500/20 hover:text-teal-300"
+          className="h-auto gap-0.5 rounded bg-accent/15 px-1.5 py-0.5 text-[10px] text-accent hover:bg-accent/20 hover:text-accent"
           onClick={() => {
             onPatch?.(w.id, { status: "completed" });
             onClose();
@@ -507,7 +532,7 @@ function EditPanel({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-auto p-0 text-[10px] text-teal-400 hover:text-teal-300"
+          className="h-auto p-0 text-[10px] text-accent hover:text-accent/80"
           onClick={() => {
             onPatch?.(w.id, {
               title,
