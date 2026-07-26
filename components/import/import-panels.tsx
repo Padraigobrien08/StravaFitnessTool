@@ -1,6 +1,6 @@
 "use client";
 
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
+import { Panel, Eyebrow } from "@/components/console/console-kit";
 import { UploadZone } from "@/components/upload-zone";
 import { FitUploadZone } from "@/components/fit-upload-zone";
 import type {
@@ -12,14 +12,13 @@ import type {
   TrustTopicView,
   CapabilityItem,
 } from "@/lib/import/viewModels";
-import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 import { Check, X, Loader2 } from "lucide-react";
 
 const levelBar = {
-  high: "bg-teal-500/55",
-  medium: "bg-amber-500/45",
-  low: "bg-red-500/35",
+  high: "bg-[var(--home-signal)]",
+  medium: "bg-amber-500/70",
+  low: "bg-red-500/50",
 };
 
 export function DataConfidencePanel({
@@ -31,32 +30,34 @@ export function DataConfidencePanel({
 }) {
   if (coverage.length === 0) {
     return (
-      <PanelChrome title="Data confidence" subdued>
+      <Panel>
+        <Eyebrow className="mb-3">Data confidence</Eyebrow>
         <p className="text-sm text-zinc-500">
           Import training data to see field coverage and confidence impact.
         </p>
-      </PanelChrome>
+      </Panel>
     );
   }
 
   return (
-    <PanelChrome title="Data confidence" accent elevated>
-      <p className={`${dash.muted} mb-4`}>
+    <Panel>
+      <Eyebrow className="mb-3">Data confidence</Eyebrow>
+      <p className="mb-4 text-[13px] text-muted-foreground">
         Coverage drives model trust — gaps explain reduced readiness and prediction confidence.
       </p>
       <div className="space-y-3">
         {coverage.map((row) => (
           <div
             key={row.id}
-            className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-3.5"
+            className="rounded-xl bg-[var(--surface-subdued)] px-4 py-3.5 ring-1 ring-[var(--border-subtle)]"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm font-medium text-zinc-300">{row.label}</span>
-              <span className="text-xs tabular-nums text-zinc-500">
+              <span className="font-mono text-xs tabular-nums text-zinc-500">
                 {row.count}/{row.total} · {row.level}
               </span>
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--surface-elevated)] ring-1 ring-[var(--border-subtle)]">
               <div
                 className={cn("h-full rounded-full", levelBar[row.level])}
                 style={{
@@ -75,7 +76,7 @@ export function DataConfidencePanel({
           ))}
         </ul>
       ) : null}
-    </PanelChrome>
+    </Panel>
   );
 }
 
@@ -83,8 +84,9 @@ export function ModalityCoveragePanel({ rows }: { rows: ModalityCoverageRow[] })
   if (rows.length === 0) return null;
   const total = rows.reduce((s, r) => s + r.count, 0);
   return (
-    <PanelChrome title="Modality coverage" subdued>
-      <p className={`${dash.muted} mb-3`}>
+    <Panel>
+      <Eyebrow className="mb-3">Modality coverage</Eyebrow>
+      <p className="mb-3 text-[13px] text-muted-foreground">
         Strava <span className="text-zinc-400">sport_type</span> distribution — StrideIQ is
         modality-aware; running stays primary for race intelligence.
       </p>
@@ -92,17 +94,17 @@ export function ModalityCoveragePanel({ rows }: { rows: ModalityCoverageRow[] })
         {rows.map((r) => (
           <span
             key={r.id}
-            className="rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-xs text-zinc-400"
+            className="rounded-md bg-[var(--surface-subdued)] px-2.5 py-1 text-xs text-zinc-400 ring-1 ring-inset ring-[var(--border-subtle)]"
           >
             {r.label}{" "}
-            <span className="tabular-nums text-zinc-300">
+            <span className="font-mono tabular-nums text-zinc-300">
               {r.count}
               {total > 0 ? ` (${Math.round((r.count / total) * 100)}%)` : ""}
             </span>
           </span>
         ))}
       </div>
-    </PanelChrome>
+    </Panel>
   );
 }
 
@@ -118,8 +120,9 @@ export function HistoricalImportPanel({
   fitProgress?: { done: number; total: number; parsing: boolean };
 }) {
   return (
-    <PanelChrome title="Historical import" accent>
-      <p className={`${dash.muted} mb-3`}>
+    <Panel className="h-full">
+      <Eyebrow className="mb-3">Historical import</Eyebrow>
+      <p className="mb-3 text-[13px] text-muted-foreground">
         Bulk exports unlock long-term progression, performance curves, historical readiness trends,
         and pacing adaptation modeling — especially before API history exists.
       </p>
@@ -135,7 +138,7 @@ export function HistoricalImportPanel({
         fitProgress={fitProgress}
         compact
       />
-    </PanelChrome>
+    </Panel>
   );
 }
 
@@ -159,15 +162,18 @@ export function FitIntelligencePanel({
   totalRuns: number;
 }) {
   return (
-    <PanelChrome title="Advanced workout intelligence" elevated>
-      <p className={`${dash.muted} mb-4`}>
+    <Panel className="h-full">
+      <Eyebrow className="mb-3">Advanced workout intelligence</Eyebrow>
+      <p className="mb-4 text-[13px] text-muted-foreground">
         FIT streams are StrideIQ&apos;s deepest signal — interval structure, drift, and execution
         scoring all depend on them.
       </p>
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-          <p className={dash.label}>Without FIT streams</p>
+        <div className="rounded-xl bg-[var(--surface-subdued)] p-4 ring-1 ring-[var(--border-subtle)]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            Without FIT streams
+          </p>
           <ul className="mt-2 space-y-1">
             {comparison.without.map((item) => (
               <li key={item} className="flex items-center gap-2 text-xs text-zinc-600">
@@ -177,12 +183,17 @@ export function FitIntelligencePanel({
             ))}
           </ul>
         </div>
-        <div className="rounded-xl border border-teal-500/20 bg-teal-500/[0.06] p-4">
-          <p className={dash.label}>With FIT streams</p>
+        <div
+          className="rounded-xl p-4 ring-1 ring-inset ring-accent/20"
+          style={{ background: "var(--home-signal-wash)" }}
+        >
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+            With FIT streams
+          </p>
           <ul className="mt-2 space-y-1">
             {comparison.with.map((item) => (
               <li key={item} className="flex items-center gap-2 text-xs text-zinc-400">
-                <Check className="h-3 w-3 shrink-0 text-teal-500/80" />
+                <Check className="h-3 w-3 shrink-0 text-accent" />
                 {item}
               </li>
             ))}
@@ -206,7 +217,7 @@ export function FitIntelligencePanel({
         totalRuns={totalRuns}
         compact
       />
-    </PanelChrome>
+    </Panel>
   );
 }
 
@@ -220,32 +231,36 @@ export function ProcessingTrustPanel({
   topics: TrustTopicView[];
 }) {
   return (
-    <PanelChrome title="Processing & trust" subdued>
+    <Panel>
+      <Eyebrow className="mb-3">Processing & trust</Eyebrow>
       {message ? (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-teal-500/20 bg-teal-500/[0.06] px-3 py-2.5">
-          <Loader2 className="h-4 w-4 animate-spin text-teal-400" />
-          <span className="text-sm text-teal-200/90">{message}</span>
+        <div
+          className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2.5 ring-1 ring-inset ring-accent/20"
+          style={{ background: "var(--home-signal-wash)" }}
+        >
+          <Loader2 className="h-4 w-4 animate-spin text-accent" />
+          <span className="text-sm text-accent">{message}</span>
         </div>
       ) : null}
 
-      <p className={`${dash.muted} mb-3`}>How your data is used</p>
+      <p className="mb-3 text-[13px] text-muted-foreground">How your data is used</p>
       <ol className="mb-5 space-y-2">
         {steps.map((step, i) => (
           <li
             key={step.label}
             className={cn(
               "flex items-center gap-3 text-xs",
-              step.done ? "text-zinc-500" : step.active ? "text-teal-300/90" : "text-zinc-600",
+              step.done ? "text-zinc-500" : step.active ? "text-accent" : "text-zinc-600",
             )}
           >
             <span
               className={cn(
-                "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold",
+                "flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold",
                 step.active
-                  ? "bg-teal-500/20 text-teal-300"
+                  ? "bg-accent/15 text-accent"
                   : step.done
-                    ? "bg-white/[0.06] text-zinc-500"
-                    : "bg-white/[0.04] text-zinc-600",
+                    ? "bg-[var(--surface-subdued)] text-zinc-500"
+                    : "bg-[var(--surface-subdued)] text-zinc-600",
               )}
             >
               {step.active ? <Loader2 className="h-3 w-3 animate-spin" /> : i + 1}
@@ -259,14 +274,14 @@ export function ProcessingTrustPanel({
         {topics.map((t) => (
           <div
             key={t.title}
-            className="rounded-lg bg-white/[0.02] px-3 py-2.5 ring-1 ring-inset ring-white/[0.04]"
+            className="rounded-lg bg-[var(--surface-subdued)] px-3 py-2.5 ring-1 ring-inset ring-[var(--border-subtle)]"
           >
             <p className="text-xs font-semibold text-zinc-300">{t.title}</p>
             <p className="mt-1 text-[11px] leading-relaxed text-zinc-600">{t.body}</p>
           </div>
         ))}
       </div>
-    </PanelChrome>
+    </Panel>
   );
 }
 
@@ -274,17 +289,18 @@ export function MissingDataGuidancePanel({ items }: { items: MissingGuidanceView
   const severityStyle = {
     critical: "border-l-red-500/50 bg-red-500/[0.04]",
     warning: "border-l-amber-500/45 bg-amber-500/[0.03]",
-    info: "border-l-teal-500/30 bg-white/[0.02]",
+    info: "border-l-accent/30 bg-[var(--surface-subdued)]",
   };
 
   return (
-    <PanelChrome title="Missing data guidance" accent>
+    <Panel>
+      <Eyebrow className="mb-3">Missing data guidance</Eyebrow>
       <div className="space-y-3">
         {items.map((item, i) => (
           <div
             key={`${item.title}-${i}`}
             className={cn(
-              "rounded-xl border border-white/[0.05] border-l-[3px] px-4 py-3.5",
+              "rounded-xl border-l-[3px] px-4 py-3.5 ring-1 ring-[var(--border-subtle)]",
               severityStyle[item.severity],
             )}
           >
@@ -293,20 +309,21 @@ export function MissingDataGuidancePanel({ items }: { items: MissingGuidanceView
               <span className="font-medium text-zinc-400">Impact · </span>
               {item.impact}
             </p>
-            <p className="mt-2 text-xs text-teal-400/85">
-              <span className="font-medium text-teal-400/70">Next step · </span>
+            <p className="mt-2 text-xs text-accent">
+              <span className="font-medium text-accent/80">Next step · </span>
               {item.action}
             </p>
           </div>
         ))}
       </div>
-    </PanelChrome>
+    </Panel>
   );
 }
 
 export function CapabilitiesMatrixPanel({ capabilities }: { capabilities: CapabilityItem[] }) {
   return (
-    <PanelChrome title="Intelligence unlock matrix" subdued>
+    <Panel className="h-full">
+      <Eyebrow className="mb-3">Intelligence unlock matrix</Eyebrow>
       <div className="grid gap-2 sm:grid-cols-2">
         {capabilities.map((c) => (
           <div
@@ -314,19 +331,20 @@ export function CapabilitiesMatrixPanel({ capabilities }: { capabilities: Capabi
             className={cn(
               "flex items-center justify-between rounded-lg px-3 py-2.5 text-xs ring-1 ring-inset",
               c.unlocked
-                ? "bg-teal-500/[0.06] text-zinc-300 ring-teal-500/15"
-                : "bg-white/[0.02] text-zinc-600 ring-white/[0.05]",
+                ? "text-zinc-300 ring-accent/20"
+                : "bg-[var(--surface-subdued)] text-zinc-600 ring-[var(--border-subtle)]",
             )}
+            style={c.unlocked ? { background: "var(--home-signal-wash)" } : undefined}
           >
             <span>{c.label}</span>
             {c.unlocked ? (
-              <Check className="h-3.5 w-3.5 text-teal-500/80" />
+              <Check className="h-3.5 w-3.5 text-accent" />
             ) : (
               <span className="text-[10px] text-zinc-600">{c.reason}</span>
             )}
           </div>
         ))}
       </div>
-    </PanelChrome>
+    </Panel>
   );
 }

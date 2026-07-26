@@ -1,18 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
+import { Panel, Eyebrow } from "@/components/console/console-kit";
 import { Button } from "@/components/ui/button";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import type { ConnectedSourceView } from "@/lib/import/viewModels";
 import type { useStravaConnection } from "@/hooks/use-strava-connection";
 import { cn } from "@/lib/utils";
-import { dash } from "@/components/home/primitives/tokens";
 import { Link2, RefreshCw, Unplug, Check, AlertTriangle } from "lucide-react";
 
 const statusStyle = {
-  connected: "text-teal-400 bg-teal-500/10 ring-teal-500/25",
-  disconnected: "text-zinc-500 bg-white/[0.04] ring-white/[0.08]",
+  connected: "text-accent bg-accent/12 ring-accent/25",
+  disconnected: "text-zinc-500 bg-[var(--surface-subdued)] ring-[var(--border-subtle)]",
   partial: "text-amber-400 bg-amber-500/10 ring-amber-500/25",
 };
 
@@ -28,8 +27,9 @@ export function ConnectedSourcesPanel({
   const stravaView = sources.find((s) => s.id === "strava");
 
   return (
-    <PanelChrome title="Connected training sources" accent elevated>
-      <p className={`${dash.muted} mb-4`}>
+    <Panel>
+      <Eyebrow className="mb-3">Connected training sources</Eyebrow>
+      <p className="mb-4 text-[13px] text-muted-foreground">
         API and export sources merge — nothing is replaced without your action.
       </p>
 
@@ -37,7 +37,7 @@ export function ConnectedSourcesPanel({
         {sources.map((source) => (
           <div
             key={source.id}
-            className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
+            className="rounded-xl bg-[var(--surface-subdued)] p-4 ring-1 ring-[var(--border-subtle)]"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -68,7 +68,8 @@ export function ConnectedSourcesPanel({
               ) : source.id === "strava" && !status?.connected ? (
                 <a
                   href="/api/auth/strava/authorize"
-                  className="inline-flex h-8 items-center rounded-lg bg-teal-600 px-3 text-xs font-medium text-zinc-950 hover:bg-teal-500"
+                  className="inline-flex h-8 items-center rounded-lg px-3 text-xs font-medium text-[var(--home-signal-ink)] transition hover:opacity-90"
+                  style={{ background: "var(--home-signal)" }}
                 >
                   <Link2 className="mr-1.5 h-3.5 w-3.5" />
                   Connect
@@ -83,13 +84,15 @@ export function ConnectedSourcesPanel({
                   href="https://www.strava.com/settings/api"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-teal-400/90 hover:text-teal-300"
+                  className="text-accent hover:text-accent/80"
                 >
                   Strava API settings
                 </a>
                 , set <span className="text-zinc-400">Authorization Callback Domain</span> to{" "}
-                <code className="rounded bg-white/[0.06] px-1 text-zinc-300">localhost</code> — no
-                “http://”, no port.
+                <code className="rounded bg-[var(--surface-subdued)] px-1 text-zinc-300">
+                  localhost
+                </code>{" "}
+                — no “http://”, no port.
               </p>
             ) : null}
 
@@ -110,12 +113,14 @@ export function ConnectedSourcesPanel({
 
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
-                <p className={dash.label}>Enabled</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                  Enabled
+                </p>
                 <ul className="mt-1.5 space-y-0.5">
                   {source.enabledCapabilities.length > 0 ? (
                     source.enabledCapabilities.map((c) => (
                       <li key={c} className="flex items-center gap-1.5 text-xs text-zinc-500">
-                        <Check className="h-3 w-3 text-teal-500/70" />
+                        <Check className="h-3 w-3 text-accent" />
                         {c}
                       </li>
                     ))
@@ -125,7 +130,9 @@ export function ConnectedSourcesPanel({
                 </ul>
               </div>
               <div>
-                <p className={dash.label}>Missing</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                  Missing
+                </p>
                 <ul className="mt-1.5 space-y-0.5">
                   {source.missingItems.length > 0 ? (
                     source.missingItems.map((m) => (
@@ -145,7 +152,7 @@ export function ConnectedSourcesPanel({
       </div>
 
       {message ? (
-        <p className="mt-4 rounded-lg bg-white/[0.03] px-3 py-2 text-xs text-zinc-400 ring-1 ring-inset ring-white/[0.05]">
+        <p className="mt-4 rounded-lg bg-[var(--surface-subdued)] px-3 py-2 text-xs text-zinc-400 ring-1 ring-inset ring-[var(--border-subtle)]">
           {message}
         </p>
       ) : null}
@@ -153,12 +160,12 @@ export function ConnectedSourcesPanel({
       {stravaView && status?.connected && (status.runsMissingStreams ?? 0) > 0 ? (
         <p className="mt-3 text-xs text-zinc-600">
           Tip: open any{" "}
-          <Link href="/runs" className="text-teal-400/90 hover:underline">
+          <Link href="/runs" className="text-accent hover:underline">
             run page
           </Link>{" "}
           to fetch streams on demand, or sync again (40 runs per batch).
         </p>
       ) : null}
-    </PanelChrome>
+    </Panel>
   );
 }

@@ -27,10 +27,13 @@ function DemoCallout() {
   const { loadDemo } = useStrava();
   const router = useRouter();
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-teal-400/25 bg-teal-400/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      className="flex flex-col gap-3 rounded-xl p-4 ring-1 ring-inset ring-accent/25 sm:flex-row sm:items-center sm:justify-between"
+      style={{ background: "var(--home-signal-wash)" }}
+    >
       <div>
-        <p className="text-sm font-semibold text-teal-200">No Strava export handy? Try the demo.</p>
-        <p className="mt-0.5 text-xs text-zinc-400">
+        <p className="text-sm font-semibold text-accent">No Strava export handy? Try the demo.</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Loads a full 12-month sample athlete so you can explore every insight instantly — no
           account, database, or API key required.
         </p>
@@ -41,7 +44,8 @@ function DemoCallout() {
           loadDemo();
           router.push("/home");
         }}
-        className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-teal-400 px-5 text-sm font-semibold text-zinc-950 transition hover:bg-teal-300"
+        className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg px-5 text-sm font-semibold text-[var(--home-signal-ink)] transition hover:opacity-90"
+        style={{ background: "var(--home-signal)" }}
       >
         Try the demo
       </button>
