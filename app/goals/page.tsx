@@ -5,7 +5,9 @@ import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
-import { useGoalStore } from "@/stores/goal-store";
+import { format, parseISO } from "date-fns";
+import { useGoalStore, RACE_DISTANCE_LABELS } from "@/stores/goal-store";
+import { isRaceUpcoming } from "@/lib/analytics/readiness";
 import { buildGoalsPageView } from "@/lib/goals/viewModels";
 import { GoalsWorkspace, GoalsIntelRow } from "@/components/goals/goals-workspace";
 import { CompactRaceGoalForm } from "@/components/goals/compact-race-goal-form";
@@ -40,16 +42,20 @@ export default function GoalsPage() {
   const { analytics, insights, loading } = useTrainingIntelligence();
   const { importData, fitDetails } = useStrava();
   const raceGoal = useGoalStore((s) => s.raceGoal);
+  // A lapsed goal is kept but not treated as an active target — mirrors the analytics gate.
+  const raceUpcoming = isRaceUpcoming(raceGoal);
+  const activeRaceGoal = raceUpcoming ? raceGoal : null;
+  const passedRace = raceGoal && !raceUpcoming ? raceGoal : null;
   const readyInsights = insights.filter((i) => i.question === "ready");
   const [showLegacyV1, setShowLegacyV1] = useState(false);
 
   const view = useMemo(() => {
     if (!analytics) return null;
-    return buildGoalsPageView(analytics, raceGoal, readyInsights, {
+    return buildGoalsPageView(analytics, activeRaceGoal, readyInsights, {
       runs: importData?.runs,
       fitDetails,
     });
-  }, [analytics, raceGoal, readyInsights, importData?.runs, fitDetails]);
+  }, [analytics, activeRaceGoal, readyInsights, importData?.runs, fitDetails]);
 
   const trajectoryNarrative = useMemo(() => {
     const item = view?.historical.find((h) => h.label === "Projection trajectory");
@@ -79,7 +85,18 @@ export default function GoalsPage() {
           <GoalsBriefingBar />
           <CompactRaceGoalForm />
 
-          {raceGoal ? <GenerateWeekPlanButton label="Generate next week" /> : null}
+          {passedRace ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-500/25 bg-amber-500/[0.06] px-3.5 py-2.5">
+              <p className="text-[13px] text-amber-100/90">
+                Your {RACE_DISTANCE_LABELS[passedRace.distance].toLowerCase()} on{" "}
+                <span className="font-mono">{format(parseISO(passedRace.date), "d MMM yyyy")}</span>{" "}
+                has passed.
+              </p>
+              <span className="text-xs text-amber-200/70">Set your next goal above ↑</span>
+            </div>
+          ) : null}
+
+          {activeRaceGoal ? <GenerateWeekPlanButton label="Generate next week" /> : null}
 
           {useBriefLayout && view.raceBrief && view.forecastV2 ? (
             <>
@@ -123,8 +140,8 @@ export default function GoalsPage() {
 
           <ReadinessIntelligencePanel dimensions={view.dimensions} readiness={view.readiness} />
 
-          {raceGoal ? (
-            <ExecutionIntelligencePanel raceGoal={raceGoal} analytics={analytics} />
+          {activeRaceGoal ? (
+            <ExecutionIntelligencePanel raceGoal={activeRaceGoal} analytics={analytics} />
           ) : (
             <section className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] px-4 py-8 text-center">
               <p className="text-sm text-zinc-500">
@@ -141,7 +158,7 @@ export default function GoalsPage() {
             <TrajectoryForecastPanel
               timeline={analytics.predictionTimeline}
               narrative={trajectoryNarrative}
-              goalDistance={raceGoal?.distance ?? null}
+              goalDistance={activeRaceGoal?.distance ?? null}
             />
 
             {!useBriefLayout ? (

@@ -5,6 +5,7 @@ import { runGoalProgress } from "./goals";
 import { easyHardSplit, hrZoneDistribution } from "./hrZones";
 import {
   halfMarathonReadiness,
+  isRaceUpcoming,
   raceReadiness,
   type RaceGoal,
   type RaceReadiness,
@@ -193,17 +194,31 @@ export function computeInsights(
   const efficiencyMoM = efficiencyMonthOverMonth(efficiencyPoints);
   const personalRecords = findPersonalRecords(runs, fitDetails);
   const racePredictionAnalysis = buildRacePredictionAnalysis(runs, fitDetails);
-  const raceReadinessResult = raceGoal
-    ? raceReadiness(runs, raceGoal, personalRecords, racePredictionAnalysis)
+  // A race whose date has passed is no longer an active target — treat it as no goal
+  // so taper/race-week/projection logic doesn't stay stuck on a lapsed race (see isRaceUpcoming).
+  const activeRaceGoal = isRaceUpcoming(raceGoal) ? raceGoal : null;
+  const raceReadinessResult = activeRaceGoal
+    ? raceReadiness(runs, activeRaceGoal, personalRecords, racePredictionAnalysis)
     : null;
   const workoutLabels = classifyAllRuns(runs, fitDetails, athleteMaxHr);
   const workoutTypeMix = workoutTypeDistribution(workoutLabels, 56);
-  const trainingEcosystem = computeTrainingEcosystem(data, workoutLabels, dataConfidence, raceGoal);
+  const trainingEcosystem = computeTrainingEcosystem(
+    data,
+    workoutLabels,
+    dataConfidence,
+    activeRaceGoal,
+  );
   const weeks = weeklyVolume(runs);
   const hmReadiness = halfMarathonReadiness(runs);
 
-  const raceStrategyResult = raceGoal
-    ? simulateRaceStrategy(raceGoal, racePredictionAnalysis, fatigue, raceReadinessResult, "even")
+  const raceStrategyResult = activeRaceGoal
+    ? simulateRaceStrategy(
+        activeRaceGoal,
+        racePredictionAnalysis,
+        fatigue,
+        raceReadinessResult,
+        "even",
+      )
     : null;
 
   const physiology = computePhysiology(runs, fitDetails, { workoutLabels, athleteMaxHr });
@@ -216,7 +231,7 @@ export function computeInsights(
       fitnessIndex: fitnessIndexPoints,
       predictionTimeline,
     },
-    raceGoal,
+    activeRaceGoal,
   );
   const progressionBurndown = computeProgressionBurndown(
     {
@@ -224,7 +239,7 @@ export function computeInsights(
       recentLongRunsKm: recentLongRunsKm(runs, workoutLabels),
       weeklyVolumeKm: weeks.map((w) => w.distanceKm),
     },
-    raceGoal,
+    activeRaceGoal,
   );
   const personalZScores = computePersonalZScores(runs, workoutLabels);
   const anomalies = computeAnomalies(runs, personalZScores);
