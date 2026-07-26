@@ -385,7 +385,7 @@ html.light .intelligence-evolution {
 
 html.light .route-terminal {
   background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(20, 184, 166, 0.06), transparent 55%), #f4f4f5;
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(217, 93, 36, 0.06), transparent 55%), #f4f4f5;
 }
 
 html.light .route-scrubber {
@@ -669,7 +669,7 @@ html.coach-route .coach-message-column {
 /* Route intelligence replay */
 .route-terminal {
   background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(20, 184, 166, 0.05), transparent 55%), #09090b;
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(240, 134, 74, 0.05), transparent 55%), #09090b;
   min-height: calc(100dvh - 8rem);
 }
 
