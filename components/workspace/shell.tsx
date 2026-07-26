@@ -48,7 +48,7 @@ function WorkspaceMeta() {
   return (
     <div className="hidden items-center gap-2 text-xs text-zinc-500 xl:flex">
       {isDemo ? (
-        <span className="rounded-full border border-teal-400/30 bg-teal-400/10 px-2 py-0.5 font-medium text-teal-300">
+        <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-medium text-accent">
           Demo
         </span>
       ) : null}
@@ -92,7 +92,7 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 shrink-0 border-b border-[var(--border-subtle)] bg-[var(--header-bg)] backdrop-blur-xl">
         <WorkspaceFrame className="flex h-[var(--app-nav-height)] items-center gap-3 sm:gap-5">
           <Link href="/home" className="type-title shrink-0 text-[1.0625rem] tracking-[-0.03em]">
-            Stride<span className="text-teal-400">IQ</span>
+            Stride<span className="text-accent">IQ</span>
           </Link>
           <Nav variant="app" className="min-w-0 flex-1" />
           <button
@@ -114,7 +114,7 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
             className={cn(
               "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors",
               pathname === "/settings" || pathname.startsWith("/settings/")
-                ? "bg-teal-500/12 text-teal-300"
+                ? "bg-accent/12 text-accent"
                 : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
             )}
           >

@@ -60,7 +60,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
             className={cn(
               "h-auto shrink-0 gap-1.5 px-2.5 py-1.5 text-xs font-medium",
               advancedActive
-                ? "bg-teal-500/12 text-teal-300 hover:bg-teal-500/12 hover:text-teal-300"
+                ? "bg-accent/12 text-accent hover:bg-accent/12 hover:text-accent"
                 : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
             )}
           />
@@ -85,7 +85,7 @@ function AdvancedMenu({ pathname }: { pathname: string }) {
                 href={href}
                 className={cn(
                   "flex w-full items-center gap-2",
-                  isActive(pathname, href) ? "text-teal-300" : "text-zinc-300",
+                  isActive(pathname, href) ? "text-accent" : "text-zinc-300",
                 )}
               />
             }
@@ -117,8 +117,8 @@ export function Nav({
       "type-nav inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 transition-colors",
       isActive(pathname, href)
         ? prominent
-          ? "bg-teal-500/15 text-teal-300"
-          : "bg-teal-500/12 text-teal-300"
+          ? "bg-accent/15 text-accent"
+          : "bg-accent/12 text-accent"
         : prominent
           ? "text-zinc-300 hover:bg-white/[0.04] hover:text-zinc-100"
           : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-200",
@@ -156,7 +156,7 @@ export function Nav({
             className={cn(
               "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive(pathname, href)
-                ? "bg-teal-500/15 text-teal-300"
+                ? "bg-accent/15 text-accent"
                 : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200",
             )}
           >
