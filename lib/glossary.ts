@@ -26,6 +26,11 @@ export const GLOSSARY = {
     definition:
       "Chronic Training Load — a rolling estimate of the fitness you've built from training volume and intensity over recent weeks.",
   },
+  atl: {
+    label: "ATL",
+    definition:
+      "Acute Training Load: the fatigue from your most recent training, the tiring side of the fitness and freshness balance.",
+  },
   tsb: {
     label: "TSB",
     definition:

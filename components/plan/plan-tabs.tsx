@@ -2,11 +2,16 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { CalendarRange, Target } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { SegmentedControl, type SegmentedItem } from "@/components/ui/segmented-control";
 import { PlanWorkspace } from "./plan-workspace";
 import { RaceGoalWorkspace } from "@/components/goals/race-goal-workspace";
 
 type PlanTab = "week" | "goal";
+
+const TABS: SegmentedItem<PlanTab>[] = [
+  { value: "week", label: "This week", icon: CalendarRange },
+  { value: "goal", label: "Race goal", icon: Target },
+];
 
 // Tab state lives in the URL (?tab=goal) so /goals redirects, Home tiles, and
 // deep links all land on the right view. Panels render conditionally — base-ui
@@ -22,50 +27,8 @@ export function PlanTabs() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-4">
-      <div
-        className="flex w-fit rounded-lg border border-[var(--border-subtle)] p-0.5"
-        role="tablist"
-        aria-label="Plan view"
-      >
-        <TabButton active={tab === "week"} onClick={() => setTab("week")} icon={CalendarRange}>
-          This week
-        </TabButton>
-        <TabButton active={tab === "goal"} onClick={() => setTab("goal")} icon={Target}>
-          Race goal
-        </TabButton>
-      </div>
-
+      <SegmentedControl items={TABS} value={tab} onChange={setTab} ariaLabel="Plan view" />
       {tab === "week" ? <PlanWorkspace /> : <RaceGoalWorkspace />}
     </div>
-  );
-}
-
-function TabButton({
-  active,
-  onClick,
-  icon: Icon,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: typeof CalendarRange;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors",
-        active
-          ? "bg-teal-500/15 text-teal-200"
-          : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300",
-      )}
-    >
-      <Icon className="h-3.5 w-3.5" />
-      {children}
-    </button>
   );
 }

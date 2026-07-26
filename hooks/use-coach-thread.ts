@@ -220,6 +220,12 @@ export function useCoachThread(disabled?: boolean) {
         persist(final, threadId);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Chat failed");
+        // Roll back the optimistic user message and restore the text so the
+        // question isn't lost — the user (or the Try again button) can resend
+        // cleanly without a duplicate turn.
+        setMessages(messages);
+        setInput(trimmed);
+        persist(messages, threadId);
       } finally {
         setLoading(false);
         setPendingTools([]);

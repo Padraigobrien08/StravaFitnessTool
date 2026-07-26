@@ -10,6 +10,7 @@ import { CoachComposer } from "./coach-composer";
 import { CoachAnalysisLoader } from "./coach-analysis-loader";
 import { CoachThreadStarter } from "./coach-thread-starter";
 import Link from "next/link";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 import { intelligenceUrl } from "@/lib/coach/domainLinks";
 
 function pairMessages(messages: CoachMessage[]) {
@@ -129,7 +130,35 @@ export function CoachReasoningPanel({
               </div>
             ) : null}
 
-            {error ? <p className="mt-6 text-sm text-red-400/90">{error}</p> : null}
+            {error && !loading ? (
+              <div
+                role="alert"
+                className="mt-6 flex flex-wrap items-start justify-between gap-2 rounded-lg border border-amber-500/25 bg-amber-500/[0.06] px-3 py-2.5"
+              >
+                <div className="flex min-w-0 items-start gap-2">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-400/90" />
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-medium text-amber-200/90">
+                      Coach couldn&apos;t finish that response.
+                    </p>
+                    <p className="mt-0.5 break-words text-[11px] text-zinc-500">
+                      Your question is still in the box. Try again in a moment. ({error})
+                    </p>
+                  </div>
+                </div>
+                {input.trim() ? (
+                  <button
+                    type="button"
+                    onClick={() => onSend(input)}
+                    disabled={disabled}
+                    className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border border-white/10 px-2.5 text-[11px] font-medium text-zinc-200 transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Try again
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
 
             <p className="mt-8 pb-2 text-[11px] text-zinc-700">
               <Link href={intelligenceUrl()} className="text-zinc-600 hover:text-zinc-400">

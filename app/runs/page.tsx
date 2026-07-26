@@ -13,9 +13,15 @@ import { NotableSessionsFeed } from "@/components/runs/notable-sessions-feed";
 import { SessionIntelligencePanel } from "@/components/runs/session-intelligence-panel";
 import { RunsDataQualityPanel } from "@/components/runs/runs-data-quality-panel";
 import { ActivityContextPanel } from "@/components/runs/activity-context-panel";
-import { cn } from "@/lib/utils";
+import { SegmentedControl, type SegmentedItem } from "@/components/ui/segmented-control";
 
 type ViewMode = "explorer" | "intelligence" | "context";
+
+const VIEW_MODES: SegmentedItem<ViewMode>[] = [
+  { value: "intelligence", label: "Session intelligence" },
+  { value: "explorer", label: "Activity explorer" },
+  { value: "context", label: "Activity mix" },
+];
 
 export default function RunsPage() {
   const {
@@ -59,17 +65,12 @@ export default function RunsPage() {
                 {dataSourceLabel ? ` · ${dataSourceLabel}` : ""}
               </p>
             </div>
-            <div className="flex rounded-lg border border-white/[0.06] p-0.5">
-              <ModeButton active={mode === "intelligence"} onClick={() => setMode("intelligence")}>
-                Session intelligence
-              </ModeButton>
-              <ModeButton active={mode === "explorer"} onClick={() => setMode("explorer")}>
-                Activity explorer
-              </ModeButton>
-              <ModeButton active={mode === "context"} onClick={() => setMode("context")}>
-                Activity mix
-              </ModeButton>
-            </div>
+            <SegmentedControl
+              items={VIEW_MODES}
+              value={mode}
+              onChange={setMode}
+              ariaLabel="Activities view"
+            />
           </header>
 
           <div className="space-y-3">
@@ -109,28 +110,5 @@ export default function RunsPage() {
         </RunsWorkspace>
       )}
     </RequireData>
-  );
-}
-
-function ModeButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors",
-        active ? "bg-teal-500/15 text-teal-200" : "text-zinc-500 hover:text-zinc-300",
-      )}
-    >
-      {children}
-    </button>
   );
 }

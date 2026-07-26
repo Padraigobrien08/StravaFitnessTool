@@ -4,6 +4,7 @@ import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { LoadIntelligenceChart } from "./charts/load-intelligence-chart";
 import type { LoadIntelligenceView } from "@/lib/training/viewModels";
 import { dash } from "@/components/home/primitives/tokens";
+import { JargonTerm } from "@/components/jargon-term";
 import { cn } from "@/lib/utils";
 
 const labelColor: Record<string, string> = {
@@ -37,7 +38,7 @@ export function LoadIntelligencePanel({
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.04] pb-4">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-            Freshness
+            <JargonTerm term="freshness">Freshness</JargonTerm>
           </p>
           <p className="font-display text-3xl font-bold tabular-nums text-white sm:text-4xl">
             {data.freshness}
@@ -54,15 +55,21 @@ export function LoadIntelligencePanel({
         </div>
         <dl className="flex gap-6 text-xs tabular-nums text-zinc-500">
           <div>
-            <dt className={dash.label}>CTL</dt>
+            <dt className={dash.label}>
+              <JargonTerm term="ctl">CTL</JargonTerm>
+            </dt>
             <dd className="mt-0.5 font-semibold text-zinc-300">{data.ctl}</dd>
           </div>
           <div>
-            <dt className={dash.label}>ATL</dt>
+            <dt className={dash.label}>
+              <JargonTerm term="atl">ATL</JargonTerm>
+            </dt>
             <dd className="mt-0.5 font-semibold text-zinc-300">{data.atl}</dd>
           </div>
           <div>
-            <dt className={dash.label}>TSB</dt>
+            <dt className={dash.label}>
+              <JargonTerm term="tsb">TSB</JargonTerm>
+            </dt>
             <dd
               className={cn(
                 "mt-0.5 font-semibold",
