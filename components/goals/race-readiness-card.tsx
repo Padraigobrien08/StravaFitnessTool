@@ -18,7 +18,7 @@ export function RaceReadinessCard({
   confidence?: InsightConfidence;
 }) {
   return (
-    <Card className="border-teal-500/20 lg:col-span-2">
+    <Card className="border-accent/20 lg:col-span-2">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
         <CardTitle>{readiness.distanceLabel} readiness</CardTitle>
         <ConfidenceBadge level={confidence} />
@@ -26,7 +26,7 @@ export function RaceReadinessCard({
       <CardContent className="space-y-4">
         <div className="flex flex-wrap items-end gap-6">
           <div>
-            <p className="font-display text-5xl font-bold text-teal-400 tabular-nums">
+            <p className="font-display text-5xl font-bold text-accent tabular-nums">
               {readiness.score}
               <span className="text-lg text-zinc-500"> / 100</span>
             </p>
@@ -96,7 +96,7 @@ export function RaceReadinessCard({
             </ul>
           </div>
         ) : (
-          <p className="text-sm text-teal-400/90">
+          <p className="text-sm text-accent/90">
             No major gaps — keep tapering and staying healthy before race day.
           </p>
         )}

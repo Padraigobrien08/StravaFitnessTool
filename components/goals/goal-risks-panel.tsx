@@ -40,8 +40,8 @@ export function GoalRisksPanel({ risks }: { risks: GoalRiskView[] }) {
               <span className="font-medium text-zinc-400">Evidence · </span>
               {risk.evidence}
             </p>
-            <p className="mt-2 text-xs text-teal-400/85">
-              <span className="font-medium text-teal-400/70">Mitigation · </span>
+            <p className="mt-2 text-xs text-accent/85">
+              <span className="font-medium text-accent/70">Mitigation · </span>
               {risk.mitigation}
             </p>
           </div>

@@ -7,7 +7,7 @@ import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 
 const levelColor = {
-  strong: "bg-teal-500/50",
+  strong: "bg-accent/50",
   moderate: "bg-amber-500/45",
   weak: "bg-red-500/40",
 };

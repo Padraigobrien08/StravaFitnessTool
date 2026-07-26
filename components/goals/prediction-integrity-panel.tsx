@@ -19,7 +19,7 @@ export function PredictionIntegrityPanel({ projection }: { projection: RaceProje
       </div>
 
       {projection.primary ? (
-        <div className="mb-5 rounded-lg border border-teal-500/15 bg-teal-500/[0.05] px-4 py-3">
+        <div className="mb-5 rounded-lg border border-accent/15 bg-accent/[0.05] px-4 py-3">
           <p className={dash.label}>{projection.primary.label} corridor</p>
           <p className="font-display text-2xl font-bold tabular-nums text-white">
             {projection.primary.timeDisplay}
@@ -37,7 +37,7 @@ export function PredictionIntegrityPanel({ projection }: { projection: RaceProje
           <ul className="mt-2 space-y-1 text-xs text-zinc-500">
             {projection.confidenceDrivers.map((line, i) => (
               <li key={i} className="flex gap-2">
-                <span className="text-teal-500/60">✓</span>
+                <span className="text-accent/60">✓</span>
                 {line}
               </li>
             ))}

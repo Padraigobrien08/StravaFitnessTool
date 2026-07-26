@@ -71,7 +71,7 @@ export function CompactRaceGoalForm() {
         <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
           Race mission setup
           {raceGoal ? (
-            <span className="ml-2 font-normal normal-case text-teal-400/80">
+            <span className="ml-2 font-normal normal-case text-accent/80">
               {RACE_DISTANCE_LABELS[raceGoal.distance]} ·{" "}
               {new Date(raceGoal.date).toLocaleDateString()}
             </span>

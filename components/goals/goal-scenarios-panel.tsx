@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 function probColor(pct: number | null): string {
   if (pct == null) return "text-zinc-500";
-  if (pct >= 70) return "text-teal-400/90";
+  if (pct >= 70) return "text-accent/90";
   if (pct >= 45) return "text-amber-400/85";
   return "text-rose-400/85";
 }
@@ -49,7 +49,7 @@ export function GoalScenariosPanel({ scenarios }: { scenarios: GoalScenarioResul
               className={cn(
                 "rounded-lg border p-3",
                 s.meetsTarget
-                  ? "border-teal-500/25 bg-teal-500/[0.04]"
+                  ? "border-accent/25 bg-accent/[0.04]"
                   : "border-white/[0.06] bg-white/[0.01]",
               )}
             >

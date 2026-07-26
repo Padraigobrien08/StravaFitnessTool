@@ -181,15 +181,15 @@ export default function GoalsPage() {
           </CollapsibleSection>
 
           <p className="text-center text-xs text-zinc-600">
-            <Link href="/performance" className="text-teal-400/90 hover:underline">
+            <Link href="/performance" className="text-accent/90 hover:underline">
               View all records & PR timeline →
             </Link>
             {" · "}
-            <Link href="/performance" className="text-teal-400/90 hover:underline">
+            <Link href="/performance" className="text-accent/90 hover:underline">
               Performance intelligence →
             </Link>
             {" · "}
-            <Link href="/coach" className="text-teal-400/90 hover:underline">
+            <Link href="/coach" className="text-accent/90 hover:underline">
               Coach →
             </Link>
           </p>

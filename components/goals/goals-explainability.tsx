@@ -32,7 +32,7 @@ export function GoalsExplainability({
             <ul className="mt-2 space-y-1 text-xs leading-relaxed text-zinc-500">
               {data.basedOn.map((line, i) => (
                 <li key={i} className="flex gap-2">
-                  <span className="text-teal-500/60">✓</span>
+                  <span className="text-accent/60">✓</span>
                   {line}
                 </li>
               ))}

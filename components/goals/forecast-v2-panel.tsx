@@ -6,7 +6,7 @@ import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
 import { cn, formatDuration } from "@/lib/utils";
 
 const effectStyle = {
-  improves: "text-teal-400/90",
+  improves: "text-accent/90",
   weakens: "text-amber-400/85",
   neutral: "text-zinc-500",
 };
@@ -51,7 +51,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
               <p
                 className={cn(
                   "text-sm font-medium",
-                  forecast.targetRealistic ? "text-teal-400/90" : "text-amber-400/85",
+                  forecast.targetRealistic ? "text-accent/90" : "text-amber-400/85",
                 )}
               >
                 {forecast.targetGapDisplay}
@@ -91,7 +91,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                       : delta > 0
                         ? "text-amber-400/85"
                         : delta < 0
-                          ? "text-teal-400/90"
+                          ? "text-accent/90"
                           : "text-zinc-500",
                   )}
                 >
@@ -129,7 +129,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                         <div
                           className={cn(
                             "absolute top-0 h-full rounded",
-                            faster ? "bg-teal-500/55" : "bg-amber-500/55",
+                            faster ? "bg-accent/55" : "bg-amber-500/55",
                           )}
                           style={{ width: `${pct}%` }}
                         />
@@ -140,7 +140,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                           s.direction === "none"
                             ? "text-zinc-600"
                             : faster
-                              ? "text-teal-400/90"
+                              ? "text-accent/90"
                               : "text-amber-400/85",
                         )}
                       >
@@ -193,7 +193,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                 <li key={c.label} className="flex gap-2">
                   <span
                     className={cn(
-                      "mt-1.5 h-1.5 shrink-0 rounded-full bg-teal-500/70",
+                      "mt-1.5 h-1.5 shrink-0 rounded-full bg-accent/70",
                       magnitudeDot[c.magnitude as keyof typeof magnitudeDot] ?? "w-1.5",
                     )}
                   />
@@ -330,7 +330,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
           </ul>
         </>
         {forecast.targetPath ? (
-          <p className="mt-4 text-sm text-teal-400/85">{forecast.targetPath}</p>
+          <p className="mt-4 text-sm text-accent/85">{forecast.targetPath}</p>
         ) : null}
         <p className="mt-4 text-xs leading-relaxed text-zinc-600">{forecast.recommendation}</p>
         {forecast.limitations.length > 0 ? (

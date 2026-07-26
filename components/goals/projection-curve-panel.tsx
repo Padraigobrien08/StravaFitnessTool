@@ -38,7 +38,7 @@ export function ProjectionCurvePanel({
 
       {primary ? (
         <div className="mb-4 flex flex-wrap gap-3 text-xs">
-          <span className="rounded-md bg-teal-500/10 px-2.5 py-1 text-teal-300/90 ring-1 ring-inset ring-teal-500/20">
+          <span className="rounded-md bg-accent/10 px-2.5 py-1 text-accent/90 ring-1 ring-inset ring-accent/20">
             Target corridor · {primary.timeDisplay} {primary.spreadDisplay}
           </span>
           <span className="rounded-md bg-white/[0.04] px-2.5 py-1 text-zinc-500 ring-1 ring-inset ring-white/[0.06]">

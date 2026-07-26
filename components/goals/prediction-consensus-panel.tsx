@@ -7,7 +7,7 @@ import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 
 const agreementStyle = {
-  tight: { bar: "bg-teal-500/55", label: "Tight cluster", text: "text-teal-400/90" },
+  tight: { bar: "bg-accent/55", label: "Tight cluster", text: "text-accent/90" },
   moderate: { bar: "bg-amber-500/45", label: "Moderate spread", text: "text-amber-400/85" },
   wide: { bar: "bg-red-500/35", label: "Wide disagreement", text: "text-red-400/80" },
 };

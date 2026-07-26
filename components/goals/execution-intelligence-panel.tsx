@@ -28,7 +28,7 @@ const MODES: { id: StrategyMode; label: string; desc: string }[] = [
 ];
 
 const fadeColor = {
-  low: "text-teal-400",
+  low: "text-accent",
   medium: "text-amber-400",
   high: "text-red-400",
 };
@@ -99,7 +99,7 @@ export function ExecutionIntelligencePanel({
             className={cn(
               "rounded-xl border px-3 py-2.5 text-left transition-colors",
               mode === m.id
-                ? "border-teal-500/35 bg-teal-500/10"
+                ? "border-accent/35 bg-accent/10"
                 : "border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04]",
             )}
           >
@@ -169,7 +169,7 @@ export function ExecutionIntelligencePanel({
                   {formatDuration(s.cumulativeSec)}
                 </td>
                 <td className="px-3 py-2 tabular-nums">{formatDuration(s.segmentSec)}</td>
-                <td className="px-3 py-2 tabular-nums text-teal-300/90">
+                <td className="px-3 py-2 tabular-nums text-accent/90">
                   {formatPace(s.paceSecPerKm)}
                 </td>
               </tr>
