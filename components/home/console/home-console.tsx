@@ -7,6 +7,22 @@ import { ArrowRight, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { coachUrl, topicCoachLink } from "@/lib/coach/domainLinks";
+import {
+  DecisionColumn,
+  Eyebrow,
+  formatDuration,
+  LoadRow,
+  Meter,
+  Panel,
+  PanelHeader,
+  ProgressBar,
+  Readout,
+  Sparkline,
+  StatItem,
+  verdictTone,
+  ZONE_COLOR,
+  ZoneLegend,
+} from "@/components/console/console-kit";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { HomeOperatingSystemView } from "@/lib/home/operatingSystemView";
 import type {
@@ -16,9 +32,8 @@ import type {
 } from "@/lib/training-calendar";
 
 /* ----------------------------------------------------------------------------
- * Home console — "instrument" direction.
+ * Home console — "instrument" direction, composed from components/console kit.
  * Wired to real data only (analytics + operating-system view + saved week).
- * Effort colours mirror CalendarIntensity via the --hz-* tokens in globals.css.
  * -------------------------------------------------------------------------- */
 
 const CONSENSUS_LABEL: Record<string, string> = {
@@ -27,45 +42,6 @@ const CONSENSUS_LABEL: Record<string, string> = {
   hm: "Half Marathon",
   marathon: "Marathon",
 };
-
-const ZONE_COLOR: Record<CalendarIntensity, string> = {
-  easy: "var(--hz-easy)",
-  recovery: "var(--hz-recovery)",
-  moderate: "var(--hz-moderate)",
-  hard: "var(--hz-hard)",
-  rest: "var(--hz-rest)",
-};
-
-const ZONE_LEGEND: { key: CalendarIntensity; label: string }[] = [
-  { key: "easy", label: "Easy" },
-  { key: "recovery", label: "Recovery" },
-  { key: "moderate", label: "Moderate" },
-  { key: "hard", label: "Hard" },
-  { key: "rest", label: "Rest" },
-];
-
-function verdictTone(label: string): { color: string; wash: string } {
-  const l = label.toLowerCase();
-  if (l.includes("fresh"))
-    return {
-      color: "var(--home-good)",
-      wash: "color-mix(in srgb, var(--home-good) 12%, transparent)",
-    };
-  if (l.includes("fatigued"))
-    return {
-      color: "var(--home-redline)",
-      wash: "color-mix(in srgb, var(--home-redline) 12%, transparent)",
-    };
-  return { color: "var(--home-signal)", wash: "var(--home-signal-wash)" };
-}
-
-function formatDuration(sec: number): string {
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = Math.round(sec % 60);
-  if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
 
 function findTodayWorkout(week: TrainingCalendarWeek | null): CalendarWorkout | null {
   if (!week) return null;
@@ -138,11 +114,32 @@ export function HomeConsole({
         <ChangeFeed items={vm.changeFeed} />
       </div>
 
-      <DecisionSupport
-        risks={vm.risks.map((r) => r.text)}
-        opportunities={vm.opportunities.map((o) => o.text)}
-        primaryActionBullets={vm.primaryActionBullets}
-      />
+      <Panel>
+        <Eyebrow className="mb-3">Decision support</Eyebrow>
+        <div className="grid gap-2.5 lg:grid-cols-3">
+          <DecisionColumn
+            title="Risks"
+            items={vm.risks.map((r) => r.text)}
+            color="var(--hz-moderate)"
+            href={topicCoachLink(
+              "intensity-stacking",
+              "What risks should I address in my current training?",
+            )}
+          />
+          <DecisionColumn
+            title="Opportunities"
+            items={vm.opportunities.map((o) => o.text)}
+            color="var(--home-good)"
+            href={topicCoachLink("opportunities", "Which opportunities should I act on this week?")}
+          />
+          <DecisionColumn
+            title="Primary action"
+            items={vm.primaryActionBullets}
+            color="var(--home-signal)"
+            href={topicCoachLink("recommendation", vm.primaryActionBullets[0] ?? "")}
+          />
+        </div>
+      </Panel>
 
       <p className="border-t border-[var(--border-subtle)] pt-3 text-[10px] text-zinc-600">
         {dataSourceLabel ? `${dataSourceLabel} · ` : ""}
@@ -156,43 +153,6 @@ export function HomeConsole({
         </Link>
       </p>
     </div>
-  );
-}
-
-/* ---------------------------------- Panel shell --------------------------- */
-
-function Panel({
-  children,
-  className,
-  bare,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  bare?: boolean;
-}) {
-  return (
-    <section
-      className={cn(
-        "rounded-xl bg-[var(--surface-elevated)] shadow-[var(--surface-shadow)] ring-1 ring-[var(--border-subtle)]",
-        !bare && "p-4 sm:p-5",
-        className,
-      )}
-    >
-      {children}
-    </section>
-  );
-}
-
-function Eyebrow({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <p
-      className={cn(
-        "text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500",
-        className,
-      )}
-    >
-      {children}
-    </p>
   );
 }
 
@@ -222,15 +182,15 @@ function StatusBar({
 
       <div className="flex-1" />
 
-      <StatusItem label="Today" value={format(new Date(), "EEE · d MMM")} />
+      <StatItem label="Today" value={format(new Date(), "EEE · d MMM")} />
       {hero.raceName && hero.daysUntilRace != null ? (
-        <StatusItem
+        <StatItem
           label={hero.raceName}
           value={`${hero.daysUntilRace} day${hero.daysUntilRace === 1 ? "" : "s"} out`}
           hot={hero.daysUntilRace <= 21}
         />
       ) : null}
-      <StatusItem label="Confidence" value={confidence} />
+      <StatItem label="Confidence" value={confidence} />
 
       <button
         type="button"
@@ -252,22 +212,6 @@ function StatusBar({
           </>
         )}
       </button>
-    </div>
-  );
-}
-
-function StatusItem({ label, value, hot }: { label: string; value: string; hot?: boolean }) {
-  return (
-    <div className="flex flex-col">
-      <span className="text-[9px] uppercase tracking-[0.14em] text-zinc-500">{label}</span>
-      <span
-        className={cn(
-          "font-mono text-[13px] tabular-nums",
-          hot ? "text-[var(--home-signal)]" : "text-foreground",
-        )}
-      >
-        {value}
-      </span>
     </div>
   );
 }
@@ -355,14 +299,11 @@ function TheCall({
             {typeLabel}
           </p>
           {readoutValue ? (
-            <p className="mt-1.5 font-mono text-[clamp(32px,6vw,52px)] font-bold leading-none tracking-tight tabular-nums text-foreground">
-              {readoutValue}
-              {readoutUnit ? (
-                <span className="ml-1 text-[0.4em] font-medium tracking-normal text-zinc-500">
-                  {readoutUnit}
-                </span>
-              ) : null}
-            </p>
+            <Readout
+              value={readoutValue}
+              unit={readoutUnit}
+              className="mt-1.5 text-[clamp(32px,6vw,52px)]"
+            />
           ) : (
             <p className="mt-1.5 font-display text-2xl font-semibold leading-tight tracking-tight text-foreground">
               {sessionTitle}
@@ -428,8 +369,7 @@ function Readiness({
 }) {
   const { fatigue, summary } = analytics;
   // High freshness = fresh (left, good); low = fatigued (right, redline).
-  const needlePct = Math.min(100, Math.max(0, 100 - hero.freshness));
-  const activeBand = fatigue.label.toLowerCase();
+  const needlePct = 100 - hero.freshness;
 
   return (
     <Panel>
@@ -442,34 +382,7 @@ function Readiness({
       </div>
 
       <div className="mb-4">
-        <div
-          className="relative h-2.5 rounded-full"
-          style={{
-            background:
-              "linear-gradient(90deg, var(--home-good), var(--hz-moderate) 55%, var(--home-redline))",
-            opacity: 0.9,
-          }}
-        >
-          <span
-            className="absolute -top-1 h-4.5 w-[3px] rounded-sm bg-foreground"
-            style={{
-              left: `calc(${needlePct}% - 1.5px)`,
-              boxShadow: "0 0 0 2px var(--surface-elevated)",
-            }}
-          />
-        </div>
-        <div className="mt-2 flex justify-between font-mono text-[10px]">
-          {["Fresh", "Neutral", "Fatigued"].map((b) => (
-            <span
-              key={b}
-              className={cn(
-                activeBand === b.toLowerCase() ? "font-semibold text-foreground" : "text-zinc-500",
-              )}
-            >
-              {b}
-            </span>
-          ))}
-        </div>
+        <Meter pct={needlePct} labels={["Fresh", "Neutral", "Fatigued"]} active={fatigue.label} />
       </div>
 
       <div className="divide-y divide-[var(--border-subtle)]">
@@ -490,18 +403,6 @@ function Readiness({
         <p className="mt-3 text-[11px] leading-snug text-zinc-500">{fatigue.evidence[0]}</p>
       ) : null}
     </Panel>
-  );
-}
-
-function LoadRow({ k, v, sub }: { k: string; v: string; sub?: string }) {
-  return (
-    <div className="flex items-baseline justify-between py-2">
-      <span className="text-[13px] text-muted-foreground">{k}</span>
-      <span className="font-mono text-[15px] tabular-nums text-foreground">
-        {v}
-        {sub ? <span className="ml-1.5 text-[11px] text-zinc-500">{sub}</span> : null}
-      </span>
-    </div>
   );
 }
 
@@ -549,22 +450,20 @@ function WeekStrip({
 
   return (
     <Panel>
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <Eyebrow>
-          This week
-          {savedWeek?.totalRunDistanceKm != null ? (
-            <span className="ml-2 font-mono text-zinc-400">
-              {savedWeek.totalRunDistanceKm.toFixed(0)} km
-            </span>
-          ) : null}
-        </Eyebrow>
-        <Link
-          href="/plan"
-          className="inline-flex items-center gap-0.5 font-mono text-[11px] text-zinc-500 hover:text-[var(--home-signal)]"
-        >
-          Open plan <ArrowRight className="h-3 w-3" />
-        </Link>
-      </div>
+      <PanelHeader
+        title={
+          <>
+            This week
+            {savedWeek?.totalRunDistanceKm != null ? (
+              <span className="ml-2 font-mono text-zinc-400">
+                {savedWeek.totalRunDistanceKm.toFixed(0)} km
+              </span>
+            ) : null}
+          </>
+        }
+        href="/plan"
+        action="Open plan"
+      />
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
         {workouts.map((w) => {
@@ -622,17 +521,7 @@ function WeekStrip({
         })}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-        {ZONE_LEGEND.map((z) => (
-          <span
-            key={z.key}
-            className="inline-flex items-center gap-1.5 font-mono text-[10px] text-zinc-500"
-          >
-            <span className="h-1 w-4 rounded-full" style={{ background: ZONE_COLOR[z.key] }} />
-            {z.label}
-          </span>
-        ))}
-      </div>
+      <ZoneLegend className="mt-3" />
     </Panel>
   );
 }
@@ -666,21 +555,15 @@ function Trajectory({
 
   return (
     <Panel>
-      <div className="mb-3 flex items-center justify-between">
-        <Eyebrow>{rr ? `Projected finish · ${rr.distanceLabel}` : "Fitness trajectory"}</Eyebrow>
-        <Link
-          href="/goals"
-          className="inline-flex items-center gap-0.5 font-mono text-[11px] text-zinc-500 hover:text-[var(--home-signal)]"
-        >
-          {rr ? "Race view" : "Set a race"} <ArrowRight className="h-3 w-3" />
-        </Link>
-      </div>
+      <PanelHeader
+        title={rr ? `Projected finish · ${rr.distanceLabel}` : "Fitness trajectory"}
+        href="/goals"
+        action={rr ? "Race view" : "Set a race"}
+      />
 
       {rr && projectedSec != null ? (
         <div className="flex items-end gap-4">
-          <span className="font-mono text-[clamp(28px,5vw,44px)] font-bold leading-none tracking-tight tabular-nums text-foreground">
-            {formatDuration(projectedSec)}
-          </span>
+          <Readout value={formatDuration(projectedSec)} className="text-[clamp(28px,5vw,44px)]" />
           {deltaSec != null ? (
             <span
               className="mb-1.5 font-mono text-[13px]"
@@ -728,62 +611,8 @@ function Trajectory({
         </div>
       ) : null}
 
-      {rr && projectedSec != null ? (
-        <div className="mt-4 flex items-center gap-3">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-zinc-500">
-            Confidence
-          </span>
-          <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--surface-subdued)] ring-1 ring-[var(--border-subtle)]">
-            <span
-              className="block h-full rounded-full"
-              style={{ width: `${confPct}%`, background: "var(--home-signal)" }}
-            />
-          </span>
-          <span className="font-mono text-[12px] tabular-nums text-muted-foreground">
-            {confPct}%
-          </span>
-        </div>
-      ) : null}
+      {rr && projectedSec != null ? <ProgressBar pct={confPct} className="mt-4" /> : null}
     </Panel>
-  );
-}
-
-function Sparkline({ values }: { values: number[] }) {
-  const w = 300;
-  const h = 48;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const span = max - min || 1;
-  const pts = values.map((v, i) => {
-    const x = (i / (values.length - 1)) * w;
-    const y = h - ((v - min) / span) * (h - 6) - 3;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-  const line = `M${pts.join(" L")}`;
-  const area = `${line} L${w},${h} L0,${h} Z`;
-  return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      width="100%"
-      height={h}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="ctlFade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="var(--home-signal)" stopOpacity="0.25" />
-          <stop offset="1" stopColor="var(--home-signal)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={area} fill="url(#ctlFade)" />
-      <path
-        d={line}
-        fill="none"
-        stroke="var(--home-signal)"
-        strokeWidth="2"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
   );
 }
 
@@ -815,88 +644,5 @@ function ChangeFeed({ items }: { items: HomeOperatingSystemView["changeFeed"] })
         </ul>
       )}
     </Panel>
-  );
-}
-
-/* ---------------------------------- Decision support ---------------------- */
-
-function DecisionSupport({
-  risks,
-  opportunities,
-  primaryActionBullets,
-}: {
-  risks: string[];
-  opportunities: string[];
-  primaryActionBullets: string[];
-}) {
-  return (
-    <Panel>
-      <Eyebrow className="mb-3">Decision support</Eyebrow>
-      <div className="grid gap-2.5 lg:grid-cols-3">
-        <DecisionCol
-          title="Risks"
-          items={risks}
-          color="var(--hz-moderate)"
-          href={topicCoachLink(
-            "intensity-stacking",
-            "What risks should I address in my current training?",
-          )}
-        />
-        <DecisionCol
-          title="Opportunities"
-          items={opportunities}
-          color="var(--home-good)"
-          href={topicCoachLink("opportunities", "Which opportunities should I act on this week?")}
-        />
-        <DecisionCol
-          title="Primary action"
-          items={primaryActionBullets}
-          color="var(--home-signal)"
-          href={topicCoachLink("recommendation", primaryActionBullets[0] ?? "")}
-        />
-      </div>
-    </Panel>
-  );
-}
-
-function DecisionCol({
-  title,
-  items,
-  color,
-  href,
-}: {
-  title: string;
-  items: string[];
-  color: string;
-  href: string;
-}) {
-  return (
-    <div className="rounded-lg bg-[var(--surface-subdued)] p-3 ring-1 ring-[var(--border-subtle)]">
-      <p
-        className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide"
-        style={{ color }}
-      >
-        <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
-        {title}
-      </p>
-      <ul className="mt-2 space-y-1.5">
-        {items.length === 0 ? (
-          <li className="text-[11px] text-zinc-600">None flagged</li>
-        ) : (
-          items.slice(0, 4).map((t) => (
-            <li key={t} className="flex gap-1.5 text-[12px] leading-snug text-zinc-300">
-              <span className="text-zinc-600">–</span>
-              <span>{t}</span>
-            </li>
-          ))
-        )}
-      </ul>
-      <Link
-        href={href}
-        className="mt-2 inline-flex items-center gap-0.5 text-[10px] text-zinc-600 hover:text-zinc-300"
-      >
-        Coach <ArrowRight className="h-3 w-3" />
-      </Link>
-    </div>
   );
 }
