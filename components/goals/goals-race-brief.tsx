@@ -57,8 +57,8 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
 
           {brief.warnings.length > 0 ? (
             <ul className="space-y-1 rounded-lg border border-amber-500/15 bg-amber-500/[0.05] px-3 py-2.5 text-[12px] text-amber-200/80">
-              {brief.warnings.map((w) => (
-                <li key={w}>· {w}</li>
+              {brief.warnings.map((w, i) => (
+                <li key={`${i}-${w}`}>· {w}</li>
               ))}
             </ul>
           ) : null}

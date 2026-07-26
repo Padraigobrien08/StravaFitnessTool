@@ -100,11 +100,15 @@ export function buildForecastObservability(
       .map((e) => `${e.modelName}: ${formatSec(e.predictedTimeSec)}`),
   ];
 
+  // De-dupe: the same concern can surface from more than one sub-model
+  // (e.g. a volume gap in both specificity.gaps and limitations).
   const warnings: string[] = [
-    ...opts.durability.penalties,
-    ...opts.specificity.gaps,
-    ...opts.freshness.risks,
-    ...opts.limitations,
+    ...new Set([
+      ...opts.durability.penalties,
+      ...opts.specificity.gaps,
+      ...opts.freshness.risks,
+      ...opts.limitations,
+    ]),
   ].slice(0, 6);
 
   let whyPredictionChanged: ForecastObservability["whyPredictionChanged"];
