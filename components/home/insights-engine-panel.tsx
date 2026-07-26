@@ -38,7 +38,7 @@ export function InsightsEnginePanel({ rows }: { rows: InsightRowViewModel[] }) {
 
       {opportunities.length > 0 ? (
         <div>
-          <h4 className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-teal-400/75">
+          <h4 className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent/75">
             Opportunities
           </h4>
           <div className="space-y-2.5">

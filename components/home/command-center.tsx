@@ -21,11 +21,11 @@ export function CommandCenter({
   const primaryPlanLabel = vm.hasSavedPlan ? "Open saved plan" : "Generate next week plan";
   return (
     <div className="command-center space-y-4">
-      <section className="relative overflow-hidden rounded-xl border border-teal-500/20 bg-gradient-to-br from-[#0f1418] via-[#0c0e12] to-[#09090b] px-5 py-5 sm:px-6 sm:py-6">
+      <section className="relative overflow-hidden rounded-xl border border-accent/20 bg-gradient-to-br from-[#0f1418] via-[#0c0e12] to-[#09090b] px-5 py-5 sm:px-6 sm:py-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_100%_0%,rgba(45,212,191,0.08),transparent)]" />
         <div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-start">
           <div className="min-w-0 space-y-3">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-teal-500/80">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-accent/80">
               What should I do next?
             </p>
             <h1 className="font-display text-xl font-bold tracking-tight text-zinc-100 sm:text-2xl">
@@ -146,7 +146,7 @@ function MetaChip({ label, value, accent }: { label: string; value: string; acce
     <div
       className={cn(
         "rounded-lg px-3 py-2",
-        accent ? "bg-teal-500/10 ring-1 ring-teal-500/20" : "bg-white/[0.03]",
+        accent ? "bg-accent/10 ring-1 ring-accent/20" : "bg-white/[0.03]",
       )}
     >
       <p className="text-[10px] text-zinc-600">{label}</p>
@@ -176,7 +176,7 @@ function RiskOpportunityCard({
         <Icon
           className={cn(
             "mt-0.5 h-3.5 w-3.5 shrink-0",
-            kind === "risk" ? "text-amber-500/80" : "text-teal-500/80",
+            kind === "risk" ? "text-amber-500/80" : "text-accent/80",
           )}
         />
         <div className="min-w-0">

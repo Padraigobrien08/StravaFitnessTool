@@ -14,7 +14,7 @@ import type { WorkoutType } from "@/lib/analytics/workoutType";
 const STORAGE_KEY = "strideiq-plan-checks-v1";
 
 const typeStyles: Record<WorkoutType, string> = {
-  easy: "bg-teal-500/12 text-teal-300 ring-teal-500/20",
+  easy: "bg-accent/12 text-accent ring-accent/20",
   recovery: "bg-zinc-500/10 text-zinc-400 ring-zinc-500/15",
   tempo: "bg-amber-500/12 text-amber-300 ring-amber-500/20",
   interval: "bg-amber-500/12 text-amber-300 ring-amber-500/20",
@@ -112,7 +112,7 @@ export function AdaptiveWeekPlan({
         </span>
         {plan.loadVsLastWeek ? (
           <span className="inline-flex items-center gap-1">
-            <LoadIcon className="h-3 w-3 text-teal-500/80" aria-hidden />
+            <LoadIcon className="h-3 w-3 text-accent/80" aria-hidden />
             {plan.loadVsLastWeek}
           </span>
         ) : null}
@@ -130,7 +130,7 @@ export function AdaptiveWeekPlan({
             key={`${s.day}-${i}`}
             className={cn(
               "flex gap-3 px-3 py-3.5 transition-colors sm:px-4",
-              checked[i] && "bg-teal-500/[0.04]",
+              checked[i] && "bg-accent/[0.04]",
               s.isKey && !checked[i] && "bg-white/[0.02]",
             )}
           >
@@ -177,7 +177,7 @@ export function AdaptiveWeekPlan({
       ) : null}
 
       <p className="mt-4 text-xs text-zinc-600">
-        <Link href="/home" className="text-teal-400/90 hover:text-teal-300">
+        <Link href="/home" className="text-accent/90 hover:text-accent">
           Weekly narrative on Home
           <ArrowRight className="ml-1 inline h-3 w-3" />
         </Link>

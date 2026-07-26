@@ -31,7 +31,7 @@ export function DataQualityFooter({ report }: { report: ImportQualityReport }) {
           {report.warnings.slice(0, 4).map((w, i) => (
             <p key={i}>{w}</p>
           ))}
-          <Link href="/settings" className="text-teal-600/80 hover:text-teal-400">
+          <Link href="/settings" className="text-accent/80 hover:text-accent">
             Open diagnostics
           </Link>
         </div>

@@ -21,7 +21,7 @@ function TrendBlock({
       <div className="flex items-baseline justify-between gap-2">
         <span className={dash.label}>{chart.label}</span>
         {chart.caption ? (
-          <span className="text-[10px] tabular-nums text-teal-400/80">{chart.caption}</span>
+          <span className="text-[10px] tabular-nums text-accent/80">{chart.caption}</span>
         ) : null}
       </div>
       <TrendChart data={chart.data} positive={chart.positive} height={44} className="mt-2" />
@@ -43,7 +43,7 @@ export function ProgressionMomentumPanel({ data }: { data: ProgressionViewModel 
         <div className="space-y-4">
           <div>
             <h4 className={dash.label}>Achievements</h4>
-            <ul className="mt-2 space-y-0 border-l border-teal-500/20 pl-3">
+            <ul className="mt-2 space-y-0 border-l border-accent/20 pl-3">
               {data.achievements.length > 0 ? (
                 data.achievements.slice(0, 4).map((a, i) => (
                   <li
@@ -54,7 +54,7 @@ export function ProgressionMomentumPanel({ data }: { data: ProgressionViewModel 
                         "border-b border-white/[0.04]",
                     )}
                   >
-                    <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-teal-400/70" aria-hidden />
+                    <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-accent/70" aria-hidden />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-medium text-zinc-200">{a.title}</span>
                       <span className={dash.muted}>{a.meta}</span>
@@ -82,14 +82,14 @@ export function ProgressionMomentumPanel({ data }: { data: ProgressionViewModel 
           ) : null}
 
           {data.bestBlock ? (
-            <div className="rounded-lg border border-teal-500/15 bg-teal-500/[0.05] px-3 py-2.5">
+            <div className="rounded-lg border border-accent/15 bg-accent/[0.05] px-3 py-2.5">
               <p className={dash.label}>Best block</p>
               <p className="mt-1 text-sm leading-snug text-zinc-300">{data.bestBlock}</p>
             </div>
           ) : null}
         </div>
 
-        <div className="rounded-xl bg-gradient-to-b from-teal-500/[0.1] via-teal-500/[0.02] to-transparent p-3 sm:p-4">
+        <div className="rounded-xl bg-gradient-to-b from-accent/[0.1] via-accent/[0.02] to-transparent p-3 sm:p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h4 className={dash.label}>Momentum telemetry</h4>
             {data.comparisons.length > 0 ? (
@@ -99,7 +99,7 @@ export function ProgressionMomentumPanel({ data }: { data: ProgressionViewModel 
                     key={c.label}
                     className={cn(
                       "text-[11px] font-medium tabular-nums",
-                      c.positive === true && "text-teal-400/90",
+                      c.positive === true && "text-accent/90",
                       c.positive === false && "text-amber-400/90",
                       c.positive === null && "text-zinc-500",
                     )}

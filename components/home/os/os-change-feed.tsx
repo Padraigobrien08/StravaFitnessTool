@@ -18,7 +18,7 @@ export function OsChangeFeed({ items }: { items: ChangeFeedItem[] }) {
             <span
               className={cn(
                 "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
-                item.tone === "positive" && "bg-teal-400/80",
+                item.tone === "positive" && "bg-accent/80",
                 item.tone === "warning" && "bg-amber-400/80",
                 item.tone === "neutral" && "bg-zinc-500/60",
               )}

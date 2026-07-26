@@ -258,10 +258,6 @@ html.light .text-zinc-600 {
   color: #a1a1aa;
 }
 
-html.light .text-teal-400 {
-  color: #0d9488;
-}
-
 html.light [class*="border-white"] {
   border-color: var(--border-subtle) !important;
 }

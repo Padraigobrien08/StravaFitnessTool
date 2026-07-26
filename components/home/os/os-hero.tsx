@@ -23,7 +23,7 @@ export function OsHero({
   planLoading?: boolean;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-xl border border-teal-500/15 bg-gradient-to-br from-[var(--surface-elevated)] via-[var(--surface-subdued)] to-[var(--background)] px-4 py-4 sm:px-5 sm:py-4">
+    <section className="relative overflow-hidden rounded-xl border border-accent/15 bg-gradient-to-br from-[var(--surface-elevated)] via-[var(--surface-subdued)] to-[var(--background)] px-4 py-4 sm:px-5 sm:py-4">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent)]" />
       <div className="relative grid gap-4 lg:grid-cols-[1fr_200px] lg:items-start">
         <div className="min-w-0 space-y-2.5">
@@ -118,7 +118,7 @@ export function OsHero({
           <StateChip label="Freshness" value={String(hero.freshness)} />
           {hero.taperActive ? (
             <div className="col-span-2 flex flex-wrap items-center gap-2 rounded-lg bg-[var(--surface)] px-2.5 py-2 lg:col-span-1">
-              <span className="text-[10px] text-teal-500/80">Taper active</span>
+              <span className="text-[10px] text-accent/80">Taper active</span>
             </div>
           ) : null}
         </aside>
@@ -133,7 +133,7 @@ function StateChip({ label, value, accent }: { label: string; value: string; acc
       className={cn(
         "rounded-lg px-2.5 py-2",
         accent
-          ? "bg-teal-500/10 ring-1 ring-teal-500/20"
+          ? "bg-accent/10 ring-1 ring-accent/20"
           : "bg-[var(--surface)] ring-1 ring-[var(--border-subtle)]",
       )}
     >

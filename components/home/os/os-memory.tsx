@@ -17,7 +17,7 @@ export function OsMemory({ memory }: { memory: MemorySnippet[] }) {
     tone: string;
   }[] = [
     { key: "stable", title: "Stable", tone: "text-zinc-500" },
-    { key: "emerging", title: "Emerging", tone: "text-teal-500/70" },
+    { key: "emerging", title: "Emerging", tone: "text-accent/70" },
     { key: "watchlist", title: "Watchlist", tone: "text-amber-400/60" },
   ];
 

@@ -6,9 +6,9 @@ import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
 
 const severityStyles = {
   positive: {
-    className: "border-teal-500/30 bg-teal-500/5",
+    className: "border-accent/30 bg-accent/5",
     icon: CheckCircle2,
-    iconClass: "text-teal-400",
+    iconClass: "text-accent",
   },
   neutral: {
     className: "border-white/10 bg-white/[0.03]",
@@ -37,7 +37,7 @@ export function InsightCard({ insight }: { insight: Insight }) {
           ))}
         </TypographyList>
         {insight.recommendation ? (
-          <p className="type-body-muted font-medium text-teal-400/90">→ {insight.recommendation}</p>
+          <p className="type-body-muted font-medium text-accent/90">→ {insight.recommendation}</p>
         ) : null}
         <TypographyCaption className="mt-2">Confidence: {insight.confidence}</TypographyCaption>
       </AlertDescription>

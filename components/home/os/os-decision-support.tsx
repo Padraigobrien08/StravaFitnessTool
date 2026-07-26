@@ -68,15 +68,12 @@ function DecisionCol({
 }) {
   return (
     <div
-      className={cn(
-        "rounded-lg p-3",
-        tone === "risk" ? "bg-amber-500/[0.04]" : "bg-teal-500/[0.04]",
-      )}
+      className={cn("rounded-lg p-3", tone === "risk" ? "bg-amber-500/[0.04]" : "bg-accent/[0.04]")}
     >
       <p
         className={cn(
           "text-[10px] font-semibold uppercase tracking-wide",
-          tone === "risk" ? "text-amber-400/60" : "text-teal-500/70",
+          tone === "risk" ? "text-amber-400/60" : "text-accent/70",
         )}
       >
         {title}
@@ -90,7 +87,7 @@ function DecisionCol({
               key={t}
               className={cn(
                 "text-[11px] leading-snug",
-                tone === "risk" ? "text-amber-100/75" : "text-teal-100/80",
+                tone === "risk" ? "text-amber-100/75" : "text-accent/80",
               )}
             >
               {t}

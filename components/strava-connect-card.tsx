@@ -25,7 +25,7 @@ export function StravaConnectCard({ onSynced, stravaQuery }: StravaConnectCardPr
   }
 
   return (
-    <div className="rounded-xl border border-teal-500/20 bg-teal-500/5 p-6">
+    <div className="rounded-xl border border-accent/20 bg-accent/5 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="font-display text-lg font-semibold text-white">Connect Strava</h2>
@@ -35,7 +35,7 @@ export function StravaConnectCard({ onSynced, stravaQuery }: StravaConnectCardPr
           </p>
         </div>
         {status.connected ? (
-          <span className="rounded-full bg-teal-500/15 px-3 py-1 text-xs font-medium text-teal-300">
+          <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-accent">
             Connected
           </span>
         ) : null}
@@ -57,7 +57,7 @@ export function StravaConnectCard({ onSynced, stravaQuery }: StravaConnectCardPr
         {!status.connected ? (
           <a
             href="/api/auth/strava/authorize"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-teal-500 px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-teal-400"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-accent px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-accent"
           >
             <Link2 className="mr-2 h-4 w-4" />
             Connect with Strava

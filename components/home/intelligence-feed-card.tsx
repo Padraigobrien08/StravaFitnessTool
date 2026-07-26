@@ -18,7 +18,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
   const pillTone =
     item.severity === "risk" ? "risk" : item.severity === "caution" ? "caution" : "positive";
 
-  const borderTone = item.kind === "risk" ? "border-l-red-500/45" : "border-l-teal-500/45";
+  const borderTone = item.kind === "risk" ? "border-l-red-500/45" : "border-l-accent/45";
 
   const TrendIcon =
     item.trend?.positive === true
@@ -41,7 +41,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
             <span
               className={cn(
                 "text-[10px] font-bold uppercase tracking-[0.14em]",
-                item.kind === "risk" ? "text-red-400/85" : "text-teal-400/85",
+                item.kind === "risk" ? "text-red-400/85" : "text-accent/85",
               )}
             >
               {kindLabel[item.kind]}
@@ -50,7 +50,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
               <span
                 className={cn(
                   "inline-flex items-center gap-1 text-[10px] font-medium",
-                  item.trend.positive === true && "text-teal-400/90",
+                  item.trend.positive === true && "text-accent/90",
                   item.trend.positive === false && "text-amber-400/90",
                   item.trend.positive === null && "text-zinc-500",
                 )}
@@ -79,7 +79,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
 
           <button
             type="button"
-            className="mt-2 text-xs font-medium text-zinc-500 transition-colors hover:text-teal-400/90"
+            className="mt-2 text-xs font-medium text-zinc-500 transition-colors hover:text-accent/90"
             onClick={() => setWhyOpen((v) => !v)}
             aria-expanded={whyOpen}
           >
@@ -109,7 +109,7 @@ export function IntelligenceFeedCard({ item }: { item: InsightRowViewModel }) {
           {item.recommendationHref ? (
             <Link
               href={item.recommendationHref}
-              className="inline-flex items-center justify-center gap-1 rounded-lg bg-teal-500/10 px-3 py-1.5 text-xs font-medium text-teal-300/95 ring-1 ring-inset ring-teal-500/20 transition-colors hover:bg-teal-500/15 hover:text-teal-200"
+              className="inline-flex items-center justify-center gap-1 rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent/95 ring-1 ring-inset ring-accent/20 transition-colors hover:bg-accent/15 hover:text-accent"
             >
               Take action
               <ArrowRight className="h-3 w-3" />

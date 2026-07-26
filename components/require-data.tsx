@@ -23,7 +23,7 @@ export function RequireData({ children }: { children: React.ReactNode }) {
               loadDemo();
               router.push("/home");
             }}
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-teal-400 px-5 text-sm font-semibold text-zinc-950 transition hover:bg-teal-300"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-accent px-5 text-sm font-semibold text-zinc-950 transition hover:bg-accent"
           >
             Try the demo
           </button>

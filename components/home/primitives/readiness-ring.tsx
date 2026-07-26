@@ -22,7 +22,7 @@ export function ReadinessRing({
   const r = (size - 12) / 2;
   const c = 2 * Math.PI * r;
   const offset = c - (progress / 100) * c;
-  const color = clamped >= 70 ? "#2dd4bf" : clamped >= 50 ? "#fbbf24" : "#f87171";
+  const color = clamped >= 70 ? "#f0864a" : clamped >= 50 ? "#fbbf24" : "#f87171";
 
   useEffect(() => {
     const t = requestAnimationFrame(() => {

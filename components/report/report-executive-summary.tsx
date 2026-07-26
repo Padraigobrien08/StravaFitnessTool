@@ -3,7 +3,7 @@ import type { ExecutiveSummaryView } from "@/lib/report/viewModels";
 export function ReportExecutiveSummary({ data }: { data: ExecutiveSummaryView }) {
   return (
     <div className="report-executive rounded-2xl border border-zinc-200/90 bg-gradient-to-br from-zinc-50 to-white p-6 shadow-sm print:border-zinc-300 print:shadow-none sm:p-8">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-teal-800/90 print:text-teal-900">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent/90 print:text-accent">
         {data.headline}
       </p>
       <p className="mt-4 font-display text-lg font-semibold leading-snug text-zinc-900 print:text-black sm:text-xl">

@@ -13,7 +13,7 @@ import { ConfidenceBadge } from "@/components/confidence-badge";
 import { cn } from "@/lib/utils";
 
 const toneBorder = {
-  positive: "border-l-teal-600/60",
+  positive: "border-l-accent/60",
   neutral: "border-l-zinc-400",
   warning: "border-l-amber-600/70",
 };
@@ -36,7 +36,7 @@ export function ReportTrainingState({
   return (
     <div className="space-y-4">
       <p className="text-sm font-medium text-zinc-800">
-        Current state · <span className="text-teal-800">{classification}</span>
+        Current state · <span className="text-accent">{classification}</span>
       </p>
       {narrative.paragraphs.map((p, i) => (
         <p key={i} className="text-sm leading-relaxed text-zinc-700">
@@ -47,7 +47,7 @@ export function ReportTrainingState({
         <ul className="space-y-1.5 text-sm text-zinc-600">
           {narrative.bullets.map((b, i) => (
             <li key={i} className="flex gap-2">
-              <span className="text-teal-700">·</span>
+              <span className="text-accent">·</span>
               {b}
             </li>
           ))}
@@ -112,7 +112,7 @@ export function ReportAdaptation({
         ))}
       </ul>
       {progressionNote ? (
-        <p className="rounded-lg bg-teal-50/80 px-3 py-2.5 text-xs text-teal-900 ring-1 ring-inset ring-teal-200/60">
+        <p className="rounded-lg bg-accent/80 px-3 py-2.5 text-xs text-accent ring-1 ring-inset ring-accent/60">
           {progressionNote}
         </p>
       ) : null}
@@ -178,8 +178,8 @@ export function ReportRaceBriefing({ data }: { data: RaceReadinessBriefingView }
 export function ReportCoaching({ data }: { data: CoachingRecommendationView }) {
   return (
     <div className="space-y-5 print:break-inside-avoid">
-      <div className="rounded-xl border border-teal-200/80 bg-teal-50/50 px-5 py-4 print:border-teal-300 print:bg-teal-50">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-teal-800">
+      <div className="rounded-xl border border-accent/80 bg-accent/50 px-5 py-4 print:border-accent print:bg-accent">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-accent">
           Primary focus
         </p>
         <p className="mt-2 text-base font-medium leading-snug text-zinc-900">{data.primaryFocus}</p>
@@ -319,13 +319,13 @@ export function ReportConfidence({ data }: { data: ConfidenceBriefView }) {
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-teal-800">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-accent">
             Strong evidence
           </p>
           <ul className="mt-2 space-y-1 text-sm text-zinc-700">
             {data.strongEvidence.map((line, i) => (
               <li key={i} className="flex gap-2">
-                <span className="text-teal-700">✓</span>
+                <span className="text-accent">✓</span>
                 {line}
               </li>
             ))}
@@ -356,7 +356,7 @@ export function ReportConfidence({ data }: { data: ConfidenceBriefView }) {
                 <span className="w-28 shrink-0 text-zinc-600">{f.label}</span>
                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-200">
                   <div
-                    className="h-full rounded-full bg-teal-700/70 print:bg-zinc-700"
+                    className="h-full rounded-full bg-accent/70 print:bg-zinc-700"
                     style={{ width: `${f.pct}%` }}
                   />
                 </div>
@@ -407,7 +407,7 @@ export function ReportTrainingEcosystem({ data }: { data: ReportEcosystemView })
           <ul className="space-y-1 text-sm text-zinc-700">
             {data.supportHighlights.map((h, i) => (
               <li key={i} className="flex gap-2">
-                <span className="text-teal-700">·</span>
+                <span className="text-accent">·</span>
                 {h}
               </li>
             ))}

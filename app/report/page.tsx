@@ -46,7 +46,7 @@ export default function ReportPage() {
         <div className="report-page-shell pb-12">
           <div className="no-print mx-auto mb-8 flex max-w-[820px] flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-400/90">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent/90">
                 Intelligence export
               </p>
               <h1 className="font-display text-2xl font-bold text-white">

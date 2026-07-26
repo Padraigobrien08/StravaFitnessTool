@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils";
 
 const segmentColors: Record<string, string> = {
   endurance: "bg-blue-400/90",
-  pacing: "bg-teal-400/90",
-  consistency: "bg-teal-400/90",
+  pacing: "bg-accent/90",
+  consistency: "bg-accent/90",
   freshness: "bg-violet-400/90",
 };
 
@@ -56,7 +56,7 @@ export function GoalMissionControl({ goal }: { goal: GoalMissionViewModel }) {
             >
               <div
                 className={cn(
-                  "h-full rounded-full bg-gradient-to-r from-teal-500 to-teal-500 transition-all duration-500",
+                  "h-full rounded-full bg-gradient-to-r from-accent to-accent transition-all duration-500",
                   goal.score < 50 && "from-amber-500 to-amber-600",
                   goal.score < 35 && "from-red-500 to-red-600",
                 )}
@@ -69,9 +69,7 @@ export function GoalMissionControl({ goal }: { goal: GoalMissionViewModel }) {
                   Target <span className="text-zinc-300">{goal.targetFinish}</span>
                 </span>
               ) : null}
-              {goal.probability ? (
-                <span className="text-teal-400/80">{goal.probability}</span>
-              ) : null}
+              {goal.probability ? <span className="text-accent/80">{goal.probability}</span> : null}
             </div>
           </div>
         </div>
@@ -98,7 +96,7 @@ export function GoalMissionControl({ goal }: { goal: GoalMissionViewModel }) {
 
         <Link
           href={goal.href}
-          className="shrink-0 text-[11px] font-medium text-teal-500/90 hover:text-teal-400"
+          className="shrink-0 text-[11px] font-medium text-accent/90 hover:text-accent"
         >
           Mission control →
         </Link>

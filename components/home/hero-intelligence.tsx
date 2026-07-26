@@ -68,7 +68,7 @@ export function HeroIntelligence({ hero }: { hero: HeroViewModel }) {
             ) : null}
           </div>
           {whyOpen && hero.whyBullets.length > 0 ? (
-            <ul className="max-w-3xl space-y-1 border-l-2 border-teal-500/25 pl-3 text-xs leading-relaxed text-zinc-500">
+            <ul className="max-w-3xl space-y-1 border-l-2 border-accent/25 pl-3 text-xs leading-relaxed text-zinc-500">
               {hero.whyBullets.map((b, i) => (
                 <li key={i}>{b}</li>
               ))}

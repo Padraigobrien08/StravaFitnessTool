@@ -38,7 +38,7 @@ export function ReportHero({ hero }: { hero: ReportHeroView }) {
   return (
     <div className="report-hero grid gap-6 rounded-2xl border border-zinc-200/90 bg-white p-6 print:break-inside-avoid print:border-zinc-300 sm:grid-cols-[1fr_220px] sm:p-8">
       <div className="min-w-0 space-y-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-800/90">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent/90">
           Athlete state
         </p>
         <h2 className="font-display text-2xl font-bold text-zinc-900 print:text-black">
@@ -60,7 +60,7 @@ export function ReportHero({ hero }: { hero: ReportHeroView }) {
             Confidence {hero.confidenceLabel}
           </span>
           {hero.raceLabel ? (
-            <span className="rounded-md bg-teal-50 px-2.5 py-1 text-teal-900 ring-1 ring-inset ring-teal-200/80">
+            <span className="rounded-md bg-accent px-2.5 py-1 text-accent ring-1 ring-inset ring-accent/80">
               {hero.raceLabel}
             </span>
           ) : null}

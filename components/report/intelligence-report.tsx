@@ -30,7 +30,7 @@ export function IntelligenceReport({
       <header className="report-masthead mb-10 border-b border-zinc-300 pb-8 print:mb-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-teal-800">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-accent">
               StrideIQ
             </p>
             <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-zinc-900 print:text-black sm:text-4xl">
