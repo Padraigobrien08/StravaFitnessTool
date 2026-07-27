@@ -1,0 +1,76 @@
+# Proposal — Leg-Feel (subjective wellness input)
+
+**Status:** P1 implemented on `feat/leg-feel` · **Effort:** ~2–3 days (P1) · **Risk:** low–medium
+
+A daily subjective check-in that lets the athlete tell the model what Strava can't measure — "legs feel heavy" — and have it bounded-nudge the readiness verdict and today's session.
+
+## The gap
+
+StrideIQ is almost entirely read-only: readiness/freshness are derived purely from training-stress balance (TSB). The code even documents it (`lib/goals/viewModels.ts`: _"No sleep/HRV — subjective freshness not modeled"_). A model that never asks how you feel can't tell "TSB says fresh, but I slept 4 hours and my legs are lead" from a genuine green-light day. This is the one signal a wearable-free, Strava-only system cannot compute — cheap to add, and it makes every readiness call more trustworthy.
+
+## Design principles (guardrails)
+
+1. **A bounded nudge, never an override.** Feel adjusts the day's freshness within a hard cap (±~12 pts). It cannot invent fitness or rewrite history.
+2. **Never touches the fitness model.** CTL/ATL/TSB are computed only from actual runs. Feel affects the _readiness verdict_, not the _load ledger_.
+3. **Asymmetric & safety-first.** "Heavy" is respected more than "fresh" is rewarded (−12 vs +5) — you can always talk the model into backing off, never into a hard session it didn't already sanction. Prevents gaming.
+4. **Today-only.** A report affects only its own date; it never retroactively rewrites past freshness or the trend.
+5. **Transparent.** When feel changes the call, the evidence line says so.
+
+## Architecture
+
+### Data model
+
+`db/migrations/008_leg_feel.sql` — a dated per-user log keyed `(user_id, feel_date)`, JSONB payload (forward-compatible with sleep/soreness/stress):
+
+```sql
+CREATE TABLE IF NOT EXISTS leg_feel_log (
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  feel_date  DATE NOT NULL,
+  report     JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, feel_date)
+);
+```
+
+Types in `lib/wellness/types.ts`; DB helper `lib/db/leg-feel.ts` follows the house pattern (lazy `ensureLegFeelSchema`, `ON CONFLICT` upsert, `catch → null` no-DB degrade).
+
+### The integration point (the elegant bit)
+
+`freshnessFromTsb()` in `lib/analytics/fatigue.ts` is the single funnel where load balance becomes the freshness number + label. Adding an optional `legFeel` arg there means every one of the ~30 consumers of `analytics.fatigue.freshness` (today-session engine, Home hero verdict, risk patterns, forecasting inputs) inherits it automatically — no prop threading.
+
+```
+legFeel → freshnessFromTsb → analytics.fatigue.freshness → today-session · hero · risk · forecast
+```
+
+Analytics is computed **client-side** in `lib/context/strava-context.tsx` from data already in the browser. Today's feel (a zustand value) threads into that `computeInsights(...)` call exactly as `raceGoal`/settings already do — it re-memoizes when feel changes. `computeInsights` stays pure and synchronous; feel arrives as a scalar arg.
+
+### Client & API
+
+- **Store** `stores/feel-store.ts` — zustand + `persist` (localStorage, key `strideiq-feel-store-v1`), keyed by date. Optimistic; works offline / no-DB.
+- **Hook** `hooks/use-leg-feel.ts` — reconciles today with the server on mount, fire-and-forget POST on set (mirrors the `use-training-calendar` local-first flow; no debounce needed — feel is a discrete tap).
+- **API** `app/api/me/leg-feel/route.ts` — `getSessionUserId()` guard, zod-validated, GET reads a day / POST upserts (route skeleton copied from `preferences`).
+
+### UI
+
+- **Morning check-in** — the "How do the legs feel?" card on the Home console (`components/home/console/leg-feel-card.tsx`). Sets `source: "morning"`; the verdict/today-session re-compute live.
+- **Post-run reflection** _(P2)_ — one-tap on run-detail (`source: "post_run"`).
+
+## The learning loop (P2)
+
+The app already grades recommendations against outcomes (`evaluateRecommendationOutcomes()` vs a `SignalSnapshot { freshness, tsb, readinessScore, hardRuns14d }`). Feed leg-feel into that loop and the model can learn each athlete's personal feel↔performance correlation — the ±nudge becomes individually calibrated instead of a fixed constant.
+
+## Phasing
+
+| Phase     | Scope                                                                                        | Est.      |
+| --------- | -------------------------------------------------------------------------------------------- | --------- |
+| **P0**    | UI + local state only (the mockup made real)                                                 | ~0.5 day  |
+| **P1** ✅ | Persist + blend into freshness + morning UI + tests                                          | ~2–3 days |
+| **P2**    | Post-run capture, niggle field, server-context threading for Coach, feel↔outcome calibration | ~3–5 days |
+
+## Risks & open decisions
+
+- **Over-weighting** → mitigated by the ±12 cap + asymmetry.
+- **Gaming** ("say fresh, get hard sessions") → the fresh nudge is small and can't unlock a session TSB didn't already allow.
+- **Sparse reporting** → the arg is optional; the model behaves identically when absent.
+
+**Open (tune after seeing it live):** the exact nudge magnitudes (−12 / +5), whether MVP includes the niggle field (P1 is legs-only), and whether the Coach LLM sees it in v1 (P1 blends client-side only; server-context threading is P2).
