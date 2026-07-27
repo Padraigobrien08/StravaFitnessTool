@@ -23,6 +23,7 @@ import {
   ZONE_COLOR,
   ZoneLegend,
 } from "@/components/console/console-kit";
+import { LegFeelCard } from "@/components/home/console/leg-feel-card";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { HomeOperatingSystemView } from "@/lib/home/operatingSystemView";
 import type {
@@ -102,7 +103,10 @@ export function HomeConsole({
           planLoading={planLoading}
           hasSavedPlan={vm.hero.hasSavedPlan}
         />
-        <Readiness analytics={analytics} hero={vm.hero} />
+        <div className="flex flex-col gap-3">
+          <Readiness analytics={analytics} hero={vm.hero} />
+          <LegFeelCard />
+        </div>
       </div>
 
       <WeekStrip
