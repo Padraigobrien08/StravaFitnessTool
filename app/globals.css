@@ -11,8 +11,8 @@ html.dark {
   --foreground: #fafafa;
   --muted: rgba(255, 255, 255, 0.06);
   --muted-subtle: #71717a;
-  --accent: #14b8a6;
-  --accent-muted: #134e4a;
+  --accent: #f0864a;
+  --accent-muted: #3a1f12;
   --warning: #fbbf24;
   --card: rgba(255, 255, 255, 0.04);
   --border: rgba(255, 255, 255, 0.1);
@@ -40,19 +40,34 @@ html.dark {
   --radius-xl: 1rem;
   --app-nav-height: 3rem;
   --coach-page-pad: 0.75rem;
-  --body-glow-1: rgba(20, 184, 166, 0.15);
-  --body-glow-2: rgba(20, 184, 166, 0.06);
+  --body-glow-1: rgba(240, 134, 74, 0.15);
+  --body-glow-2: rgba(240, 134, 74, 0.06);
   --card-foreground: #fafafa;
   --popover: #18181b;
   --popover-foreground: #fafafa;
-  --primary: #14b8a6;
-  --primary-foreground: #042f2e;
+  --primary: #f0864a;
+  --primary-foreground: #1a0d04;
   --secondary: rgba(255, 255, 255, 0.06);
   --secondary-foreground: #fafafa;
   --muted-foreground: #a1a1aa;
   --destructive: #ef4444;
   --input: rgba(255, 255, 255, 0.1);
-  --ring: rgba(20, 184, 166, 0.45);
+  --ring: rgba(240, 134, 74, 0.45);
+
+  /* Home console (instrument direction) — scoped tokens, do not affect other routes */
+  --home-signal: #f0864a;
+  --home-signal-strong: #ff9a5c;
+  --home-signal-wash: rgba(240, 134, 74, 0.12);
+  --home-signal-line: rgba(240, 134, 74, 0.42);
+  --home-signal-ink: #1a0d04;
+  --home-redline: #ff5e4d;
+  --home-good: #4ec48a;
+  /* effort scale — mirrors CalendarIntensity */
+  --hz-easy: #5f8fb0;
+  --hz-recovery: #4aa88a;
+  --hz-moderate: #d0982e;
+  --hz-hard: #ff5e4d;
+  --hz-rest: rgba(255, 255, 255, 0.16);
 }
 
 html.light {
@@ -61,8 +76,8 @@ html.light {
   --foreground: #18181b;
   --muted: rgba(0, 0, 0, 0.04);
   --muted-subtle: #71717a;
-  --accent: #0d9488;
-  --accent-muted: #ccfbf1;
+  --accent: #d95d24;
+  --accent-muted: #f8e7dc;
   --warning: #d97706;
   --card: rgba(0, 0, 0, 0.03);
   --border: rgba(0, 0, 0, 0.1);
@@ -85,19 +100,33 @@ html.light {
   --chart-ref-line: rgba(0, 0, 0, 0.12);
   --chart-sparkline: rgba(0, 0, 0, 0.14);
   --chart-ring-track: rgba(0, 0, 0, 0.08);
-  --body-glow-1: rgba(20, 184, 166, 0.08);
-  --body-glow-2: rgba(20, 184, 166, 0.04);
+  --body-glow-1: rgba(217, 93, 36, 0.08);
+  --body-glow-2: rgba(217, 93, 36, 0.04);
   --card-foreground: #18181b;
   --popover: #ffffff;
   --popover-foreground: #18181b;
-  --primary: #0d9488;
-  --primary-foreground: #f0fdfa;
+  --primary: #d95d24;
+  --primary-foreground: #fff6f0;
   --secondary: rgba(0, 0, 0, 0.04);
   --secondary-foreground: #18181b;
   --muted-foreground: #52525b;
   --destructive: #dc2626;
   --input: rgba(0, 0, 0, 0.12);
-  --ring: rgba(13, 148, 136, 0.35);
+  --ring: rgba(217, 93, 36, 0.35);
+
+  /* Home console (instrument direction) — scoped tokens, do not affect other routes */
+  --home-signal: #d95d24;
+  --home-signal-strong: #b84e18;
+  --home-signal-wash: rgba(217, 93, 36, 0.1);
+  --home-signal-line: rgba(217, 93, 36, 0.35);
+  --home-signal-ink: #fff6f0;
+  --home-redline: #d63a2a;
+  --home-good: #1f9d63;
+  --hz-easy: #3f77a0;
+  --hz-recovery: #2f8f72;
+  --hz-moderate: #b07d16;
+  --hz-hard: #d63a2a;
+  --hz-rest: rgba(0, 0, 0, 0.16);
 }
 
 html.coach-route,
@@ -229,10 +258,6 @@ html.light .text-zinc-600 {
   color: #a1a1aa;
 }
 
-html.light .text-teal-400 {
-  color: #0d9488;
-}
-
 html.light [class*="border-white"] {
   border-color: var(--border-subtle) !important;
 }
@@ -360,7 +385,7 @@ html.light .intelligence-evolution {
 
 html.light .route-terminal {
   background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(20, 184, 166, 0.06), transparent 55%), #f4f4f5;
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(217, 93, 36, 0.06), transparent 55%), #f4f4f5;
 }
 
 html.light .route-scrubber {
@@ -644,7 +669,7 @@ html.coach-route .coach-message-column {
 /* Route intelligence replay */
 .route-terminal {
   background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(20, 184, 166, 0.05), transparent 55%), #09090b;
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(240, 134, 74, 0.05), transparent 55%), #09090b;
   min-height: calc(100dvh - 8rem);
 }
 

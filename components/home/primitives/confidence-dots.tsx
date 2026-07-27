@@ -24,7 +24,7 @@ export function ConfidenceDots({
       {[1, 2, 3].map((i) => (
         <span
           key={i}
-          className={cn("h-1 w-1 rounded-full", i <= n ? "bg-teal-400/80" : "bg-white/10")}
+          className={cn("h-1 w-1 rounded-full", i <= n ? "bg-accent/80" : "bg-white/10")}
         />
       ))}
     </span>

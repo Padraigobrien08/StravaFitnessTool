@@ -10,7 +10,7 @@ export function Sparkline({
   data,
   className,
   height = 32,
-  stroke = "rgba(45, 212, 191, 0.9)",
+  stroke = "rgba(240, 134, 74, 0.9)",
   fill = "url(#spark-fill)",
   animate = true,
   positive,
@@ -41,7 +41,7 @@ export function Sparkline({
     positive === false
       ? "rgba(251, 191, 36, 0.85)"
       : positive === true
-        ? "rgba(45, 212, 191, 0.9)"
+        ? "rgba(240, 134, 74, 0.9)"
         : stroke;
 
   if (values.length < 2) {
@@ -94,8 +94,8 @@ export function Sparkline({
     >
       <defs>
         <linearGradient id={`spark-fill-${uid}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(45, 212, 191, 0.22)" />
-          <stop offset="100%" stopColor="rgba(45, 212, 191, 0)" />
+          <stop offset="0%" stopColor="rgba(240, 134, 74, 0.22)" />
+          <stop offset="100%" stopColor="rgba(240, 134, 74, 0)" />
         </linearGradient>
       </defs>
       <path
@@ -139,7 +139,7 @@ export function TrendChart({
       className={className}
       positive={positive}
       fullWidth
-      stroke={positive ? "rgba(45, 212, 191, 0.95)" : "rgba(251, 191, 36, 0.9)"}
+      stroke={positive ? "rgba(240, 134, 74, 0.95)" : "rgba(251, 191, 36, 0.9)"}
     />
   );
 }

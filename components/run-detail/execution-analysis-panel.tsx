@@ -6,7 +6,7 @@ import { dash } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 
 const toneBorder = {
-  positive: "border-l-teal-500/40",
+  positive: "border-l-accent/50",
   neutral: "border-l-zinc-500/30",
   warning: "border-l-amber-500/45",
 };
@@ -21,7 +21,7 @@ export function ExecutionAnalysisPanel({ data }: { data: ExecutionAnalysisView }
     data.decouplingPct == null
       ? "text-zinc-300"
       : data.decouplingPct <= 5
-        ? "text-teal-300/95"
+        ? "text-[var(--home-good)]"
         : data.decouplingPct <= 10
           ? "text-amber-300/90"
           : "text-rose-300/90";
@@ -31,14 +31,14 @@ export function ExecutionAnalysisPanel({ data }: { data: ExecutionAnalysisView }
       <div className="mb-4 flex flex-wrap gap-6">
         <div>
           <p className={dash.label}>Execution quality</p>
-          <p className="font-display text-3xl font-bold tabular-nums text-white">
+          <p className="font-mono text-3xl font-bold leading-none tracking-tight tabular-nums text-foreground">
             {data.qualityScore}
             <span className="text-lg font-normal text-zinc-600"> / 100</span>
           </p>
         </div>
         <div>
           <p className={dash.label}>Pacing stability</p>
-          <p className="font-display text-3xl font-bold tabular-nums text-teal-300/95">
+          <p className="font-mono text-3xl font-bold leading-none tracking-tight tabular-nums text-accent">
             {data.pacingStabilityScore}
             <span className="text-lg font-normal text-zinc-600"> / 100</span>
           </p>
@@ -50,7 +50,7 @@ export function ExecutionAnalysisPanel({ data }: { data: ExecutionAnalysisView }
           {data.repeatabilityScore != null ? (
             <div>
               <p className={dash.label}>Interval repeatability</p>
-              <p className="text-lg font-semibold tabular-nums text-zinc-200">
+              <p className="font-mono text-lg font-semibold tabular-nums text-zinc-200">
                 {data.repeatabilityScore}
                 <span className="text-xs font-normal text-zinc-600"> / 100</span>
               </p>
@@ -59,7 +59,7 @@ export function ExecutionAnalysisPanel({ data }: { data: ExecutionAnalysisView }
           {data.decouplingPct != null ? (
             <div>
               <p className={dash.label}>Aerobic decoupling</p>
-              <p className={cn("text-lg font-semibold tabular-nums", decoupTone)}>
+              <p className={cn("font-mono text-lg font-semibold tabular-nums", decoupTone)}>
                 {data.decouplingPct > 0 ? "+" : ""}
                 {data.decouplingPct}%
               </p>
@@ -68,7 +68,7 @@ export function ExecutionAnalysisPanel({ data }: { data: ExecutionAnalysisView }
           {data.thresholdControlScore != null ? (
             <div>
               <p className={dash.label}>Threshold control</p>
-              <p className="text-lg font-semibold tabular-nums text-zinc-200">
+              <p className="font-mono text-lg font-semibold tabular-nums text-zinc-200">
                 {data.thresholdControlScore}
                 <span className="text-xs font-normal text-zinc-600"> / 100</span>
               </p>

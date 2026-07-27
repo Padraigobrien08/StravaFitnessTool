@@ -256,7 +256,7 @@ function StatusBadge({
     <div
       className={cn(
         "rounded-lg px-4 py-2 text-sm font-medium",
-        ok ? "bg-teal-500/15 text-teal-300" : "bg-amber-500/15 text-amber-200",
+        ok ? "bg-accent/15 text-accent" : "bg-amber-500/15 text-amber-200",
       )}
     >
       {ok ? "Fixture OK" : "Needs review"} · {profile.id}

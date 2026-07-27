@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import { Panel } from "@/components/ui/panel";
 
 const STATUS_STYLE: Record<BurndownMetric["status"], { label: string; cls: string }> = {
-  met: { label: "met", cls: "text-teal-400/90" },
-  ahead: { label: "ahead", cls: "text-teal-400/90" },
+  met: { label: "met", cls: "text-[var(--home-good)]" },
+  ahead: { label: "ahead", cls: "text-[var(--home-good)]" },
   on_track: { label: "on track", cls: "text-zinc-400" },
   behind: { label: "behind", cls: "text-amber-300/90" },
   stalled: { label: "stalled", cls: "text-amber-300/90" },
@@ -55,7 +55,7 @@ function MetricRow({ metric }: { metric: BurndownMetric }) {
   const barColor =
     metric.status === "behind" || metric.status === "stalled"
       ? "bg-amber-400/70"
-      : "bg-teal-400/70";
+      : "bg-[var(--home-good)]";
 
   return (
     <div>

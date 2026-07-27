@@ -36,7 +36,7 @@ export function CoachEmptyState({
       </div>
 
       {memory.length > 0 ? (
-        <div className="rounded-xl border border-teal-500/10 bg-teal-500/[0.04] p-4">
+        <div className="rounded-xl border border-accent/10 bg-accent/[0.04] p-4">
           <p className={cn(dash.labelAccent, "mb-3")}>Athletic memory</p>
           <ul className="space-y-2.5">
             {memory.map((m) => (
@@ -58,7 +58,7 @@ export function CoachEmptyState({
               className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
             >
               <div className="mb-3 flex items-center gap-2">
-                <Icon className="h-4 w-4 text-teal-500/70" />
+                <Icon className="h-4 w-4 text-accent/70" />
                 <div>
                   <h3 className="text-sm font-semibold text-zinc-200">{group.title}</h3>
                   <p className="text-[11px] text-zinc-600">{group.description}</p>

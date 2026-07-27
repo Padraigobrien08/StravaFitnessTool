@@ -13,7 +13,7 @@ const MAP_STYLES = {
 } as const;
 
 const OVERLAY_COLORS: Record<string, string> = {
-  interval: "#2dd4bf",
+  interval: "#f0864a",
   recovery: "#52525b",
   fade: "#f59e0b",
   pause: "#71717a",
@@ -78,9 +78,9 @@ export function RouteMap({
         type: "line",
         source: "route",
         paint: {
-          "line-color": "#14b8a6",
+          "line-color": "#f0864a",
           "line-width": 8,
-          "line-opacity": 0.15,
+          "line-opacity": 0.18,
           "line-blur": 4,
         },
       });
@@ -90,9 +90,9 @@ export function RouteMap({
         type: "line",
         source: "route",
         paint: {
-          "line-color": "#5eead4",
+          "line-color": "#ff9a5c",
           "line-width": 3,
-          "line-opacity": 0.9,
+          "line-opacity": 0.95,
         },
       });
 
@@ -105,7 +105,7 @@ export function RouteMap({
 
     mapRef.current = map;
     markerRef.current = new maplibregl.Marker({
-      color: "#5eead4",
+      color: "#f0864a",
       scale: 0.9,
     });
 

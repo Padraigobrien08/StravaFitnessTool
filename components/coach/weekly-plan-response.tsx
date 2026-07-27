@@ -4,7 +4,7 @@ import type { GenerateWeeklyPlanResult, PlanToolObservability } from "@/lib/ai-p
 import { cn } from "@/lib/utils";
 
 const intensityDot: Record<string, string> = {
-  easy: "bg-teal-400/80",
+  easy: "bg-accent/80",
   moderate: "bg-amber-400/80",
   hard: "bg-orange-400/80",
   recovery: "bg-zinc-500",
@@ -28,13 +28,13 @@ export function WeeklyPlanResponse({
   return (
     <article
       className={cn(
-        "weekly-plan-response rounded-xl border border-white/[0.06] bg-[#0c0d10]/80",
+        "weekly-plan-response rounded-xl border border-white/[0.06] bg-[var(--surface-elevated)]",
         className,
       )}
     >
       <header className="border-b border-white/[0.04] px-4 py-3">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-medium uppercase tracking-wider text-teal-500/90">
+          <span className="text-[10px] font-medium uppercase tracking-wider text-accent">
             Weekly plan
           </span>
           <span className="text-[10px] text-zinc-600">·</span>

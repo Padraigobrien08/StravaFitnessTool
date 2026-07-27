@@ -17,7 +17,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 const badgeTone = {
-  up: "text-teal-400/90 bg-teal-500/10 border-teal-500/20",
+  up: "text-accent/90 bg-accent/10 border-accent/20",
   down: "text-amber-300/90 bg-amber-500/10 border-amber-500/20",
   flat: "text-zinc-400 bg-white/[0.04] border-white/[0.08]",
   alert: "text-amber-200/90 bg-amber-500/12 border-amber-500/25",
@@ -55,7 +55,7 @@ export function CoachDomains({
           type="button"
           disabled={disabled}
           onClick={() => onExplore(featured.suggestedQuery)}
-          className="coach-domain-feature group w-full rounded-2xl border border-teal-500/20 bg-gradient-to-br from-teal-500/[0.09] to-transparent p-4 text-left transition-all hover:border-teal-500/35 disabled:opacity-40 sm:p-5"
+          className="coach-domain-feature group w-full rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/[0.09] to-transparent p-4 text-left transition-all hover:border-accent/35 disabled:opacity-40 sm:p-5"
         >
           <DomainCardInner domain={featured} featured />
         </button>
@@ -73,7 +73,7 @@ export function CoachDomains({
               className="coach-domain-card rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5 text-left transition-all hover:border-white/[0.12] hover:bg-white/[0.04] disabled:opacity-40"
             >
               <div className="mb-2 flex items-center gap-2">
-                <Icon className="h-3.5 w-3.5 text-teal-500/60" />
+                <Icon className="h-3.5 w-3.5 text-accent/60" />
                 <span className="text-sm font-semibold text-zinc-200">{d.title}</span>
                 {d.trendBadge ? (
                   <span
@@ -108,7 +108,7 @@ function DomainCardInner({ domain, featured }: { domain: CoachingDomain; feature
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        <Icon className={cn("h-4 w-4", featured ? "text-teal-400/90" : "text-teal-500/60")} />
+        <Icon className={cn("h-4 w-4", featured ? "text-accent/90" : "text-accent/60")} />
         <span className="font-display text-lg font-semibold text-white">{domain.title}</span>
         {domain.trendBadge ? (
           <span
@@ -124,11 +124,11 @@ function DomainCardInner({ domain, featured }: { domain: CoachingDomain; feature
       <p className="mt-1 text-xs text-zinc-500">{domain.subtitle}</p>
       <p className="mt-3 text-sm leading-relaxed text-zinc-300">{domain.liveInsight}</p>
       {domain.memoryRef ? (
-        <p className="mt-3 text-xs text-zinc-500 border-l-2 border-teal-500/30 pl-3">
+        <p className="mt-3 text-xs text-zinc-500 border-l-2 border-accent/30 pl-3">
           {domain.memoryRef}
         </p>
       ) : null}
-      <p className="mt-4 text-[11px] text-teal-400/70 group-hover:text-teal-300/90">
+      <p className="mt-4 text-[11px] text-accent/70 group-hover:text-accent/90">
         Explore → {domain.suggestedQuery}
       </p>
     </>

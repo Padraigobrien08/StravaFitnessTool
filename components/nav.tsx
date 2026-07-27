@@ -43,7 +43,7 @@ export function Nav({
               className={cn(
                 "type-nav inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 transition-colors",
                 isActive(pathname, href)
-                  ? "bg-teal-500/15 text-teal-300"
+                  ? "bg-accent/15 text-accent"
                   : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100",
               )}
               aria-label={label}
@@ -68,7 +68,7 @@ export function Nav({
             className={cn(
               "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               isActive(pathname, href)
-                ? "bg-teal-500/15 text-teal-300"
+                ? "bg-accent/15 text-accent"
                 : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200",
             )}
           >

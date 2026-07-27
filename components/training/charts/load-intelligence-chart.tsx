@@ -20,6 +20,7 @@ export function LoadIntelligenceChart({
   currentIndex: number;
 }) {
   const chart = useTrainingChart();
+  const accent = "var(--home-signal)";
 
   if (data.length < 2) {
     return (
@@ -36,8 +37,8 @@ export function LoadIntelligenceChart({
       <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="ctlGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={chart.teal} stopOpacity={0.35} />
-            <stop offset="100%" stopColor={chart.teal} stopOpacity={0} />
+            <stop offset="0%" stopColor={accent} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={accent} stopOpacity={0} />
           </linearGradient>
           <linearGradient id="atlGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={chart.amber} stopOpacity={0.25} />
@@ -57,7 +58,7 @@ export function LoadIntelligenceChart({
         <Area
           type="monotone"
           dataKey="ctl"
-          stroke={chart.teal}
+          stroke={accent}
           fill="url(#ctlGrad)"
           strokeWidth={2}
           name="Fitness (CTL)"
@@ -84,7 +85,7 @@ export function LoadIntelligenceChart({
           x={current.label}
           y={current.ctl}
           r={5}
-          fill={chart.teal}
+          fill={accent}
           stroke="var(--background)"
           strokeWidth={2}
         />

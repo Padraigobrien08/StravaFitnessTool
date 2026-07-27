@@ -122,7 +122,7 @@ export default function RunDetailPage() {
             </Link>
             <Link
               href={`/runs/${id}/route`}
-              className="inline-flex items-center gap-2 rounded-lg border border-teal-500/20 bg-teal-500/[0.08] px-3 py-1.5 text-xs font-medium text-teal-200/90 transition-colors hover:bg-teal-500/12"
+              className="inline-flex items-center gap-2 rounded-lg border border-accent/20 bg-accent/[0.08] px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/[0.14]"
             >
               <Map className="h-3.5 w-3.5" />
               Route replay
@@ -165,7 +165,7 @@ export default function RunDetailPage() {
           {!fit && !listedWithStreams && run.fitFilename && (
             <p className="text-sm text-zinc-500">
               FIT file referenced ({run.fitFilename}) but not loaded. Re-import your Strava export
-              including <code className="text-teal-400/90">activities/</code>.
+              including <code className="text-accent/90">activities/</code>.
             </p>
           )}
         </div>
@@ -175,7 +175,7 @@ export default function RunDetailPage() {
       {!run && (
         <p className="text-zinc-500">
           Run not found.{" "}
-          <Link href="/runs" className="text-teal-400">
+          <Link href="/runs" className="text-accent">
             Back to runs
           </Link>
         </p>

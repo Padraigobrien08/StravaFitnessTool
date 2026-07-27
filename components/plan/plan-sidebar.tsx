@@ -33,7 +33,7 @@ export function PlanSidebar({
   const data = week ?? (preview ? previewToSidebar(preview) : null);
   if (!data) {
     return (
-      <aside className="rounded-xl border border-white/[0.06] bg-[#0c0d10]/60 p-4">
+      <aside className="rounded-xl bg-[var(--surface-elevated)] p-4 shadow-[var(--surface-shadow)] ring-1 ring-[var(--border-subtle)]">
         <p className="text-[12px] text-zinc-600">
           Generate or save a plan to see reasoning, constraints, and integrity status.
         </p>
@@ -46,7 +46,7 @@ export function PlanSidebar({
   const severity = week?.integritySeverity ?? integrity?.severity ?? "none";
 
   return (
-    <aside className="plan-sidebar space-y-3 rounded-xl border border-white/[0.06] bg-[#0c0d10]/80 p-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+    <aside className="plan-sidebar space-y-3 rounded-xl bg-[var(--surface-elevated)] p-4 shadow-[var(--surface-shadow)] ring-1 ring-[var(--border-subtle)] lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
       <div>
         <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
           Plan reasoning
@@ -78,11 +78,13 @@ export function PlanSidebar({
       <div
         className={cn(
           "flex items-start gap-2 rounded-lg px-2.5 py-2",
-          passed ? "bg-teal-500/[0.06]" : "bg-amber-500/[0.06]",
+          passed
+            ? "bg-[color-mix(in_srgb,var(--home-good)_8%,transparent)]"
+            : "bg-amber-500/[0.06]",
         )}
       >
         {passed ? (
-          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-teal-400/80" />
+          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--home-good)]" />
         ) : (
           <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400/80" />
         )}

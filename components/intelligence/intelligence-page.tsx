@@ -27,6 +27,7 @@ import { IntelligenceCapabilityRadar } from "./intelligence-capability-radar";
 import { IntelligenceProgressionBurndown } from "./intelligence-progression-burndown";
 import { IntelligenceDeepDive } from "./intelligence-deep-dive";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Eyebrow } from "@/components/console/console-kit";
 import { useRecommendationOutcomes } from "@/hooks/use-recommendation-outcomes";
 import { useForecastAccuracy } from "@/hooks/use-forecast-accuracy";
 import { coachUrl } from "@/lib/coach/domainLinks";
@@ -94,14 +95,14 @@ export function IntelligencePage() {
       <IntelligenceWorkspace>
         <div className="intelligence-model mx-auto max-w-5xl space-y-3 pb-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[11px] text-zinc-600">
+            <p className="text-[11px] text-zinc-500">
               What StrideIQ currently believes, what changed, and what to investigate
             </p>
-            <div className="flex gap-3 text-[11px]">
-              <Link href="/plan" className="text-teal-500/90 hover:text-teal-300">
+            <div className="flex gap-3 font-mono text-[11px]">
+              <Link href="/plan" className="text-zinc-500 hover:text-accent">
                 Plan →
               </Link>
-              <Link href={coachUrl()} className="text-zinc-500 hover:text-zinc-300">
+              <Link href={coachUrl()} className="text-zinc-500 hover:text-accent">
                 Coach →
               </Link>
             </div>
@@ -130,9 +131,7 @@ export function IntelligencePage() {
 
           {/* The evidence behind the belief, grouped so the page never becomes a wall. */}
           <div className="pt-1">
-            <p className="mb-2 text-[10px] font-medium uppercase tracking-eyebrow text-zinc-600">
-              Evidence
-            </p>
+            <Eyebrow className="mb-2">Evidence</Eyebrow>
             <Tabs
               value={evidenceTab}
               onValueChange={(value) =>

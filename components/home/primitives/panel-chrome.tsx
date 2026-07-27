@@ -30,7 +30,7 @@ export function PanelChrome({
         {href ? (
           <Link
             href={href}
-            className="text-[11px] text-zinc-500 transition-colors hover:text-teal-400"
+            className="text-[11px] text-zinc-500 transition-colors hover:text-accent"
           >
             Open <ArrowRight className="inline h-3 w-3" />
           </Link>

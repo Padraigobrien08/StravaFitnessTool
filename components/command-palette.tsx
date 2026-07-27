@@ -318,19 +318,19 @@ export function CommandPalette() {
                       className={cn(
                         "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] transition-colors",
                         index === active
-                          ? "bg-teal-500/15 text-teal-100"
+                          ? "bg-accent/15 text-accent"
                           : "text-zinc-300 hover:bg-white/[0.04]",
                       )}
                     >
                       <Icon
                         className={cn(
                           "h-4 w-4 shrink-0",
-                          index === active ? "text-teal-300" : "text-zinc-500",
+                          index === active ? "text-accent" : "text-zinc-500",
                         )}
                       />
                       <span className="min-w-0 flex-1 truncate">{cmd.label}</span>
                       {index === active ? (
-                        <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-teal-300/70" />
+                        <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-accent/70" />
                       ) : null}
                     </button>
                   </div>

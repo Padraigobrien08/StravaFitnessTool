@@ -55,7 +55,7 @@ export function RouteReplayWorkspace({
         </p>
         <Link
           href={backHref}
-          className="mt-6 inline-flex items-center gap-2 text-sm text-teal-400/90 hover:underline"
+          className="mt-6 inline-flex items-center gap-2 text-sm text-accent hover:underline"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to workout
@@ -85,7 +85,7 @@ export function RouteReplayWorkspace({
             </p>
           ) : null}
         </div>
-        <span className="rounded-md border border-teal-500/15 bg-teal-500/[0.06] px-2.5 py-1 text-[10px] font-medium text-teal-400/90">
+        <span className="rounded-md border border-accent/15 bg-accent/[0.06] px-2.5 py-1 text-[10px] font-medium text-accent">
           Spatial intelligence · Phase 1
         </span>
       </header>

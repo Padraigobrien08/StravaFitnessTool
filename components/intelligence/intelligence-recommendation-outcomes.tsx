@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const adherenceStyle: Record<Adherence, string> = {
-  followed: "text-teal-400/90",
+  followed: "text-[var(--home-good)]",
   partial: "text-amber-400/85",
   skipped: "text-rose-400/85",
   pending: "text-zinc-500",
@@ -18,8 +18,8 @@ const adherenceStyle: Record<Adherence, string> = {
 };
 
 const signalStyle: Record<OutcomeSignal, string> = {
-  supported: "text-teal-400/90",
-  partially_supported: "text-teal-400/70",
+  supported: "text-[var(--home-good)]",
+  partially_supported: "text-[var(--home-good)]",
   contradicted: "text-rose-400/85",
   inconclusive: "text-zinc-500",
 };

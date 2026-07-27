@@ -8,29 +8,33 @@ import type {
   WeeklyTrainingPlan,
 } from "@/lib/ai-planning";
 import { dash } from "@/components/home/primitives/tokens";
+import { ZONE_COLOR } from "@/components/console/console-kit";
+import type { CalendarIntensity } from "@/lib/training-calendar";
 import { cn } from "@/lib/utils";
 
-const intensityStyles: Record<string, string> = {
-  easy: "text-teal-300/90",
-  moderate: "text-amber-300/90",
-  hard: "text-orange-300/90",
-  recovery: "text-zinc-400",
-  rest: "text-zinc-500",
-};
+const ZONE_INTENSITIES: CalendarIntensity[] = ["easy", "recovery", "moderate", "hard", "rest"];
+
+function intensityColor(intensity: string): string {
+  return ZONE_INTENSITIES.includes(intensity as CalendarIntensity)
+    ? ZONE_COLOR[intensity as CalendarIntensity]
+    : "var(--muted-subtle)";
+}
 
 function WorkoutRow({ w }: { w: PlannedWorkout }) {
   return (
-    <li className="rounded-lg bg-white/[0.02] px-3 py-2.5 ring-1 ring-white/[0.04]">
+    <li className="rounded-lg bg-[var(--surface-subdued)] px-3 py-2.5 ring-1 ring-[var(--border-subtle)]">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-[13px] font-medium text-zinc-200">
           {w.day} · {w.title}
         </span>
         <span
-          className={cn(
-            "text-[11px] uppercase tracking-wide",
-            intensityStyles[w.intensity] ?? "text-zinc-500",
-          )}
+          className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wide"
+          style={{ color: intensityColor(w.intensity) }}
         >
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ background: intensityColor(w.intensity) }}
+          />
           {w.intensity}
         </span>
       </div>

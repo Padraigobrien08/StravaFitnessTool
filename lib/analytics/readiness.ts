@@ -19,6 +19,16 @@ import type { RacePredictionAnalysis } from "./predictions";
 import { lastNDaysVolume } from "./volume";
 import { differenceInDays, parseISO } from "date-fns";
 
+/**
+ * A race goal is a *live* target only up to and including race day. Once the date is
+ * in the past it becomes archived context, not an active race — callers should treat a
+ * lapsed goal as "no active race" (this is what gates `raceReadiness` in the analytics build).
+ */
+export function isRaceUpcoming(goal: RaceGoal | null | undefined): boolean {
+  if (!goal) return false;
+  return differenceInDays(parseISO(goal.date), new Date()) >= 0;
+}
+
 const HM_KM = 21.0975;
 const TYPICAL_4WK_HM_KM = 160;
 

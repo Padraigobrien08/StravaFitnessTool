@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
 
 const sigStyles = {
-  critical: "border-teal-500/25 bg-teal-500/[0.06] text-teal-300/90",
+  critical: "border-accent/25 bg-accent/[0.06] text-accent",
   meaningful: "border-amber-500/20 bg-amber-500/[0.04] text-amber-200/80",
-  supporting: "border-white/[0.06] bg-white/[0.02] text-zinc-500",
+  supporting: "border-[var(--border-subtle)] bg-white/[0.02] text-zinc-500",
 };
 
 export function NotableSessionsFeed({
@@ -49,7 +49,7 @@ export function NotableSessionsFeed({
               <p className="mt-0.5 text-[11px] text-zinc-500">{s.why}</p>
               {!compact ? (
                 <>
-                  <p className="mt-1 text-[11px] text-teal-400/70">{s.adaptation}</p>
+                  <p className="mt-1 text-[11px] text-accent/70">{s.adaptation}</p>
                   <p className="text-[10px] text-zinc-600">{s.goalRelation}</p>
                 </>
               ) : null}

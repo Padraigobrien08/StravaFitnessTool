@@ -37,7 +37,8 @@ export function DashboardPanel({
     <div
       className={cn(
         surface,
-        variant === "hero" && "bg-gradient-to-br from-[#0f1218] via-[#0c0d10] to-[#09090b]",
+        variant === "hero" &&
+          "bg-gradient-to-br from-[var(--surface-panel)] via-[var(--surface-elevated)] to-[var(--background)]",
         variant === "flat" && "shadow-none bg-white/[0.02]",
         hover && dash.surfaceHover,
         pad,

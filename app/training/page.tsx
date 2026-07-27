@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo } from "react";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
@@ -14,18 +15,29 @@ import { SupportingAnalytics } from "@/components/training/supporting-analytics"
 import { TrainingEcosystemPanel } from "@/components/training/training-ecosystem-panel";
 import { ops } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
-import { dash } from "@/components/home/primitives/tokens";
+import { Eyebrow } from "@/components/console/console-kit";
 import { JargonTerm } from "@/components/jargon-term";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 function TrainingEvidenceBanner() {
   return (
-    <div className="border-b border-white/[0.04] pb-3">
-      <p className={dash.labelAccent}>Training · Am I training correctly?</p>
-      <p className="mt-0.5 text-xs text-zinc-600">
-        <JargonTerm term="load">Load</JargonTerm>, intensity mix,{" "}
-        <JargonTerm term="phase">phase</JargonTerm>, and cross-training: how your training is
-        structured.
-      </p>
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[var(--surface-elevated)] px-4 py-3 shadow-[var(--surface-shadow-subtle)] ring-1 ring-[var(--border-subtle)]">
+      <div>
+        <Eyebrow>Training · Am I training correctly?</Eyebrow>
+        <p className="mt-0.5 text-xs text-zinc-600">
+          <JargonTerm term="load">Load</JargonTerm>, intensity mix,{" "}
+          <JargonTerm term="phase">phase</JargonTerm>, and cross-training — how your training is
+          structured.
+        </p>
+      </div>
+      <Link
+        href="/plan"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-accent/12 px-3 py-2 text-[13px] font-medium text-accent ring-1 ring-inset ring-accent/30 hover:bg-accent/20"
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+        Next week plan
+        <ArrowRight className="h-3.5 w-3.5" />
+      </Link>
     </div>
   );
 }

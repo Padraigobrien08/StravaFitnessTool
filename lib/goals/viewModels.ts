@@ -251,7 +251,7 @@ function buildDimensions(
       label: "Threshold support",
       score: threshold,
       level: levelFromScore(threshold),
-      note: `${analytics.intensityAdvice.currentEasyPct}% easy · ${hardPct}% hard share`,
+      note: `${Math.round(analytics.intensityAdvice.currentEasyPct)}% easy · ${Math.round(hardPct)}% hard share`,
     },
     {
       id: "pacing",
@@ -324,7 +324,7 @@ function buildRisks(
     risks.push({
       title: "Threshold density high",
       severity: "medium",
-      evidence: `${hardPct}% of efforts classified hard in recent block.`,
+      evidence: `${Math.round(hardPct)}% of efforts classified hard in recent block.`,
       mitigation: "Cap quality to 1–2 sessions/week; protect easy volume.",
       confidence: "medium",
     });

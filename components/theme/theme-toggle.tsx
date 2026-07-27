@@ -59,7 +59,7 @@ export function ThemeSegmentedControl({ className }: { className?: string }) {
         <ToggleGroupItem
           key={value}
           value={value}
-          className="capitalize data-pressed:bg-teal-500/15 data-pressed:text-teal-600 dark:data-pressed:text-teal-300"
+          className="capitalize data-pressed:bg-accent/15 data-pressed:text-accent dark:data-pressed:text-accent"
         >
           {value}
         </ToggleGroupItem>

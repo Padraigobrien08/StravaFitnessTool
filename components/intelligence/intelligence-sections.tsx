@@ -17,6 +17,7 @@ import type { RiskOpportunity } from "@/lib/coach/types";
 import type { TrainingEcosystemView } from "@/lib/training/ecosystemViewModel";
 import { domainCoachLink, signalCoachLink, topicCoachLink } from "@/lib/coach/domainLinks";
 import { cn } from "@/lib/utils";
+import { DecisionColumn, Eyebrow, Panel } from "@/components/console/console-kit";
 import {
   AlertTriangle,
   ArrowRight,
@@ -81,42 +82,42 @@ export function IntelligenceStateEvolution({ items }: { items: StateEvolutionIte
   if (items.length === 0) return null;
 
   return (
-    <section className="intelligence-evolution rounded-lg border border-white/[0.04] bg-white/[0.015] px-3 py-2.5">
-      <p className="mb-2 text-[11px] font-medium text-zinc-500">How your state is moving</p>
-      <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+    <Panel className="intelligence-evolution">
+      <Eyebrow className="mb-2.5">How your state is moving</Eyebrow>
+      <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none">
         {items.map((item) => {
           const display = formatTrajectoryDisplay(item);
           return (
             <div
               key={item.id}
-              className="min-w-[132px] shrink-0 rounded-md bg-white/[0.03] px-2 py-1.5 sm:min-w-[140px]"
+              className="min-w-[132px] shrink-0 rounded-lg bg-[var(--surface-subdued)] px-2.5 py-2 ring-1 ring-[var(--border-subtle)] sm:min-w-[140px]"
             >
               <div className="flex items-center justify-between gap-1">
-                <p className="text-[10px] text-zinc-600">{item.label}</p>
+                <p className="text-[9px] uppercase tracking-[0.14em] text-zinc-500">{item.label}</p>
                 <TrendGlyph trend={item.trend} />
               </div>
-              <p className="mt-0.5 text-[12px] font-medium leading-tight text-zinc-200">
+              <p className="mt-1 font-mono text-[12px] font-medium leading-tight tabular-nums text-foreground">
                 {display.headline}
               </p>
-              {display.sub ? <p className="text-[10px] text-zinc-600">{display.sub}</p> : null}
+              {display.sub ? <p className="text-[10px] text-zinc-500">{display.sub}</p> : null}
             </div>
           );
         })}
       </div>
-    </section>
+    </Panel>
   );
 }
 
 function TrendGlyph({ trend }: { trend: "up" | "down" | "flat" }) {
-  if (trend === "up") return <TrendingUp className="h-3 w-3 text-zinc-500" />;
+  if (trend === "up") return <TrendingUp className="h-3 w-3 text-accent" />;
   if (trend === "down") return <TrendingDown className="h-3 w-3 text-zinc-500" />;
   return <span className="text-[10px] text-zinc-600">→</span>;
 }
 
 function SignalStatusIcon({ severity }: { severity: IntelligenceSignal["severity"] }) {
-  if (severity === "positive") return <span className="text-teal-400/80">↑</span>;
+  if (severity === "positive") return <span className="text-[var(--home-good)]">↑</span>;
   if (severity === "warning") return <span className="text-amber-400/80">!</span>;
-  if (severity === "opportunity") return <span className="text-teal-300/70">◇</span>;
+  if (severity === "opportunity") return <span className="text-accent/80">◇</span>;
   return <span className="text-zinc-500">~</span>;
 }
 
@@ -126,10 +127,10 @@ function IntelligenceSignalFeed({ signals }: { signals: IntelligenceSignal[] }) 
 
   return (
     <Section title="Signals shaping the current recommendation">
-      <div className="overflow-x-auto rounded-lg border border-white/[0.04]">
+      <div className="overflow-x-auto rounded-lg ring-1 ring-[var(--border-subtle)]">
         <table className="w-full min-w-[520px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-white/[0.04] text-[10px] text-zinc-600">
+            <tr className="border-b border-[var(--border-subtle)] text-[10px] uppercase tracking-[0.1em] text-zinc-500">
               <th className="w-8 px-2 py-1.5 font-medium" />
               <th className="px-2 py-1.5 font-medium">Signal</th>
               <th className="hidden px-2 py-1.5 font-medium sm:table-cell">Implication</th>
@@ -143,7 +144,7 @@ function IntelligenceSignalFeed({ signals }: { signals: IntelligenceSignal[] }) 
               return (
                 <tr
                   key={s.id}
-                  className="border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02]"
+                  className="border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--surface-subdued)]"
                 >
                   <td className="px-2 py-2 align-top text-center text-[12px]">
                     <SignalStatusIcon severity={s.severity} />
@@ -216,9 +217,9 @@ export function IntelligenceSignalBoard({
     <Section title="Prioritized signals">
       <div className="space-y-3">
         {primary ? (
-          <div className="group rounded-xl bg-white/[0.04] p-4 ring-1 ring-white/[0.06]">
+          <div className="group rounded-xl bg-[var(--surface-subdued)] p-4 ring-1 ring-[var(--border-subtle)]">
             <div className="flex items-start gap-3">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-teal-400/70" />
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent/80" />
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] text-zinc-600">{primary.type}</p>
                 <p className="mt-1 text-[16px] font-medium leading-snug text-zinc-100">
@@ -258,7 +259,9 @@ function CompactSignalCard({ signal, watch }: { signal: IntelligenceSignal; watc
     <div
       className={cn(
         "group rounded-lg px-3 py-2.5",
-        watch ? "bg-amber-500/[0.05]" : "bg-white/[0.025]",
+        watch
+          ? "bg-amber-500/[0.05]"
+          : "bg-[var(--surface-subdued)] ring-1 ring-[var(--border-subtle)]",
       )}
     >
       <div className="flex gap-2">
@@ -291,7 +294,7 @@ function SignalMeta({
       )}
     >
       {!compact ? (
-        <span className="rounded bg-white/[0.04] px-1.5 py-0.5 text-zinc-500">
+        <span className="rounded bg-[var(--surface-subdued)] px-1.5 py-0.5 text-zinc-500 ring-1 ring-[var(--border-subtle)]">
           {signal.evidence}
         </span>
       ) : null}
@@ -317,91 +320,29 @@ export function IntelligenceDecisionSupport({
         <DecisionColumn
           title="Risks"
           items={risks.map((r) => r.text)}
-          tone="risk"
-          topic="intensity-stacking"
-          query="What risks should I address in my current training?"
+          color="var(--hz-moderate)"
+          href={topicCoachLink(
+            "intensity-stacking",
+            "What risks should I address in my current training?",
+          )}
+          coachLabel="Ask Coach"
         />
         <DecisionColumn
           title="Opportunities"
           items={opportunities.map((o) => o.text)}
-          tone="opp"
-          topic="opportunities"
-          query="Which opportunities should I act on this week?"
+          color="var(--home-good)"
+          href={topicCoachLink("opportunities", "Which opportunities should I act on this week?")}
+          coachLabel="Ask Coach"
         />
-        <div className="rounded-xl bg-zinc-100/[0.06] p-3.5 ring-1 ring-white/[0.08]">
-          <p className="text-[11px] font-medium text-zinc-400">Primary action</p>
-          <ul className="mt-2.5 space-y-2">
-            {actionBullets.map((line) => (
-              <li key={line} className="flex gap-2 text-[13px] leading-snug text-zinc-100">
-                <span className="text-zinc-600">–</span>
-                <span>{line}</span>
-              </li>
-            ))}
-          </ul>
-          <Link
-            href={topicCoachLink("recommendation", recommendation)}
-            className="mt-3 inline-flex items-center gap-0.5 text-[11px] text-zinc-500 hover:text-zinc-300"
-          >
-            Ask Coach <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
+        <DecisionColumn
+          title="Primary action"
+          items={actionBullets}
+          color="var(--home-signal)"
+          href={topicCoachLink("recommendation", recommendation)}
+          coachLabel="Ask Coach"
+        />
       </div>
     </Section>
-  );
-}
-
-function DecisionColumn({
-  title,
-  items,
-  tone,
-  topic,
-  query,
-}: {
-  title: string;
-  items: string[];
-  tone: "risk" | "opp";
-  topic: string;
-  query: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "rounded-xl p-3.5",
-        tone === "risk" ? "bg-amber-500/[0.05]" : "bg-teal-500/[0.05]",
-      )}
-    >
-      <p
-        className={cn(
-          "text-[11px] font-medium",
-          tone === "risk" ? "text-amber-200/55" : "text-teal-400/55",
-        )}
-      >
-        {title}
-      </p>
-      <ul className="mt-2 space-y-1.5">
-        {items.length === 0 ? (
-          <li className="text-[12px] text-zinc-600">None flagged</li>
-        ) : (
-          items.slice(0, 4).map((t) => (
-            <li
-              key={t}
-              className={cn(
-                "text-[12px] leading-snug",
-                tone === "risk" ? "text-amber-100/80" : "text-teal-100/85",
-              )}
-            >
-              {t}
-            </li>
-          ))
-        )}
-      </ul>
-      <Link
-        href={topicCoachLink(topic, query)}
-        className="mt-2.5 inline-flex items-center gap-0.5 text-[11px] text-zinc-500 hover:text-zinc-300"
-      >
-        Ask Coach <ArrowRight className="h-3 w-3" />
-      </Link>
-    </div>
   );
 }
 
@@ -432,7 +373,7 @@ export function IntelligenceMemoryGrouped({
     tone: string;
   }[] = [
     { key: "stable", title: "Stable patterns", tone: "text-zinc-500" },
-    { key: "emerging", title: "Emerging patterns", tone: "text-teal-500/60" },
+    { key: "emerging", title: "Emerging patterns", tone: "text-accent/70" },
     { key: "watchlist", title: "Watchlist", tone: "text-amber-400/55" },
   ];
 
@@ -476,7 +417,7 @@ export function IntelligenceMemoryGrouped({
 
 function MemoryBeliefRow({ belief, evidence }: { belief: MemorySnippet; evidence: string }) {
   return (
-    <li className="group rounded-md bg-white/[0.02] px-2 py-2">
+    <li className="group rounded-md bg-[var(--surface-subdued)] px-2 py-2 ring-1 ring-[var(--border-subtle)]">
       <p className="text-[12px] leading-snug text-zinc-400">{belief.text}</p>
       <p className="mt-1 text-[10px] text-zinc-600">
         Confidence: <span className="capitalize text-zinc-500">{belief.confidence}</span>
@@ -623,8 +564,8 @@ export function IntelligenceEcosystemCompact({
 
 function EcoMetric({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
   return (
-    <div className="rounded-md bg-white/[0.025] px-2 py-1.5 text-center">
-      <p className="text-[9px] text-zinc-600">{label}</p>
+    <div className="rounded-md bg-[var(--surface-subdued)] px-2 py-1.5 text-center ring-1 ring-[var(--border-subtle)]">
+      <p className="text-[9px] uppercase tracking-[0.1em] text-zinc-500">{label}</p>
       <p
         className={cn(
           "text-[11px] font-medium tabular-nums text-zinc-400",
@@ -664,13 +605,13 @@ export function IntelligenceCoachEntries({ domains }: { domains: CoachWorkspaceS
           <Link
             key={item.key}
             href={item.href}
-            className="group rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.035]"
+            className="group rounded-lg bg-[var(--surface-subdued)] px-3 py-2.5 ring-1 ring-[var(--border-subtle)] transition-colors hover:ring-accent/30"
           >
-            <p className="text-[12px] font-medium text-zinc-300 group-hover:text-zinc-100">
+            <p className="text-[12px] font-medium text-zinc-300 group-hover:text-foreground">
               {item.label}
             </p>
-            <p className="mt-0.5 text-[11px] leading-snug text-zinc-600">{item.hypothesis}</p>
-            <span className="mt-1.5 inline-flex items-center gap-0.5 text-[10px] text-zinc-600 group-hover:text-zinc-400">
+            <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">{item.hypothesis}</p>
+            <span className="mt-1.5 inline-flex items-center gap-0.5 font-mono text-[10px] text-zinc-500 group-hover:text-accent">
               Open in Coach <ArrowRight className="h-3 w-3" />
             </span>
           </Link>
@@ -702,13 +643,13 @@ function Section({
   className?: string;
 }) {
   return (
-    <section className={cn("intelligence-block", className)}>
-      <div className="mb-2">
-        <h2 className="text-[12px] font-medium text-zinc-500">{title}</h2>
-        {subtitle ? <p className="mt-0.5 text-[10px] text-zinc-700">{subtitle}</p> : null}
+    <Panel className={cn("intelligence-block", className)}>
+      <div className="mb-3">
+        <Eyebrow>{title}</Eyebrow>
+        {subtitle ? <p className="mt-1 text-[10px] text-zinc-600">{subtitle}</p> : null}
       </div>
       {children}
-    </section>
+    </Panel>
   );
 }
 

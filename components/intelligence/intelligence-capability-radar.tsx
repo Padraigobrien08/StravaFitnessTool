@@ -52,7 +52,13 @@ export function IntelligenceCapabilityRadar({ data }: { data: CapabilityRadar })
                 fillOpacity={1}
               />
             ) : null}
-            <Radar name="You" dataKey="score" stroke="#2dd4bf" fill="#2dd4bf" fillOpacity={0.28} />
+            <Radar
+              name="You"
+              dataKey="score"
+              stroke="var(--home-signal)"
+              fill="var(--home-signal)"
+              fillOpacity={0.28}
+            />
           </RadarChart>
         </ResponsiveContainer>
       </div>

@@ -17,7 +17,7 @@ function ContextRow({
   return (
     <div className="rounded-md bg-white/[0.025] px-2.5 py-2">
       <p className="text-[11px] text-zinc-600">{label}</p>
-      <p className="mt-0.5 text-[13px] font-medium tabular-nums text-zinc-300">{value}</p>
+      <p className="mt-0.5 font-mono text-[13px] font-medium tabular-nums text-zinc-300">{value}</p>
       {sub ? <p className="mt-0.5 text-[11px] text-zinc-600">{sub}</p> : null}
     </div>
   );
@@ -41,7 +41,7 @@ export function CoachMiniContext({
       <button
         type="button"
         onClick={onToggle}
-        className="coach-mini-context hidden h-full min-h-0 w-9 shrink-0 items-center justify-center self-stretch bg-[#0a0b0e]/80 xl:flex"
+        className="coach-mini-context hidden h-full min-h-0 w-9 shrink-0 items-center justify-center self-stretch bg-[var(--surface-subdued)] xl:flex"
         aria-label="Expand context"
       >
         <ChevronRight className="h-4 w-4 rotate-180 text-zinc-600" />
@@ -50,7 +50,7 @@ export function CoachMiniContext({
   }
 
   return (
-    <aside className="coach-mini-context hidden h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden bg-[#0a0b0e]/50 xl:flex">
+    <aside className="coach-mini-context hidden h-full min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden bg-[var(--surface-subdued)] xl:flex">
       <div className="flex shrink-0 items-center justify-between px-3 py-2.5">
         <span className="text-[12px] font-medium text-zinc-500">Answer context</span>
         <button
@@ -120,8 +120,8 @@ export function CoachMiniContext({
         ) : null}
 
         {topOpp ? (
-          <div className="mt-2 rounded-md border border-teal-500/15 bg-teal-500/[0.03] px-2.5 py-2">
-            <p className="text-[11px] text-teal-400/50">Opportunity</p>
+          <div className="mt-2 rounded-md border border-accent/15 bg-accent/[0.03] px-2.5 py-2">
+            <p className="text-[11px] text-accent/70">Opportunity</p>
             <p className="mt-0.5 text-[12px] leading-snug text-zinc-400">{topOpp.text}</p>
           </div>
         ) : null}

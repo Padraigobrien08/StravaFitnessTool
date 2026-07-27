@@ -11,14 +11,13 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
+import { Eyebrow, Panel } from "@/components/console/console-kit";
 import { useTrainingChart } from "@/components/training/charts/chart-theme";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import { simulateRaceStrategy, type StrategyMode } from "@/lib/analytics/raceStrategy";
 import { minMaxYDomainReversed } from "@/lib/charts/yDomain";
 import { formatDuration, formatPace, cn } from "@/lib/utils";
-import { dash } from "@/components/home/primitives/tokens";
 
 const MODES: { id: StrategyMode; label: string; desc: string }[] = [
   { id: "even", label: "Even split", desc: "Steady effort, slight second-half drift" },
@@ -28,7 +27,7 @@ const MODES: { id: StrategyMode; label: string; desc: string }[] = [
 ];
 
 const fadeColor = {
-  low: "text-teal-400",
+  low: "text-accent",
   medium: "text-amber-400",
   high: "text-red-400",
 };
@@ -57,11 +56,12 @@ export function ExecutionIntelligencePanel({
 
   if (!strategy) {
     return (
-      <PanelChrome title="Execution intelligence" subdued>
+      <Panel>
+        <Eyebrow className="mb-2.5">Execution intelligence</Eyebrow>
         <p className="text-sm text-zinc-500">
           Set a target time or ensure predictions exist for this distance.
         </p>
-      </PanelChrome>
+      </Panel>
     );
   }
 
@@ -84,9 +84,14 @@ export function ExecutionIntelligencePanel({
   const activeMode = MODES.find((m) => m.id === mode)!;
 
   return (
-    <PanelChrome title="Execution intelligence" elevated>
-      <p className={`${dash.muted} mb-4`}>
-        Target {formatDuration(strategy.targetTimeSec)} ({strategy.targetTimeSource}) · Fade risk{" "}
+    <Panel>
+      <Eyebrow className="mb-2.5">Execution intelligence</Eyebrow>
+      <p className="mb-4 text-xs text-zinc-500">
+        Target{" "}
+        <span className="font-mono tabular-nums text-zinc-300">
+          {formatDuration(strategy.targetTimeSec)}
+        </span>{" "}
+        ({strategy.targetTimeSource}) · Fade risk{" "}
         <span className={fadeColor[strategy.fadeRisk]}>{strategy.fadeRisk}</span>
       </p>
 
@@ -97,14 +102,14 @@ export function ExecutionIntelligencePanel({
             type="button"
             onClick={() => setMode(m.id)}
             className={cn(
-              "rounded-xl border px-3 py-2.5 text-left transition-colors",
+              "rounded-xl px-3 py-2.5 text-left ring-1 transition-colors",
               mode === m.id
-                ? "border-teal-500/35 bg-teal-500/10"
-                : "border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.04]",
+                ? "bg-accent/10 ring-accent/35"
+                : "bg-[var(--surface-subdued)] ring-[var(--border-subtle)] hover:bg-[var(--surface-hover)]",
             )}
           >
             <span className="text-xs font-semibold text-zinc-200">{m.label}</span>
-            <p className="mt-0.5 text-[10px] leading-snug text-zinc-600">{m.desc}</p>
+            <p className="mt-0.5 text-[10px] leading-snug text-zinc-500">{m.desc}</p>
           </button>
         ))}
       </div>
@@ -113,11 +118,13 @@ export function ExecutionIntelligencePanel({
         {strategy.narrative.map((n, i) => (
           <li key={i}>· {n}</li>
         ))}
-        <li className="text-zinc-600">· {activeMode.desc}</li>
+        <li className="text-zinc-500">· {activeMode.desc}</li>
       </ul>
 
-      <div className="rounded-lg bg-white/[0.02] p-2 ring-1 ring-inset ring-white/[0.04]">
-        <p className={cn(dash.label, "px-1 pb-2")}>Pacing progression</p>
+      <div className="rounded-lg bg-[var(--surface-subdued)] p-2 ring-1 ring-inset ring-[var(--border-subtle)]">
+        <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+          Pacing progression
+        </p>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartData}>
             <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -143,18 +150,18 @@ export function ExecutionIntelligencePanel({
             <Line
               type="monotone"
               dataKey="pace"
-              stroke={chart.teal}
+              stroke="var(--home-signal)"
               strokeWidth={2}
-              dot={{ r: 3, fill: chart.teal }}
+              dot={{ r: 3, fill: "var(--home-signal)" }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-white/[0.05]">
+      <div className="mt-4 overflow-x-auto rounded-xl ring-1 ring-[var(--border-subtle)]">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-white/[0.06] bg-white/[0.02] text-[10px] uppercase tracking-wider text-zinc-500">
+            <tr className="border-b border-[var(--border-subtle)] bg-[var(--surface-subdued)] text-[10px] uppercase tracking-wider text-zinc-500">
               <th className="px-3 py-2 text-left">Km</th>
               <th className="px-3 py-2 text-left">Cumulative</th>
               <th className="px-3 py-2 text-left">Segment</th>
@@ -163,15 +170,14 @@ export function ExecutionIntelligencePanel({
           </thead>
           <tbody>
             {strategy.splits.map((s) => (
-              <tr key={s.km} className="border-b border-white/[0.03] text-zinc-400">
-                <td className="px-3 py-2 tabular-nums">{s.km}</td>
-                <td className="px-3 py-2 tabular-nums text-zinc-200">
-                  {formatDuration(s.cumulativeSec)}
-                </td>
-                <td className="px-3 py-2 tabular-nums">{formatDuration(s.segmentSec)}</td>
-                <td className="px-3 py-2 tabular-nums text-teal-300/90">
-                  {formatPace(s.paceSecPerKm)}
-                </td>
+              <tr
+                key={s.km}
+                className="border-b border-[var(--border-subtle)] font-mono tabular-nums text-zinc-400"
+              >
+                <td className="px-3 py-2">{s.km}</td>
+                <td className="px-3 py-2 text-zinc-200">{formatDuration(s.cumulativeSec)}</td>
+                <td className="px-3 py-2">{formatDuration(s.segmentSec)}</td>
+                <td className="px-3 py-2 text-accent">{formatPace(s.paceSecPerKm)}</td>
               </tr>
             ))}
           </tbody>
@@ -179,11 +185,11 @@ export function ExecutionIntelligencePanel({
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg bg-white/[0.02] px-3 py-2.5 text-xs text-zinc-500">
+        <div className="rounded-lg bg-[var(--surface-subdued)] px-3 py-2.5 text-xs text-zinc-500 ring-1 ring-[var(--border-subtle)]">
           <p className="font-medium text-zinc-400">Physiological note</p>
           <p className="mt-1">{strategy.uncertaintyNote}</p>
         </div>
-        <div className="rounded-lg bg-white/[0.02] px-3 py-2.5 text-xs text-zinc-500">
+        <div className="rounded-lg bg-[var(--surface-subdued)] px-3 py-2.5 text-xs text-zinc-500 ring-1 ring-[var(--border-subtle)]">
           <p className="font-medium text-zinc-400">Fade factors</p>
           <ul className="mt-1 space-y-0.5">
             {strategy.fadeFactors.map((f, i) => (
@@ -200,6 +206,6 @@ export function ExecutionIntelligencePanel({
           ))}
         </ul>
       ) : null}
-    </PanelChrome>
+    </Panel>
   );
 }

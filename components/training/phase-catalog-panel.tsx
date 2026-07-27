@@ -1,12 +1,12 @@
 "use client";
 
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import type { TrainingPhase, TrainingPhaseType } from "@/lib/analytics";
+import { Eyebrow, Panel } from "@/components/console/console-kit";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 
 const band: Record<TrainingPhaseType, string> = {
-  base: "bg-teal-500/60",
+  base: "bg-accent/60",
   build: "bg-sky-500/60",
   peak: "bg-violet-500/65",
   taper: "bg-amber-500/65",
@@ -15,7 +15,7 @@ const band: Record<TrainingPhaseType, string> = {
 };
 
 const dot: Record<TrainingPhaseType, string> = {
-  base: "bg-teal-400/80",
+  base: "bg-accent/80",
   build: "bg-sky-400/80",
   peak: "bg-violet-400/85",
   taper: "bg-amber-400/85",
@@ -34,7 +34,8 @@ export function PhaseCatalogPanel({ phases }: { phases: TrainingPhase[] }) {
   const totalWeeks = phases.reduce((s, p) => s + p.weeks, 0);
 
   return (
-    <PanelChrome title="Training phases" subdued>
+    <Panel>
+      <Eyebrow className="mb-2">Training phases</Eyebrow>
       <p className="mb-2 text-xs text-zinc-500">
         The shape of your last {totalWeeks} weeks — base, build, sharpening, taper, and recovery.
       </p>
@@ -63,11 +64,11 @@ export function PhaseCatalogPanel({ phases }: { phases: TrainingPhase[] }) {
             <li key={i} className="flex items-baseline gap-2.5 text-xs">
               <span className={cn("mt-1 h-2 w-2 shrink-0 rounded-full", dot[p.type])} />
               <span className="w-20 shrink-0 font-medium text-zinc-300">{p.label}</span>
-              <span className="w-28 shrink-0 tabular-nums text-zinc-600">{span(p)}</span>
+              <span className="w-28 shrink-0 font-mono tabular-nums text-zinc-600">{span(p)}</span>
               <span className="text-zinc-500">{p.characterization}</span>
             </li>
           ))}
       </ul>
-    </PanelChrome>
+    </Panel>
   );
 }

@@ -2,16 +2,17 @@
 
 import type { GoalsRaceBriefView } from "@/lib/goals/goalsRaceBrief";
 import { GoalsCoachPrompts } from "@/components/goals/goals-coach-prompts";
+import { Eyebrow, Panel, Readout } from "@/components/console/console-kit";
 import { cn } from "@/lib/utils";
 
 export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
   return (
-    <section className="goals-race-brief relative overflow-hidden rounded-xl bg-gradient-to-br from-[#12141a] via-[#0d0e12] to-[#0a0b0e] px-5 py-5 sm:px-6 sm:py-6">
-      <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(160px,200px)] lg:items-start">
+    <Panel bare className="overflow-hidden">
+      <div className="grid gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1fr)_minmax(180px,220px)] lg:items-start">
         <div className="min-w-0 space-y-4">
           <div>
-            <p className="text-[12px] text-zinc-500">Race forecast</p>
-            <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <Eyebrow>Race forecast{brief.distanceLabel ? ` · ${brief.distanceLabel}` : ""}</Eyebrow>
+            <h2 className="mt-1.5 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               {brief.headline}
             </h2>
             {brief.targetTimeDisplay ? (
@@ -31,9 +32,19 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
             </p>
           </div>
 
-          <div className="rounded-lg bg-white/[0.04] px-3.5 py-3 ring-1 ring-white/[0.05]">
-            <p className="text-[11px] font-medium text-zinc-500">Primary action</p>
-            <p className="mt-1.5 text-[14px] leading-[1.55] text-zinc-100">{brief.primaryAction}</p>
+          <div
+            className="rounded-lg px-3.5 py-3"
+            style={{
+              background: "var(--home-signal-wash)",
+              boxShadow: "inset 0 0 0 1px var(--home-signal-line)",
+            }}
+          >
+            <p className="text-[11px] font-medium" style={{ color: "var(--home-signal)" }}>
+              Primary action
+            </p>
+            <p className="mt-1.5 text-[14px] leading-[1.55] text-foreground">
+              {brief.primaryAction}
+            </p>
           </div>
 
           {brief.evidenceBullets.length > 0 ? (
@@ -57,8 +68,8 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
 
           {brief.warnings.length > 0 ? (
             <ul className="space-y-1 rounded-lg border border-amber-500/15 bg-amber-500/[0.05] px-3 py-2.5 text-[12px] text-amber-200/80">
-              {brief.warnings.map((w) => (
-                <li key={w}>· {w}</li>
+              {brief.warnings.map((w, i) => (
+                <li key={`${i}-${w}`}>· {w}</li>
               ))}
             </ul>
           ) : null}
@@ -66,8 +77,16 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
           <GoalsCoachPrompts prompts={brief.coachPrompts} />
         </div>
 
-        <aside className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-          <BriefMetric label="Most likely" value={brief.mostLikely} sub={brief.distanceLabel} />
+        <aside className="space-y-3">
+          <div className="rounded-lg bg-[var(--surface-subdued)] p-3.5 ring-1 ring-[var(--border-subtle)]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Most likely
+            </p>
+            <Readout value={brief.mostLikely} className="mt-1 text-[clamp(26px,4vw,36px)]" />
+            {brief.distanceLabel ? (
+              <p className="mt-1 font-mono text-[11px] text-zinc-500">{brief.distanceLabel}</p>
+            ) : null}
+          </div>
           <BriefMetric label="Range" value={brief.rangeDisplay} sub="p25–p75" />
           {brief.readinessScore != null ? (
             <BriefMetric
@@ -78,17 +97,17 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
           ) : null}
         </aside>
       </div>
-    </section>
+    </Panel>
   );
 }
 
 function BriefMetric({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-lg bg-white/[0.03] px-3 py-2.5">
-      <p className="text-[11px] text-zinc-600">{label}</p>
+    <div className="rounded-lg bg-[var(--surface-subdued)] px-3 py-2.5 ring-1 ring-[var(--border-subtle)]">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500">{label}</p>
       <p
         className={cn(
-          "mt-0.5 font-medium tabular-nums text-zinc-100",
+          "mt-0.5 font-mono font-semibold tabular-nums text-foreground",
           value.length > 12 ? "text-base" : "text-lg",
         )}
       >

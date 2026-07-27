@@ -80,11 +80,11 @@ export function CoachReasoningWorkspace({
           </div>
         </div>
         <div className="hidden shrink-0 items-center gap-2 text-[10px] text-zinc-600 sm:flex">
-          <Link href={intelligenceUrl()} className="hover:text-teal-400/80 hover:underline">
+          <Link href={intelligenceUrl()} className="hover:text-accent hover:underline">
             Intelligence
           </Link>
           <span className="text-zinc-800">·</span>
-          <Link href="/import" className="hover:text-teal-400/80 hover:underline">
+          <Link href="/import" className="hover:text-accent hover:underline">
             Data
           </Link>
         </div>

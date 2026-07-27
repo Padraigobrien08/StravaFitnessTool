@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel, Eyebrow } from "@/components/console/console-kit";
 import { Button } from "@/components/ui/button";
 
 interface PushSubscription {
@@ -64,11 +64,9 @@ export function StravaWebhookCard({ apiConnected }: { apiConnected: boolean }) {
   if (!apiConnected) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Strava auto-sync (webhooks)</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 text-sm text-zinc-400">
+    <Panel>
+      <Eyebrow className="mb-3">Strava auto-sync (webhooks)</Eyebrow>
+      <div className="space-y-4 text-sm text-muted-foreground">
         <p>
           Push subscriptions notify this app when you create, update, or delete an activity on
           Strava. Requires a public HTTPS callback URL (e.g. ngrok in dev, your production domain in
@@ -91,7 +89,7 @@ export function StravaWebhookCard({ apiConnected }: { apiConnected: boolean }) {
         ) : (
           <p className="text-zinc-500">No push subscription registered yet.</p>
         )}
-        {message ? <p className="text-teal-400/90">{message}</p> : null}
+        {message ? <p className="text-accent">{message}</p> : null}
         {error ? <p className="text-amber-400/90">{error}</p> : null}
         <Button
           variant="outline"
@@ -101,7 +99,7 @@ export function StravaWebhookCard({ apiConnected }: { apiConnected: boolean }) {
         >
           {loading ? "Enabling…" : "Enable auto-sync"}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }

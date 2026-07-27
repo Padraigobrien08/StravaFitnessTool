@@ -2,6 +2,7 @@
 
 import type { PlanWeekTelemetry } from "@/lib/plan/planWorkspaceView";
 import { formatKm } from "@/lib/utils";
+import { Eyebrow, Panel, StatItem } from "@/components/console/console-kit";
 
 export function PlanWeekTelemetryStrip({ telemetry }: { telemetry: PlanWeekTelemetry }) {
   const chips = [
@@ -23,28 +24,24 @@ export function PlanWeekTelemetryStrip({ telemetry }: { telemetry: PlanWeekTelem
   }[];
 
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {chips.map((c) => (
-        <div
-          key={c.label}
-          className={
-            c.warn
-              ? "rounded-md bg-amber-500/[0.06] px-2.5 py-1.5 ring-1 ring-amber-500/15"
-              : "rounded-md bg-[var(--surface)] px-2.5 py-1.5 ring-1 ring-[var(--border-subtle)]"
-          }
-        >
-          <p className="text-[9px] uppercase tracking-wide text-zinc-600">{c.label}</p>
-          <p
-            className={
-              c.warn
-                ? "text-[11px] font-medium text-amber-200/80"
-                : "text-[11px] font-medium text-zinc-300"
-            }
-          >
-            {c.value}
-          </p>
-        </div>
-      ))}
-    </div>
+    <Panel>
+      <Eyebrow className="mb-3">Week telemetry</Eyebrow>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-6">
+        {chips.map((c) =>
+          c.warn ? (
+            <div key={c.label} className="flex flex-col">
+              <span className="text-[9px] uppercase tracking-[0.14em] text-amber-400/70">
+                {c.label}
+              </span>
+              <span className="font-mono text-[13px] tabular-nums text-amber-200/85">
+                {c.value}
+              </span>
+            </div>
+          ) : (
+            <StatItem key={c.label} label={c.label} value={c.value} />
+          ),
+        )}
+      </div>
+    </Panel>
   );
 }

@@ -40,7 +40,7 @@ export function ActivityContextPanel({
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="h-full rounded-full bg-teal-500/80"
+                    className="h-full rounded-full bg-accent/80"
                     style={{ width: `${a.pct}%` }}
                   />
                 </div>

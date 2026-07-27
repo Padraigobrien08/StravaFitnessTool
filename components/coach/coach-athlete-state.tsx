@@ -14,10 +14,10 @@ const toneIcon = {
 };
 
 const toneClass = {
-  positive: "text-teal-400/90",
+  positive: "text-accent/90",
   neutral: "text-zinc-500",
   warning: "text-amber-400/90",
-  opportunity: "text-teal-300/80",
+  opportunity: "text-accent/80",
 };
 
 function compactMemoryLine(text: string, max = 72): string {

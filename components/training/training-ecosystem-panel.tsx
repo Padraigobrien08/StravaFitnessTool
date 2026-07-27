@@ -1,12 +1,12 @@
 "use client";
 
 import type { TrainingEcosystemView } from "@/lib/training/ecosystemViewModel";
-import { PanelChrome } from "@/components/home/primitives/panel-chrome";
 import { ConfidenceBadge } from "@/components/confidence-badge";
+import { Eyebrow, Panel } from "@/components/console/console-kit";
 import { cn } from "@/lib/utils";
 
 function trendColor(t: "positive" | "neutral" | "warning") {
-  if (t === "positive") return "text-teal-400";
+  if (t === "positive") return "text-accent";
   if (t === "warning") return "text-amber-400";
   return "text-zinc-400";
 }
@@ -20,26 +20,28 @@ export function TrainingEcosystemPanel({
 }) {
   if (!data.hasNonRunData && data.interferenceWarnings.length === 0) {
     return (
-      <PanelChrome title="Training ecosystem" className={className}>
+      <Panel className={className}>
+        <Eyebrow className="mb-2">Training ecosystem</Eyebrow>
         <p className="text-sm text-zinc-500">
           Log bike, strength, yoga, and other sports on Strava to see cross-training load,
           durability support, and interference context alongside your runs.
         </p>
-      </PanelChrome>
+      </Panel>
     );
   }
 
   return (
-    <PanelChrome title="Training ecosystem" className={className} accent>
+    <Panel className={className}>
+      <Eyebrow className="mb-3">Training ecosystem</Eyebrow>
       <div className="space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="space-y-1 max-w-2xl">
+          <div className="max-w-2xl space-y-1">
             <p className="text-[10px] uppercase tracking-wider text-zinc-500">
               Profile · {data.archetypeLabel}
               <span className="text-zinc-600"> ({data.archetypeConfidence} confidence)</span>
             </p>
             {data.headline ? (
-              <p className="text-sm text-zinc-300 leading-relaxed">{data.headline}</p>
+              <p className="text-sm leading-relaxed text-zinc-300">{data.headline}</p>
             ) : null}
           </div>
           <ConfidenceBadge level={data.confidence} />
@@ -50,10 +52,10 @@ export function TrainingEcosystemPanel({
             {data.modalityDistribution.map((m) => (
               <span
                 key={m.modality}
-                className="rounded-md border border-white/[0.06] px-2 py-1 text-[11px] text-zinc-500"
+                className="rounded-md px-2 py-1 text-[11px] text-zinc-500 ring-1 ring-inset ring-[var(--border-subtle)]"
               >
                 {m.label}{" "}
-                <span className="text-zinc-300 tabular-nums">
+                <span className="font-mono tabular-nums text-zinc-300">
                   {m.sessions}
                   {m.minutes > 0 ? ` · ${m.minutes}m` : ""}
                 </span>
@@ -62,11 +64,11 @@ export function TrainingEcosystemPanel({
           </div>
         ) : null}
 
-        <div className="rounded-lg border border-white/[0.05] bg-black/20 p-4">
+        <div className="rounded-lg bg-[var(--surface-subdued)] p-4 ring-1 ring-inset ring-[var(--border-subtle)]">
           <p className="text-[10px] uppercase tracking-wider text-zinc-500">
             Cross-training load · {data.crossTrainingLoad.weekLabel}
           </p>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-8 text-center">
+          <div className="mt-3 grid grid-cols-2 gap-3 text-center sm:grid-cols-3 lg:grid-cols-8">
             <Stat label="Run volume" value={data.crossTrainingLoad.runKm} />
             <Stat label="Runs" value={String(data.crossTrainingLoad.runSessions)} />
             <Stat label="Bike" value={`${data.crossTrainingLoad.bikeMinutes}m`} />
@@ -98,10 +100,13 @@ export function TrainingEcosystemPanel({
 
         <div className="grid gap-3 sm:grid-cols-2">
           {data.supportCards.map((card) => (
-            <div key={card.id} className="rounded-lg border border-white/[0.05] bg-black/15 p-3">
+            <div
+              key={card.id}
+              className="rounded-lg bg-[var(--surface-subdued)] p-3 ring-1 ring-inset ring-[var(--border-subtle)]"
+            >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-medium text-zinc-200">{card.title}</p>
-                <span className={cn("text-xs font-mono", trendColor(card.trend))}>
+                <span className={cn("font-mono text-xs tabular-nums", trendColor(card.trend))}>
                   {card.score}
                 </span>
               </div>
@@ -117,25 +122,25 @@ export function TrainingEcosystemPanel({
           ))}
         </div>
 
-        {(data.readinessContext || data.fatigueContext) && (
-          <p className="text-xs text-zinc-500 border-t border-white/[0.04] pt-3">
+        {data.readinessContext || data.fatigueContext ? (
+          <p className="border-t border-[var(--border-subtle)] pt-3 text-xs text-zinc-500">
             {data.readinessContext ?? data.fatigueContext}
           </p>
-        )}
+        ) : null}
 
-        <p className="text-[10px] text-zinc-600 leading-relaxed">
+        <p className="text-[10px] leading-relaxed text-zinc-600">
           {data.limitations[0]} Running remains primary for race performance; non-run work informs
           fatigue and durability context only.
         </p>
       </div>
-    </PanelChrome>
+    </Panel>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-lg font-semibold text-zinc-200 tabular-nums">{value}</p>
+      <p className="font-mono text-lg font-semibold tabular-nums text-zinc-200">{value}</p>
       <p className="text-[10px] uppercase tracking-wider text-zinc-600">{label}</p>
     </div>
   );

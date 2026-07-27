@@ -28,7 +28,7 @@ export function HistoricalContextPanel({ items }: { items: HistoricalCompareView
             className={cn(
               "rounded-lg px-3 py-2.5 text-sm ring-1 ring-inset",
               item.tone === "positive"
-                ? "bg-teal-500/[0.05] text-zinc-300 ring-teal-500/15"
+                ? "bg-accent/[0.06] text-zinc-300 ring-accent/15"
                 : "bg-white/[0.02] text-zinc-400 ring-white/[0.05]",
             )}
           >
@@ -50,10 +50,10 @@ export function WorkoutQualityPanel({ data }: { data: WorkoutDataQualityView }) 
       <DashboardPanel padding="compact" subdued>
         <p className="text-sm text-zinc-400">{data.summary}</p>
         <div className="mt-4 flex flex-wrap gap-4 text-xs">
-          <span className={data.hrCoverage ? "text-teal-400/80" : "text-zinc-600"}>
+          <span className={data.hrCoverage ? "text-accent/80" : "text-zinc-600"}>
             HR {data.hrCoverage ? "✓" : "○"}
           </span>
-          <span className={data.paceCoverage ? "text-teal-400/80" : "text-zinc-600"}>
+          <span className={data.paceCoverage ? "text-accent/80" : "text-zinc-600"}>
             Pace {data.paceCoverage ? "✓" : "○"}
           </span>
           <span className="text-zinc-500">{data.lapCount} laps</span>
@@ -81,7 +81,9 @@ export function CompactStatsRail({ stats }: { stats: { label: string; value: str
           className="rounded-lg bg-white/[0.02] px-3 py-2 ring-1 ring-inset ring-white/[0.05]"
         >
           <p className={dash.label}>{s.label}</p>
-          <p className="mt-0.5 text-sm font-semibold text-zinc-200">{s.value}</p>
+          <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-zinc-200">
+            {s.value}
+          </p>
         </div>
       ))}
     </div>

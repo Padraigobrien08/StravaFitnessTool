@@ -60,7 +60,7 @@ function TabButton({
       className={cn(
         "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors",
         active
-          ? "bg-teal-500/15 text-teal-200"
+          ? "bg-accent/15 text-accent"
           : "text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300",
       )}
     >

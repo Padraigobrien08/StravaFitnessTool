@@ -4,7 +4,8 @@ import type { MonthlyNarrative, PreRaceNarrative } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 const severityAccent = {
-  positive: "border-teal-500/20 bg-teal-500/[0.03]",
+  positive:
+    "[border-color:color-mix(in_srgb,var(--home-good)_22%,transparent)] [background-color:color-mix(in_srgb,var(--home-good)_4%,transparent)]",
   neutral: "border-white/[0.06] bg-white/[0.02]",
   warning: "border-amber-500/20 bg-amber-500/[0.03]",
 };
@@ -29,7 +30,7 @@ export function IntelligencePeriodNarratives({
               </p>
             ))}
           </div>
-          <p className="mt-2 text-[12px] leading-snug text-teal-300/85">
+          <p className="mt-2 text-[12px] leading-snug text-accent">
             <span className="text-zinc-500">Game plan: </span>
             {preRace.gamePlan}
           </p>

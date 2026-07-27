@@ -6,7 +6,7 @@ import type { WorkoutType } from "@/lib/analytics/workoutType";
 import { cn } from "@/lib/utils";
 
 const barColors: Record<WorkoutType, string> = {
-  easy: "bg-teal-500/60",
+  easy: "bg-accent/60",
   recovery: "bg-zinc-500/50",
   long: "bg-blue-500/55",
   tempo: "bg-amber-500/55",

@@ -75,11 +75,11 @@ function Th({
 }
 
 const markerConfig: Record<RunMarker, { label: string; icon: typeof Trophy; className: string }> = {
-  pr: { label: "PR", icon: Trophy, className: "text-teal-400" },
+  pr: { label: "PR", icon: Trophy, className: "text-accent" },
   long: { label: "Long", icon: Mountain, className: "text-blue-400/90" },
   key: { label: "Key", icon: Zap, className: "text-amber-400/90" },
   high_load: { label: "Load", icon: TrendingUp, className: "text-amber-300/80" },
-  efficient: { label: "Eff", icon: TrendingUp, className: "text-teal-400/70" },
+  efficient: { label: "Eff", icon: TrendingUp, className: "text-accent/70" },
 };
 
 export function RunExplorer({
@@ -166,11 +166,16 @@ export function RunExplorer({
   }
 
   return (
-    <section ref={tableTopRef} className="rounded-xl border border-white/[0.06] bg-[#0a0b0e]/60">
-      <div className="border-b border-white/[0.04] px-3 py-2.5">
+    <section
+      ref={tableTopRef}
+      className="rounded-xl bg-[var(--surface-elevated)] shadow-[var(--surface-shadow)] ring-1 ring-[var(--border-subtle)]"
+    >
+      <div className="border-b border-[var(--border-subtle)] px-3 py-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-[12px] font-medium text-zinc-400">Activity explorer</h2>
-          <span className="text-[10px] text-zinc-600">
+          <h2 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+            Activity explorer
+          </h2>
+          <span className="font-mono text-[10px] tabular-nums text-zinc-600">
             {total} sessions · page {page + 1}/{totalPages}
           </span>
         </div>
@@ -186,7 +191,7 @@ export function RunExplorer({
                 setSearch(e.target.value);
                 setPage(0);
               }}
-              className="border-white/[0.06] bg-white/[0.03] py-1.5 pl-7 pr-2 text-[12px] text-zinc-200 placeholder:text-zinc-600 focus-visible:border-teal-500/30"
+              className="border-[var(--border-subtle)] bg-white/[0.03] py-1.5 pl-7 pr-2 text-[12px] text-zinc-200 placeholder:text-zinc-600 focus-visible:border-accent/30"
               aria-label="Search sessions"
             />
           </div>
@@ -235,8 +240,8 @@ export function RunExplorer({
             className={cn(
               "h-auto px-2 py-1.5 text-[10px]",
               groupByMonth
-                ? "bg-teal-500/15 text-teal-300 hover:bg-teal-500/20"
-                : "border-white/[0.06] bg-white/[0.03] text-zinc-500",
+                ? "bg-accent/15 text-accent hover:bg-accent/20"
+                : "border-[var(--border-subtle)] bg-white/[0.03] text-zinc-500",
             )}
             onClick={() => setGroupByMonth((v) => !v)}
           >
@@ -333,7 +338,7 @@ export function RunExplorer({
         </p>
       ) : null}
 
-      <div className="flex items-center justify-between gap-2 border-t border-white/[0.04] px-3 py-2">
+      <div className="flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] px-3 py-2">
         <Button
           type="button"
           variant="ghost"
@@ -344,7 +349,7 @@ export function RunExplorer({
         >
           <ChevronLeft className="h-3.5 w-3.5" /> Prev
         </Button>
-        <span className="text-[10px] text-zinc-600">
+        <span className="font-mono text-[10px] tabular-nums text-zinc-600">
           Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, total)} of {total}
         </span>
         <Button
@@ -408,7 +413,7 @@ function ExplorerRow({
       <tr
         className={cn(
           "border-b border-white/[0.03] cursor-pointer transition-colors hover:bg-white/[0.03]",
-          isNotable && "bg-teal-500/[0.02]",
+          isNotable && "bg-accent/[0.03]",
         )}
         onClick={onToggle}
       >
@@ -437,7 +442,7 @@ function ExplorerRow({
           <Link
             href={`/runs/${row.runId}`}
             onClick={(e) => e.stopPropagation()}
-            className="text-[12px] font-medium text-teal-300/90 hover:text-teal-200 line-clamp-1"
+            className="text-[12px] font-medium text-accent hover:text-[var(--home-signal-strong)] line-clamp-1"
           >
             {row.formattedTitle.primary}
           </Link>
@@ -453,11 +458,15 @@ function ExplorerRow({
             ))}
           </div>
         </td>
-        <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-400">
+        <td className="py-1.5 pr-2 font-mono text-[11px] tabular-nums text-zinc-400">
           {row.distanceDisplay}
         </td>
-        <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-400">{row.paceDisplay}</td>
-        <td className="py-1.5 pr-2 text-[11px] tabular-nums text-zinc-500">{row.hrDisplay}</td>
+        <td className="py-1.5 pr-2 font-mono text-[11px] tabular-nums text-zinc-400">
+          {row.paceDisplay}
+        </td>
+        <td className="py-1.5 pr-2 font-mono text-[11px] tabular-nums text-zinc-500">
+          {row.hrDisplay}
+        </td>
       </tr>
       {expanded && intel ? (
         <tr className="border-b border-white/[0.04] bg-white/[0.02]">
@@ -497,7 +506,7 @@ function ExplorerRow({
             <div className="mt-2 flex gap-3">
               <Link
                 href={`/runs/${row.runId}`}
-                className="text-[10px] text-teal-400/80 hover:text-teal-300"
+                className="text-[10px] text-accent/80 hover:text-accent"
                 onClick={(e) => e.stopPropagation()}
               >
                 Full session →

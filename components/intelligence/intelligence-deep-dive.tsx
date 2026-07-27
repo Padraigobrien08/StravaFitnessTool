@@ -56,29 +56,29 @@ export function IntelligenceDeepDive({ data }: { data: DeepDiveData }) {
   if (chips.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-white/[0.06] bg-white/[0.02]">
+    <section className="rounded-xl bg-[var(--surface-elevated)] shadow-[var(--surface-shadow)] ring-1 ring-[var(--border-subtle)]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left"
+        className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
       >
         <span className="min-w-0">
-          <span className="text-[12px] font-medium text-zinc-300">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
             Deep dive · signals & statistics
           </span>
-          <span className="mt-0.5 block truncate text-[11px] text-zinc-500">
+          <span className="mt-1 block truncate font-mono text-[11px] text-zinc-500">
             {chips.join(" · ")}
           </span>
         </span>
-        <span className="flex shrink-0 items-center gap-1 text-[11px] text-zinc-500">
+        <span className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-zinc-500">
           {open ? "Hide" : "Show analysis"}
           <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
         </span>
       </button>
 
       {open ? (
-        <div className="space-y-2 border-t border-white/[0.06] px-3 pb-3 pt-3">
+        <div className="space-y-2 border-t border-[var(--border-subtle)] px-4 pb-4 pt-3 sm:px-5">
           <IntelligenceStandoutSessions data={data.personalZScores} />
           <IntelligenceAnomalies data={data.anomalies} />
           <IntelligenceUncertainty data={data.uncertaintyEstimates} />
@@ -86,12 +86,12 @@ export function IntelligenceDeepDive({ data }: { data: DeepDiveData }) {
           <IntelligenceChangePoints data={data.changePoints} />
         </div>
       ) : (
-        <div className="border-t border-white/[0.06] px-3 py-2.5">
+        <div className="border-t border-[var(--border-subtle)] px-4 py-2.5 sm:px-5">
           <Link
             href={signalCoachLink(
               "Walk me through the statistical signals in my data — anomalies, correlations, and fitness change-points.",
             )}
-            className="inline-flex items-center gap-1 text-[11px] text-teal-400/90 hover:text-teal-300"
+            className="inline-flex items-center gap-1 font-mono text-[11px] text-accent hover:text-accent/80"
           >
             Ask Coach <ArrowRight className="h-3 w-3" />
           </Link>

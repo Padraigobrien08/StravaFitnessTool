@@ -35,8 +35,8 @@ export function UploadZone({
           "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all",
           compact ? "min-h-[140px] px-4 py-6" : "min-h-[220px] rounded-2xl",
           dragOver
-            ? "border-teal-400/50 bg-teal-500/10"
-            : "border-white/[0.08] bg-white/[0.02] hover:border-teal-500/35 hover:bg-white/[0.04]",
+            ? "border-accent/50 bg-accent/10"
+            : "border-white/[0.08] bg-white/[0.02] hover:border-accent/35 hover:bg-white/[0.04]",
         )}
         onDragOver={(e) => {
           e.preventDefault();
@@ -58,16 +58,16 @@ export function UploadZone({
           directory=""
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <Upload className={cn("text-teal-400/80", compact ? "mb-2 h-8 w-8" : "mb-3 h-10 w-10")} />
+        <Upload className={cn("text-accent/80", compact ? "mb-2 h-8 w-8" : "mb-3 h-10 w-10")} />
         <p className={cn("font-medium text-zinc-100", compact ? "text-sm" : "text-lg")}>
           {compact ? "Drop Strava export folder" : "Drop your Strava export folder"}
         </p>
         <p className="mt-1 max-w-md text-center text-xs text-zinc-500 sm:text-sm">
-          Needs <code className="text-teal-400/90">activities.csv</code>
+          Needs <code className="text-accent/90">activities.csv</code>
           {compact ? "" : " — include "}
           {!compact && (
             <>
-              <code className="text-teal-400/90">activities/*.fit.gz</code> for streams.
+              <code className="text-accent/90">activities/*.fit.gz</code> for streams.
             </>
           )}
         </p>

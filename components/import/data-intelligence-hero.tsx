@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
 import { Check, Minus } from "lucide-react";
 
 function DataQualityRing({ score }: { score: number }) {
-  const color = score >= 72 ? "#2dd4bf" : score >= 45 ? "#fbbf24" : "#f87171";
+  const color =
+    score >= 72 ? "var(--home-signal)" : score >= 45 ? "var(--hz-moderate)" : "var(--home-redline)";
   const r = 44;
   const c = 2 * Math.PI * r;
   const offset = c - (score / 100) * c;
@@ -30,7 +31,7 @@ function DataQualityRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="font-display text-2xl font-bold tabular-nums text-white">{score}</span>
+        <span className="font-mono text-2xl font-bold tabular-nums text-foreground">{score}</span>
         <span className="text-[9px] font-semibold uppercase tracking-widest text-zinc-500">
           quality
         </span>
@@ -42,7 +43,7 @@ function DataQualityRing({ score }: { score: number }) {
 export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
   const borderTone = hero.hasData
     ? hero.overallConfidence === "high"
-      ? "border-l-teal-500/50"
+      ? "border-l-accent/50"
       : "border-l-amber-500/40"
     : "border-l-zinc-500/35";
 
@@ -60,7 +61,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
       className={cn(
         "border-l-[3px]",
         borderTone,
-        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,rgba(45,212,191,0.07),transparent_55%)]",
+        "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_75%_55%_at_100%_0%,var(--home-signal-wash),transparent_55%)]",
       )}
     >
       <div className="relative grid gap-6 lg:grid-cols-[1fr_minmax(220px,280px)] lg:gap-8">
@@ -85,7 +86,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
             <p>{hero.fitNarrative}</p>
           </div>
 
-          <p className="text-sm text-teal-300/85">{hero.recommendation}</p>
+          <p className="text-sm font-medium text-accent">{hero.recommendation}</p>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
@@ -94,7 +95,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
                 {hero.unlockedCapabilities.length > 0 ? (
                   hero.unlockedCapabilities.slice(0, 5).map((c) => (
                     <li key={c} className="flex items-center gap-2 text-xs text-zinc-400">
-                      <Check className="h-3 w-3 shrink-0 text-teal-500/80" />
+                      <Check className="h-3 w-3 shrink-0 text-accent" />
                       {c}
                     </li>
                   ))
@@ -117,7 +118,7 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
           </div>
         </div>
 
-        <aside className="space-y-4 rounded-xl bg-white/[0.03] p-4">
+        <aside className="space-y-4 rounded-xl bg-[var(--surface-subdued)] p-4 ring-1 ring-[var(--border-subtle)]">
           <DataQualityRing score={hero.confidenceScore} />
           <div className="flex items-center justify-center gap-2">
             <ConfidenceBadge level={hero.overallConfidence} />
@@ -130,7 +131,10 @@ export function DataIntelligenceHero({ hero }: { hero: ImportHeroView }) {
               {streamBars.map((on, i) => (
                 <div
                   key={i}
-                  className={cn("h-6 w-2 rounded-sm", on ? "bg-teal-500/55" : "bg-white/[0.06]")}
+                  className={cn(
+                    "h-6 w-2 rounded-sm",
+                    on ? "bg-[var(--home-signal)]" : "bg-[var(--border-default)]",
+                  )}
                 />
               ))}
             </div>

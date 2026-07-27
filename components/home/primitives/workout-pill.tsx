@@ -3,7 +3,7 @@ import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import { cn } from "@/lib/utils";
 
 const typeStyles: Record<WorkoutType, string> = {
-  easy: "bg-teal-500/12 text-teal-300 ring-teal-500/20",
+  easy: "bg-accent/12 text-accent ring-accent/20",
   recovery: "bg-zinc-500/10 text-zinc-400 ring-zinc-500/15",
   tempo: "bg-amber-500/12 text-amber-300 ring-amber-500/20",
   interval: "bg-amber-500/12 text-amber-300 ring-amber-500/20",

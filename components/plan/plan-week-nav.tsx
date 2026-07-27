@@ -37,7 +37,7 @@ export function PlanWeekNav({
       >
         <ChevronLeft className="h-4 w-4" />
       </button>
-      <p className="min-w-0 flex-1 truncate text-center text-[11px] font-medium text-zinc-400">
+      <p className="min-w-0 flex-1 truncate text-center font-mono text-[11px] font-medium tabular-nums text-zinc-400">
         {weekRange}
       </p>
       <button

@@ -37,7 +37,7 @@ export function CoachComposer({
   const canSend = !loading && !disabled && value.trim().length > 0;
 
   return (
-    <div className="coach-composer shrink-0 border-t border-white/[0.04] bg-[#0a0b0e]/95 px-3 pb-3 pt-3 sm:px-5">
+    <div className="coach-composer shrink-0 border-t border-[var(--border-subtle)] bg-[var(--header-bg)] px-3 pb-3 pt-3 sm:px-5">
       <div className="coach-message-column mx-auto w-full">
         {loading ? (
           <Progress
@@ -53,10 +53,10 @@ export function CoachComposer({
 
         <div
           className={cn(
-            "flex items-end gap-2 rounded-xl bg-[#111318] px-3 py-2",
-            "shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] ring-1 ring-white/[0.07]",
+            "flex items-end gap-2 rounded-xl bg-[var(--input-bg)] px-3 py-2",
+            "ring-1 ring-[var(--border-default)]",
             "transition-[box-shadow,ring-color]",
-            "focus-within:ring-white/[0.12] focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_0_1px_rgba(255,255,255,0.04)]",
+            "focus-within:ring-[var(--ring)]",
             (disabled || loading) && "opacity-60",
           )}
         >

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel, Eyebrow } from "@/components/console/console-kit";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,26 +46,22 @@ export default function SettingsPage() {
   } = useSettingsStore();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="type-page-title">Settings</h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Appearance</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <Panel>
+        <Eyebrow className="mb-3">Appearance</Eyebrow>
+        <div className="space-y-3">
           <p className="type-body-muted">
             Choose light or dark mode. Charts, maps, and panels adapt to your selection.
           </p>
           <ThemeSegmentedControl />
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Import & privacy</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm text-zinc-400">
+      <Panel>
+        <Eyebrow className="mb-3">Import & privacy</Eyebrow>
+        <div className="space-y-4 text-sm text-muted-foreground">
           <p>
             Summary runs live in localStorage (export and/or API merge). Stream and lap detail live
             in IndexedDB (FIT upload or Strava API). We never load your email from profile.csv.
@@ -119,8 +115,8 @@ export default function SettingsPage() {
               </>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       <StravaWebhookCard apiConnected={apiConnected} />
 
@@ -128,13 +124,11 @@ export default function SettingsPage() {
 
       <RaceGoalPicker />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Training plan limits</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel>
+        <Eyebrow className="mb-3">Training plan limits</Eyebrow>
+        <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="default-weekly-runs" className="text-zinc-500">
+            <Label htmlFor="default-weekly-runs" className="text-muted-foreground">
               Default runs per week (when Strava has no goal)
             </Label>
             <Input
@@ -147,7 +141,7 @@ export default function SettingsPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="max-weekly-km" className="text-zinc-500">
+            <Label htmlFor="max-weekly-km" className="text-muted-foreground">
               Max weekly km for adaptive plan (0 = auto from your history)
             </Label>
             <Input
@@ -160,16 +154,14 @@ export default function SettingsPage() {
               onChange={(e) => setMaxWeeklyKm(Number(e.target.value) || 0)}
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Units</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <Panel>
+        <Eyebrow className="mb-3">Units</Eyebrow>
+        <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="text-zinc-500">Distance</Label>
+            <Label className="text-muted-foreground">Distance</Label>
             <Select value={distanceUnit} onValueChange={(v) => setDistanceUnit(v as "km" | "mi")}>
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -181,7 +173,7 @@ export default function SettingsPage() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-zinc-500">Pace</Label>
+            <Label className="text-muted-foreground">Pace</Label>
             <Select value={paceUnit} onValueChange={(v) => setPaceUnit(v as "min/km" | "min/mi")}>
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -195,21 +187,20 @@ export default function SettingsPage() {
           <p className="text-xs text-zinc-600">
             Applied across distances and paces app-wide. Changes take effect as you navigate.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
 
       {quality && <DataQualityPanel report={quality} />}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Activity mix</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Link href="/runs" className="text-sm text-teal-400">
-            View cross-training breakdown →
-          </Link>
-        </CardContent>
-      </Card>
+      <Panel>
+        <Eyebrow className="mb-3">Activity mix</Eyebrow>
+        <Link
+          href="/runs"
+          className="text-sm font-medium text-accent transition-colors hover:text-accent/80"
+        >
+          View cross-training breakdown →
+        </Link>
+      </Panel>
     </div>
   );
 }

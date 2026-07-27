@@ -1,16 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useAthleteIntelligence } from "@/hooks/use-athlete-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
+import { useGoalStore, RACE_DISTANCE_LABELS } from "@/stores/goal-store";
+import { isRaceUpcoming } from "@/lib/analytics/readiness";
 import { buildHomeOperatingSystemView } from "@/lib/home/operatingSystemView";
-import { AthleteOperatingSystem } from "@/components/home/athlete-operating-system";
+import { HomeConsole } from "@/components/home/console/home-console";
 import { DashboardSkeleton } from "@/components/home/primitives/dashboard-skeleton";
-import { HomeCommandBar } from "@/components/home/home-command-bar";
-import { HomeOrientation } from "@/components/home/home-orientation";
 import { useWeeklyPlan } from "@/hooks/use-weekly-plan";
 import { useTrainingCalendar } from "@/hooks/use-training-calendar";
 
@@ -20,7 +19,14 @@ export default function HomePage() {
   const intel = useAthleteIntelligence();
   const { generate, loading: planLoading } = useWeeklyPlan();
   const calendar = useTrainingCalendar();
+  const raceGoal = useGoalStore((s) => s.raceGoal);
   const [syncing, setSyncing] = useState(false);
+
+  // A saved goal whose date has passed: kept, but surfaced as a prompt to set the next one.
+  const pastRace = useMemo(() => {
+    if (!raceGoal || isRaceUpcoming(raceGoal)) return null;
+    return { label: RACE_DISTANCE_LABELS[raceGoal.distance], date: raceGoal.date };
+  }, [raceGoal]);
 
   const vm = useMemo(() => {
     if (!analytics) return null;
@@ -60,52 +66,24 @@ export default function HomePage() {
     return <DashboardSkeleton />;
   }
 
-  const readinessScore =
-    analytics?.raceReadiness?.score ?? analytics?.halfMarathonReadiness.score ?? 0;
-
   return (
     <RequireData>
       {analytics && vm && (
-        <div className="dashboard-enter mx-auto w-full max-w-6xl space-y-3 px-0 pb-6">
-          <HomeCommandBar
-            apiConnected={apiConnected}
-            confidence={analytics.dataConfidence}
-            syncing={syncing || loading}
-            onSync={() => void handleSync()}
-            syncError={error}
-            mobileSummary={{
-              title: vm.hero.focusTitle,
-              readinessScore,
-              freshness: analytics.fatigue.freshness,
-            }}
-          />
-
-          <HomeOrientation />
-
-          <AthleteOperatingSystem
+        <div className="dashboard-enter mx-auto w-full max-w-6xl px-0 pb-6">
+          <HomeConsole
             vm={vm}
+            analytics={analytics}
             savedWeek={calendar.savedWeek}
             calendarHydrated={calendar.hydrated}
-            onPatchWorkout={calendar.patchWorkout}
             onGeneratePlan={() => void generate()}
             planLoading={planLoading}
+            onSync={() => void handleSync()}
+            syncing={syncing || loading}
+            syncError={error}
+            apiConnected={apiConnected}
+            dataSourceLabel={dataSourceLabel}
+            pastRace={pastRace}
           />
-
-          <p className="border-t border-[var(--border-subtle)] pt-3 text-[10px] text-zinc-600">
-            {dataSourceLabel ? `${dataSourceLabel} · ` : ""}
-            Deep analytics →{" "}
-            <Link href="/intelligence" className="text-zinc-500 hover:text-zinc-400">
-              Intelligence
-            </Link>
-            {" · "}
-            <Link href="/performance" className="text-zinc-500 hover:text-zinc-400">
-              Performance
-            </Link>
-            {" · "}
-            <Link href="/training" className="text-zinc-500 hover:text-zinc-400">
-              Training
-            </Link>
-          </p>
         </div>
       )}
     </RequireData>

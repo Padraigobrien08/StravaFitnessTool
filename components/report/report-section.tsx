@@ -19,7 +19,7 @@ export function ReportSection({
     <section className={cn("report-section", breakBefore && "print:break-before-page", className)}>
       <header className="report-section-header mb-5 border-b border-zinc-200/80 pb-4 print:border-zinc-300">
         {number != null ? (
-          <span className="report-section-num mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-teal-700/80 print:text-teal-800">
+          <span className="report-section-num mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-accent/80 print:text-accent">
             Section {number}
           </span>
         ) : null}

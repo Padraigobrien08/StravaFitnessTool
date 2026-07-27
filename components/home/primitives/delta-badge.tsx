@@ -10,7 +10,7 @@ export function DeltaBadge({ text, positive }: { text: string; positive: boolean
       variant="ghost"
       className={cn(
         "h-auto gap-1 px-0 py-0 text-[11px] leading-tight font-normal",
-        positive === true && "text-teal-400/90 hover:text-teal-400/90",
+        positive === true && "text-accent/90 hover:text-accent/90",
         positive === false && "text-amber-400/90 hover:text-amber-400/90",
         positive === null && "text-zinc-500 hover:text-zinc-500",
       )}

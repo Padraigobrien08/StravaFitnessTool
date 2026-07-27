@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const roleStyles: Record<SegmentRowView["roleTone"], string> = {
   work: "bg-amber-500/12 text-amber-300/90 ring-amber-500/20",
   recovery: "bg-zinc-500/10 text-zinc-400 ring-zinc-500/15",
-  steady: "bg-teal-500/10 text-teal-300/80 ring-teal-500/15",
+  steady: "bg-accent/10 text-accent ring-accent/15",
   neutral: "bg-white/[0.04] text-zinc-500 ring-white/10",
 };
 
@@ -47,7 +47,7 @@ export function SegmentAnalysisPanel({ segments }: { segments: SegmentRowView[] 
                 key={row.index}
                 className={cn(
                   "border-b border-white/[0.03] transition-colors hover:bg-white/[0.03]",
-                  row.highlight && "bg-teal-500/[0.04]",
+                  row.highlight && "bg-accent/[0.05]",
                 )}
               >
                 <td className="px-3 py-2.5 text-zinc-500">{row.index}</td>
@@ -61,11 +61,11 @@ export function SegmentAnalysisPanel({ segments }: { segments: SegmentRowView[] 
                     {row.role}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-400">{row.distance}</td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-400">{row.time}</td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-200">{row.pace}</td>
-                <td className="px-3 py-2.5 tabular-nums text-zinc-500">{row.hr}</td>
-                <td className="px-3 py-2.5 text-xs text-teal-400/80">
+                <td className="px-3 py-2.5 font-mono tabular-nums text-zinc-400">{row.distance}</td>
+                <td className="px-3 py-2.5 font-mono tabular-nums text-zinc-400">{row.time}</td>
+                <td className="px-3 py-2.5 font-mono tabular-nums text-zinc-200">{row.pace}</td>
+                <td className="px-3 py-2.5 font-mono tabular-nums text-zinc-500">{row.hr}</td>
+                <td className="px-3 py-2.5 text-xs text-accent/80">
                   {row.highlight ?? row.consistencyNote ?? "—"}
                 </td>
               </tr>

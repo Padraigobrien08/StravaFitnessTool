@@ -6,6 +6,7 @@ import type { AdaptationSignal } from "@/lib/adaptation-engine";
 import { coachUrl } from "@/lib/coach/domainLinks";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Eyebrow, Panel } from "@/components/console/console-kit";
 
 export function IntelligenceRecentlyLearned({
   items,
@@ -21,12 +22,12 @@ export function IntelligenceRecentlyLearned({
   const hiddenCount = items.length - visible.length;
 
   return (
-    <section className="rounded-lg border border-teal-500/12 bg-teal-500/[0.03] px-3 py-3">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] font-medium text-zinc-500">What the system recently learned</p>
+    <Panel className="border-l-2 border-l-accent/40">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <Eyebrow>What the system recently learned</Eyebrow>
         <Link
           href={coachUrl({ q: "What have you learned about me recently?" })}
-          className="text-[10px] text-zinc-600 hover:text-zinc-400"
+          className="font-mono text-[10px] text-zinc-500 hover:text-accent"
         >
           Ask Coach
         </Link>
@@ -34,7 +35,7 @@ export function IntelligenceRecentlyLearned({
       <ul className="mt-2 space-y-1.5">
         {visible.map((item) => (
           <li key={item.slice(0, 48)} className="flex gap-2 text-[12px] leading-snug text-zinc-400">
-            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500/50" />
+            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent/60" />
             {item}
           </li>
         ))}
@@ -49,6 +50,6 @@ export function IntelligenceRecentlyLearned({
           {expanded ? "Show less" : `Show ${hiddenCount} more`}
         </button>
       ) : null}
-    </section>
+    </Panel>
   );
 }
