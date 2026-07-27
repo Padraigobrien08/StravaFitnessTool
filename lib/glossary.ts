@@ -50,6 +50,35 @@ export const GLOSSARY = {
     label: "MoM",
     definition: "Month over month — the change compared with the previous month.",
   },
+  freshness: {
+    label: "Freshness",
+    definition:
+      "How rested your legs are right now: built-up fitness minus recent fatigue. Positive means fresh, negative means tired.",
+  },
+  readiness: {
+    label: "Readiness",
+    definition:
+      "A 0 to 100 estimate of how prepared you are to perform, blending fitness, freshness, and recent training.",
+  },
+  load: {
+    label: "Training load",
+    definition:
+      "How much training stress you've absorbed lately, from the volume and intensity of your runs.",
+  },
+  adaptation: {
+    label: "Adaptation",
+    definition:
+      "The fitness changes your body makes in response to training, seen as trends in pace, heart rate, and endurance over time.",
+  },
+  phase: {
+    label: "Training phase",
+    definition:
+      "The training block you're in (base, build, peak, or taper), each with its own goal.",
+  },
+  fatigue: {
+    label: "Fatigue",
+    definition: "Tiredness built up from recent training, before your body has fully recovered.",
+  },
 } as const;
 
 export type GlossaryKey = keyof typeof GLOSSARY;

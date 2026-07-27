@@ -134,7 +134,9 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
       if (!status.connected) return;
 
       const res = await fetch("/api/me/import");
-      if (!res.ok) return;
+      if (!res.ok) {
+        throw new Error(`Strava returned ${res.status} while loading your activities`);
+      }
       const apiData = StravaImportSchema.parse(await res.json());
 
       const base = importData ?? loadImport();

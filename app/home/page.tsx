@@ -14,7 +14,7 @@ import { useWeeklyPlan } from "@/hooks/use-weekly-plan";
 import { useTrainingCalendar } from "@/hooks/use-training-calendar";
 
 export default function HomePage() {
-  const { apiConnected, dataSourceLabel, refreshFromStravaApi, loading } = useStrava();
+  const { apiConnected, dataSourceLabel, refreshFromStravaApi, loading, error } = useStrava();
   const { analytics, insights, loading: intelLoading } = useTrainingIntelligence();
   const intel = useAthleteIntelligence();
   const { generate, loading: planLoading } = useWeeklyPlan();
@@ -79,6 +79,7 @@ export default function HomePage() {
             planLoading={planLoading}
             onSync={() => void handleSync()}
             syncing={syncing || loading}
+            syncError={error}
             apiConnected={apiConnected}
             dataSourceLabel={dataSourceLabel}
             pastRace={pastRace}

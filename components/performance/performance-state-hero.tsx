@@ -74,7 +74,7 @@ export function PerformanceStateHero({ hero }: { hero: PerformanceHeroView }) {
             ))}
           </dl>
 
-          <Link href="/goals">
+          <Link href="/plan?tab=goal">
             <Button
               size="sm"
               className="h-9 border-0 text-[var(--home-signal-ink)]"

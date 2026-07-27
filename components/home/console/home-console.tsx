@@ -66,6 +66,7 @@ export function HomeConsole({
   apiConnected,
   dataSourceLabel,
   pastRace,
+  syncError,
 }: {
   vm: HomeOperatingSystemView;
   analytics: DashboardInsights;
@@ -78,6 +79,7 @@ export function HomeConsole({
   apiConnected?: boolean;
   dataSourceLabel?: string | null;
   pastRace?: { label: string; date: string } | null;
+  syncError?: string | null;
 }) {
   const today = useMemo(() => findTodayWorkout(savedWeek), [savedWeek]);
 
@@ -87,6 +89,7 @@ export function HomeConsole({
         hero={vm.hero}
         onSync={onSync}
         syncing={syncing}
+        syncError={syncError}
         apiConnected={apiConnected}
         confidence={analytics.dataConfidence}
       />
@@ -162,12 +165,14 @@ function StatusBar({
   hero,
   onSync,
   syncing,
+  syncError,
   apiConnected,
   confidence,
 }: {
   hero: HomeOperatingSystemView["hero"];
   onSync?: () => void;
   syncing?: boolean;
+  syncError?: string | null;
   apiConnected?: boolean;
   confidence: "low" | "medium" | "high";
 }) {
@@ -196,11 +201,18 @@ function StatusBar({
         type="button"
         onClick={onSync}
         disabled={syncing}
+        title={syncError ?? undefined}
         className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-mono text-xs text-zinc-400 ring-1 ring-[var(--border-subtle)] transition hover:text-foreground hover:ring-[var(--border-default)] disabled:opacity-60"
       >
         <span
           className={cn("inline-block h-1.5 w-1.5 rounded-full", syncing && "animate-pulse")}
-          style={{ background: apiConnected ? "var(--home-good)" : "var(--hz-moderate)" }}
+          style={{
+            background: syncError
+              ? "var(--home-redline)"
+              : apiConnected
+                ? "var(--home-good)"
+                : "var(--hz-moderate)",
+          }}
         />
         {syncing ? (
           <>

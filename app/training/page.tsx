@@ -16,6 +16,7 @@ import { TrainingEcosystemPanel } from "@/components/training/training-ecosystem
 import { ops } from "@/components/home/primitives/tokens";
 import { cn } from "@/lib/utils";
 import { Eyebrow } from "@/components/console/console-kit";
+import { JargonTerm } from "@/components/jargon-term";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 function TrainingEvidenceBanner() {
@@ -24,7 +25,9 @@ function TrainingEvidenceBanner() {
       <div>
         <Eyebrow>Training · Am I training correctly?</Eyebrow>
         <p className="mt-0.5 text-xs text-zinc-600">
-          Load, intensity mix, phase, and cross-training — how your training is structured.
+          <JargonTerm term="load">Load</JargonTerm>, intensity mix,{" "}
+          <JargonTerm term="phase">phase</JargonTerm>, and cross-training — how your training is
+          structured.
         </p>
       </div>
       <Link

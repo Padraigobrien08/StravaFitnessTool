@@ -195,7 +195,7 @@ export default function SettingsPage() {
       <Panel>
         <Eyebrow className="mb-3">Activity mix</Eyebrow>
         <Link
-          href="/context"
+          href="/runs"
           className="text-sm font-medium text-accent transition-colors hover:text-accent/80"
         >
           View cross-training breakdown →

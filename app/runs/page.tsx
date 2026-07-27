@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
@@ -14,13 +13,15 @@ import { NotableSessionsFeed } from "@/components/runs/notable-sessions-feed";
 import { SessionIntelligencePanel } from "@/components/runs/session-intelligence-panel";
 import { RunsDataQualityPanel } from "@/components/runs/runs-data-quality-panel";
 import { Eyebrow, Panel } from "@/components/console/console-kit";
+import { ActivityContextPanel } from "@/components/runs/activity-context-panel";
 import { cn } from "@/lib/utils";
 
-type ViewMode = "explorer" | "intelligence";
+type ViewMode = "explorer" | "intelligence" | "context";
 
 export default function RunsPage() {
   const {
     importData,
+    insights,
     fitRunIds,
     dataSourceLabel,
     loading: stravaLoading,
@@ -53,10 +54,7 @@ export default function RunsPage() {
             <div>
               <Eyebrow className="text-accent/80">Activities · Explore your sessions</Eyebrow>
               <p className="mt-1 text-[11px] text-zinc-600">
-                Interpret, explore, and compare individual runs · intensity &amp; load breakdown on{" "}
-                <Link href="/training" className="text-zinc-500 hover:text-accent">
-                  Training
-                </Link>
+                Interpret, explore, and compare individual runs
                 {dataSourceLabel ? ` · ${dataSourceLabel}` : ""}
               </p>
             </div>
@@ -66,6 +64,9 @@ export default function RunsPage() {
               </ModeButton>
               <ModeButton active={mode === "explorer"} onClick={() => setMode("explorer")}>
                 Activity explorer
+              </ModeButton>
+              <ModeButton active={mode === "context"} onClick={() => setMode("context")}>
+                Activity mix
               </ModeButton>
             </div>
           </header>
@@ -78,6 +79,12 @@ export default function RunsPage() {
               <SessionIntelligencePanel
                 sessions={view.intelligenceSessions}
                 patterns={view.patterns}
+              />
+            ) : mode === "context" ? (
+              <ActivityContextPanel
+                activityMix={insights?.activityMix ?? []}
+                monthlyVolume={insights?.monthlyVolume ?? []}
+                totalActivities={importData.allActivities.length}
               />
             ) : (
               <>
@@ -94,7 +101,7 @@ export default function RunsPage() {
               </>
             )}
 
-            <RunsDataQualityPanel data={view.quality} />
+            {mode === "context" ? null : <RunsDataQualityPanel data={view.quality} />}
           </div>
         </RunsWorkspace>
       )}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
@@ -18,6 +17,7 @@ import { PerformanceIntegrityPanel } from "@/components/performance/performance-
 import { dash } from "@/components/home/primitives/tokens";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { JargonTerm } from "@/components/jargon-term";
 
 const RACE_DISTANCE_KM: Record<RaceDistance, number> = {
   "5k": 5,
@@ -31,16 +31,8 @@ function PerformanceEvidenceBanner() {
     <div className="border-b border-[var(--border-subtle)] pb-3">
       <p className={dash.labelAccent}>Performance · Am I improving?</p>
       <p className="mt-0.5 text-xs text-zinc-600">
-        Trajectory, adaptation, and projected outcome — the evidence you&apos;re getting fitter. For
-        intensity &amp; load see{" "}
-        <Link href="/training" className="text-zinc-500 hover:text-zinc-400">
-          Training
-        </Link>
-        , for race strategy see{" "}
-        <Link href="/goals" className="text-zinc-500 hover:text-zinc-400">
-          Goals
-        </Link>
-        .
+        Trajectory, <JargonTerm term="adaptation">adaptation</JargonTerm>, and projected outcome:
+        the evidence you&apos;re getting fitter.
       </p>
     </div>
   );
@@ -108,13 +100,6 @@ export default function PerformancePage() {
               <div className="space-y-4 border-t border-[var(--border-subtle)] px-4 pb-4 pt-3">
                 <AdaptationTrendsPanel trends={view.adaptationTrends} />
                 <PerformanceIntegrityPanel data={view.integrity} />
-                <p className="text-[11px] text-zinc-600">
-                  Intensity &amp; load distribution lives on{" "}
-                  <Link href="/training" className="text-accent hover:underline">
-                    Training
-                  </Link>
-                  .
-                </p>
               </div>
             ) : null}
           </div>
