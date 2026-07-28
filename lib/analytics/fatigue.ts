@@ -1,5 +1,6 @@
 import type { RunActivity } from "@/lib/strava/types";
 import type { LegFeel } from "@/lib/wellness/types";
+import { DEFAULT_FEEL_CALIBRATION, type FeelCalibration } from "@/lib/wellness/calibration";
 import { parseISO, format, startOfWeek } from "date-fns";
 
 export interface WeeklyLoadPoint {
@@ -86,6 +87,7 @@ export function freshnessFromTsb(
   tsb: number,
   restDaysSinceLastRun: number,
   legFeel?: LegFeel,
+  calibration: FeelCalibration = DEFAULT_FEEL_CALIBRATION,
 ): { freshness: number; label: string } {
   let freshness: number;
   let label: string;
@@ -112,17 +114,21 @@ export function freshnessFromTsb(
   // more than "fresh" is rewarded, so it can force a back-off but never unlock a
   // hard day the load balance didn't already sanction.
   if (legFeel === "heavy") {
-    freshness = Math.max(0, freshness - 12);
+    freshness = Math.max(0, freshness + calibration.heavyDelta);
     if (label === "Fresh") label = "Neutral";
     if (freshness < 40) label = "Fatigued";
   } else if (legFeel === "fresh") {
-    freshness = Math.min(100, freshness + 5);
+    freshness = Math.min(100, freshness + calibration.freshDelta);
   }
 
   return { freshness: Math.round(freshness), label };
 }
 
-export function buildFatigueSnapshot(runs: RunActivity[], legFeel?: LegFeel): FatigueSnapshot {
+export function buildFatigueSnapshot(
+  runs: RunActivity[],
+  legFeel?: LegFeel,
+  calibration: FeelCalibration = DEFAULT_FEEL_CALIBRATION,
+): FatigueSnapshot {
   const series = weeklyLoadSeries(runs);
   const withLoad = runs.filter((r) => r.trainingLoad !== null);
   const usesProxyLoad = withLoad.length < runs.length * 0.5;
@@ -134,7 +140,7 @@ export function buildFatigueSnapshot(runs: RunActivity[], legFeel?: LegFeel): Fa
     ? Math.floor((Date.now() - parseISO(lastRun.date).getTime()) / (1000 * 60 * 60 * 24))
     : 99;
 
-  const { freshness, label } = freshnessFromTsb(tsb, restDaysSinceLastRun, legFeel);
+  const { freshness, label } = freshnessFromTsb(tsb, restDaysSinceLastRun, legFeel, calibration);
 
   const evidence = [
     `Chronic load (CTL): ${ctl} · Acute load (ATL): ${atl} · Balance (TSB): ${tsb > 0 ? "+" : ""}${tsb}.`,
@@ -155,6 +161,14 @@ export function buildFatigueSnapshot(runs: RunActivity[], legFeel?: LegFeel): Fa
     evidence.push("Adjusted down for reported heavy legs — protect the block today.");
   } else if (legFeel === "fresh") {
     evidence.push("Nudged up for reported fresh legs.");
+  }
+  if (
+    legFeel &&
+    legFeel !== "normal" &&
+    calibration.reliability > 0.5 &&
+    calibration.sampleCount >= 4
+  ) {
+    evidence.push(calibration.basis);
   }
 
   return {

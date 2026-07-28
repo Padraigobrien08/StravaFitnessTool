@@ -199,6 +199,11 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
   const maxWeeklyKm = useSettingsStore((s) => s.maxWeeklyKm);
   const raceGoal = useGoalStore((s) => s.raceGoal);
   const legFeel = useFeelStore(selectTodayLegFeel);
+  const feelByDate = useFeelStore((s) => s.byDate);
+  const feelHistory = useMemo(
+    () => Object.entries(feelByDate).map(([date, r]) => ({ date, legs: r.legs })),
+    [feelByDate],
+  );
 
   const insights = useMemo(() => {
     if (!effectiveImport) return null;
@@ -214,12 +219,13 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         raceGoal,
         maxWeeklyKm > 0 ? maxWeeklyKm : undefined,
         legFeel,
+        feelHistory,
       );
     } catch (err) {
       console.error("computeInsights failed:", err);
       return null;
     }
-  }, [effectiveImport, fitDetails, defaultWeeklyRuns, raceGoal, maxWeeklyKm, legFeel]);
+  }, [effectiveImport, fitDetails, defaultWeeklyRuns, raceGoal, maxWeeklyKm, legFeel, feelHistory]);
 
   const importFitFiles = useCallback(
     async (files: File[]) => {

@@ -5,6 +5,7 @@ import { buildStravaImportFromDb } from "@/lib/db/activities";
 import { getAllFitDetailsForUser } from "@/lib/db/activity-streams";
 import { getStravaConnection } from "@/lib/db/strava-connection";
 import { getUserPreferences } from "@/lib/db/user-preferences";
+import { getRecentLegFeel } from "@/lib/db/leg-feel";
 import { buildIntelligenceBrief } from "./brief";
 import { buildRunCoachDetail } from "@/lib/coaching-context";
 import type {
@@ -50,6 +51,7 @@ export async function computeAthleteIntelligence(
   const { importData, fitDetails, quality } = await loadAthleteDataset(ctx.userId);
   const resolved = await resolveIntelligenceContext(ctx.userId, ctx);
   const maxKm = resolved.settings.maxWeeklyKm > 0 ? resolved.settings.maxWeeklyKm : undefined;
+  const feelHistory = await getRecentLegFeel(ctx.userId);
 
   const analytics = computeInsights(
     importData,
@@ -58,6 +60,7 @@ export async function computeAthleteIntelligence(
     resolved.raceGoal ?? null,
     maxKm,
     ctx.legFeel,
+    feelHistory,
   );
   const insights = generateInsights(analytics, quality);
 
