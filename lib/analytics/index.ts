@@ -64,7 +64,9 @@ import {
   workoutTypeDistribution,
   type RunWorkoutLabel,
   type WorkoutTypeBucket,
+  type WorkoutClassification,
 } from "./workoutType";
+import { scoreSessionExecution } from "@/lib/reasoning/executionScore";
 import {
   buildNextWeekPlan,
   buildPlanContextFromInsights,
@@ -145,6 +147,8 @@ export interface DashboardInsights {
 
 const DEFAULT_MAX_HR = 190;
 
+const UNKNOWN_WORKOUT: WorkoutClassification = { type: "unknown", confidence: "low", signals: [] };
+
 export function computeInsights(
   data: StravaImport,
   fitDetails: FitRunDetail[] = [],
@@ -195,12 +199,30 @@ export function computeInsights(
   const predictionTimeline = buildPredictionTimeline(runs, fitDetails);
   const loadSeries = weeklyLoadSeries(runs);
   const loadHistory = acuteChronicLoad(loadSeries).history;
-  // Calibration ladder: outcome-based (real feel↔performance evidence) → P3
+  const workoutLabels = classifyAllRuns(runs, fitDetails, athleteMaxHr);
+  // Per-run outcome samples for calibration: session execution grade (FIT runs,
+  // the strongest "did it go well?" signal) plus aerobic efficiency (broader).
+  const fitById = new Map(fitDetails.map((f) => [f.activityId, f]));
+  const labelById = new Map(workoutLabels.map((l) => [l.runId, l.classification]));
+  const outcomeSamples = runs.map((run) => {
+    const pace = paceSecPerKm(run);
+    const efficiency =
+      pace != null && run.avgHr != null && run.avgHr >= 80
+        ? Math.round((pace / run.avgHr) * 1000) / 1000
+        : undefined;
+    const fit = fitById.get(run.id) ?? null;
+    const executionScore =
+      fit && fit.hrStream.length >= 12
+        ? scoreSessionExecution(run, fit, labelById.get(run.id) ?? UNKNOWN_WORKOUT).qualityScore
+        : undefined;
+    return { date: run.date, efficiency, executionScore };
+  });
+  // Calibration ladder: outcome-based (execution grade → efficiency) → P3
   // agreement-with-load proxy → flat default, degrading as evidence thins out.
   const agreementCalibration = computeFeelCalibration(feelHistory ?? [], loadHistory);
   const feelCalibration = computeOutcomeCalibration(
     feelHistory ?? [],
-    efficiencyPoints,
+    outcomeSamples,
     agreementCalibration,
   );
   const fatigue = buildFatigueSnapshot(runs, legFeel, feelCalibration);
@@ -213,7 +235,6 @@ export function computeInsights(
   const raceReadinessResult = activeRaceGoal
     ? raceReadiness(runs, activeRaceGoal, personalRecords, racePredictionAnalysis)
     : null;
-  const workoutLabels = classifyAllRuns(runs, fitDetails, athleteMaxHr);
   const workoutTypeMix = workoutTypeDistribution(workoutLabels, 56);
   const trainingEcosystem = computeTrainingEcosystem(
     data,
