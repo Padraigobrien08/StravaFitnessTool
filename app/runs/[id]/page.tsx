@@ -11,6 +11,7 @@ import { FitRunDetailSchema } from "@/lib/strava/fitTypes";
 import { workoutLabelsByRunId } from "@/lib/analytics/workoutType";
 import { buildWorkoutDetailView } from "@/lib/runs/workoutDetailViewModels";
 import { WorkoutIntelligenceHero } from "@/components/run-detail/workout-intelligence-hero";
+import { PostRunFeel } from "@/components/run-detail/post-run-feel";
 import { WorkoutInterpretationPanel } from "@/components/run-detail/run-detail-panels";
 import { ExecutionAnalysisPanel } from "@/components/run-detail/execution-analysis-panel";
 import { StreamIntelligencePanel } from "@/components/run-detail/stream-intelligence-panel";
@@ -130,6 +131,7 @@ export default function RunDetailPage() {
           </div>
 
           <WorkoutIntelligenceHero hero={view.hero} />
+          <PostRunFeel runDate={run.date} />
           <WorkoutInterpretationPanel text={view.interpretation} />
           <ExecutionAnalysisPanel data={view.execution} />
           <AdaptationSignalsPanel signals={view.adaptations} />

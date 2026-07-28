@@ -3,6 +3,8 @@ import { parseSessionToken } from "@/lib/auth/session";
 import type { NextRequest } from "next/server";
 import type { IntelligenceContext } from "./types";
 import type { RaceGoal, RaceDistance } from "@/lib/analytics/readiness";
+import { getLegFeel } from "@/lib/db/leg-feel";
+import { feelDateKey } from "@/lib/wellness/types";
 
 export async function intelligenceContextFromRequest(
   req: NextRequest,
@@ -32,6 +34,8 @@ export async function intelligenceContextFromRequest(
   const raceGoal = parseRaceGoalQuery(req);
   const defaultWeeklyRuns = parseInt(req.nextUrl.searchParams.get("defaultWeeklyRuns") ?? "", 10);
   const maxWeeklyKm = parseFloat(req.nextUrl.searchParams.get("maxWeeklyKm") ?? "");
+  // Today's subjective leg-feel, if reported. Returns null on any DB failure.
+  const feel = await getLegFeel(userId, feelDateKey());
 
   return {
     userId,
@@ -40,6 +44,7 @@ export async function intelligenceContextFromRequest(
       ...(Number.isFinite(defaultWeeklyRuns) && defaultWeeklyRuns > 0 ? { defaultWeeklyRuns } : {}),
       ...(Number.isFinite(maxWeeklyKm) && maxWeeklyKm > 0 ? { maxWeeklyKm } : {}),
     },
+    legFeel: feel?.legs,
   };
 }
 

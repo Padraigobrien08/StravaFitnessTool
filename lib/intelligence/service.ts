@@ -57,6 +57,7 @@ export async function computeAthleteIntelligence(
     resolved.settings.defaultWeeklyRuns,
     resolved.raceGoal ?? null,
     maxKm,
+    ctx.legFeel,
   );
   const insights = generateInsights(analytics, quality);
 

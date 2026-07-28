@@ -39,6 +39,9 @@ export function evaluateRecommendationOutcome(
   if (input.readinessScore != null) {
     signals.push(`Readiness ${input.readinessScore}/100`);
   }
+  if (input.legFeel) {
+    signals.push(`Reported legs: ${input.legFeel}`);
+  }
   if (input.readinessDelta != null && Math.abs(input.readinessDelta) >= 3) {
     signals.push(
       `Readiness ${input.readinessDelta > 0 ? "improved" : "declined"} ${Math.abs(input.readinessDelta)} pts`,

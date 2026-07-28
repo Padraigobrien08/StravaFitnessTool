@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
       tsb: analytics.fatigue.tsb,
       readinessScore: analytics.raceReadiness?.score,
       hardRuns14d: analytics.intensityAdvice.hardRunsLast14d,
+      legFeel: ctx.legFeel,
     });
     return NextResponse.json(result);
   } catch (e) {

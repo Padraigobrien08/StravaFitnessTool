@@ -24,6 +24,8 @@ export interface FatigueSnapshot {
   restDaysSinceLastRun: number;
   evidence: string[];
   usesProxyLoad: boolean;
+  /** The athlete's reported leg-feel for the day, if any — rides the snapshot to every consumer. */
+  reportedLegFeel?: LegFeel;
 }
 
 export function weeklyLoadSeries(runs: RunActivity[]): WeeklyLoadPoint[] {
@@ -164,5 +166,6 @@ export function buildFatigueSnapshot(runs: RunActivity[], legFeel?: LegFeel): Fa
     restDaysSinceLastRun,
     evidence,
     usesProxyLoad,
+    reportedLegFeel: legFeel,
   };
 }

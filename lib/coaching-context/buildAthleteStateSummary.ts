@@ -69,8 +69,11 @@ export function buildAthleteStateSummary(insights: DashboardInsights): CoachingC
   const specificity = mapSpecificity(insights);
   const intensityBalance = mapIntensityBalance(insights);
 
+  const reportedLegFeel = insights.fatigue.reportedLegFeel;
+
   const parts: string[] = [];
   parts.push(`Freshness ${Math.round(freshness)} (TSB ${insights.fatigue.tsb.toFixed(0)}).`);
+  if (reportedLegFeel) parts.push(`Athlete reports ${reportedLegFeel} legs today.`);
   if (readiness != null) parts.push(`Readiness signal ~${Math.round(readiness)}.`);
   parts.push(`${focus}: ${rationale}`);
   const intRec = insights.intensityAdvice.recommendations[0];
@@ -79,6 +82,7 @@ export function buildAthleteStateSummary(insights: DashboardInsights): CoachingC
   return {
     readiness: readiness != null ? Math.round(readiness) : undefined,
     freshness: Math.round(freshness),
+    reportedLegFeel,
     fatigueState,
     durability,
     specificity,

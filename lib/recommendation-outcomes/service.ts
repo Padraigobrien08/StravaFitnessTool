@@ -10,6 +10,7 @@ import { evaluateRecommendationOutcome } from "@/lib/recommendation-learning/eva
 import { evaluateAdherence } from "./evaluateAdherence";
 import { evaluateVolumeTrendAdherence } from "./evaluateVolumeTrend";
 import type { Adherence, LoggedRecommendation } from "./types";
+import type { LegFeel } from "@/lib/wellness/types";
 
 /** Current analytics signals used to judge whether a followed recommendation worked. */
 export interface SignalSnapshot {
@@ -18,6 +19,7 @@ export interface SignalSnapshot {
   readinessScore?: number;
   efficiencyTrend?: "improving" | "declining" | "stable" | null;
   hardRuns14d?: number;
+  legFeel?: LegFeel;
 }
 
 /** Days a followed recommendation must age before its physiological effect is judged. */
@@ -66,6 +68,7 @@ export function evaluateSignal(
     readinessScore: snap.readinessScore,
     efficiencyTrend: snap.efficiencyTrend,
     hardRuns14d: snap.hardRuns14d,
+    legFeel: snap.legFeel,
   });
   return { signal: tracked.evaluation, note: tracked.observedSignals.slice(0, 3).join(" · ") };
 }
