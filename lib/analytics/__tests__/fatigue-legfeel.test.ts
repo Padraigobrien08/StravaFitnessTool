@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { freshnessFromTsb } from "@/lib/analytics/fatigue";
+import { buildFatigueSnapshot, freshnessFromTsb } from "@/lib/analytics/fatigue";
 
 describe("freshnessFromTsb — leg-feel subjective nudge", () => {
   it("is a no-op when legFeel is absent (byte-identical to the base path)", () => {
@@ -39,5 +39,15 @@ describe("freshnessFromTsb — leg-feel subjective nudge", () => {
   it("clamps to [0, 100]", () => {
     expect(freshnessFromTsb(-40, 0, "heavy").freshness).toBeGreaterThanOrEqual(0);
     expect(freshnessFromTsb(40, 3, "fresh").freshness).toBeLessThanOrEqual(100);
+  });
+});
+
+describe("buildFatigueSnapshot — carries reportedLegFeel to consumers", () => {
+  it("stamps the reported feel onto the snapshot (for Coach context + learning loop)", () => {
+    expect(buildFatigueSnapshot([], "heavy").reportedLegFeel).toBe("heavy");
+  });
+
+  it("is undefined when nothing was reported", () => {
+    expect(buildFatigueSnapshot([]).reportedLegFeel).toBeUndefined();
   });
 });
