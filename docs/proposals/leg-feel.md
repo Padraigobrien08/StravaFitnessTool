@@ -1,6 +1,6 @@
 # Proposal — Leg-Feel (subjective wellness input)
 
-**Status:** P1 implemented on `feat/leg-feel` · **Effort:** ~2–3 days (P1) · **Risk:** low–medium
+**Status:** P1 + P2 merged to `main` (PRs #77, #78) · **Remaining:** per-athlete calibration (P3) · **Risk:** low–medium
 
 A daily subjective check-in that lets the athlete tell the model what Strava can't measure — "legs feel heavy" — and have it bounded-nudge the readiness verdict and today's session.
 
@@ -59,13 +59,16 @@ Analytics is computed **client-side** in `lib/context/strava-context.tsx` from d
 
 The app already grades recommendations against outcomes (`evaluateRecommendationOutcomes()` vs a `SignalSnapshot { freshness, tsb, readinessScore, hardRuns14d }`). Feed leg-feel into that loop and the model can learn each athlete's personal feel↔performance correlation — the ±nudge becomes individually calibrated instead of a fixed constant.
 
+**Shipped in P2:** leg-feel is now recorded into that loop (added to `SignalSnapshot` and written to each outcome's `observedSignals`). **Remaining (P3):** the calibration step that turns the recorded feel↔outcome history into a per-athlete nudge, replacing the fixed −12 / +5.
+
 ## Phasing
 
-| Phase     | Scope                                                                                        | Est.      |
-| --------- | -------------------------------------------------------------------------------------------- | --------- |
-| **P0**    | UI + local state only (the mockup made real)                                                 | ~0.5 day  |
-| **P1** ✅ | Persist + blend into freshness + morning UI + tests                                          | ~2–3 days |
-| **P2**    | Post-run capture, niggle field, server-context threading for Coach, feel↔outcome calibration | ~3–5 days |
+| Phase     | Scope                                                                                      | Est.      |
+| --------- | ------------------------------------------------------------------------------------------ | --------- |
+| **P0**    | UI + local state only (the mockup made real)                                               | ~0.5 day  |
+| **P1** ✅ | Persist + blend into freshness + morning UI + tests                                        | ~2–3 days |
+| **P2** ✅ | Post-run capture, niggle field, server-context threading for Coach, feel↔outcome recording | ~3–5 days |
+| **P3**    | Per-athlete calibration — turn recorded feel↔outcome history into an individualized nudge  | TBD       |
 
 ## Risks & open decisions
 
