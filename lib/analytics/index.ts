@@ -215,7 +215,13 @@ export function computeInsights(
       fit && fit.hrStream.length >= 12
         ? scoreSessionExecution(run, fit, labelById.get(run.id) ?? UNKNOWN_WORKOUT).qualityScore
         : undefined;
-    return { date: run.date, efficiency, executionScore };
+    return {
+      date: run.date,
+      efficiency,
+      executionScore,
+      hrDriftPct: fit?.hrDriftPct ?? undefined,
+      distanceKm: run.distanceM / 1000,
+    };
   });
   // Calibration ladder: outcome-based (execution grade → efficiency) → P3
   // agreement-with-load proxy → flat default, degrading as evidence thins out.

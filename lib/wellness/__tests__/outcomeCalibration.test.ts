@@ -77,10 +77,15 @@ describe("computeOutcomeCalibration", () => {
   });
 });
 
-const sample = (date: string, o: { eff?: number; exec?: number }): OutcomeSample => ({
+const sample = (
+  date: string,
+  o: { eff?: number; exec?: number; drift?: number; km?: number },
+): OutcomeSample => ({
   date,
   efficiency: o.eff,
   executionScore: o.exec,
+  hrDriftPct: o.drift,
+  distanceKm: o.km,
 });
 
 describe("computeOutcomeCalibration — execution grade", () => {
@@ -116,5 +121,35 @@ describe("computeOutcomeCalibration — execution grade", () => {
     // If efficiency had won, reliability would be < 0.5 (all contradicted).
     expect(c.reliability).toBeGreaterThan(0.5);
     expect(c.basis).toContain("session execution");
+  });
+});
+
+describe("computeOutcomeCalibration — HR-drift & training-response tiers", () => {
+  it("uses HR drift when there's no execution grade (higher drift = worse)", () => {
+    const samples = [
+      sample("2026-03-01", { drift: 8 }), // heavy → high drift ✓
+      sample("2026-03-02", { drift: 9 }),
+      sample("2026-03-03", { drift: 10 }),
+      sample("2026-03-04", { drift: 2 }), // fresh → low drift ✓
+      sample("2026-03-05", { drift: 3 }),
+      sample("2026-03-06", { drift: 4 }),
+    ];
+    const c = computeOutcomeCalibration(PREDICTIVE.reports, samples);
+    expect(c.reliability).toBeGreaterThan(0.5);
+    expect(c.basis).toContain("heart-rate drift");
+  });
+
+  it("falls to training-response (volume) when only distance is available", () => {
+    const samples = [
+      sample("2026-03-01", { km: 3 }), // heavy → trained less ✓
+      sample("2026-03-02", { km: 4 }),
+      sample("2026-03-03", { km: 5 }),
+      sample("2026-03-04", { km: 12 }), // fresh → trained normally ✓
+      sample("2026-03-05", { km: 13 }),
+      sample("2026-03-06", { km: 14 }),
+    ];
+    const c = computeOutcomeCalibration(PREDICTIVE.reports, samples);
+    expect(c.reliability).toBeGreaterThan(0.5);
+    expect(c.basis).toContain("how you trained after");
   });
 });
