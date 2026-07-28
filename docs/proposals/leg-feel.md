@@ -1,6 +1,6 @@
 # Proposal — Leg-Feel (subjective wellness input)
 
-**Status:** P1 + P2 merged; P3 (calibration v1) on `feat/leg-feel-p3` · **Remaining:** outcome-based recalibration · **Risk:** low–medium
+**Status:** P1–P4 shipped (P4 outcome-based recalibration on `feat/leg-feel-outcome-cal`) · **Remaining:** refine the outcome metric with production data · **Risk:** low–medium
 
 A daily subjective check-in that lets the athlete tell the model what Strava can't measure — "legs feel heavy" — and have it bounded-nudge the readiness verdict and today's session.
 
@@ -61,7 +61,9 @@ The app already grades recommendations against outcomes (`evaluateRecommendation
 
 **Shipped in P2:** leg-feel is now recorded into that loop (added to `SignalSnapshot` and written to each outcome's `observedSignals`).
 
-**Shipped in P3 (`lib/wellness/calibration.ts`):** a v1 per-athlete calibration. It's deliberately conservative — **amplify-only** and **evidence-gated**: below a history threshold everyone gets the proven default (−12 / +5); once there's enough history, an athlete whose reports reliably track the objective load model (a proxy for thoughtful reporting) earns a bit more weight, within a hard cap (−17 / +8); it never dampens below the default, so a reporter who diverges from the model — the case the feature exists for — keeps full weight. **Remaining:** replace the agreement-with-load proxy with true feel↔**outcome** recalibration once enough outcome data has accrued (that's the P2 recording paying off).
+**Shipped in P3 (`lib/wellness/calibration.ts`):** a v1 per-athlete calibration. It's deliberately conservative — **amplify-only** and **evidence-gated**: below a history threshold everyone gets the proven default (−12 / +5); once there's enough history, an athlete whose reports reliably track the objective load model (a proxy for thoughtful reporting) earns a bit more weight, within a hard cap (−17 / +8); it never dampens below the default, so a reporter who diverges from the model — the case the feature exists for — keeps full weight.
+
+**Shipped in P4 (`lib/wellness/outcomeCalibration.ts`):** true feel↔**outcome** recalibration. It pairs each directional report with the athlete's running in the next 0–2 days (aerobic efficiency vs. their baseline — _did they actually run worse when they said heavy?_) and, unlike P3, is **bidirectional**: predictive reporters are trusted more, counter-predictive ones less. It's Laplace-shrunk toward the default on small samples and floored so a "heavy" report never drops readiness by less than 6 (safety). It sits atop a ladder — outcome-based → P3 agreement proxy → flat default — degrading as evidence thins. **Remaining:** refine the outcome metric (execution grade, HR-drift, skipped-session behaviour) as real usage data accrues.
 
 ## Phasing
 
@@ -71,6 +73,7 @@ The app already grades recommendations against outcomes (`evaluateRecommendation
 | **P1** ✅ | Persist + blend into freshness + morning UI + tests                                        | ~2–3 days |
 | **P2** ✅ | Post-run capture, niggle field, server-context threading for Coach, feel↔outcome recording | ~3–5 days |
 | **P3** ✅ | Per-athlete calibration (v1) — amplify-only, evidence-gated nudge from feel↔load agreement | ~1 day    |
+| **P4** ✅ | Outcome-based recalibration — bidirectional, shrunk, from feel↔performance pairs           | ~1 day    |
 
 ## Risks & open decisions
 

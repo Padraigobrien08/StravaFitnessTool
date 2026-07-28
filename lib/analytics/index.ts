@@ -2,6 +2,7 @@ import type { StravaImport } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { LegFeel } from "@/lib/wellness/types";
 import { computeFeelCalibration, type FeelHistoryPoint } from "@/lib/wellness/calibration";
+import { computeOutcomeCalibration } from "@/lib/wellness/outcomeCalibration";
 import { activityTypeMix } from "./context";
 import { runGoalProgress } from "./goals";
 import { easyHardSplit, hrZoneDistribution } from "./hrZones";
@@ -194,7 +195,14 @@ export function computeInsights(
   const predictionTimeline = buildPredictionTimeline(runs, fitDetails);
   const loadSeries = weeklyLoadSeries(runs);
   const loadHistory = acuteChronicLoad(loadSeries).history;
-  const feelCalibration = computeFeelCalibration(feelHistory ?? [], loadHistory);
+  // Calibration ladder: outcome-based (real feel↔performance evidence) → P3
+  // agreement-with-load proxy → flat default, degrading as evidence thins out.
+  const agreementCalibration = computeFeelCalibration(feelHistory ?? [], loadHistory);
+  const feelCalibration = computeOutcomeCalibration(
+    feelHistory ?? [],
+    efficiencyPoints,
+    agreementCalibration,
+  );
   const fatigue = buildFatigueSnapshot(runs, legFeel, feelCalibration);
   const efficiencyMoM = efficiencyMonthOverMonth(efficiencyPoints);
   const personalRecords = findPersonalRecords(runs, fitDetails);
