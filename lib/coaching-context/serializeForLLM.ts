@@ -117,6 +117,7 @@ export function serializeCoachingContextForLLM(
       `Fatigue: ${s.fatigueState} · Durability: ${s.durability} · Specificity: ${s.specificity} · Intensity balance: ${s.intensityBalance}`,
       s.readiness != null ? `Readiness score: ${s.readiness}` : "",
       s.freshness != null ? `Freshness: ${s.freshness}` : "",
+      s.reportedLegFeel ? `Reported legs today: ${s.reportedLegFeel}` : "",
     ]),
   );
 

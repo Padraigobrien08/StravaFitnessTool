@@ -3,6 +3,7 @@ import type { Insight } from "@/lib/insights/types";
 import type { ImportQualityReport } from "@/lib/quality/assessImport";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import type { StrategyMode } from "@/lib/analytics/raceStrategy";
+import type { LegFeel } from "@/lib/wellness/types";
 
 export type IntelligenceConfidence = "low" | "medium" | "high";
 
@@ -23,6 +24,8 @@ export interface IntelligenceContext {
   userId: string;
   raceGoal?: RaceGoal | null;
   settings?: Partial<IntelligenceSettings>;
+  /** Today's reported leg-feel, resolved from the DB per request. */
+  legFeel?: LegFeel;
 }
 
 export interface RecentRunSummary {

@@ -1,3 +1,5 @@
+import type { LegFeel } from "@/lib/wellness/types";
+
 export type OutcomeEvaluation =
   "supported" | "partially_supported" | "contradicted" | "inconclusive";
 
@@ -33,4 +35,6 @@ export interface EvaluateOutcomeInput {
   efficiencyTrend?: "improving" | "declining" | "stable" | null;
   hardRuns14d?: number;
   priorHardRuns14d?: number;
+  /** Athlete's reported leg-feel at/around evaluation time (for feel↔outcome learning). */
+  legFeel?: LegFeel;
 }

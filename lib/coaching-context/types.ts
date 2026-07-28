@@ -1,4 +1,5 @@
 import type { AthleteArchetype } from "@/lib/ecosystem/types";
+import type { LegFeel } from "@/lib/wellness/types";
 
 export type ConfidenceLevel = "low" | "medium" | "high";
 
@@ -98,6 +99,8 @@ export interface CoachingGoalContext {
 export interface CoachingCurrentState {
   readiness?: number;
   freshness?: number;
+  /** Athlete's reported leg-feel for the day, if any. */
+  reportedLegFeel?: LegFeel;
   fatigueState: FatigueStateLabel;
   durability: DurabilityLabel;
   specificity: SpecificityLabel;

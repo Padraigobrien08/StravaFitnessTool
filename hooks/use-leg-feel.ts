@@ -4,13 +4,15 @@ import { useEffect } from "react";
 import { useFeelStore } from "@/stores/feel-store";
 import { feelDateKey, type LegFeel, type LegFeelReport } from "@/lib/wellness/types";
 
+type FeelExtra = { niggle?: LegFeelReport["niggle"]; note?: string };
+
 /**
- * Today's leg-feel: local-first (zustand + localStorage), reconciled with the
- * server once on mount, fire-and-forget POST on set. Degrades to local-only
- * when there's no DB / the user isn't signed in.
+ * Leg-feel for a given day (defaults to today): local-first (zustand + localStorage),
+ * reconciled with the server on mount, fire-and-forget POST on set. Degrades to
+ * local-only when there's no DB / the user isn't signed in.
  */
-export function useLegFeel() {
-  const date = feelDateKey();
+export function useLegFeel(dateArg?: string) {
+  const date = dateArg ?? feelDateKey();
   const report = useFeelStore((s) => s.byDate[date]);
   const setFeelLocal = useFeelStore((s) => s.setFeel);
   const mergeFromServer = useFeelStore((s) => s.mergeFromServer);
@@ -28,8 +30,20 @@ export function useLegFeel() {
     };
   }, [date, mergeFromServer]);
 
-  const setFeel = (legs: LegFeel, source: LegFeelReport["source"] = "morning") => {
-    const next: LegFeelReport = { legs, source, reportedAt: new Date().toISOString() };
+  const setFeel = (
+    legs: LegFeel,
+    source: LegFeelReport["source"] = "morning",
+    extra?: FeelExtra,
+  ) => {
+    // Merge onto the day's existing report so setting legs preserves a flagged
+    // niggle (and vice versa); `extra` explicitly overrides.
+    const next: LegFeelReport = {
+      ...report,
+      legs,
+      source,
+      reportedAt: new Date().toISOString(),
+      ...(extra ?? {}),
+    };
     setFeelLocal(date, next); // optimistic
     void fetch("/api/me/leg-feel", {
       method: "POST",
