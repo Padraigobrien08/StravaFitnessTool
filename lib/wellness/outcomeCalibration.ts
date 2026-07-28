@@ -49,7 +49,19 @@ export interface EfficiencySample {
   efficiency: number;
 }
 
-type Signal = "execution" | "hr-drift" | "efficiency" | "training-response";
+export type OutcomeSignal = "execution" | "hr-drift" | "efficiency" | "training-response";
+
+/** Raw pre-gate evidence: how reports paired with outcomes, by winning signal. */
+export interface OutcomePairs {
+  /** "heavy"→worse or "fresh"→better outcomes. */
+  confirmed: number;
+  /** reports whose outcome went the other way. */
+  contradicted: number;
+  /** confirmed + contradicted — the paired-evidence count the gate tests. */
+  pairs: number;
+  /** which rung of the ladder decided each pair. */
+  signalCounts: Record<OutcomeSignal, number>;
+}
 
 const BASE_HEAVY = DEFAULT_FEEL_CALIBRATION.heavyDelta; // −12
 const BASE_FRESH = DEFAULT_FEEL_CALIBRATION.freshDelta; // +5
@@ -64,7 +76,7 @@ const HIGH_PAIRS = 12;
 const PRIOR = 2; // Laplace prior strength → shrink toward 0.5
 const SCALE_SENSITIVITY = 1.0;
 
-const SIGNAL_PHRASE: Record<Signal, string> = {
+const SIGNAL_PHRASE: Record<OutcomeSignal, string> = {
   execution: "session execution",
   "hr-drift": "heart-rate drift",
   efficiency: "how you ran",
@@ -90,15 +102,18 @@ function medianOrNull(nums: number[]): number | null {
 }
 
 /**
+ * Pair each directional report with its 0–2-day outcome window and decide, via
+ * the signal ladder, whether the session went worse (or better) than the
+ * athlete's own baseline. Pre-gate and side-effect-free: the raw evidence the
+ * calibration is built from, exposed for validation/backtesting.
+ *
  * @param reports  the athlete's leg-feel history
  * @param samples  per-run outcome samples (execution / drift / efficiency / distance)
- * @param fallback the P3 calibration to use when there isn't enough paired evidence
  */
-export function computeOutcomeCalibration(
+export function scoreOutcomePairs(
   reports: FeelHistoryPoint[],
   samples: OutcomeSample[],
-  fallback: FeelCalibration = DEFAULT_FEEL_CALIBRATION,
-): FeelCalibration {
+): OutcomePairs {
   const execMedian = medianOrNull(collect(samples, "executionScore"));
   const driftMedian = medianOrNull(collect(samples, "hrDriftPct"));
   const effMedian = medianOrNull(collect(samples, "efficiency"));
@@ -126,7 +141,7 @@ export function computeOutcomeCalibration(
 
   let confirmed = 0;
   let contradicted = 0;
-  const signalCounts: Record<Signal, number> = {
+  const signalCounts: Record<OutcomeSignal, number> = {
     execution: 0,
     "hr-drift": 0,
     efficiency: 0,
@@ -135,7 +150,7 @@ export function computeOutcomeCalibration(
 
   for (const w of windows) {
     let worse: boolean | null = null;
-    let signal: Signal | null = null;
+    let signal: OutcomeSignal | null = null;
     if (execMedian != null && w.execMean != null) {
       worse = w.execMean < execMedian; // lower execution = worse
       signal = "execution";
@@ -157,7 +172,20 @@ export function computeOutcomeCalibration(
     signalCounts[signal]++;
   }
 
-  const pairs = confirmed + contradicted;
+  return { confirmed, contradicted, pairs: confirmed + contradicted, signalCounts };
+}
+
+/**
+ * @param reports  the athlete's leg-feel history
+ * @param samples  per-run outcome samples (execution / drift / efficiency / distance)
+ * @param fallback the P3 calibration to use when there isn't enough paired evidence
+ */
+export function computeOutcomeCalibration(
+  reports: FeelHistoryPoint[],
+  samples: OutcomeSample[],
+  fallback: FeelCalibration = DEFAULT_FEEL_CALIBRATION,
+): FeelCalibration {
+  const { confirmed, contradicted, pairs, signalCounts } = scoreOutcomePairs(reports, samples);
   if (pairs < MIN_PAIRS) return fallback;
 
   // Laplace-shrunk predictive reliability, pulled toward 0.5 on small samples.
@@ -167,7 +195,7 @@ export function computeOutcomeCalibration(
   const freshDelta = Math.round(clamp(BASE_FRESH * scale, FRESH_FLOOR, FRESH_CAP));
   const confidence = pairs >= HIGH_PAIRS ? "high" : "medium";
   const rawPct = Math.round((confirmed / pairs) * 100);
-  const dominant = (Object.keys(signalCounts) as Signal[]).reduce((a, b) =>
+  const dominant = (Object.keys(signalCounts) as OutcomeSignal[]).reduce((a, b) =>
     signalCounts[b] > signalCounts[a] ? b : a,
   );
   const phrase = SIGNAL_PHRASE[dominant];

@@ -1,8 +1,18 @@
 import type { StravaImport } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { LegFeel } from "@/lib/wellness/types";
-import { computeFeelCalibration, type FeelHistoryPoint } from "@/lib/wellness/calibration";
-import { computeOutcomeCalibration } from "@/lib/wellness/outcomeCalibration";
+import {
+  computeFeelCalibration,
+  type FeelHistoryPoint,
+  type FeelCalibration,
+} from "@/lib/wellness/calibration";
+import {
+  computeOutcomeCalibration,
+  scoreOutcomePairs,
+  type OutcomeSample,
+  type OutcomePairs,
+} from "@/lib/wellness/outcomeCalibration";
+import type { RunActivity } from "@/lib/strava/types";
 import { activityTypeMix } from "./context";
 import { runGoalProgress } from "./goals";
 import { easyHardSplit, hrZoneDistribution } from "./hrZones";
@@ -149,6 +159,85 @@ const DEFAULT_MAX_HR = 190;
 
 const UNKNOWN_WORKOUT: WorkoutClassification = { type: "unknown", confidence: "low", signals: [] };
 
+/**
+ * Build the per-run outcome samples the feel-calibration reads (execution grade,
+ * HR drift, aerobic efficiency, distance). Shared by `computeInsights` and the
+ * offline calibration validator so both feed the calibration identical inputs.
+ */
+export function buildOutcomeSamples(
+  runs: RunActivity[],
+  fitById: Map<string, FitRunDetail>,
+  labelById: Map<string, WorkoutClassification>,
+): OutcomeSample[] {
+  return runs.map((run) => {
+    const pace = paceSecPerKm(run);
+    const efficiency =
+      pace != null && run.avgHr != null && run.avgHr >= 80
+        ? Math.round((pace / run.avgHr) * 1000) / 1000
+        : undefined;
+    const fit = fitById.get(run.id) ?? null;
+    const executionScore =
+      fit && fit.hrStream.length >= 12
+        ? scoreSessionExecution(run, fit, labelById.get(run.id) ?? UNKNOWN_WORKOUT).qualityScore
+        : undefined;
+    return {
+      date: run.date,
+      efficiency,
+      executionScore,
+      hrDriftPct: fit?.hrDriftPct ?? undefined,
+      distanceKm: run.distanceM / 1000,
+    };
+  });
+}
+
+/** Diagnostics for the offline calibration validator (see scripts/validate-calibration.mts). */
+export interface FeelCalibrationDiagnostics {
+  /** Final calibration the athlete would receive. */
+  calibration: FeelCalibration;
+  /** P3 agreement-with-load layer the outcome calibration falls back to. */
+  agreement: FeelCalibration;
+  /** Raw pre-gate outcome evidence. */
+  pairs: OutcomePairs;
+  /** Outcome samples carrying at least one usable signal. */
+  usableSamples: number;
+  /** Directional (heavy/fresh) reports in the history. */
+  directionalReports: number;
+}
+
+/**
+ * Run the full calibration ladder over one athlete's dataset and return the
+ * result plus the raw evidence behind it. Same code path as `computeInsights`
+ * (via {@link buildOutcomeSamples} + {@link computeOutcomeCalibration}), so the
+ * validator measures exactly what production would apply.
+ */
+export function buildFeelCalibration(
+  runs: RunActivity[],
+  fitDetails: FitRunDetail[],
+  feelHistory: FeelHistoryPoint[],
+  athleteMaxHr: number = DEFAULT_MAX_HR,
+): FeelCalibrationDiagnostics {
+  const fitById = new Map(fitDetails.map((f) => [f.activityId, f]));
+  const labelById = new Map(
+    classifyAllRuns(runs, fitDetails, athleteMaxHr).map((l) => [l.runId, l.classification]),
+  );
+  const samples = buildOutcomeSamples(runs, fitById, labelById);
+  const loadHistory = acuteChronicLoad(weeklyLoadSeries(runs)).history;
+  const agreement = computeFeelCalibration(feelHistory, loadHistory);
+  const calibration = computeOutcomeCalibration(feelHistory, samples, agreement);
+  const pairs = scoreOutcomePairs(feelHistory, samples);
+  const usableSamples = samples.filter(
+    (s) =>
+      s.executionScore != null ||
+      s.hrDriftPct != null ||
+      s.efficiency != null ||
+      s.distanceKm != null,
+  ).length;
+  const directionalReports = feelHistory.filter(
+    (r) => r.legs === "heavy" || r.legs === "fresh",
+  ).length;
+  return { calibration, agreement, pairs, usableSamples, directionalReports };
+}
+
 export function computeInsights(
   data: StravaImport,
   fitDetails: FitRunDetail[] = [],
@@ -204,25 +293,7 @@ export function computeInsights(
   // the strongest "did it go well?" signal) plus aerobic efficiency (broader).
   const fitById = new Map(fitDetails.map((f) => [f.activityId, f]));
   const labelById = new Map(workoutLabels.map((l) => [l.runId, l.classification]));
-  const outcomeSamples = runs.map((run) => {
-    const pace = paceSecPerKm(run);
-    const efficiency =
-      pace != null && run.avgHr != null && run.avgHr >= 80
-        ? Math.round((pace / run.avgHr) * 1000) / 1000
-        : undefined;
-    const fit = fitById.get(run.id) ?? null;
-    const executionScore =
-      fit && fit.hrStream.length >= 12
-        ? scoreSessionExecution(run, fit, labelById.get(run.id) ?? UNKNOWN_WORKOUT).qualityScore
-        : undefined;
-    return {
-      date: run.date,
-      efficiency,
-      executionScore,
-      hrDriftPct: fit?.hrDriftPct ?? undefined,
-      distanceKm: run.distanceM / 1000,
-    };
-  });
+  const outcomeSamples = buildOutcomeSamples(runs, fitById, labelById);
   // Calibration ladder: outcome-based (execution grade → efficiency) → P3
   // agreement-with-load proxy → flat default, degrading as evidence thins out.
   const agreementCalibration = computeFeelCalibration(feelHistory ?? [], loadHistory);

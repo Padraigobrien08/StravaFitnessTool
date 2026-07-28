@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   computeOutcomeCalibration,
+  scoreOutcomePairs,
   type EfficiencySample,
   type OutcomeSample,
 } from "@/lib/wellness/outcomeCalibration";
@@ -121,6 +122,41 @@ describe("computeOutcomeCalibration — execution grade", () => {
     // If efficiency had won, reliability would be < 0.5 (all contradicted).
     expect(c.reliability).toBeGreaterThan(0.5);
     expect(c.basis).toContain("session execution");
+  });
+});
+
+describe("scoreOutcomePairs (pre-gate evidence)", () => {
+  it("counts confirmed/contradicted and attributes the winning signal", () => {
+    // Dates spaced ≥4 days apart so each 0–2 day window isolates one sample.
+    // Efficiency LOWER = better; baseline median of these six is 2.05.
+    // 4 of 6 reports match the outcome → 4 confirmed, 2 contradicted.
+    const reports: FeelHistoryPoint[] = [
+      feel("2026-03-01", "heavy"),
+      feel("2026-03-05", "heavy"),
+      feel("2026-03-09", "heavy"),
+      feel("2026-03-13", "fresh"),
+      feel("2026-03-17", "fresh"),
+      feel("2026-03-21", "fresh"),
+    ];
+    const mixed: EfficiencySample[] = [
+      eff("2026-03-01", 2.5), // heavy → worse ✓
+      eff("2026-03-05", 2.5), // heavy → worse ✓
+      eff("2026-03-09", 1.6), // heavy → better ✗
+      eff("2026-03-13", 1.6), // fresh → better ✓
+      eff("2026-03-17", 1.6), // fresh → better ✓
+      eff("2026-03-21", 2.5), // fresh → worse ✗
+    ];
+    const p = scoreOutcomePairs(reports, mixed);
+    expect(p.pairs).toBe(6);
+    expect(p.confirmed).toBe(4);
+    expect(p.contradicted).toBe(2);
+    expect(p.signalCounts.efficiency).toBe(6);
+    expect(p.signalCounts.execution).toBe(0);
+  });
+
+  it("returns zero pairs when no baseline is available", () => {
+    const p = scoreOutcomePairs(PREDICTIVE.reports, PREDICTIVE.eff.slice(0, 2));
+    expect(p.pairs).toBe(0);
   });
 });
 
