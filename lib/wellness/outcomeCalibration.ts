@@ -6,24 +6,36 @@ import {
 } from "./calibration";
 
 /**
- * Outcome-based recalibration of the leg-feel nudge (P4).
+ * Outcome-based recalibration of the leg-feel nudge (P4 + execution-grade refinement).
  *
  * Where P3 used *agreement with the load model* as a proxy for thoughtful
  * reporting (and could only ever amplify), this uses actual results: did a
- * "heavy" report precede genuinely worse running, and "fresh" better running?
+ * "heavy" report precede a genuinely worse session, and "fresh" a better one?
  * Because that's real evidence — not a proxy — it is **bidirectional**: a
- * reporter whose reads reliably predict performance is trusted more; one whose
- * reads are counter-predictive is trusted less. It stays bounded and floored
- * (a "heavy" report can never be worth less than −6), and it is heavily shrunk
- * toward the default on small samples. Below the pair gate it defers to the
- * P3 result (which itself defers to the flat default).
+ * reporter whose reads reliably predict how sessions go is trusted more; one
+ * whose reads are counter-predictive is trusted less. It stays bounded and
+ * floored (a "heavy" report can never be worth less than −6), and is heavily
+ * shrunk toward the default on small samples. Below the pair gate it defers to
+ * the P3 result (which itself defers to the flat default).
  *
- * Efficiency convention (see lib/analytics/efficiency): LOWER = better (faster
- * at a given HR). So a report is "confirmed" when heavy→above-median efficiency
- * (ran worse) or fresh→below-median (ran better).
+ * The outcome signal is a ladder, strongest first:
+ *   1. Session execution grade (`scoreSessionExecution`, 0–100, higher = better)
+ *      — the most direct "did the session go well?" signal, available when a run
+ *      has FIT streams.
+ *   2. Aerobic efficiency vs. baseline (lower = better) — broader, HR-only.
+ * A report window uses execution grade when present, else efficiency.
  */
 
-/** Minimal per-run efficiency sample (kept local so lib/wellness stays analytics-free). */
+/** Per-run outcome sample. Either/both signals may be present. */
+export interface OutcomeSample {
+  date: string;
+  /** Aerobic-efficiency index (pace/HR). LOWER = better. */
+  efficiency?: number;
+  /** Session execution quality 0–100. HIGHER = better. */
+  executionScore?: number;
+}
+
+/** @deprecated retained for callers that only have efficiency — assignable to OutcomeSample. */
 export interface EfficiencySample {
   date: string;
   efficiency: number;
@@ -36,7 +48,7 @@ const HEAVY_FLOOR = -6; // weakest — a heavy report always drops readiness ≥
 const FRESH_CAP = 8;
 const FRESH_FLOOR = 3;
 const WINDOW_DAYS = 2; // runs within 0–2 days after a report count as its outcome
-const MIN_EFF_POINTS = 4; // need a stable efficiency baseline
+const MIN_BASELINE = 4; // samples of a signal needed for a stable baseline median
 const MIN_PAIRS = 6; // paired outcomes needed before deviating from the fallback
 const HIGH_PAIRS = 12;
 const PRIOR = 2; // Laplace prior strength → shrink toward 0.5
@@ -52,31 +64,49 @@ function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));
 }
 
+function mean(nums: number[]): number {
+  return nums.reduce((a, b) => a + b, 0) / nums.length;
+}
+
 /**
  * @param reports  the athlete's leg-feel history
- * @param efficiency  per-run efficiency samples (date + index; lower = better)
- * @param fallback  the P3 calibration to use when there isn't enough paired evidence
+ * @param samples  per-run outcome samples (execution grade and/or efficiency)
+ * @param fallback the P3 calibration to use when there isn't enough paired evidence
  */
 export function computeOutcomeCalibration(
   reports: FeelHistoryPoint[],
-  efficiency: EfficiencySample[],
+  samples: OutcomeSample[],
   fallback: FeelCalibration = DEFAULT_FEEL_CALIBRATION,
 ): FeelCalibration {
-  if (efficiency.length < MIN_EFF_POINTS) return fallback;
-
-  const med = median(efficiency.map((e) => e.efficiency));
+  const execScores = samples.filter((s) => s.executionScore != null).map((s) => s.executionScore!);
+  const effScores = samples.filter((s) => s.efficiency != null).map((s) => s.efficiency!);
+  const execMedian = execScores.length >= MIN_BASELINE ? median(execScores) : null;
+  const effMedian = effScores.length >= MIN_BASELINE ? median(effScores) : null;
+  if (execMedian == null && effMedian == null) return fallback;
 
   let confirmed = 0;
   let contradicted = 0;
+  let usedExecution = false;
   for (const r of reports) {
     if (r.legs !== "heavy" && r.legs !== "fresh") continue;
-    const window = efficiency.filter((e) => {
-      const d = differenceInCalendarDays(parseISO(e.date), parseISO(r.date));
+    const window = samples.filter((s) => {
+      const d = differenceInCalendarDays(parseISO(s.date), parseISO(r.date));
       return d >= 0 && d <= WINDOW_DAYS;
     });
-    if (window.length === 0) continue; // no-data pair
-    const windowEff = window.reduce((a, e) => a + e.efficiency, 0) / window.length;
-    const ranWorse = windowEff > med; // higher index = slower at HR = worse
+    if (window.length === 0) continue;
+
+    // Prefer the execution-grade verdict; fall back to efficiency.
+    const execVals = window.map((s) => s.executionScore).filter((v): v is number => v != null);
+    const effVals = window.map((s) => s.efficiency).filter((v): v is number => v != null);
+    let ranWorse: boolean | null = null;
+    if (execMedian != null && execVals.length > 0) {
+      ranWorse = mean(execVals) < execMedian; // lower execution = worse
+      usedExecution = true;
+    } else if (effMedian != null && effVals.length > 0) {
+      ranWorse = mean(effVals) > effMedian; // higher efficiency index = worse
+    }
+    if (ranWorse == null) continue; // no-data pair
+
     const feltHeavy = r.legs === "heavy";
     if ((feltHeavy && ranWorse) || (!feltHeavy && !ranWorse)) confirmed++;
     else contradicted++;
@@ -92,12 +122,13 @@ export function computeOutcomeCalibration(
   const freshDelta = Math.round(clamp(BASE_FRESH * scale, FRESH_FLOOR, FRESH_CAP));
   const confidence = pairs >= HIGH_PAIRS ? "high" : "medium";
   const rawPct = Math.round((confirmed / pairs) * 100);
+  const signal = usedExecution ? "session execution" : "how you ran";
   const basis =
     reliability > 0.55
-      ? `Your reports predicted how you actually ran ${rawPct}% of the time across ${pairs} sessions — carrying more weight.`
+      ? `Your reports predicted ${signal} ${rawPct}% of the time across ${pairs} sessions — carrying more weight.`
       : reliability < 0.45
-        ? `Your reports matched how you ran only ${rawPct}% of the time across ${pairs} sessions — carrying a little less weight.`
-        : `Personalised from ${pairs} sessions of reported-feel vs. how you ran.`;
+        ? `Your reports matched ${signal} only ${rawPct}% of the time across ${pairs} sessions — carrying a little less weight.`
+        : `Personalised from ${pairs} sessions of reported-feel vs. ${signal}.`;
 
   return { heavyDelta, freshDelta, sampleCount: pairs, reliability, confidence, basis };
 }
