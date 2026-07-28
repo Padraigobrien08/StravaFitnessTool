@@ -1,5 +1,7 @@
+import { format } from "date-fns";
 import { getSql } from "./client";
 import type { LegFeelReport } from "@/lib/wellness/types";
+import type { FeelHistoryPoint } from "@/lib/wellness/calibration";
 
 let ensured = false;
 
@@ -50,5 +52,28 @@ export async function getLegFeel(userId: string, date: string): Promise<LegFeelR
     return row?.report ?? null;
   } catch {
     return null;
+  }
+}
+
+/** Recent daily reports (newest first) for per-athlete calibration. [] on failure. */
+export async function getRecentLegFeel(userId: string, days = 60): Promise<FeelHistoryPoint[]> {
+  try {
+    await ensureLegFeelSchema();
+    const sql = getSql();
+    const rows = await sql`
+      SELECT feel_date, report FROM leg_feel_log
+      WHERE user_id = ${userId}::uuid AND feel_date >= (CURRENT_DATE - ${days}::int)
+      ORDER BY feel_date DESC
+    `;
+    return rows.map((r) => {
+      const row = r as { feel_date: string | Date; report: LegFeelReport };
+      const date =
+        typeof row.feel_date === "string"
+          ? row.feel_date.slice(0, 10)
+          : format(row.feel_date, "yyyy-MM-dd");
+      return { date, legs: row.report.legs };
+    });
+  } catch {
+    return [];
   }
 }

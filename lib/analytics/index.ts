@@ -1,6 +1,7 @@
 import type { StravaImport } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { LegFeel } from "@/lib/wellness/types";
+import { computeFeelCalibration, type FeelHistoryPoint } from "@/lib/wellness/calibration";
 import { activityTypeMix } from "./context";
 import { runGoalProgress } from "./goals";
 import { easyHardSplit, hrZoneDistribution } from "./hrZones";
@@ -150,6 +151,7 @@ export function computeInsights(
   raceGoal: RaceGoal | null = null,
   maxWeeklyKm?: number,
   legFeel?: LegFeel,
+  feelHistory?: FeelHistoryPoint[],
 ): DashboardInsights {
   const { runs, profile, goals, allActivities } = data;
   const athleteMaxHr = profile.maxHeartRate ?? DEFAULT_MAX_HR;
@@ -192,7 +194,8 @@ export function computeInsights(
   const predictionTimeline = buildPredictionTimeline(runs, fitDetails);
   const loadSeries = weeklyLoadSeries(runs);
   const loadHistory = acuteChronicLoad(loadSeries).history;
-  const fatigue = buildFatigueSnapshot(runs, legFeel);
+  const feelCalibration = computeFeelCalibration(feelHistory ?? [], loadHistory);
+  const fatigue = buildFatigueSnapshot(runs, legFeel, feelCalibration);
   const efficiencyMoM = efficiencyMonthOverMonth(efficiencyPoints);
   const personalRecords = findPersonalRecords(runs, fitDetails);
   const racePredictionAnalysis = buildRacePredictionAnalysis(runs, fitDetails);
