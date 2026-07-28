@@ -6,7 +6,7 @@ import {
 } from "./calibration";
 
 /**
- * Outcome-based recalibration of the leg-feel nudge (P4 + execution-grade refinement).
+ * Outcome-based recalibration of the leg-feel nudge (P4 + signal refinements).
  *
  * Where P3 used *agreement with the load model* as a proxy for thoughtful
  * reporting (and could only ever amplify), this uses actual results: did a
@@ -18,21 +18,29 @@ import {
  * shrunk toward the default on small samples. Below the pair gate it defers to
  * the P3 result (which itself defers to the flat default).
  *
- * The outcome signal is a ladder, strongest first:
- *   1. Session execution grade (`scoreSessionExecution`, 0–100, higher = better)
- *      — the most direct "did the session go well?" signal, available when a run
- *      has FIT streams.
- *   2. Aerobic efficiency vs. baseline (lower = better) — broader, HR-only.
- * A report window uses execution grade when present, else efficiency.
+ * The outcome verdict is a ladder — the most direct signal with data wins,
+ * broadening coverage to athletes with less data as it descends:
+ *   1. Session execution grade (`scoreSessionExecution`, higher = better) — FIT.
+ *   2. HR drift within the run (higher = more fatigue) — FIT. (Overlaps #1,
+ *      which already factors drift; used when a full grade isn't available.)
+ *   3. Aerobic efficiency vs. baseline (lower = better) — needs HR.
+ *   4. Training-response: did near-term volume move the way the report implies
+ *      (heavy → trained less), normalised within the athlete's own report
+ *      windows — needs only run dates + distance. A behavioural proxy for a
+ *      "skipped/curtailed session"; carries a rest-day confound, so it sits last.
  */
 
-/** Per-run outcome sample. Either/both signals may be present. */
+/** Per-run outcome sample. Any subset of signals may be present. */
 export interface OutcomeSample {
   date: string;
   /** Aerobic-efficiency index (pace/HR). LOWER = better. */
   efficiency?: number;
   /** Session execution quality 0–100. HIGHER = better. */
   executionScore?: number;
+  /** HR drift over the run, %. HIGHER = more fatigue = worse. */
+  hrDriftPct?: number;
+  /** Run distance (km) — for the training-response signal. */
+  distanceKm?: number;
 }
 
 /** @deprecated retained for callers that only have efficiency — assignable to OutcomeSample. */
@@ -41,6 +49,8 @@ export interface EfficiencySample {
   efficiency: number;
 }
 
+type Signal = "execution" | "hr-drift" | "efficiency" | "training-response";
+
 const BASE_HEAVY = DEFAULT_FEEL_CALIBRATION.heavyDelta; // −12
 const BASE_FRESH = DEFAULT_FEEL_CALIBRATION.freshDelta; // +5
 const HEAVY_CAP = -18; // strongest a heavy nudge can get
@@ -48,11 +58,18 @@ const HEAVY_FLOOR = -6; // weakest — a heavy report always drops readiness ≥
 const FRESH_CAP = 8;
 const FRESH_FLOOR = 3;
 const WINDOW_DAYS = 2; // runs within 0–2 days after a report count as its outcome
-const MIN_BASELINE = 4; // samples of a signal needed for a stable baseline median
+const MIN_BASELINE = 4; // samples/reports needed for a stable baseline median
 const MIN_PAIRS = 6; // paired outcomes needed before deviating from the fallback
 const HIGH_PAIRS = 12;
 const PRIOR = 2; // Laplace prior strength → shrink toward 0.5
 const SCALE_SENSITIVITY = 1.0;
+
+const SIGNAL_PHRASE: Record<Signal, string> = {
+  execution: "session execution",
+  "hr-drift": "heart-rate drift",
+  efficiency: "how you ran",
+  "training-response": "how you trained after",
+};
 
 function median(nums: number[]): number {
   const sorted = [...nums].sort((a, b) => a - b);
@@ -64,13 +81,17 @@ function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));
 }
 
-function mean(nums: number[]): number {
-  return nums.reduce((a, b) => a + b, 0) / nums.length;
+function mean(nums: number[]): number | null {
+  return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
+}
+
+function medianOrNull(nums: number[]): number | null {
+  return nums.length >= MIN_BASELINE ? median(nums) : null;
 }
 
 /**
  * @param reports  the athlete's leg-feel history
- * @param samples  per-run outcome samples (execution grade and/or efficiency)
+ * @param samples  per-run outcome samples (execution / drift / efficiency / distance)
  * @param fallback the P3 calibration to use when there isn't enough paired evidence
  */
 export function computeOutcomeCalibration(
@@ -78,38 +99,62 @@ export function computeOutcomeCalibration(
   samples: OutcomeSample[],
   fallback: FeelCalibration = DEFAULT_FEEL_CALIBRATION,
 ): FeelCalibration {
-  const execScores = samples.filter((s) => s.executionScore != null).map((s) => s.executionScore!);
-  const effScores = samples.filter((s) => s.efficiency != null).map((s) => s.efficiency!);
-  const execMedian = execScores.length >= MIN_BASELINE ? median(execScores) : null;
-  const effMedian = effScores.length >= MIN_BASELINE ? median(effScores) : null;
-  if (execMedian == null && effMedian == null) return fallback;
+  const execMedian = medianOrNull(collect(samples, "executionScore"));
+  const driftMedian = medianOrNull(collect(samples, "hrDriftPct"));
+  const effMedian = medianOrNull(collect(samples, "efficiency"));
 
-  let confirmed = 0;
-  let contradicted = 0;
-  let usedExecution = false;
-  for (const r of reports) {
-    if (r.legs !== "heavy" && r.legs !== "fresh") continue;
-    const window = samples.filter((s) => {
+  const directional = reports.filter((r) => r.legs === "heavy" || r.legs === "fresh");
+  const windows = directional.map((r) => {
+    const inWin = samples.filter((s) => {
       const d = differenceInCalendarDays(parseISO(s.date), parseISO(r.date));
       return d >= 0 && d <= WINDOW_DAYS;
     });
-    if (window.length === 0) continue;
+    return {
+      legs: r.legs,
+      execMean: mean(collect(inWin, "executionScore")),
+      driftMean: mean(collect(inWin, "hrDriftPct")),
+      effMean: mean(collect(inWin, "efficiency")),
+      windowKm: collect(inWin, "distanceKm").reduce((a, b) => a + b, 0),
+    };
+  });
 
-    // Prefer the execution-grade verdict; fall back to efficiency.
-    const execVals = window.map((s) => s.executionScore).filter((v): v is number => v != null);
-    const effVals = window.map((s) => s.efficiency).filter((v): v is number => v != null);
-    let ranWorse: boolean | null = null;
-    if (execMedian != null && execVals.length > 0) {
-      ranWorse = mean(execVals) < execMedian; // lower execution = worse
-      usedExecution = true;
-    } else if (effMedian != null && effVals.length > 0) {
-      ranWorse = mean(effVals) > effMedian; // higher efficiency index = worse
+  // Behavioural (training-response) baseline: usable only with enough reports and
+  // real variation in near-term volume across them.
+  const windowKms = windows.map((w) => w.windowKm);
+  const behaviouralUsable = directional.length >= MIN_BASELINE && new Set(windowKms).size > 1;
+  const windowKmMedian = behaviouralUsable ? median(windowKms) : null;
+
+  let confirmed = 0;
+  let contradicted = 0;
+  const signalCounts: Record<Signal, number> = {
+    execution: 0,
+    "hr-drift": 0,
+    efficiency: 0,
+    "training-response": 0,
+  };
+
+  for (const w of windows) {
+    let worse: boolean | null = null;
+    let signal: Signal | null = null;
+    if (execMedian != null && w.execMean != null) {
+      worse = w.execMean < execMedian; // lower execution = worse
+      signal = "execution";
+    } else if (driftMedian != null && w.driftMean != null) {
+      worse = w.driftMean > driftMedian; // more drift = worse
+      signal = "hr-drift";
+    } else if (effMedian != null && w.effMean != null) {
+      worse = w.effMean > effMedian; // higher index = slower at HR = worse
+      signal = "efficiency";
+    } else if (windowKmMedian != null) {
+      worse = w.windowKm < windowKmMedian; // trained less = backed off
+      signal = "training-response";
     }
-    if (ranWorse == null) continue; // no-data pair
+    if (worse == null || signal == null) continue; // no-data pair
 
-    const feltHeavy = r.legs === "heavy";
-    if ((feltHeavy && ranWorse) || (!feltHeavy && !ranWorse)) confirmed++;
+    const feltHeavy = w.legs === "heavy";
+    if ((feltHeavy && worse) || (!feltHeavy && !worse)) confirmed++;
     else contradicted++;
+    signalCounts[signal]++;
   }
 
   const pairs = confirmed + contradicted;
@@ -122,13 +167,20 @@ export function computeOutcomeCalibration(
   const freshDelta = Math.round(clamp(BASE_FRESH * scale, FRESH_FLOOR, FRESH_CAP));
   const confidence = pairs >= HIGH_PAIRS ? "high" : "medium";
   const rawPct = Math.round((confirmed / pairs) * 100);
-  const signal = usedExecution ? "session execution" : "how you ran";
+  const dominant = (Object.keys(signalCounts) as Signal[]).reduce((a, b) =>
+    signalCounts[b] > signalCounts[a] ? b : a,
+  );
+  const phrase = SIGNAL_PHRASE[dominant];
   const basis =
     reliability > 0.55
-      ? `Your reports predicted ${signal} ${rawPct}% of the time across ${pairs} sessions — carrying more weight.`
+      ? `Your reports predicted ${phrase} ${rawPct}% of the time across ${pairs} sessions — carrying more weight.`
       : reliability < 0.45
-        ? `Your reports matched ${signal} only ${rawPct}% of the time across ${pairs} sessions — carrying a little less weight.`
-        : `Personalised from ${pairs} sessions of reported-feel vs. ${signal}.`;
+        ? `Your reports matched ${phrase} only ${rawPct}% of the time across ${pairs} sessions — carrying a little less weight.`
+        : `Personalised from ${pairs} sessions of reported-feel vs. ${phrase}.`;
 
   return { heavyDelta, freshDelta, sampleCount: pairs, reliability, confidence, basis };
+}
+
+function collect(samples: OutcomeSample[], key: keyof OutcomeSample): number[] {
+  return samples.map((s) => s[key]).filter((v): v is number => typeof v === "number");
 }
