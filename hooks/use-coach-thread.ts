@@ -13,6 +13,8 @@ import {
   titleFromFirstMessage,
 } from "@/lib/coach/threadStorage";
 import type { CoachMessage } from "@/lib/coach/types";
+import { isAbortError, retryTargetFromMessages } from "@/lib/coach/threadRetry";
+import { toast } from "sonner";
 import { classifyPlanningMessage } from "@/lib/ai-planning/planningIntent";
 import { classifyMemoryQuestion } from "@/lib/athlete-memory/memoryIntent";
 import { classifyAdaptiveCoachQuestion } from "@/lib/adaptive-intelligence";
@@ -34,6 +36,9 @@ export function useCoachThread(disabled?: boolean) {
   const [pendingTools, setPendingTools] = useState<string[]>([]);
   const [loadingPhase, setLoadingPhase] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // A tool-backed turn can run for tens of seconds, so the athlete needs a way
+  // out of it. Held in a ref so `stop()` can reach the in-flight request.
+  const abortRef = useRef<AbortController | null>(null);
 
   const loadThread = useCallback((id: string) => {
     const t = getThread(id);
@@ -75,10 +80,18 @@ export function useCoachThread(disabled?: boolean) {
   }, [activeId]);
 
   const send = useCallback(
-    async (text: string) => {
+    /**
+     * @param baseOverride the thread to build on, instead of current `messages`.
+     *   Used by `retryLast`, which drops the failed turn before re-running it;
+     *   without this the closure's stale `messages` would duplicate it.
+     */
+    async (text: string, baseOverride?: CoachMessage[]) => {
       const trimmed = text.trim();
       if (!trimmed || loading || disabled) return;
 
+      const base = baseOverride ?? messages;
+      const controller = new AbortController();
+      abortRef.current = controller;
       const threadId = ensureThread();
       const userMsg: CoachMessage = {
         id: crypto.randomUUID(),
@@ -86,7 +99,7 @@ export function useCoachThread(disabled?: boolean) {
         content: trimmed,
         createdAt: new Date().toISOString(),
       };
-      const nextMessages = [...messages, userMsg];
+      const nextMessages = [...base, userMsg];
       setMessages(nextMessages);
       setInput("");
       setLoading(true);
@@ -94,11 +107,11 @@ export function useCoachThread(disabled?: boolean) {
       setPendingTools([]);
       setLoadingPhase(0);
 
-      const isFirst = messages.filter((m) => m.role === "user").length === 0;
+      const isFirst = base.filter((m) => m.role === "user").length === 0;
       persist(nextMessages, threadId, isFirst ? titleFromFirstMessage(trimmed) : undefined);
 
       try {
-        const lastPlan = [...messages]
+        const lastPlan = [...base]
           .reverse()
           .find((m) => m.role === "assistant" && m.weeklyPlan)?.weeklyPlan;
         const savedCalendar = getCalendarWeek(targetPlanWeekStart());
@@ -115,6 +128,7 @@ export function useCoachThread(disabled?: boolean) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
+            signal: controller.signal,
             body: JSON.stringify({ message: trimmed }),
           });
           const memData = await memRes.json();
@@ -146,6 +160,7 @@ export function useCoachThread(disabled?: boolean) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
+            signal: controller.signal,
             body: JSON.stringify({
               message: trimmed,
               previousPlan,
@@ -190,6 +205,7 @@ export function useCoachThread(disabled?: boolean) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
+          signal: controller.signal,
           body: JSON.stringify({
             messages: nextMessages.map((m) => ({
               role: m.role,
@@ -219,14 +235,39 @@ export function useCoachThread(disabled?: boolean) {
         setMessages(final);
         persist(final, threadId);
       } catch (e) {
+        // Stopping on purpose is not a failure, so it must not surface as one.
+        if (isAbortError(e)) return;
         setError(e instanceof Error ? e.message : "Chat failed");
       } finally {
+        abortRef.current = null;
         setLoading(false);
         setPendingTools([]);
       }
     },
     [messages, loading, disabled, ensureThread, persist],
   );
+
+  /** Cancel the turn in flight and keep the thread as it stands. */
+  const stop = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setLoading(false);
+    setPendingTools([]);
+  }, []);
+
+  /**
+   * Re-run the last question after a failure. `retryTargetFromMessages` drops
+   * the trailing user turn so the thread does not gain a duplicate of it.
+   */
+  const retryLast = useCallback(() => {
+    if (loading) return;
+    const target = retryTargetFromMessages(messages);
+    if (!target) return;
+    void send(target.text, target.base);
+  }, [loading, messages, send]);
+
+  // Abandoning the page should not leave a request running.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   useEffect(() => {
     if (!loading) return;
@@ -254,6 +295,9 @@ export function useCoachThread(disabled?: boolean) {
 
   const handleDeleteThread = useCallback(
     (id: string) => {
+      // One click on a trash icon used to destroy an investigation outright.
+      // Keep the thread in hand so the toast can genuinely put it back.
+      const removed = getThread(id);
       deleteThread(id);
       const next = listThreads();
       setThreads(next);
@@ -263,6 +307,20 @@ export function useCoachThread(disabled?: boolean) {
           setActiveId(null);
           setMessages([]);
         }
+      }
+      if (removed) {
+        toast.success("Investigation deleted", {
+          description: removed.title || "Untitled investigation",
+          action: {
+            label: "Undo",
+            onClick: () => {
+              upsertThread(removed);
+              setThreads(listThreads());
+              loadThread(removed.id);
+              toast.success("Investigation restored");
+            },
+          },
+        });
       }
     },
     [activeId, loadThread],
@@ -280,6 +338,8 @@ export function useCoachThread(disabled?: boolean) {
     loadingPhase,
     scrollRef,
     send,
+    stop,
+    retryLast,
     loadThread,
     handleNewThread,
     handleDeleteThread,

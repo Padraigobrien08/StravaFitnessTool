@@ -147,6 +147,8 @@ export function CoachReasoningWorkspace({
               pendingTools={thread.pendingTools}
               scrollRef={thread.scrollRef}
               onSend={(t) => void thread.send(t)}
+              onStop={thread.stop}
+              onRetry={thread.retryLast}
               disabled={disabled}
             />
           ) : intel.loading ? (
