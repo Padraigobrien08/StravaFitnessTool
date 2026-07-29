@@ -24,6 +24,7 @@ import {
   ZoneLegend,
 } from "@/components/console/console-kit";
 import { LegFeelCard } from "@/components/home/console/leg-feel-card";
+import { JargonTerm } from "@/components/jargon-term";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { HomeOperatingSystemView } from "@/lib/home/operatingSystemView";
 import type {
@@ -205,8 +206,15 @@ function StatusBar({
         type="button"
         onClick={onSync}
         disabled={syncing}
-        title={syncError ?? undefined}
-        className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-mono text-xs text-zinc-400 ring-1 ring-[var(--border-subtle)] transition hover:text-foreground hover:ring-[var(--border-default)] disabled:opacity-60"
+        aria-label={
+          syncError ? "Retry sync" : apiConnected ? "Sync with Strava" : "Connect Strava to sync"
+        }
+        className={cn(
+          "flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-mono text-xs ring-1 transition disabled:opacity-60",
+          syncError
+            ? "text-[var(--home-redline)] ring-[color-mix(in_srgb,var(--home-redline)_45%,transparent)] hover:ring-[var(--home-redline)]"
+            : "text-zinc-400 ring-[var(--border-subtle)] hover:text-foreground hover:ring-[var(--border-default)]",
+        )}
       >
         <span
           className={cn("inline-block h-1.5 w-1.5 rounded-full", syncing && "animate-pulse")}
@@ -222,12 +230,29 @@ function StatusBar({
           <>
             <RefreshCw className="h-3 w-3 animate-spin" /> Syncing
           </>
+        ) : syncError ? (
+          <>
+            <RefreshCw className="h-3 w-3" /> Retry sync
+          </>
         ) : (
           <>
-            <RefreshCw className="h-3 w-3" /> Sync
+            <RefreshCw className="h-3 w-3" /> {apiConnected ? "Sync" : "Not connected"}
           </>
         )}
       </button>
+
+      {syncError ? (
+        <p
+          role="alert"
+          className="basis-full font-mono text-[11px] leading-snug text-[var(--home-redline)]"
+        >
+          Couldn&apos;t sync with Strava: {syncError}. Your data is unchanged. Retry above, or{" "}
+          <Link href="/import" className="underline underline-offset-2 hover:text-foreground">
+            import manually
+          </Link>
+          .
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -392,7 +417,7 @@ function Readiness({
       <div className="mb-3 flex items-center justify-between">
         <Eyebrow>Readiness</Eyebrow>
         <span className="font-mono text-[11px] text-zinc-500">
-          TSB {fatigue.tsb > 0 ? "+" : ""}
+          <JargonTerm term="tsb">TSB</JargonTerm> {fatigue.tsb > 0 ? "+" : ""}
           {fatigue.tsb}
         </span>
       </div>
@@ -402,8 +427,14 @@ function Readiness({
       </div>
 
       <div className="divide-y divide-[var(--border-subtle)]">
-        <LoadRow k="Freshness" v={String(hero.freshness)} />
-        <LoadRow k="Chronic load (CTL)" v={String(fatigue.ctl)} />
+        <LoadRow
+          k={<JargonTerm term="freshness">Freshness</JargonTerm>}
+          v={String(hero.freshness)}
+        />
+        <LoadRow
+          k={<JargonTerm term="ctl">Chronic load (CTL)</JargonTerm>}
+          v={String(fatigue.ctl)}
+        />
         <LoadRow
           k="7-day volume"
           v={`${summary.last7DaysKm.toFixed(0)} km`}

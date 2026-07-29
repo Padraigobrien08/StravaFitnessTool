@@ -19,36 +19,36 @@ export const GLOSSARY = {
   ci: {
     label: "CI",
     definition:
-      "Confidence interval — the range your true value most likely falls in, given how much data there is. Wider means less certain.",
+      "Confidence interval: the range your true value most likely falls in, given how much data there is. Wider means less certain.",
   },
   ctl: {
     label: "CTL",
     definition:
-      "Chronic Training Load — a rolling estimate of the fitness you've built from training volume and intensity over recent weeks.",
+      "Chronic Training Load: a rolling estimate of the fitness you've built from training volume and intensity over recent weeks.",
   },
   tsb: {
     label: "TSB",
     definition:
-      "Training Stress Balance, i.e. freshness — recent fatigue subtracted from built-up fitness. Positive means fresh, negative means tired.",
+      "Training Stress Balance (freshness): recent fatigue subtracted from built-up fitness. Positive means fresh, negative means tired.",
   },
   cs: {
     label: "Critical speed",
     definition:
-      "The fastest pace your aerobic system can hold with fatigue roughly steady — your aerobic ceiling.",
+      "The fastest pace your aerobic system can hold with fatigue roughly steady; your aerobic ceiling.",
   },
   dprime: {
     label: "D′",
     definition:
-      "Anaerobic distance reserve — how far you can run above critical speed before you run out, like a battery above your aerobic pace.",
+      "Anaerobic distance reserve: how far you can run above critical speed before you run out, like a battery above your aerobic pace.",
   },
   rsquared: {
     label: "R²",
     definition:
-      "Goodness of fit — how well the model matches your data, from 0 (poor) to 1 (perfect).",
+      "Goodness of fit: how well the model matches your data, from 0 (poor) to 1 (perfect).",
   },
   mom: {
     label: "MoM",
-    definition: "Month over month — the change compared with the previous month.",
+    definition: "Month over month: the change compared with the previous month.",
   },
   freshness: {
     label: "Freshness",
