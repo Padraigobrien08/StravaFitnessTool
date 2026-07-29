@@ -65,8 +65,8 @@ export function PlanPlanningContext({
             <span className="ml-1.5 font-normal text-zinc-600">(optional)</span>
           </p>
           <p className="mt-0.5 max-w-xl text-[11px] text-zinc-600">
-            Tell the planner what this week is about — post-race recovery, travel, no goal,
-            returning from break, etc.
+            Tell the planner what this week is about: post-race recovery, travel, no goal, returning
+            from a break.
           </p>
         </div>
         <Button
@@ -91,7 +91,7 @@ export function PlanPlanningContext({
       <Textarea
         className="mt-2 resize-y border-[var(--border-subtle)] bg-[var(--surface)]/80 text-[12px] leading-relaxed text-zinc-200 placeholder:text-zinc-600 focus-visible:border-accent/40 focus-visible:ring-accent/25"
         rows={expanded ? PLAN_CONTEXT_EXPANDED_ROWS : PLAN_CONTEXT_COMPACT_ROWS}
-        placeholder="e.g. I just ran a half marathon — plan my recovery for this week. No race goal for now."
+        placeholder="e.g. I just ran a half marathon, so plan my recovery for this week. No race goal for now."
         value={value}
         disabled={disabled}
         maxLength={PLAN_CONTEXT_MAX_CHARS}

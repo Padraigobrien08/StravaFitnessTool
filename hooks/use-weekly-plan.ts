@@ -12,12 +12,16 @@ export type GenerateWeeklyPlanRequest = {
 export function useWeeklyPlan() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Kept beside the message so the UI can explain the failure in plain language
+  // instead of rendering the API's HTTP reason ("Unauthorized") verbatim.
+  const [errorStatus, setErrorStatus] = useState<number | null>(null);
   const [result, setResult] = useState<GenerateWeeklyPlanResult | null>(null);
   const [lastPlanningContext, setLastPlanningContext] = useState<string | null>(null);
 
   const generate = useCallback(async (opts?: GenerateWeeklyPlanRequest) => {
     setLoading(true);
     setError(null);
+    setErrorStatus(null);
     const planningContext = opts?.planningContext?.trim().slice(0, PLAN_CONTEXT_MAX_CHARS);
     if (planningContext) {
       setLastPlanningContext(planningContext);
@@ -34,6 +38,7 @@ export function useWeeklyPlan() {
       });
       const data = await res.json();
       if (!res.ok) {
+        setErrorStatus(res.status);
         throw new Error(data.error ?? "Failed to generate plan");
       }
       const payload: GenerateWeeklyPlanResult = {
@@ -57,12 +62,14 @@ export function useWeeklyPlan() {
   const reset = useCallback(() => {
     setResult(null);
     setError(null);
+    setErrorStatus(null);
   }, []);
 
   return {
     generate,
     loading,
     error,
+    errorStatus,
     result,
     reset,
     lastPlanningContext,

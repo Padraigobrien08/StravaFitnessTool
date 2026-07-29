@@ -5,7 +5,6 @@ import type { GenerateWeeklyPlanResult } from "@/lib/ai-planning";
 import {
   deleteCalendarWeek,
   getCalendarWeek,
-  hasSavedWeek,
   mergeServerWeeks,
   saveCalendarWeek,
   targetPlanWeekStart,
@@ -166,7 +165,10 @@ export function useTrainingCalendar(weekStart?: string) {
     targetWeek,
     savedWeek,
     hydrated,
-    hasSaved: hasSavedWeek(targetWeek),
+    // Derived from state, not a parallel localStorage read: the two could
+    // disagree, which left the header offering Duplicate/Clear for a week that
+    // had already been cleared. It also keeps first render hydration-safe.
+    hasSaved: savedWeek !== null,
     refresh,
     saveFromGenerated,
     clearWeek,
