@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { addDays, format, parseISO } from "date-fns";
 import { useWeeklyPlan } from "@/hooks/use-weekly-plan";
@@ -19,7 +20,11 @@ import {
   matchPlannedVsActual,
 } from "@/lib/training-calendar";
 import type { TrainingCalendarWeek } from "@/lib/training-calendar";
-import { historyCount, revertCalendarWeek } from "@/lib/training-calendar/calendarHistory";
+import {
+  historyCount,
+  pushWeekSnapshot,
+  revertCalendarWeek,
+} from "@/lib/training-calendar/calendarHistory";
 import {
   buildWeekTelemetry,
   buildTodayInPlan,
@@ -29,6 +34,7 @@ import {
   planPhaseLabel,
 } from "@/lib/plan/planWorkspaceView";
 import { coachUrl } from "@/lib/coach/domainLinks";
+import { planErrorPresentation } from "@/lib/plan/planErrorPresentation";
 import { PlanHeader, type PlanHeaderStatus } from "./plan-header";
 import { PlanWeekBoard } from "./plan-week-board";
 import { PlanWeekNav } from "./plan-week-nav";
@@ -41,6 +47,15 @@ import { PlanWeekExecution } from "./plan-week-execution";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 import { CalendarPlus, RefreshCw } from "lucide-react";
 import type { RunActivity } from "@/lib/strava/types";
 
@@ -63,6 +78,7 @@ export function PlanWorkspace() {
     generate,
     loading,
     error,
+    errorStatus,
     result: preview,
     reset: resetPreview,
     lastPlanningContext,
@@ -74,6 +90,7 @@ export function PlanWorkspace() {
   const [confirmReplace, setConfirmReplace] = useState(false);
   const [highlightIds, setHighlightIds] = useState<string[]>([]);
   const [historyTick, setHistoryTick] = useState(0);
+  const [clearOpen, setClearOpen] = useState(false);
 
   useEffect(() => {
     if (calendar.savedWeek?.planningContext) {
@@ -138,6 +155,7 @@ export function PlanWorkspace() {
       : "Adaptive week";
 
   const goalContext = goalContextLabel(raceGoal, analytics);
+  const errorInfo = useMemo(() => planErrorPresentation(error, errorStatus), [error, errorStatus]);
 
   const telemetry = displayWeek ? buildWeekTelemetry(displayWeek, analytics) : null;
   const today = displayWeek ? buildTodayInPlan(displayWeek) : null;
@@ -157,19 +175,15 @@ export function PlanWorkspace() {
     setHighlightIds([]);
   }, []);
 
+  // Generating a preview never touches the saved week (it lives beside it until
+  // you save over it), so this needs no confirmation step.
   const handleGenerate = useCallback(async () => {
-    if (calendar.hasSaved && !confirmReplace) {
-      const ok = window.confirm(
-        "Generate a new preview? Your saved week stays until you save over it.",
-      );
-      if (!ok) return;
-    }
     setSaveError(null);
     await generate({
       planningContext: planningContext.trim() || undefined,
     });
     setConfirmReplace(false);
-  }, [calendar.hasSaved, confirmReplace, generate, planningContext]);
+  }, [generate, planningContext]);
 
   const handleSave = useCallback(() => {
     if (!preview) return;
@@ -179,31 +193,56 @@ export function PlanWorkspace() {
     });
     if (!outcome.ok) {
       const high = outcome.validation.issues.filter((i) => i.severity === "high");
-      setSaveError(high[0]?.message ?? "Cannot save — fix critical issues or regenerate.");
+      setSaveError(high[0]?.message ?? "Cannot save: fix the critical issues, or regenerate.");
       return;
     }
     resetPreview();
     setConfirmReplace(false);
     setHistoryTick((n) => n + 1);
-  }, [preview, calendar, resetPreview, planningContext, lastPlanningContext]);
+    toast.success("Week saved", {
+      description: `${weekRange} is now your living plan on Home and Plan.`,
+    });
+  }, [preview, calendar, resetPreview, planningContext, lastPlanningContext, weekRange]);
 
-  const handleClear = useCallback(() => {
-    if (!window.confirm("Clear the saved calendar for this week? This cannot be undone.")) {
-      return;
-    }
+  // Clearing is the one destructive action here, so snapshot first: that makes
+  // the toast's Undo real rather than decorative.
+  const handleClearConfirmed = useCallback(() => {
+    const cleared = calendar.savedWeek;
+    if (cleared) pushWeekSnapshot(cleared);
     calendar.clearWeek();
     resetPreview();
     setConfirmReplace(false);
     setSaveError(null);
     setHighlightIds([]);
-  }, [calendar, resetPreview]);
+    setClearOpen(false);
+    setHistoryTick((n) => n + 1);
+    toast.success("Saved week cleared", {
+      description: weekRange,
+      action: cleared
+        ? {
+            label: "Undo",
+            onClick: () => {
+              saveCalendarWeek(cleared);
+              revertCalendarWeek(cleared.weekStart);
+              calendar.refresh();
+              setHistoryTick((n) => n + 1);
+              toast.success("Week restored");
+            },
+          }
+        : undefined,
+    });
+  }, [calendar, resetPreview, weekRange]);
 
   const handleRevert = useCallback(() => {
     const previous = revertCalendarWeek(calendar.targetWeek);
-    if (!previous) return;
+    if (!previous) {
+      toast.info("No earlier version to restore for this week.");
+      return;
+    }
     saveCalendarWeek(previous);
     calendar.refresh();
     setHistoryTick((n) => n + 1);
+    toast.success("Restored the previous version of this week");
   }, [calendar]);
 
   const handleDuplicate = useCallback(() => {
@@ -227,8 +266,14 @@ export function PlanWorkspace() {
       })),
     };
     saveCalendarWeek(duplicated);
-    alert(`Duplicated to week starting ${nextStart}.`);
-  }, [calendar.savedWeek]);
+    toast.success("Week duplicated", {
+      description: `Copied to the week of ${format(parseISO(nextStart), "MMM d")}.`,
+      action: {
+        label: "View it",
+        onClick: () => shiftViewWeek(1),
+      },
+    });
+  }, [calendar.savedWeek, shiftViewWeek]);
 
   const coachPlan = calendar.savedWeek
     ? calendarWeekToWeeklyPlan(calendar.savedWeek)
@@ -236,7 +281,7 @@ export function PlanWorkspace() {
 
   const coachHref = coachUrl({
     q: calendar.savedWeek
-      ? "Modify my saved week plan — keep changes conservative"
+      ? "Modify my saved week plan, keeping changes conservative"
       : "Build my next week plan for Mon/Wed/Fri/Sun only",
   });
 
@@ -267,7 +312,7 @@ export function PlanWorkspace() {
         loading={loading}
         onGenerate={() => void handleGenerate()}
         onSave={handleSave}
-        onClear={handleClear}
+        onClear={() => setClearOpen(true)}
         onDuplicate={calendar.hasSaved ? handleDuplicate : undefined}
         onRevert={handleRevert}
         onViewPreview={() => setConfirmReplace(true)}
@@ -310,7 +355,7 @@ export function PlanWorkspace() {
       {showingPreview && preview ? (
         <Alert className="border-amber-500/20 bg-amber-500/[0.05] px-3 py-1.5 text-[11px] text-amber-200/85">
           <AlertDescription className="text-[11px] text-amber-200/85">
-            Preview — save to make this your persistent training week
+            Preview only. Save it to make this your persistent training week.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -321,17 +366,43 @@ export function PlanWorkspace() {
         </Alert>
       ) : null}
 
-      {error ? (
-        <Alert className="border-red-500/20 bg-red-500/5 px-3 py-2.5">
-          <AlertDescription className="text-sm text-red-300/90">{error}</AlertDescription>
-          <Button
-            size="sm"
-            variant="outline"
-            className="mt-2 h-8"
-            onClick={() => void generate({ forceFallback: true })}
-          >
-            Use safe fallback
-          </Button>
+      {errorInfo ? (
+        <Alert role="alert" className="border-red-500/20 bg-red-500/5 px-3 py-2.5">
+          <AlertDescription className="text-sm text-red-300/90">
+            <span className="font-medium text-red-200">{errorInfo.title}</span>
+            <span className="mt-0.5 block text-[13px] text-red-300/80">{errorInfo.detail}</span>
+          </AlertDescription>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {errorInfo.fallbackLabel ? (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8"
+                disabled={loading}
+                onClick={() => void generate({ forceFallback: true })}
+              >
+                {errorInfo.fallbackLabel}
+              </Button>
+            ) : null}
+            {errorInfo.link ? (
+              <Link href={errorInfo.link.href}>
+                <Button size="sm" variant="outline" className="h-8">
+                  {errorInfo.link.label}
+                </Button>
+              </Link>
+            ) : null}
+            {errorInfo.canRetry ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 text-zinc-400"
+                disabled={loading}
+                onClick={() => void handleGenerate()}
+              >
+                Try again
+              </Button>
+            ) : null}
+          </div>
         </Alert>
       ) : null}
 
@@ -349,7 +420,7 @@ export function PlanWorkspace() {
             Your training week starts here
           </p>
           <p className="mx-auto mt-1 max-w-md text-[12px] text-zinc-600">
-            Generate a week, edit sessions on the board, then save — it becomes your living plan on
+            Generate a week, edit sessions on the board, then save. It becomes your living plan on
             Home and Plan.
           </p>
           <Button className="mt-4 h-9 gap-1.5" onClick={() => void handleGenerate()}>
@@ -440,6 +511,29 @@ export function PlanWorkspace() {
           persist in this browser only.
         </p>
       ) : null}
+
+      <Dialog open={clearOpen} onOpenChange={setClearOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Clear the saved week?</DialogTitle>
+            <DialogDescription>
+              {weekRange} will be removed from Home and Plan. You can undo this straight afterwards.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setClearOpen(false)}>
+              Keep the week
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleClearConfirmed}
+              className="border-0 bg-[var(--home-redline)] text-white hover:opacity-90"
+            >
+              Clear saved week
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

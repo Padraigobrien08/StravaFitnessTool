@@ -95,11 +95,18 @@ export function ExecutionIntelligencePanel({
         <span className={fadeColor[strategy.fadeRisk]}>{strategy.fadeRisk}</span>
       </p>
 
-      <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
+        role="group"
+        aria-label="Pacing strategy"
+      >
         {MODES.map((m) => (
           <button
             key={m.id}
             type="button"
+            // Selection was signalled by background colour alone, so assistive
+            // tech could not tell which strategy was active.
+            aria-pressed={mode === m.id}
             onClick={() => setMode(m.id)}
             className={cn(
               "rounded-xl px-3 py-2.5 text-left ring-1 transition-colors",

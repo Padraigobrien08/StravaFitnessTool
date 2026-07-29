@@ -84,13 +84,15 @@ export function IntelligenceStateEvolution({ items }: { items: StateEvolutionIte
   return (
     <Panel className="intelligence-evolution">
       <Eyebrow className="mb-2.5">How your state is moving</Eyebrow>
-      <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none">
+      {/* Wraps on narrow screens: as a scroller with a hidden scrollbar the last
+          card was cut off with no affordance that anything was there. */}
+      <div className="grid grid-cols-2 gap-2 md:flex md:overflow-x-auto md:pb-0.5 md:scrollbar-none">
         {items.map((item) => {
           const display = formatTrajectoryDisplay(item);
           return (
             <div
               key={item.id}
-              className="min-w-[132px] shrink-0 rounded-lg bg-[var(--surface-subdued)] px-2.5 py-2 ring-1 ring-[var(--border-subtle)] sm:min-w-[140px]"
+              className="min-w-0 rounded-lg bg-[var(--surface-subdued)] px-2.5 py-2 ring-1 ring-[var(--border-subtle)] md:min-w-[140px] md:shrink-0"
             >
               <div className="flex items-center justify-between gap-1">
                 <p className="text-[9px] uppercase tracking-[0.14em] text-zinc-500">{item.label}</p>

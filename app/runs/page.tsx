@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useStrava } from "@/lib/context/strava-context";
@@ -18,7 +19,33 @@ import { cn } from "@/lib/utils";
 
 type ViewMode = "explorer" | "intelligence" | "context";
 
+const VIEW_MODES: ViewMode[] = ["explorer", "intelligence", "context"];
+
+function parseMode(raw: string | null): ViewMode {
+  return VIEW_MODES.find((m) => m === raw) ?? "explorer";
+}
+
+function RunsPageSkeleton() {
+  return (
+    <div className="dashboard-enter w-full max-w-6xl space-y-3 pb-8">
+      <div className="skeleton-shimmer h-8 w-48 rounded" />
+      <div className="skeleton-shimmer h-36 rounded-xl" />
+      <div className="skeleton-shimmer h-12 rounded-lg" />
+      <div className="skeleton-shimmer h-48 rounded-xl" />
+    </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary to keep /runs prerenderable.
 export default function RunsPage() {
+  return (
+    <Suspense fallback={<RunsPageSkeleton />}>
+      <RunsPageContent />
+    </Suspense>
+  );
+}
+
+function RunsPageContent() {
   const {
     importData,
     insights,
@@ -28,7 +55,14 @@ export default function RunsPage() {
     getFitDetailForRun,
   } = useStrava();
   const { analytics, quality, loading } = useTrainingIntelligence();
-  const [mode, setMode] = useState<ViewMode>("explorer");
+  // View lives in the URL (?view=) so a chosen tab survives a refresh and can be
+  // linked to, matching how /plan handles its tabs.
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = parseMode(searchParams.get("view"));
+  const setMode = (next: ViewMode) => {
+    router.replace(next === "explorer" ? "/runs" : `/runs?view=${next}`, { scroll: false });
+  };
 
   const view = useMemo(() => {
     if (!importData || !analytics) return null;
@@ -36,14 +70,7 @@ export default function RunsPage() {
   }, [importData, analytics, fitRunIds, quality]);
 
   if ((loading || stravaLoading) && !view) {
-    return (
-      <div className="dashboard-enter w-full max-w-6xl space-y-3 pb-8">
-        <div className="skeleton-shimmer h-8 w-48 rounded" />
-        <div className="skeleton-shimmer h-36 rounded-xl" />
-        <div className="skeleton-shimmer h-12 rounded-lg" />
-        <div className="skeleton-shimmer h-48 rounded-xl" />
-      </div>
-    );
+    return <RunsPageSkeleton />;
   }
 
   return (
@@ -58,7 +85,11 @@ export default function RunsPage() {
                 {dataSourceLabel ? ` · ${dataSourceLabel}` : ""}
               </p>
             </div>
-            <div className="flex rounded-lg p-0.5 ring-1 ring-[var(--border-subtle)]">
+            <div
+              className="flex rounded-lg p-0.5 ring-1 ring-[var(--border-subtle)]"
+              role="tablist"
+              aria-label="Activities view"
+            >
               <ModeButton active={mode === "intelligence"} onClick={() => setMode("intelligence")}>
                 Session intelligence
               </ModeButton>
@@ -121,6 +152,8 @@ function ModeButton({
   return (
     <button
       type="button"
+      role="tab"
+      aria-selected={active}
       onClick={onClick}
       className={cn(
         "rounded-md px-3 py-1.5 text-[11px] font-medium transition-colors",

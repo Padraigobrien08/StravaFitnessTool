@@ -32,13 +32,18 @@ const eslintConfig = defineConfig([
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
+    // Default ignores of eslint-config-next, widened to any depth: a git
+    // worktree checked out inside the repo (e.g. .claude/worktrees/*) carries
+    // its own build output, and a root-relative ".next/**" would not match it,
+    // so `npm run check` failed on generated bundles.
+    "**/.next/**",
+    "**/out/**",
+    "**/build/**",
     "next-env.d.ts",
     // Generated coverage report (contains its own eslint-disable directives).
-    "coverage/**",
+    "**/coverage/**",
+    // Harness-managed state and scratch worktrees, never our sources.
+    ".claude/**",
   ]),
 ]);
 

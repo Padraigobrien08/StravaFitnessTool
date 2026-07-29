@@ -92,7 +92,7 @@ export function PlanSidebar({
           <p className="text-[11px] font-medium text-zinc-400">Integrity</p>
           <p className="text-[10px] text-zinc-600">
             {passed
-              ? "Checks passed — plan aligned with guardrails"
+              ? "Checks passed: plan aligned with guardrails"
               : `Review recommended (${severity} severity)`}
           </p>
         </div>

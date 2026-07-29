@@ -97,8 +97,10 @@ export function RunExplorer({
   const [sortKey, setSortKey] = useState<ExplorerSortKey>("date");
   const [sortAsc, setSortAsc] = useState(false);
   const [typeFilter, setTypeFilter] = useState<WorkoutType | typeof ALL_TYPES>(ALL_TYPES);
-  const [significance] = useState<string>("all");
-  const [effortFilter] = useState<"all" | "easy" | "hard">("all");
+  // No UI exposes these two yet, so they stay at "all" rather than pretending to
+  // be state the user can change.
+  const significance = "all";
+  const effortFilter = "all" as const;
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(25);
@@ -149,6 +151,21 @@ export function RunExplorer({
       historicalRuns: runs,
     });
   }, [expandedId, runsById, rows, getFitForRun, analytics, runs]);
+
+  // What is actually narrowing the list, so an empty result can say so instead
+  // of leaving the athlete at a dead end.
+  const activeFilters: string[] = [];
+  if (search.trim()) activeFilters.push(`search “${search.trim()}”`);
+  if (typeFilter !== ALL_TYPES) activeFilters.push(`type ${typeFilter}`);
+  if (quickFilter !== "all") activeFilters.push(`quick filter ${quickFilter.replace(/_/g, " ")}`);
+  const hasFilters = activeFilters.length > 0;
+
+  function clearFilters() {
+    setSearch("");
+    setTypeFilter(ALL_TYPES);
+    setQuickFilter("all");
+    setPage(0);
+  }
 
   function toggleSort(key: ExplorerSortKey) {
     if (sortKey === key) setSortAsc(!sortAsc);
@@ -333,9 +350,39 @@ export function RunExplorer({
       </div>
 
       {pageRows.length === 0 ? (
-        <p className="px-3 py-6 text-center text-[12px] text-zinc-600">
-          No sessions match filters.
-        </p>
+        <div className="px-3 py-8 text-center">
+          {rows.length === 0 ? (
+            <>
+              <p className="text-[13px] text-zinc-400">No runs in this history yet.</p>
+              <p className="mx-auto mt-1 max-w-sm text-[12px] text-zinc-600">
+                Once runs are imported they appear here, searchable by distance, pace, and workout
+                type.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[13px] text-zinc-400">
+                No sessions match {hasFilters ? "these filters" : "this view"}.
+              </p>
+              {hasFilters ? (
+                <p className="mx-auto mt-1 max-w-md text-[12px] text-zinc-600">
+                  Filtering {rows.length} runs by {activeFilters.join(" and ")}.
+                </p>
+              ) : null}
+              {hasFilters ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 h-8 text-[12px]"
+                  onClick={clearFilters}
+                >
+                  Clear filters
+                </Button>
+              ) : null}
+            </>
+          )}
+        </div>
       ) : null}
 
       <div className="flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] px-3 py-2">

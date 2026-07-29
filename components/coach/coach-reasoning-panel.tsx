@@ -10,6 +10,7 @@ import { CoachComposer } from "./coach-composer";
 import { CoachAnalysisLoader } from "./coach-analysis-loader";
 import { CoachThreadStarter } from "./coach-thread-starter";
 import Link from "next/link";
+import { RotateCcw, Square } from "lucide-react";
 import { intelligenceUrl } from "@/lib/coach/domainLinks";
 
 function pairMessages(messages: CoachMessage[]) {
@@ -33,6 +34,8 @@ export function CoachReasoningPanel({
   pendingTools,
   scrollRef,
   onSend,
+  onStop,
+  onRetry,
   disabled,
 }: {
   workspace: CoachWorkspaceState;
@@ -46,6 +49,8 @@ export function CoachReasoningPanel({
   pendingTools: string[];
   scrollRef: React.RefObject<HTMLDivElement | null>;
   onSend: (text: string) => void;
+  onStop?: () => void;
+  onRetry?: () => void;
   disabled?: boolean;
 }) {
   const hasConversation = messages.length > 0;
@@ -126,10 +131,40 @@ export function CoachReasoningPanel({
             {loading ? (
               <div className={hasConversation ? "coach-exchange py-6" : "mt-6 py-2"}>
                 <CoachAnalysisLoader activeTools={pendingTools} />
+                {onStop ? (
+                  <button
+                    type="button"
+                    onClick={onStop}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] text-zinc-500 ring-1 ring-[var(--border-subtle)] transition hover:text-zinc-200 hover:ring-[var(--border-default)]"
+                  >
+                    <Square className="h-3 w-3" /> Stop
+                  </button>
+                ) : null}
               </div>
             ) : null}
 
-            {error ? <p className="mt-6 text-sm text-red-400/90">{error}</p> : null}
+            {error && !loading ? (
+              <div
+                role="alert"
+                className="mt-6 rounded-lg border border-red-500/25 bg-red-500/[0.06] px-3 py-2.5"
+              >
+                <p className="text-[13px] font-medium text-red-200">
+                  That investigation didn&apos;t finish
+                </p>
+                <p className="mt-0.5 text-[12px] leading-snug text-red-300/80">
+                  Your question is still here, so nothing was lost. ({error})
+                </p>
+                {onRetry ? (
+                  <button
+                    type="button"
+                    onClick={onRetry}
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] text-red-200 ring-1 ring-red-500/30 transition hover:bg-red-500/10"
+                  >
+                    <RotateCcw className="h-3 w-3" /> Ask again
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
 
             <p className="mt-8 pb-2 text-[11px] text-zinc-700">
               <Link href={intelligenceUrl()} className="text-zinc-600 hover:text-zinc-400">

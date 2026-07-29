@@ -185,7 +185,7 @@ export function computeOutcomeCalibration(
   samples: OutcomeSample[],
   fallback: FeelCalibration = DEFAULT_FEEL_CALIBRATION,
 ): FeelCalibration {
-  const { confirmed, contradicted, pairs, signalCounts } = scoreOutcomePairs(reports, samples);
+  const { confirmed, pairs, signalCounts } = scoreOutcomePairs(reports, samples);
   if (pairs < MIN_PAIRS) return fallback;
 
   // Laplace-shrunk predictive reliability, pulled toward 0.5 on small samples.
