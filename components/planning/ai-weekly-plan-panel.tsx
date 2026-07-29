@@ -10,7 +10,7 @@ import type {
 import { dash } from "@/components/home/primitives/tokens";
 import { ZONE_COLOR } from "@/components/console/console-kit";
 import type { CalendarIntensity } from "@/lib/training-calendar";
-import { cn } from "@/lib/utils";
+import { cn, formatKm } from "@/lib/utils";
 
 const ZONE_INTENSITIES: CalendarIntensity[] = ["easy", "recovery", "moderate", "hard", "rest"];
 
@@ -40,7 +40,7 @@ function WorkoutRow({ w }: { w: PlannedWorkout }) {
       </div>
       <p className="mt-1 text-[12px] text-zinc-500">
         {w.modality}
-        {w.distanceKm != null ? ` · ${w.distanceKm} km` : ""}
+        {w.distanceKm != null ? ` · ${formatKm(w.distanceKm)}` : ""}
         {w.durationMin != null ? ` · ${w.durationMin} min` : ""}
       </p>
       <p className="mt-1.5 text-[12px] leading-relaxed text-zinc-400">{w.purpose}</p>

@@ -7,7 +7,7 @@ import type {
   CalendarWorkout,
   TrainingCalendarWeek,
 } from "@/lib/training-calendar";
-import { cn } from "@/lib/utils";
+import { cn, formatKm } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, ChevronDown, GripVertical, MoreHorizontal, X } from "lucide-react";
@@ -431,7 +431,7 @@ function WorkoutBoardBody({
       {!isRest ? (
         <>
           <p className="mt-0.5 font-mono text-[10px] tabular-nums text-zinc-500">
-            {w.distanceKm != null ? `${w.distanceKm} km` : null}
+            {w.distanceKm != null ? formatKm(w.distanceKm) : null}
             {w.distanceKm != null && w.durationMin != null ? " · " : null}
             {w.durationMin != null ? `${w.durationMin} min` : null}
           </p>

@@ -61,34 +61,25 @@ export function CoachReasoningWorkspace({
   const showSidebar = intel.state && !intel.loading;
 
   return (
-    <div className="coach-terminal flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-lg">
-      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.04] px-3 py-2.5 sm:px-4">
-        <div className="flex min-w-0 items-center gap-2">
-          {showSidebar ? (
-            <button
-              type="button"
-              className="rounded-md p-1.5 text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300 lg:hidden"
-              onClick={() => setSidebarOpen((o) => !o)}
-              aria-label={sidebarOpen ? "Close threads" : "Open threads"}
-            >
-              {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </button>
-          ) : null}
-          <div className="min-w-0">
-            <h1 className="font-display text-sm font-bold text-zinc-100 sm:text-base">Coach</h1>
-            <p className="truncate text-[12px] text-zinc-600">Training investigations</p>
-          </div>
+    // No rounded card and no inner title bar: the app shell already marks Coach
+    // as the current surface, so a second header and a floating panel read as a
+    // shell inside a shell. The conversation is the page.
+    <div className="coach-terminal flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+      {/* Only reason for a bar at all is reaching the thread drawer on screens
+          too narrow for the persistent sidebar. */}
+      {showSidebar ? (
+        <div className="flex shrink-0 items-center gap-2 border-b border-white/[0.04] px-3 py-2 lg:hidden">
+          <button
+            type="button"
+            className="rounded-md p-1.5 text-zinc-500 hover:bg-white/[0.04] hover:text-zinc-300"
+            onClick={() => setSidebarOpen((o) => !o)}
+            aria-label={sidebarOpen ? "Close threads" : "Open threads"}
+          >
+            {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+          <span className="text-[11px] text-zinc-600">Investigations</span>
         </div>
-        <div className="hidden shrink-0 items-center gap-2 text-[10px] text-zinc-600 sm:flex">
-          <Link href={intelligenceUrl()} className="hover:text-accent hover:underline">
-            Intelligence
-          </Link>
-          <span className="text-zinc-800">·</span>
-          <Link href="/import" className="hover:text-accent hover:underline">
-            Data
-          </Link>
-        </div>
-      </header>
+      ) : null}
 
       {disabled ? (
         <div className="flex shrink-0 items-center gap-2 border-b border-amber-500/15 bg-amber-500/[0.06] px-4 py-2 text-[11px] text-amber-200/85">
