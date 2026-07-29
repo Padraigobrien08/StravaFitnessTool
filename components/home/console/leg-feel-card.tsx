@@ -13,9 +13,9 @@ const OPTS: { key: LegFeel; label: string }[] = [
 ];
 
 const HINT: Record<LegFeel, string> = {
-  fresh: "Noted — a touch more room in today's call.",
+  fresh: "Noted. A touch more room in today's call.",
   normal: "Logged. Today's call stands.",
-  heavy: "Adjusted — today's readiness eased. Re-check tomorrow.",
+  heavy: "Adjusted: today's readiness eased. Re-check tomorrow.",
 };
 
 const AREAS = ["Knee", "Calf", "Achilles", "Hamstring", "Foot", "Other"];
@@ -61,7 +61,9 @@ export function LegFeelCard() {
       </div>
 
       <p className="mt-2.5 text-[11px] leading-snug text-zinc-500">
-        {legs ? HINT[legs] : "Tell the model what the numbers can't — it tunes today's readiness."}
+        {legs
+          ? HINT[legs]
+          : "Tell the model what the numbers can't see. It tunes today's readiness."}
       </p>
 
       {/* niggle */}

@@ -858,6 +858,14 @@ html.coach-route .coach-message-column {
   * {
     @apply border-border outline-ring/50;
   }
+  /* Consistent keyboard-only focus ring. `:root` bumps specificity so this wins
+     over the base `*{outline-ring/50}` and lands at full strength. Components
+     that set their own (shadcn Button, JargonTerm) still opt out via
+     `outline-none` + a ring utility (utilities layer beats base). */
+  :root :focus-visible {
+    outline: 2px solid var(--home-signal);
+    outline-offset: 2px;
+  }
   body {
     @apply bg-background text-foreground font-sans;
   }

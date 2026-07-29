@@ -143,7 +143,7 @@ export function StatItem({ label, value, hot }: { label: string; value: string; 
 }
 
 /** Key/value row with a hairline divider (use inside a `divide-y` container). */
-export function LoadRow({ k, v, sub }: { k: string; v: ReactNode; sub?: string }) {
+export function LoadRow({ k, v, sub }: { k: ReactNode; v: ReactNode; sub?: string }) {
   return (
     <div className="flex items-baseline justify-between py-2">
       <span className="text-[13px] text-muted-foreground">{k}</span>
