@@ -7,7 +7,7 @@ import type {
   CalendarWorkout,
   TrainingCalendarWeek,
 } from "@/lib/training-calendar";
-import { cn } from "@/lib/utils";
+import { cn, formatKm } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Check, MoreHorizontal, X } from "lucide-react";
 import { ZONE_COLOR } from "@/components/console/console-kit";
@@ -190,7 +190,7 @@ function WorkoutBody({ w, className }: { w: CalendarWorkout; className?: string 
             {w.modality} · {w.type}
           </p>
           <p className="text-[10px] text-zinc-600">
-            {w.distanceKm != null ? `${w.distanceKm} km` : null}
+            {w.distanceKm != null ? formatKm(w.distanceKm) : null}
             {w.distanceKm != null && w.durationMin != null ? " · " : null}
             {w.durationMin != null ? `${w.durationMin} min` : null}
           </p>

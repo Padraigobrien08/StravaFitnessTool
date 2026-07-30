@@ -1,7 +1,7 @@
 "use client";
 
 import type { GenerateWeeklyPlanResult, PlanToolObservability } from "@/lib/ai-planning";
-import { cn } from "@/lib/utils";
+import { cn, formatKm } from "@/lib/utils";
 
 const intensityDot: Record<string, string> = {
   easy: "bg-accent/80",
@@ -91,7 +91,7 @@ export function WeeklyPlanResponse({
                 <p className="text-[13px] text-zinc-200">{w.title}</p>
                 <p className="text-[11px] text-zinc-600">
                   {w.modality}
-                  {w.distanceKm != null ? ` · ${w.distanceKm} km` : ""}
+                  {w.distanceKm != null ? ` · ${formatKm(w.distanceKm)}` : ""}
                   {w.durationMin != null ? ` · ${w.durationMin} min` : ""}
                 </p>
                 <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">{w.purpose}</p>

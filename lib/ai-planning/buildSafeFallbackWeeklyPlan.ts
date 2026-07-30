@@ -14,6 +14,43 @@ function session(
   };
 }
 
+/** Planned distances are shown to the athlete, so keep them to one decimal. */
+function km(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+/**
+ * Below this, calling a session the "long run" overstates it: on a very reduced
+ * week the longest run can be shorter than a normal easy run, and labelling that
+ * a weekly endurance anchor reads as nonsense.
+ */
+const LONG_RUN_MIN_KM = 8;
+
+/**
+ * The week's longest easy run, named for what it actually is. When volume is
+ * capped low the distance no longer earns the "long run" framing, so it becomes
+ * the week's longest easy run instead of claiming endurance work it isn't.
+ */
+function longSession(
+  rawKm: number,
+  day: string,
+  opts?: { longTitle?: string; longPurpose?: string },
+): PlannedWorkout {
+  const distanceKm = km(rawKm);
+  const isLong = distanceKm >= LONG_RUN_MIN_KM;
+  return session({
+    day,
+    modality: "run",
+    type: isLong ? "long" : "easy",
+    title: isLong ? (opts?.longTitle ?? "Long run") : "Longest easy run",
+    distanceKm,
+    intensity: "easy",
+    purpose: isLong
+      ? (opts?.longPurpose ?? "Weekly endurance anchor")
+      : "Longest run of a reduced week, kept easy while volume is low",
+  });
+}
+
 export function buildSafeFallbackWeeklyPlan(
   context: CoachingContext,
   guardrails: WeeklyPlanGuardrails,
@@ -140,14 +177,9 @@ export function buildSafeFallbackWeeklyPlan(
         purpose: "Brief steady effort — not a full workout",
         constraintsApplied: ["Single quality session"],
       }),
-      session({
-        day: "Sat",
-        modality: "run",
-        type: "long",
-        title: "Moderate long run",
-        distanceKm: longKm,
-        intensity: "easy",
-        purpose: "Last longer effort before race — keep it controlled",
+      longSession(longKm, "Sat", {
+        longTitle: "Moderate long run",
+        longPurpose: "Last longer effort before the race, kept controlled",
       }),
       session({
         day: "Sun",
@@ -190,15 +222,7 @@ export function buildSafeFallbackWeeklyPlan(
         intensity: "easy",
         purpose: "Volume support",
       }),
-      session({
-        day: "Sat",
-        modality: "run",
-        type: "long",
-        title: "Long run",
-        distanceKm: Math.min(guardrails.longRunMaxKm, per * 1.4),
-        intensity: "easy",
-        purpose: "Weekly endurance anchor",
-      }),
+      longSession(Math.min(guardrails.longRunMaxKm, per * 1.4), "Sat"),
     ];
     summary = "Maintenance week: steady easy volume, no race-specific sharpening.";
     primaryGoal = "Sustain consistency without a target race";
@@ -221,7 +245,7 @@ export function buildSafeFallbackWeeklyPlan(
         modality: "run",
         type: "tempo",
         title: "Steady tempo",
-        distanceKm: Math.max(5, easyKm),
+        distanceKm: km(Math.max(5, easyKm)),
         intensity: hardSessionCount > 0 ? "hard" : "moderate",
         purpose: "Controlled quality — not all-out",
       }),
@@ -234,15 +258,7 @@ export function buildSafeFallbackWeeklyPlan(
         intensity: "easy",
         purpose: "Volume between quality days",
       }),
-      session({
-        day: "Sun",
-        modality: "run",
-        type: "long",
-        title: "Long run",
-        distanceKm: longKm,
-        intensity: "easy",
-        purpose: "Durability support for goal race",
-      }),
+      longSession(longKm, "Sun"),
     ];
     if (context.modalityContext.strengthSummary.includes("strength")) {
       workouts.push(

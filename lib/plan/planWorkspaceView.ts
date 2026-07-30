@@ -7,6 +7,7 @@ import type {
   CalendarWorkout,
   TrainingCalendarWeek,
 } from "@/lib/training-calendar";
+import { formatKm } from "@/lib/utils";
 import { validateCalendarWeek } from "@/lib/training-calendar/calendarValidation";
 import { isHardTrainingRun } from "@/lib/training-calendar/hardSessionRules";
 
@@ -108,15 +109,21 @@ export function buildWeekTelemetry(
   };
 }
 
-export function buildTodayInPlan(week: TrainingCalendarWeek): PlanTodayFocus {
+/**
+ * Today's session, but only when the week being viewed actually contains today.
+ *
+ * This used to fall back to matching the weekday *name*, so opening next week's
+ * plan on a Wednesday matched next Wednesday's session and presented it as
+ * "today in this plan". Returns null for any week that does not span today, and
+ * the caller shows week-level framing instead.
+ */
+export function buildTodayInPlan(week: TrainingCalendarWeek): PlanTodayFocus | null {
   const todayIso = format(new Date(), "yyyy-MM-dd");
-  const dayShort = format(new Date(), "EEE");
+  if (todayIso < week.weekStart.slice(0, 10) || todayIso > week.weekEnd.slice(0, 10)) {
+    return null;
+  }
 
-  const workout =
-    week.workouts.find(
-      (w) =>
-        w.date.slice(0, 10) === todayIso || w.day.toLowerCase().startsWith(dayShort.toLowerCase()),
-    ) ?? null;
+  const workout = week.workouts.find((w) => w.date.slice(0, 10) === todayIso) ?? null;
 
   if (!workout || workout.modality === "rest") {
     return {
@@ -128,7 +135,7 @@ export function buildTodayInPlan(week: TrainingCalendarWeek): PlanTodayFocus {
   }
 
   const metrics = [
-    workout.distanceKm != null ? `${workout.distanceKm} km` : null,
+    workout.distanceKm != null ? formatKm(workout.distanceKm) : null,
     workout.durationMin != null ? `${workout.durationMin} min` : null,
   ]
     .filter(Boolean)

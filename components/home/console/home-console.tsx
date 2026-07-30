@@ -45,15 +45,18 @@ const CONSENSUS_LABEL: Record<string, string> = {
   marathon: "Marathon",
 };
 
+/**
+ * Today's planned session, matched on the actual date. Matching the weekday
+ * *name* as a fallback meant a saved week for a different week (the planner
+ * targets next week) surfaced that week's same-named day as today's session.
+ */
 function findTodayWorkout(week: TrainingCalendarWeek | null): CalendarWorkout | null {
   if (!week) return null;
   const todayIso = format(new Date(), "yyyy-MM-dd");
-  const dayShort = format(new Date(), "EEE").toLowerCase();
-  return (
-    week.workouts.find(
-      (w) => w.date.slice(0, 10) === todayIso || w.day.toLowerCase().startsWith(dayShort),
-    ) ?? null
-  );
+  if (todayIso < week.weekStart.slice(0, 10) || todayIso > week.weekEnd.slice(0, 10)) {
+    return null;
+  }
+  return week.workouts.find((w) => w.date.slice(0, 10) === todayIso) ?? null;
 }
 
 export function HomeConsole({
@@ -96,7 +99,10 @@ export function HomeConsole({
         confidence={analytics.dataConfidence}
       />
 
-      <div className="grid gap-3 lg:grid-cols-[1.65fr_1fr]">
+      {/* items-start: grid rows stretch by default, so the verdict panel grew to
+          match the taller Readiness + leg-feel column and left a large empty
+          block under its actions. */}
+      <div className="grid items-start gap-3 lg:grid-cols-[1.65fr_1fr]">
         <TheCall
           vm={vm}
           today={today}
@@ -183,12 +189,9 @@ function StatusBar({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl bg-[var(--surface-elevated)] px-4 py-3 shadow-[var(--surface-shadow-subtle)] ring-1 ring-[var(--border-subtle)]">
-      <div className="flex items-baseline gap-2">
-        <span className="font-mono text-[15px] font-bold tracking-tight text-foreground">
-          Stride<span className="text-[var(--home-signal)]">IQ</span>
-        </span>
-        <span className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Console</span>
-      </div>
+      {/* No wordmark here: the app shell already carries it, and repeating it
+          read as two logos stacked on top of each other. */}
+      <Eyebrow>Console</Eyebrow>
 
       <div className="flex-1" />
 
