@@ -27,7 +27,7 @@ function parseMode(raw: string | null): ViewMode {
 
 function RunsPageSkeleton() {
   return (
-    <div className="dashboard-enter w-full max-w-6xl space-y-3 pb-8">
+    <div className="dashboard-enter w-full space-y-3 pb-8">
       <div className="skeleton-shimmer h-8 w-48 rounded" />
       <div className="skeleton-shimmer h-36 rounded-xl" />
       <div className="skeleton-shimmer h-12 rounded-lg" />
@@ -76,7 +76,7 @@ function RunsPageContent() {
   return (
     <RequireData>
       {view && importData && analytics && (
-        <RunsWorkspace className="max-w-6xl">
+        <RunsWorkspace>
           <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
             <div>
               <Eyebrow className="text-accent/80">Activities · Explore your sessions</Eyebrow>

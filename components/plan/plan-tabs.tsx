@@ -21,7 +21,7 @@ export function PlanTabs() {
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-4">
+    <div className="space-y-4">
       <div
         className="flex w-fit rounded-lg border border-[var(--border-subtle)] p-0.5"
         role="tablist"

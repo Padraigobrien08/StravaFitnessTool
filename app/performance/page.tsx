@@ -60,7 +60,7 @@ export default function PerformancePage() {
 
   if (loading && !view) {
     return (
-      <div className="dashboard-enter w-full max-w-5xl space-y-4 pb-8">
+      <div className="dashboard-enter w-full space-y-4 pb-8">
         <div className="skeleton-shimmer h-10 w-full rounded-lg" />
         <div className="skeleton-shimmer h-40 w-full rounded-xl" />
       </div>
@@ -70,7 +70,7 @@ export default function PerformancePage() {
   return (
     <RequireData>
       {view && analytics && (
-        <PerformanceWorkspace className="max-w-5xl">
+        <PerformanceWorkspace>
           <PerformanceEvidenceBanner />
           <PerformanceStateHero hero={view.hero} />
           <PerformanceTrajectoryPanel data={view.progression} prTimeline={analytics.prTimeline} />

@@ -57,7 +57,7 @@ export function IntelligencePage() {
     return (
       <RequireData>
         <IntelligenceWorkspace>
-          <div className="intelligence-model mx-auto max-w-5xl space-y-3">
+          <div className="intelligence-model space-y-3">
             <div className="skeleton-shimmer h-32 rounded-xl" />
             <div className="skeleton-shimmer h-16 rounded-lg" />
           </div>
@@ -93,7 +93,7 @@ export function IntelligencePage() {
   return (
     <RequireData>
       <IntelligenceWorkspace>
-        <div className="intelligence-model mx-auto max-w-5xl space-y-3 pb-8">
+        <div className="intelligence-model space-y-3 pb-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-[11px] text-zinc-500">
               What StrideIQ currently believes, what changed, and what to investigate

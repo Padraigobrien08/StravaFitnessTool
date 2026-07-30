@@ -52,7 +52,7 @@ export default function TrainingPage() {
 
   if (loading && !view) {
     return (
-      <div className="dashboard-enter w-full max-w-5xl space-y-4 pb-8">
+      <div className="dashboard-enter w-full space-y-4 pb-8">
         <div className="skeleton-shimmer h-10 w-full rounded-lg" />
         <div className="skeleton-shimmer h-32 w-full rounded-xl" />
       </div>
@@ -62,7 +62,7 @@ export default function TrainingPage() {
   return (
     <RequireData>
       {view && analytics && (
-        <TrainingWorkspace className="max-w-5xl">
+        <TrainingWorkspace>
           <TrainingEvidenceBanner />
           <TrainingStateHero hero={view.hero} />
           <div className="grid gap-4 lg:grid-cols-2">
