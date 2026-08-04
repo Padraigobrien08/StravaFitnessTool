@@ -53,6 +53,10 @@ export default function PerformancePage() {
       goal: raceGoal,
       runs: importData?.runs,
       fitDetails,
+      // With no goal set this used to return null and the page fell back to the
+      // legacy consensus projection, which backtests far worse. Forecast the
+      // half by default so the headline number always comes from one engine.
+      fallbackDistance: "hm",
     });
     const goalDistanceKm = raceGoal ? RACE_DISTANCE_KM[raceGoal.distance] : null;
     return buildPerformancePageView(analytics, insights, quality, { forecast, goalDistanceKm });

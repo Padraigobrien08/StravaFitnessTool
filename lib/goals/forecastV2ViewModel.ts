@@ -114,12 +114,15 @@ export function buildForecastV2View(opts: {
   goal: RaceGoal | null;
   runs?: RunActivity[];
   fitDetails?: FitRunDetail[];
+  /** Distance to forecast when no race goal is set. */
+  fallbackDistance?: RaceGoal["distance"];
 }): ForecastV2View | null {
   const input = buildRaceForecastInput({
     analytics: opts.analytics,
     goal: opts.goal,
     runs: opts.runs,
     fitDetails: opts.fitDetails,
+    fallbackDistance: opts.fallbackDistance,
   });
   if (!input || input.efforts.length === 0) return null;
 

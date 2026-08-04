@@ -46,10 +46,22 @@ export function buildRaceForecastInput(opts: {
   fitDetails?: FitRunDetail[];
   analytics: DashboardInsights;
   goal: RaceGoal | null;
+  /**
+   * Distance to forecast when no race is set.
+   *
+   * Without this the function returns null, and every caller falls back to
+   * whatever older model it has. On the live account that meant the Performance
+   * page quietly showed the legacy Riegel/consensus projection, which backtests
+   * at +29% against a held-out race where this engine came in at +7.5%. An
+   * athlete with no goal should still get the better model, not a worse one.
+   */
+  fallbackDistance?: RaceGoal["distance"];
   previousMostLikelyTimeSec?: number;
 }): RaceForecastInput | null {
-  const { analytics, goal } = opts;
-  if (!goal) return null;
+  const { analytics } = opts;
+  const distance = opts.goal?.distance ?? opts.fallbackDistance;
+  if (!distance) return null;
+  const goal = opts.goal;
 
   const runs = opts.runs ?? [];
   const fitDetails = opts.fitDetails ?? [];
@@ -57,7 +69,7 @@ export function buildRaceForecastInput(opts: {
     runs.length > 0 ? effortsFromRuns(runs, fitDetails) : effortsFromAnalysis(analytics, runs);
   const efforts = prepareCapabilityEfforts(rawEfforts);
   const normalized = runsToNormalized(runs);
-  const cfg = RACE_READINESS_CONFIG[goal.distance];
+  const cfg = RACE_READINESS_CONFIG[distance];
 
   return {
     activities: normalized,
@@ -66,9 +78,11 @@ export function buildRaceForecastInput(opts: {
     recentBlocks: analytics.trainingBlocks ?? [],
     goal: {
       distanceMeters: Math.round(cfg.raceDistanceKm * 1000),
-      distanceKey: goal.distance,
-      targetTimeSec: goal.targetTimeSec,
-      raceDate: goal.date,
+      distanceKey: distance,
+      // No goal means no date and no target: downstream taper and target logic
+      // must stay silent rather than invent a race.
+      targetTimeSec: goal?.targetTimeSec ?? undefined,
+      raceDate: goal?.date,
     },
     athleteContext: {
       readinessScore: analytics.raceReadiness?.score,
