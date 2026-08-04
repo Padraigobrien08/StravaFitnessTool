@@ -13,6 +13,7 @@ import {
 } from "@/lib/intelligence/presentation";
 import { buildHeroSupportingReasons } from "@/lib/intelligence/intelligenceUiHelpers";
 import { getPrimaryRecommendation } from "@/lib/intelligence/athleteState";
+import { alreadyStated } from "@/lib/insights/consistency";
 import { buildCommandCenterView } from "./commandCenter";
 
 export interface HomeHeroView {
@@ -110,24 +111,32 @@ export function buildHomeOperatingSystemView(params: {
     taperActive,
   };
 
+  const today = buildTodayFocus(savedWeek, analytics, primaryAction);
+  const actionBullets = primaryActionBullets(primaryAction);
+
+  // Decision support renders three columns beside the hero's "Why this", and all
+  // four draw from overlapping pools. On the live account one sentence filled the
+  // hero, a Risks bullet and the Primary action at once, reading as three
+  // findings when it was one. The primary action is the canonical place for it,
+  // so risks and opportunities yield to whatever the hero and action already say.
+  const alreadyShown = [today.why, ...actionBullets];
+  const withoutRepeats = <T extends { text: string }>(items: T[]) =>
+    dedupeByTopic(items, (x) => x.text).filter((x) => !alreadyStated(x.text, alreadyShown));
+
   return {
     hero,
-    today: buildTodayFocus(savedWeek, analytics, primaryAction),
+    today,
     changeFeed: buildChangeFeed(
       params.signals,
       params.recentlyLearned,
       params.adaptationSignals,
       analytics,
     ),
-    risks: dedupeByTopic(
-      params.risksAndOpportunities.filter((x) => x.kind === "risk"),
-      (x) => x.text,
-    ),
-    opportunities: dedupeByTopic(
+    risks: withoutRepeats(params.risksAndOpportunities.filter((x) => x.kind === "risk")),
+    opportunities: withoutRepeats(
       params.risksAndOpportunities.filter((x) => x.kind === "opportunity"),
-      (x) => x.text,
     ),
-    primaryActionBullets: primaryActionBullets(primaryAction),
+    primaryActionBullets: actionBullets,
     trajectory: getStateEvolutionStrip(analytics),
     memory: params.memory,
     command,

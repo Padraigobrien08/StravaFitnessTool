@@ -44,8 +44,13 @@ export function detectInterference(
         anchorRunDate: run.startDate,
         hoursApart: Math.round(hours * 10) / 10,
         message:
+          // Both activities are already in the history being scanned, so this
+          // pairing is something that happened, not something ahead. It used to
+          // read "may interfere with upcoming key run", which invented a
+          // scheduled session, most visibly for an athlete with no plan saved
+          // and no run in over a week.
           nrTime < runTime
-            ? `${nr.sportType} may interfere with upcoming key run (${Math.round(hours)}h apart).`
+            ? `${nr.sportType} landed ${Math.round(hours)}h before a key run: that run's quality may have been compromised.`
             : `${nr.sportType} followed a key run within ${Math.round(hours)}h: recovery context may be compressed.`,
         evidence: [
           `Non-run: ${nr.sportType}, ${Math.round(nr.movingTimeSec / 60)} min, ${nr.perceivedIntensity} intensity`,
