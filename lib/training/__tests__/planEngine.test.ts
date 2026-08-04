@@ -288,34 +288,63 @@ describe("the comeback week comes from the athlete's own baseline", () => {
     expect(plan.totalKmRange).toEqual([12, 20]);
   });
 
-  it("still plans race day mid-comeback, but says what it is", () => {
+  /** A half-marathon four days out, in the middle of a comeback. */
+  function raceMidComeback() {
+    return baseContext({
+      returning: returningPlan(),
+      raceReadiness: {
+        distance: "hm",
+        distanceLabel: "Half marathon",
+        daysUntilRace: 4,
+        raceDate: "2025-05-18",
+        score: 40,
+        label: "In training",
+        probabilityBand: "Off track",
+        longestRunKm: 16,
+        longestRunPct: 75,
+        fourWeekVolumeKm: 20,
+        volumePct: 15,
+        gaps: [],
+      },
+    });
+  }
+
+  // A taper is how you arrive fresh on top of training that happened. There is
+  // none here, so race week loses to the ramp: prescribing sharpeners and a
+  // race-length effort to someone three weeks out of running is how people get
+  // hurt. The race is still on the calendar, so it has to be said out loud.
+  it("keeps the comeback ramp even when race day falls in the plan week", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2025-05-14T08:00:00Z"));
     try {
-      const plan = buildNextWeekPlan(
-        baseContext({
-          returning: returningPlan(),
-          raceReadiness: {
-            distance: "hm",
-            distanceLabel: "Half marathon",
-            daysUntilRace: 4,
-            raceDate: "2025-05-18",
-            score: 40,
-            label: "In training",
-            probabilityBand: "Off track",
-            longestRunKm: 16,
-            longestRunPct: 75,
-            fourWeekVolumeKm: 20,
-            volumePct: 15,
-            gaps: [],
-          },
-        }),
-      );
-      expect(plan.template).toBe("race_week");
-      expect(plan.warnings.some((w) => /participation effort/i.test(w))).toBe(true);
+      const plan = buildNextWeekPlan(raceMidComeback());
+      expect(plan.template).toBe("return");
+      expect(plan.sessions.every((s) => s.type === "easy")).toBe(true);
+      expect(countHardSessions(plan)).toBe(0);
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("warns about the race it is not tapering for, in the athlete's own numbers", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2025-05-14T08:00:00Z"));
+    try {
+      const plan = buildNextWeekPlan(raceMidComeback());
+      const warning = plan.warnings.find((w) => /half marathon/i.test(w));
+      expect(warning).toBeDefined();
+      expect(warning).toContain("Sun");
+      expect(warning).toContain("21.1 km"); // the race distance it falls short of
+      expect(warning).toContain("20 km"); // what the ramp actually plans
+      expect(warning).toMatch(/does not taper/i);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("says nothing about a race when there isn't one", () => {
+    const plan = buildNextWeekPlan(baseContext({ returning: returningPlan() }));
+    expect(plan.warnings.some((w) => /taper/i.test(w))).toBe(false);
   });
 
   it("leaves a currently-training athlete's week alone", () => {

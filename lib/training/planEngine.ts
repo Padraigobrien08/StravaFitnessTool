@@ -483,6 +483,26 @@ function buildBasePlan(ctx: PlanContext, week: { weekStart: string; weekLabel: s
   };
 }
 
+/**
+ * Names the race the comeback week is deliberately not tapering for.
+ *
+ * The athlete entered it and the date has not moved, so silence would be the
+ * worst option: they would see an easy week and no mention of Sunday. Stating
+ * the mismatch in kilometres lets them make the call themselves.
+ */
+function raceMidComebackWarning(ctx: PlanContext, plan: WeekPlan, raceDate: string): string {
+  const r = ctx.raceReadiness!;
+  const day = raceDayLabel(raceDate);
+  const raceKm = Math.round(RACE_READINESS_CONFIG[r.distance].raceDistanceKm * 10) / 10;
+  const weekKm = plan.totalKmRange[1];
+  const gap = ctx.returning?.gapDays ?? 0;
+  const scale =
+    weekKm < raceKm
+      ? `this week's ${weekKm} km rebuild is less than the ${raceKm} km race distance`
+      : `this week is easy running only`;
+  return `${r.distanceLabel} on ${day}, ${r.daysUntilRace} day(s) away: after ${gap} days off, ${scale}. This plan does not taper for it — treat race day as a participation effort or step back to a shorter distance.`;
+}
+
 export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
   const raceDate = ctx.raceReadiness?.raceDate;
   const daysUntilRace = ctx.raceReadiness?.daysUntilRace ?? null;
@@ -495,23 +515,19 @@ export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
 
   const comingBack = ctx.returning?.weeks.length ? ctx.returning : null;
 
-  if (raceDate && daysUntilRace !== null && daysUntilRace <= 14 && raceInPlanWeek) {
-    // Race day is fixed and the plan has to cover it, even mid-comeback: say so
-    // rather than quietly tapering someone who has not run in weeks.
-    plan = buildRaceWeekPlan(ctx, week, daysUntilRace, raceDate);
-    if (comingBack) {
-      plan = {
-        ...plan,
-        warnings: [
-          ...plan.warnings,
-          `You have not run in ${comingBack.gapDays} days: treat this as a participation effort, not a target race.`,
-        ],
-      };
-    }
-  } else if (comingBack) {
-    // Coming back outranks the remaining branches: they all shape a training
-    // week, and there is no training week to shape yet.
+  if (comingBack) {
+    // Coming back outranks every other branch, race week included. A taper is
+    // a way of arriving fresh on top of training that happened; there is no
+    // training here to taper from, and prescribing sharpeners and a race-length
+    // effort to someone weeks out of running is how people get hurt. The race
+    // is real and it is on the calendar, so it becomes a warning rather than
+    // the shape of the week.
     plan = buildReturnPlan(ctx, week, comingBack);
+    if (raceDate && daysUntilRace !== null && raceInPlanWeek) {
+      plan = { ...plan, warnings: [...plan.warnings, raceMidComebackWarning(ctx, plan, raceDate)] };
+    }
+  } else if (raceDate && daysUntilRace !== null && daysUntilRace <= 14 && raceInPlanWeek) {
+    plan = buildRaceWeekPlan(ctx, week, daysUntilRace, raceDate);
   } else if (ctx.fatigue.freshness < 40 && (daysUntilRace === null || daysUntilRace > 3)) {
     plan = buildFatiguePlan(ctx, week);
   } else if (daysUntilRace !== null && daysUntilRace <= 14) {
