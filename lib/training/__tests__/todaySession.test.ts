@@ -11,6 +11,7 @@ function fatigue(freshness: number, tsb: number): FatigueSnapshot {
     tsb,
     freshness,
     label: "test",
+    readiness: { balance: "neutral", currency: "current", volumeRatio: null },
     restDaysSinceLastRun: 1,
     evidence: [],
     usesProxyLoad: false,

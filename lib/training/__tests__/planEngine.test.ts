@@ -29,6 +29,7 @@ function baseContext(overrides: Partial<PlanContext> = {}): PlanContext {
     tsb: -10,
     freshness: 55,
     label: "Neutral",
+    readiness: { balance: "neutral", currency: "current", volumeRatio: null },
     restDaysSinceLastRun: 1,
     evidence: [],
     usesProxyLoad: false,

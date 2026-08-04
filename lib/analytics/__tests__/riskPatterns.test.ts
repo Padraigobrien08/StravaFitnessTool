@@ -10,6 +10,7 @@ function fatigue(overrides: Partial<FatigueSnapshot> = {}): FatigueSnapshot {
     tsb: 0,
     freshness: 60,
     label: "neutral",
+    readiness: { balance: "neutral", currency: "current", volumeRatio: null },
     restDaysSinceLastRun: 1,
     evidence: [],
     usesProxyLoad: false,
