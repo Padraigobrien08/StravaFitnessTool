@@ -12,6 +12,7 @@ import {
 import type { MemorySnippet } from "./memorySnippets";
 import { buildCoachContextSnapshot } from "./viewModel";
 import { buildActiveInvestigations, buildContinuityLine } from "./investigations";
+import { isTrainingCurrent, stalenessClause } from "@/lib/insights/consistency";
 import type {
   ActiveObservation,
   CoachWorkspaceState,
@@ -55,11 +56,17 @@ export function buildActiveObservations(
       isNew: true,
     });
   } else if (analytics.efficiencySummary.trend === "declining") {
+    // Attributing the dip to fatigue only makes sense if training is current.
+    // After a layoff the same dip is a detraining signal, and blaming fatigue
+    // for load that was never absorbed reads as nonsense.
+    const current = isTrainingCurrent(analytics.fatigue);
     push({
       id: "eff-down",
-      text: "Efficiency has dipped: fatigue or heat may be compressing aerobic returns.",
+      text: current
+        ? "Efficiency has dipped: fatigue or heat may be compressing aerobic returns."
+        : `Efficiency has dipped, measured before ${stalenessClause(analytics.fatigue)}: read it as lost sharpness rather than fatigue.`,
       tone: "warning",
-      domain: "Fatigue",
+      domain: current ? "Fatigue" : "Readiness",
       confidence: "medium",
     });
   }
@@ -108,7 +115,11 @@ export function buildActiveObservations(
   if (tempoCount && tempoCount.runCount >= 2) {
     push({
       id: "threshold",
-      text: `Threshold-style sessions are appearing regularly (${tempoCount.runCount} in recent mix).`,
+      // Present continuous only holds while training is current; after a gap the
+      // same count is history, not something still happening.
+      text: isTrainingCurrent(analytics.fatigue)
+        ? `Threshold-style sessions are appearing regularly (${tempoCount.runCount} in recent mix).`
+        : `Threshold-style sessions featured in the last block (${tempoCount.runCount}), before ${stalenessClause(analytics.fatigue)}.`,
       tone: "neutral",
       domain: "Training patterns",
       confidence: "medium",
