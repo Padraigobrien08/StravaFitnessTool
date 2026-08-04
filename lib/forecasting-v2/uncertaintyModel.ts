@@ -108,7 +108,6 @@ export function buildUncertaintyAssessment(
 
   const distanceFactor = targetKm >= 35 ? 1.35 : targetKm >= 18 ? 1.15 : 1;
   const scale = distanceFactor * (1 + (100 - opts.specificity.score) / 200);
-  const intervalWidthSec = Math.round(width * scale);
   const baseWidthSec = Math.round(baseWidthRaw * scale);
   const drivers: ForecastUncertaintyDriver[] = raw.map((r) => ({
     ...r.driver,
@@ -119,6 +118,39 @@ export function buildUncertaintyAssessment(
   if (score >= 78) confidenceLabel = "high";
   else if (score >= 62) confidenceLabel = "medium_high";
   else if (score < 45) confidenceLabel = "low";
+
+  // The width above is driven by how much the capability models disagree. That
+  // measures consensus, not accuracy: three models can agree closely and still
+  // be wrong together. Backtesting the one held-out race on file put the point
+  // estimate 7.5% off while this width claimed ±1%, so a floor is applied as a
+  // share of the predicted time — the forecast may not imply precision the
+  // engine has never demonstrated.
+  //
+  // These fractions are a minimum honesty guarantee, not a calibrated interval:
+  // one race cannot calibrate one. Scoring more races should replace them with
+  // measured quantiles. See scripts/backtest-race-forecast.mts.
+  const MIN_WIDTH_FRACTION: Record<UncertaintyAssessment["confidenceLabel"], number> = {
+    high: 0.08,
+    medium_high: 0.1,
+    medium: 0.13,
+    low: 0.18,
+  };
+  const floorSec = Math.round(opts.mostLikelyTimeSec * MIN_WIDTH_FRACTION[confidenceLabel]);
+  const computedWidthSec = Math.round(width * scale);
+  const intervalWidthSec = Math.max(computedWidthSec, floorSec);
+
+  // The decomposition shown to the athlete must add up, so when the floor binds
+  // the extra width is attributed rather than appearing from nowhere — and the
+  // reason it exists is worth saying out loud.
+  if (intervalWidthSec > computedWidthSec) {
+    drivers.push({
+      widthSec: intervalWidthSec - computedWidthSec,
+      label: "Unvalidated against your races",
+      impact: "medium",
+      explanation:
+        "The models agree with each other, which is not the same as being right. This holds the band open until predictions have been scored against races you have actually run.",
+    });
+  }
 
   return {
     score,

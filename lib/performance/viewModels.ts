@@ -7,6 +7,7 @@ import type { ImportQualityReport } from "@/lib/quality/assessImport";
 import { buildProgressionView, type ProgressionViewModel } from "@/lib/home/dashboardData";
 import { formatDuration, formatPace } from "@/lib/utils";
 import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
+import { isTrainingCurrent } from "@/lib/insights/consistency";
 import { parseISO } from "date-fns";
 
 export type PerformanceSeverity = "positive" | "neutral" | "warning";
@@ -318,7 +319,11 @@ function buildProjectionView(analytics: DashboardInsights): RaceProjectionView {
   if (analytics.efficiencySummary.trend === "improving") {
     confidenceDrivers.push("Stable or improving aerobic efficiency");
   }
-  if (analytics.bestBlock) {
+  // `bestBlock` only says a strong block exists somewhere in the history, which
+  // says nothing about recent volume: the live account listed this as a
+  // confidence driver on a page also reporting 4-week volume down 77%.
+  const volumePct = (analytics.raceReadiness ?? analytics.halfMarathonReadiness)?.volumePct ?? 0;
+  if (analytics.bestBlock && isTrainingCurrent(analytics.fatigue) && volumePct >= 60) {
     confidenceDrivers.push("Sufficient recent 4-week volume");
   }
   if (analytics.consistencyScore.overall >= 65) {
