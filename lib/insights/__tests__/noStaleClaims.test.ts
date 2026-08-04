@@ -16,6 +16,15 @@ import {
   dedupeIntelligenceSlots,
   getStateEvolutionStrip,
 } from "@/lib/intelligence/presentation";
+import {
+  buildHeroSupportingReasons,
+  formatTrajectoryDisplay,
+} from "@/lib/intelligence/intelligenceUiHelpers";
+import { buildTrainingPageView } from "@/lib/training/viewModels";
+import { buildPerformancePageView } from "@/lib/performance/viewModels";
+import { buildGoalsPageView } from "@/lib/goals/viewModels";
+import { buildRunsPageView } from "@/lib/runs/viewModels";
+import { buildReportPageView } from "@/lib/report/viewModels";
 import { mkRun, mkImport } from "@/lib/coaching-context/__tests__/fixtures";
 import type { RunActivity } from "@/lib/strava/types";
 
@@ -99,7 +108,37 @@ function compose(runs: RunActivity[]) {
     adaptationSignals: adaptive.adaptationSignals.map((s) => s.statement),
   });
 
-  return { analytics, insights, state, adaptive, slots, home };
+  return { analytics, insights, quality, state, adaptive, slots, home };
+}
+
+/**
+ * Every string anywhere in a value, however deeply nested.
+ *
+ * The page view models are big nested objects and listing their text fields by
+ * hand is what let "Efficiency slipping: check fatigue" survive the first
+ * sweep: it lived in `training.adaptation.headline`, which nothing enumerated.
+ * Walking the whole structure means a new field is covered the day it is added.
+ */
+function deepStrings(value: unknown, seen = new WeakSet<object>()): string[] {
+  if (typeof value === "string") return [value];
+  if (value === null || typeof value !== "object") return [];
+  if (seen.has(value)) return [];
+  seen.add(value);
+  if (Array.isArray(value)) return value.flatMap((v) => deepStrings(v, seen));
+  return Object.values(value).flatMap((v) => deepStrings(v, seen));
+}
+
+/** Every string the five page view models would render. */
+function pageViewStrings(runs: RunActivity[]): string[] {
+  const { analytics, insights, quality } = compose(runs);
+  const fitIds: string[] = [];
+  return [
+    ...deepStrings(buildTrainingPageView(analytics, insights)),
+    ...deepStrings(buildPerformancePageView(analytics, insights, quality)),
+    ...deepStrings(buildGoalsPageView(analytics, null, insights, { runs, fitDetails: [] })),
+    ...deepStrings(buildRunsPageView(runs, analytics, fitIds, quality)),
+    ...deepStrings(buildReportPageView(analytics, insights, quality, [], null)),
+  ];
 }
 
 /** Every user-visible string the composed surfaces would render. */
@@ -107,6 +146,7 @@ function surfaceStrings(runs: RunActivity[]): string[] {
   const { analytics, insights, state, adaptive, slots, home } = compose(runs);
 
   const out: string[] = [
+    ...pageViewStrings(runs),
     // Home
     home.today.title,
     home.today.why,
@@ -128,7 +168,16 @@ function surfaceStrings(runs: RunActivity[]): string[] {
     ...adaptive.adaptationSignals.map((s) => s.statement),
     ...adaptive.sessionSummary,
     adaptive.primaryRecommendation,
-    ...getStateEvolutionStrip(analytics).flatMap((t) => [t.label, t.direction, t.interpretation]),
+    // Both the strip and the helper that formats it for the page: the helper
+    // decorates items with phrases inferred from `trend` alone, so it can
+    // reintroduce "quality window" on top of a corrected interpretation.
+    ...getStateEvolutionStrip(analytics).flatMap((t) => [
+      t.label,
+      t.direction,
+      t.interpretation,
+      ...Object.values(formatTrajectoryDisplay(t)),
+    ]),
+    ...buildHeroSupportingReasons(state, analytics),
     // Insight cards
     ...insights.flatMap((i) => [i.title, ...(i.evidence ?? []), i.recommendation ?? ""]),
   ];

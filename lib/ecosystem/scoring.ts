@@ -88,7 +88,7 @@ export function scoreStrength(activities: NormalizedActivity[]): {
                   : "Strength support emerging",
               trend: count >= 2 ? "positive" : "neutral",
               evidence: [
-                `${count} WeightTraining sessions in 14 days`,
+                `${count} strength sessions in 14 days`,
                 ...strength
                   .slice(-2)
                   .map((s) => `${format(parseISO(s.startDate), "d MMM")}: ${s.name}`),

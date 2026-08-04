@@ -82,6 +82,26 @@ export function normalizeSportType(sportType: string): string {
   return CSV_ALIASES[raw] ?? raw;
 }
 
+/** Inverse of CSV_ALIASES, so the names Strava exports round-trip exactly. */
+const SPORT_TYPE_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(CSV_ALIASES).map(([label, key]) => [key, label]),
+);
+
+/**
+ * The display name for a sport type.
+ *
+ * `normalizeSportType` deliberately folds export labels into Strava's
+ * PascalCase keys, which are correct internally and wrong in a sentence:
+ * "WeightTraining landed 23h before a key run". This is the way back out.
+ */
+export function sportTypeLabel(sportType: string): string {
+  const key = normalizeSportType(sportType);
+  if (!key) return "Activity";
+  if (SPORT_TYPE_LABELS[key]) return SPORT_TYPE_LABELS[key];
+  // Unmapped keys are still PascalCase from the API, so split on the caps.
+  return key.replace(/([a-z0-9])([A-Z])/g, "$1 $2").trim();
+}
+
 export function classifyActivityModality(sportType: string): ActivityModality {
   const key = normalizeSportType(sportType);
   if (!key) return "unknown";

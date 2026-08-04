@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyActivityModality } from "../modality";
+import { classifyActivityModality, sportTypeLabel } from "../modality";
 import { detectAthleteArchetype } from "../archetype";
 import { collectInterferenceFlags } from "../interference";
 import { buildTrainingEcosystem } from "../engine";
@@ -136,5 +136,43 @@ describe("computeTrainingEcosystem from import", () => {
     );
     expect(eco.activities[0]?.source).toBe("strava_api");
     expect(eco.activities[0]?.modality).toBe("bike");
+  });
+});
+
+describe("sportTypeLabel", () => {
+  // normalizeSportType folds export labels into Strava's PascalCase keys, which
+  // are right internally and wrong in a sentence: the live account showed
+  // "WeightTraining landed 23h before a key run".
+  it("reads as English, from either the API key or the export label", () => {
+    expect(sportTypeLabel("WeightTraining")).toBe("Weight Training");
+    expect(sportTypeLabel("Weight Training")).toBe("Weight Training");
+    expect(sportTypeLabel("HighIntensityIntervalTraining")).toBe(
+      "High Intensity Interval Training",
+    );
+    expect(sportTypeLabel("EBikeRide")).toBe("E-Bike Ride");
+  });
+
+  it("splits unmapped PascalCase rather than passing it through raw", () => {
+    // New Strava sport types appear without warning; none of them should ever
+    // reach a sentence glued together.
+    expect(sportTypeLabel("VirtualRow")).toBe("Virtual Row");
+    expect(sportTypeLabel("Run")).toBe("Run");
+  });
+
+  it("never renders an empty subject", () => {
+    expect(sportTypeLabel("")).toBe("Activity");
+    expect(sportTypeLabel("   ")).toBe("Activity");
+  });
+
+  it("keeps interference messages readable", () => {
+    const flags = collectInterferenceFlags(strengthHeavy, null);
+    expect(flags.length).toBeGreaterThan(0);
+    for (const f of flags) {
+      // No PascalCase run-ons in generated copy. Evidence is deliberately
+      // excluded: it quotes the athlete's own activity titles, which are user
+      // data and render verbatim however they were typed. The raw key also
+      // stays on `nonRunSportType`, which is data for callers to label.
+      expect(f.message, f.message).not.toMatch(/[a-z][A-Z]/);
+    }
   });
 });

@@ -23,6 +23,13 @@ export interface StateEvolutionItem {
   interpretation: string;
   trend: "up" | "down" | "flat";
   values: { label: string; value: number }[];
+  /**
+   * True when the athlete is not training currently. Display helpers decorate
+   * these items with phrases inferred from `trend` ("taper effect" for a volume
+   * drop, "quality window" for high freshness), which are training readings
+   * that a layoff invalidates — the trend is real, the reading is not.
+   */
+  stale: boolean;
 }
 
 export function buildCurrentBelief(
@@ -84,6 +91,7 @@ export function prioritizeSignals(signals: IntelligenceSignal[]): PrioritizedSig
 
 export function getStateEvolutionStrip(analytics: DashboardInsights): StateEvolutionItem[] {
   const series = getTrajectorySeries(analytics);
+  const stale = !isTrainingCurrent(analytics.fatigue);
   const items: StateEvolutionItem[] = series.map((s) => ({
     id: s.id,
     label: shortLabel(s),
@@ -91,6 +99,7 @@ export function getStateEvolutionStrip(analytics: DashboardInsights): StateEvolu
     interpretation: s.interpretation,
     trend: s.trend,
     values: s.values,
+    stale,
   }));
 
   if (analytics.intensityAdvice.status === "too_hard") {
@@ -98,9 +107,10 @@ export function getStateEvolutionStrip(analytics: DashboardInsights): StateEvolu
       id: "intensity",
       label: "Intensity",
       direction: "Elevated",
-      interpretation: "Watch stacking",
+      interpretation: stale ? "Last block" : "Watch stacking",
       trend: "flat",
       values: [],
+      stale,
     });
   }
 
