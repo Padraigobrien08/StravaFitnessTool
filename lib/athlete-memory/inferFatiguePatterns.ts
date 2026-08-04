@@ -1,5 +1,6 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import { createBelief } from "./beliefUtils";
+import { isTrainingCurrent } from "@/lib/insights/consistency";
 import type { AthleteBelief } from "./types";
 
 export function inferFatiguePatterns(analytics: DashboardInsights): AthleteBelief[] {
@@ -41,7 +42,10 @@ export function inferFatiguePatterns(analytics: DashboardInsights): AthleteBelie
     );
   }
 
-  if (fatigue.freshness >= 65 && fatigue.tsb > -5) {
+  // Only a fresh window if the freshness came from recovering between sessions.
+  // After a layoff the same number is just rest, and reading it as "quality is
+  // absorbable" points the athlete at exactly the wrong first week back.
+  if (fatigue.freshness >= 65 && fatigue.tsb > -5 && isTrainingCurrent(fatigue)) {
     out.push(
       createBelief({
         id: "fatigue-fresh-window",

@@ -4,6 +4,7 @@ import type { Insight } from "./types";
 import { formatPace, formatDuration } from "@/lib/utils";
 import { recentPrHighlights } from "@/lib/analytics/progression";
 import { generateEcosystemInsights } from "@/lib/ecosystem/insights";
+import { isTrainingCurrent, stalenessClause } from "./consistency";
 
 export function generateInsights(
   analytics: DashboardInsights,
@@ -23,6 +24,12 @@ export function generateInsights(
     fatigue,
     efficiencyMoM,
   } = analytics;
+
+  // Several insights below describe the training the athlete is doing. After a
+  // layoff they still have data to describe, but the tense and the advice both
+  // have to change: nothing is happening to blame fatigue on or to correct.
+  const trainingCurrent = isTrainingCurrent(fatigue);
+  const gap = stalenessClause(fatigue);
 
   // Am I improving?
   for (const pr of recentPrHighlights(prTimeline, 14)) {
@@ -58,12 +65,18 @@ export function generateInsights(
     insights.push({
       id: "pace-efficiency-down",
       question: "improving",
-      title: "Efficiency has dipped recently",
+      title: trainingCurrent
+        ? "Efficiency has dipped recently"
+        : `Efficiency had dipped before ${gap}`,
       severity: "warning",
       evidence: [
-        "Pace at a given HR has worsened vs your prior block: fatigue or heat may be a factor.",
+        trainingCurrent
+          ? "Pace at a given HR has worsened vs your prior block: fatigue or heat may be a factor."
+          : `Pace at a given HR had worsened vs the block before it. Measured before ${gap}, so read it as where you left off, not as current form.`,
       ],
-      recommendation: "Consider an easy week or check sleep and hydration before adding intensity.",
+      recommendation: trainingCurrent
+        ? "Consider an easy week or check sleep and hydration before adding intensity."
+        : "Re-measure it over your first two weeks back before drawing any conclusion.",
       confidence: analytics.dataConfidence,
     });
   }
@@ -90,13 +103,18 @@ export function generateInsights(
     insights.push({
       id: "intensity-heavy",
       question: "training",
-      title: "Training looks intensity-heavy",
+      title: trainingCurrent
+        ? "Training looks intensity-heavy"
+        : "Your last block was intensity-heavy",
       severity: "warning",
       evidence: [
         `${easyHard.hard} of ${easyHard.easy + easyHard.hard} runs classified as hard (≥80% max HR).`,
         `Only ${easyPct.toFixed(0)}% easy: polarized plans often target ~80% easy.`,
+        ...(trainingCurrent ? [] : [`Measured before ${gap}.`]),
       ],
-      recommendation: "Add 1–2 low-HR easy runs per week to support recovery and aerobic base.",
+      recommendation: trainingCurrent
+        ? "Add 1–2 low-HR easy runs per week to support recovery and aerobic base."
+        : "Coming back is the moment to fix the mix: make the first weeks back easy running only.",
       confidence: quality.fieldCoverage.find((f) => f.label === "Heart rate")?.level ?? "medium",
     });
   }

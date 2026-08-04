@@ -3,6 +3,7 @@ import type { CoachWorkspaceState } from "@/lib/coach/types";
 import type { AthleteBelief } from "@/lib/athlete-memory/types";
 import type { MemorySnippet } from "@/lib/coach/memorySnippets";
 import type { StateEvolutionItem } from "./presentation";
+import { isTrainingCurrent, stalenessClause } from "@/lib/insights/consistency";
 
 export function buildHeroSupportingReasons(
   state: CoachWorkspaceState,
@@ -18,13 +19,17 @@ export function buildHeroSupportingReasons(
   }
 
   const fresh = state.snapshot.freshness ?? analytics.fatigue.freshness;
-  if (fresh >= 60) reasons.push("Freshness high");
+  const trainingCurrent = isTrainingCurrent(analytics.fatigue);
+  // Freshness after a layoff is rest, not sharpness, and the intensity and
+  // efficiency reasons below describe a block that has already finished.
+  if (!trainingCurrent) reasons.push(`Out of training · ${stalenessClause(analytics.fatigue)}`);
+  else if (fresh >= 60) reasons.push("Freshness high");
   else if (fresh < 45) reasons.push("Freshness constrained");
   else reasons.push("Freshness moderate");
 
   if (analytics.intensityAdvice.status === "too_hard") {
-    reasons.push("Intensity density elevated");
-  } else if (analytics.efficiencySummary.trend === "improving") {
+    reasons.push(trainingCurrent ? "Intensity density elevated" : "Last block intensity-heavy");
+  } else if (trainingCurrent && analytics.efficiencySummary.trend === "improving") {
     reasons.push("Efficiency improving");
   }
 

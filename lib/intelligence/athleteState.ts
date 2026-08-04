@@ -13,6 +13,7 @@ import type {
   RiskOpportunity,
 } from "@/lib/coach/types";
 import type { MemorySnippet } from "@/lib/coach/memorySnippets";
+import { isTrainingCurrent, stalenessClause, dedupeByText } from "@/lib/insights/consistency";
 import { buildTrainingEcosystemView } from "@/lib/training/ecosystemViewModel";
 import type { TrainingEcosystemView } from "@/lib/training/ecosystemViewModel";
 
@@ -138,6 +139,12 @@ export function getPrimaryRecommendation(
 }
 
 export function getTrajectorySeries(analytics: DashboardInsights): TrajectorySeries[] {
+  // Every interpretation below reads a trend as a training decision ("taper
+  // effect", "quality window", "check fatigue"). After a layoff the trends are
+  // real but the readings are not: volume is down because nothing was run, not
+  // because anything was tapered.
+  const current = isTrainingCurrent(analytics.fatigue);
+  const gap = stalenessClause(analytics.fatigue);
   const weeks = analytics.weeklyVolume.slice(-8);
   const volTrend =
     weeks.length >= 2 && weeks[weeks.length - 1]!.distanceKm > weeks[weeks.length - 2]!.distanceKm
@@ -152,8 +159,9 @@ export function getTrajectorySeries(analytics: DashboardInsights): TrajectorySer
     label: "Weekly volume",
     values: weeks.map((w) => ({ label: w.label, value: w.distanceKm })),
     trend: volTrend,
-    interpretation:
-      volTrend === "down"
+    interpretation: !current
+      ? `Paused · ${gap}`
+      : volTrend === "down"
         ? "Down this week · taper effect"
         : volTrend === "up"
           ? "Building · load rising"
@@ -176,8 +184,11 @@ export function getTrajectorySeries(analytics: DashboardInsights): TrajectorySer
       value: p.efficiency,
     })),
     trend: effTrend,
-    interpretation:
-      effTrend === "up"
+    // The strip splits interpretations on "·" for its direction chip, so every
+    // branch needs both halves or the chip repeats the whole sentence.
+    interpretation: !current
+      ? `Untested · last read before ${gap}`
+      : effTrend === "up"
         ? analytics.efficiencyMoM.narrative
           ? "Improving · MoM gain"
           : "Improving"
@@ -218,8 +229,9 @@ export function getTrajectorySeries(analytics: DashboardInsights): TrajectorySer
       ),
     })),
     trend: freshTrend,
-    interpretation:
-      analytics.fatigue.freshness >= 65
+    interpretation: !current
+      ? "Rested, not sharp · rebuild first"
+      : analytics.fatigue.freshness >= 65
         ? "High · quality window"
         : analytics.fatigue.freshness < 45
           ? "Low · ease intensity"
@@ -234,16 +246,20 @@ export function getCoachingStateBullets(
   analytics: DashboardInsights,
 ): string[] {
   const bullets: string[] = [];
-  if (analytics.fatigue.freshness >= 65) bullets.push("Freshness high");
+  const current = isTrainingCurrent(analytics.fatigue);
+  // "Freshness high" after two weeks off describes rest, not readiness to race;
+  // and "intensity stacking" describes a block that has already ended.
+  if (!current) bullets.push(`Out of training · ${stalenessClause(analytics.fatigue)}`);
+  else if (analytics.fatigue.freshness >= 65) bullets.push("Freshness high");
   else if (analytics.fatigue.freshness < 45) bullets.push("Freshness low");
   if (state.snapshot.readinessScore != null) {
     bullets.push(`Readiness ${state.snapshot.readinessLabel?.toLowerCase() ?? "stable"}`);
   }
-  if (analytics.efficiencySummary.trend === "improving") {
+  if (current && analytics.efficiencySummary.trend === "improving") {
     bullets.push("Aerobic adaptation improving");
   }
   if (analytics.intensityAdvice.status === "too_hard") {
-    bullets.push("Intensity stacking elevated");
+    bullets.push(current ? "Intensity stacking elevated" : "Last block was intensity-heavy");
   }
   if (state.snapshot.riskLevel !== "low") {
     bullets.push(state.snapshot.riskLabel);
