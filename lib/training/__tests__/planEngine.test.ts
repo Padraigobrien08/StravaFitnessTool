@@ -10,6 +10,7 @@ import type { FatigueSnapshot } from "@/lib/analytics/fatigue";
 import type { IntensityAdvice } from "@/lib/analytics/intensityAdvisor";
 import type { ConsistencyScore } from "@/lib/analytics/consistency";
 import type { WeekSnapshot } from "@/lib/analytics/week";
+import type { ReturnToRunningPlan } from "@/lib/returning/returnToRunning";
 
 const week: WeekSnapshot = {
   weekStart: "2025-05-12",
@@ -66,6 +67,7 @@ function baseContext(overrides: Partial<PlanContext> = {}): PlanContext {
     easyHardPct: 65,
     runsPerWeekTarget: 3,
     longestRunKm: 16,
+    returning: null,
     ...overrides,
   };
 }
@@ -183,5 +185,141 @@ describe("buildNextWeekPlan", () => {
   it("includes medical disclaimer in warnings", () => {
     const plan = buildNextWeekPlan(baseContext());
     expect(plan.warnings.some((w) => w.includes("Not a substitute"))).toBe(true);
+  });
+});
+
+describe("the comeback week comes from the athlete's own baseline", () => {
+  /** A returning plan shaped like lib/returning produces for a real gap. */
+  function returningPlan(
+    over: Partial<ReturnToRunningPlan> = {},
+    week: Partial<ReturnToRunningPlan["weeks"][number]> = {},
+  ): ReturnToRunningPlan {
+    return {
+      gapDays: 21,
+      baseline: { weeklyKm: 40, longestRunKm: 16, weeksSampled: 4 },
+      retention: { aerobicPct: 95, sharpnessPct: 88, note: "Endurance holds up." },
+      weeksToBaseline: 9,
+      firstStep: "Start with 3 easy runs this week.",
+      weeks: [
+        {
+          week: 1,
+          targetKm: 20,
+          longestRunKm: 8,
+          runs: 3,
+          quality: false,
+          focus: "Easy running only, on non-consecutive days",
+          ...week,
+        },
+      ],
+      ...over,
+    };
+  }
+
+  it("plans the ramp's first week rather than a fixed 12–20 km", () => {
+    const plan = buildNextWeekPlan(baseContext({ returning: returningPlan() }));
+    expect(plan.template).toBe("return");
+    expect(plan.totalKmRange[1]).toBe(20);
+    expect(plan.sessions).toHaveLength(3);
+  });
+
+  // The old fixed range told a 22 km/week athlete to run their usual volume and
+  // a 70 km/week athlete a quarter of theirs. The week has to scale.
+  it("scales with the athlete, not a constant", () => {
+    const small = buildNextWeekPlan(
+      baseContext({
+        returning: returningPlan(
+          { baseline: { weeklyKm: 20, longestRunKm: 8, weeksSampled: 4 } },
+          { targetKm: 10, longestRunKm: 4 },
+        ),
+      }),
+    );
+    const big = buildNextWeekPlan(
+      baseContext({
+        returning: returningPlan(
+          { baseline: { weeklyKm: 80, longestRunKm: 30, weeksSampled: 4 } },
+          { targetKm: 40, longestRunKm: 16 },
+        ),
+      }),
+    );
+    expect(big.totalKmRange[1]).toBeGreaterThan(small.totalKmRange[1] * 3);
+  });
+
+  // The other templates treat session ranges as guidance, so their upper bounds
+  // sum well past the stated week. On a comeback the week total is the point:
+  // running the top of every session must not overshoot it.
+  it("never sums the sessions above the ramp's target, even at the top of each range", () => {
+    for (const [targetKm, longestRunKm, runs] of [
+      [10, 4, 3],
+      [20, 8, 3],
+      [40, 16, 4],
+      [6, 2.4, 3],
+    ] as const) {
+      const plan = buildNextWeekPlan(
+        baseContext({ returning: returningPlan({}, { targetKm, longestRunKm, runs }) }),
+      );
+      const high = plan.sessions.reduce((s, x) => s + x.distanceKmRange[1], 0);
+      expect(high, `target ${targetKm}`).toBeLessThanOrEqual(targetKm + 0.1);
+      expect(high, `target ${targetKm}`).toBeGreaterThan(targetKm * 0.9);
+    }
+  });
+
+  it("holds all quality work while the ramp does", () => {
+    const plan = buildNextWeekPlan(baseContext({ returning: returningPlan() }));
+    expect(countHardSessions(plan)).toBe(0);
+    expect(plan.warnings.some((w) => /no quality work/i.test(w))).toBe(true);
+  });
+
+  it("spaces the runs so no two land on consecutive days", () => {
+    const order = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const plan = buildNextWeekPlan(baseContext({ returning: returningPlan() }));
+    const idx = plan.sessions.map((s) => order.indexOf(s.day!)).sort((a, b) => a - b);
+    for (let i = 1; i < idx.length; i++) expect(idx[i] - idx[i - 1]).toBeGreaterThan(1);
+  });
+
+  it("falls back to the generic return week when there is no baseline to ramp from", () => {
+    const plan = buildNextWeekPlan(
+      baseContext({
+        returning: returningPlan({ baseline: null, weeks: [] }),
+        currentWeek: { ...week, runCount: 0, distanceKm: 0 },
+        previousWeek: { ...week, runCount: 0, distanceKm: 0 },
+      }),
+    );
+    expect(plan.template).toBe("return");
+    expect(plan.totalKmRange).toEqual([12, 20]);
+  });
+
+  it("still plans race day mid-comeback, but says what it is", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2025-05-14T08:00:00Z"));
+    try {
+      const plan = buildNextWeekPlan(
+        baseContext({
+          returning: returningPlan(),
+          raceReadiness: {
+            distance: "hm",
+            distanceLabel: "Half marathon",
+            daysUntilRace: 4,
+            raceDate: "2025-05-18",
+            score: 40,
+            label: "In training",
+            probabilityBand: "Off track",
+            longestRunKm: 16,
+            longestRunPct: 75,
+            fourWeekVolumeKm: 20,
+            volumePct: 15,
+            gaps: [],
+          },
+        }),
+      );
+      expect(plan.template).toBe("race_week");
+      expect(plan.warnings.some((w) => /participation effort/i.test(w))).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("leaves a currently-training athlete's week alone", () => {
+    const plan = buildNextWeekPlan(baseContext({ returning: null }));
+    expect(plan.template).not.toBe("return");
   });
 });

@@ -211,6 +211,41 @@ describe("the primary action tells a returning athlete to start running", () => 
   });
 });
 
+describe("Home and the weekly planner agree on the comeback week", () => {
+  // They used to disagree: the hero quoted the returning ramp's first week
+  // while nextWeekPlan quoted a hardcoded 12–20 km, so the same athlete saw two
+  // different targets on two screens. One source, one number.
+  const runs = blockThenGap(11);
+
+  it("plans the ramp's first week, not a fixed range", () => {
+    const { analytics } = compose(runs);
+    const w1 = analytics.returning!.weeks[0]!;
+    expect(analytics.nextWeekPlan.template).toBe("return");
+    expect(analytics.nextWeekPlan.totalKmRange[1]).toBe(w1.targetKm);
+    expect(analytics.nextWeekPlan.sessions).toHaveLength(w1.runs);
+  });
+
+  it("quotes the same weekly total the hero does", () => {
+    const { analytics, home } = compose(runs);
+    const planned = analytics.nextWeekPlan.totalKmRange[1];
+    expect(home.hero.primaryAction).toContain(String(planned));
+  });
+
+  it("sizes the week to the athlete rather than a constant", () => {
+    // Two athletes, same gap, very different pre-gap volume.
+    const light: RunActivity[] = [];
+    const heavy: RunActivity[] = [];
+    for (let i = 0; i < 18; i++) {
+      const daysAgo = 11 + (18 - i) * 3;
+      light.push(mkRun(daysAgo, { distanceM: 5000, avgHr: 150 }));
+      heavy.push(mkRun(daysAgo, { distanceM: 20000, avgHr: 150 }));
+    }
+    const lightKm = compose(light).analytics.nextWeekPlan.totalKmRange[1];
+    const heavyKm = compose(heavy).analytics.nextWeekPlan.totalKmRange[1];
+    expect(heavyKm).toBeGreaterThan(lightKm * 2);
+  });
+});
+
 describe("intensity balance is not read as sound during a layoff", () => {
   it("reports paused rather than insufficient data when there is history", () => {
     const { analytics } = compose(blockThenGap(11));
