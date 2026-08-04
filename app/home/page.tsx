@@ -69,7 +69,7 @@ export default function HomePage() {
   return (
     <RequireData>
       {analytics && vm && (
-        <div className="dashboard-enter mx-auto w-full max-w-6xl px-0 pb-6">
+        <div className="dashboard-enter w-full px-0 pb-6">
           <HomeConsole
             vm={vm}
             analytics={analytics}

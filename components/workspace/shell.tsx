@@ -11,10 +11,15 @@ import { CommandPalette, openCommandPalette } from "@/components/command-palette
 import { cn } from "@/lib/utils";
 import { Settings, Search } from "lucide-react";
 
-/** Usable workspace width on large displays */
-export const WORKSPACE_MAX = "max-w-[1500px]";
-/** Coach: wider than default pages, with modest side gutters on ultra-wide screens */
-export const COACH_WORKSPACE_MAX = "max-w-[1720px]";
+/**
+ * Usable workspace width on large displays. This frame is the single place that
+ * caps content: pages used to re-clamp themselves to max-w-5xl/6xl on top of it,
+ * which rendered dashboards in a ~1024px column on a wide monitor and read as a
+ * tablet layout.
+ */
+export const WORKSPACE_MAX = "max-w-[1720px]";
+/** Coach matches the rest of the app; kept as a named export for clarity. */
+export const COACH_WORKSPACE_MAX = WORKSPACE_MAX;
 
 export function WorkspaceFrame({
   children,

@@ -6,7 +6,7 @@ import { PlanTabs } from "@/components/plan/plan-tabs";
 
 function PlanPageFallback() {
   return (
-    <div className="mx-auto max-w-7xl space-y-4 pb-12">
+    <div className="space-y-4 pb-12">
       <div className="skeleton-shimmer h-10 w-64 rounded" />
       <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
         <div className="skeleton-shimmer h-64 rounded-xl" />
