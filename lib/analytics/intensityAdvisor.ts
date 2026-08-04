@@ -4,7 +4,13 @@ import { runsInLastNDays } from "./week";
 import { parseISO, subDays } from "date-fns";
 
 export interface IntensityAdvice {
-  status: "balanced" | "too_hard" | "too_easy" | "insufficient_data";
+  /**
+   * `paused` means there is history to read but nothing in the last week, so
+   * the easy/hard mix describes a block that has ended. It used to be folded
+   * into `insufficient_data`, which is a different claim ("we cannot tell")
+   * and led consumers that branch on `too_hard` to render a layoff as balanced.
+   */
+  status: "balanced" | "too_hard" | "too_easy" | "paused" | "insufficient_data";
   easyTargetPct: number;
   currentEasyPct: number;
   hardRunsLast14d: number;
@@ -48,14 +54,17 @@ export function buildIntensityAdvice(
   }
 
   if (last7Runs === 0) {
+    const hasHistory = easyHardLifetime.easy + easyHardLifetime.hard > 0;
     return {
-      status: "insufficient_data",
+      status: hasHistory ? "paused" : "insufficient_data",
       easyTargetPct,
       currentEasyPct,
       hardRunsLast14d: easyHard14d.hard,
       recommendations: [
         ...recommendations,
-        "No runs in the last 7 days: resume with one easy 30–40 minute run.",
+        hasHistory
+          ? "No runs in the last 7 days: the mix below describes your last block, not this week. Resume with one easy 30–40 minute run."
+          : "No runs in the last 7 days: resume with one easy 30–40 minute run.",
       ],
       suggestedWeekPlan: [
         { type: "easy", description: "1 easy run: 30–40 min, conversational pace" },

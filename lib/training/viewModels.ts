@@ -338,7 +338,10 @@ function buildExplain(
     "Recommendations are heuristic: confirm with feel, soreness, and life stress.",
     "Race plans assume your stated goal date and recent volume are accurate.",
   ];
-  if (analytics.intensityAdvice.status === "insufficient_data") {
+  if (
+    analytics.intensityAdvice.status === "insufficient_data" ||
+    analytics.intensityAdvice.status === "paused"
+  ) {
     limitations.push("Limited recent running: plan is conservative until volume returns.");
   }
 

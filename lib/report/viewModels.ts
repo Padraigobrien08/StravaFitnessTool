@@ -177,7 +177,13 @@ function synthesizeSignals(
     });
   }
 
-  if (analytics.intensityAdvice.status === "too_hard") {
+  if (analytics.intensityAdvice.status === "paused") {
+    signals.push({
+      text: "Intensity balance cannot be read this week.",
+      significance: `The ${hardPct}% hard share describes your last block: nothing has been run in the last 7 days.`,
+      tone: "neutral",
+    });
+  } else if (analytics.intensityAdvice.status === "too_hard") {
     signals.push({
       text: "Intensity balance remains elevated.",
       significance: `${hardPct}% hard share vs ~${100 - analytics.intensityAdvice.easyTargetPct}% target hard ceiling.`,
@@ -241,11 +247,13 @@ function buildExecutive(
 
   const opportunity =
     goals.hero.biggestLimiter ||
-    (analytics.intensityAdvice.status === "too_hard"
-      ? "Reduce intensity density slightly before race week."
-      : analytics.fatigue.tsb < -10
-        ? "Prioritize recovery before adding race-specific sharpness."
-        : "Add one race-pace touchpoint while holding easy volume.");
+    (analytics.intensityAdvice.status === "paused"
+      ? "Get back to consistent easy running before anything else."
+      : analytics.intensityAdvice.status === "too_hard"
+        ? "Reduce intensity density slightly before race week."
+        : analytics.fatigue.tsb < -10
+          ? "Prioritize recovery before adding race-specific sharpness."
+          : "Add one race-pace touchpoint while holding easy volume.");
 
   const projected =
     readiness.score >= 72

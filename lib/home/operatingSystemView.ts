@@ -226,8 +226,11 @@ function buildOperationalStateLine(analytics: DashboardInsights): string {
   parts.push(`Freshness ${Math.round(analytics.fatigue.freshness)}`);
   if (analytics.intensityAdvice.status === "too_hard") {
     parts.push("intensity elevated");
-  } else {
+  } else if (analytics.intensityAdvice.status === "balanced") {
     parts.push("intensity balanced");
+  } else {
+    // too_easy, paused and insufficient_data are all "we can't call it balanced".
+    parts.push("intensity unread");
   }
   if (analytics.raceReadiness && analytics.raceReadiness.daysUntilRace <= 14) {
     parts.push("taper active");

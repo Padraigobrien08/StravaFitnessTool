@@ -184,6 +184,58 @@ describe("no surface makes a stale claim", () => {
   });
 });
 
+describe("the primary action tells a returning athlete to start running", () => {
+  // Everything else on Home answers "how should this week be shaped", which is
+  // the wrong question after a layoff. The returning plan already computes the
+  // right answer from the athlete's own pre-gap baseline; the hero has to use it.
+  const runs = blockThenGap(11);
+
+  it("leads with the comeback's first step, not a training adjustment", () => {
+    const { analytics, home } = compose(runs);
+    expect(analytics.returning).not.toBeNull();
+    expect(home.hero.primaryAction).toContain(analytics.returning!.firstStep);
+    expect(home.today.why).toMatch(/easy runs? this week/i);
+  });
+
+  it("says how long the way back is", () => {
+    const { analytics, home } = compose(runs);
+    expect(home.hero.primaryAction).toContain(String(analytics.returning!.weeksToBaseline));
+  });
+
+  it("still answers the training question once the athlete is back", () => {
+    const current: RunActivity[] = [];
+    for (let d = 60; d >= 0; d -= 2) current.push(mkRun(d, { distanceM: 11000, avgHr: 150 }));
+    const { analytics, home } = compose(current);
+    expect(analytics.returning).toBeNull();
+    expect(home.hero.primaryAction).not.toMatch(/rebuilding from/i);
+  });
+});
+
+describe("intensity balance is not read as sound during a layoff", () => {
+  it("reports paused rather than insufficient data when there is history", () => {
+    const { analytics } = compose(blockThenGap(11));
+    expect(analytics.intensityAdvice.status).toBe("paused");
+  });
+
+  it("says insufficient data only when there is nothing to read", () => {
+    const { analytics } = compose([]);
+    expect(analytics.intensityAdvice.status).toBe("insufficient_data");
+  });
+
+  it("keeps calling a genuinely balanced block balanced", () => {
+    const runs: RunActivity[] = [];
+    // Mostly easy: low HR against the fixture's max keeps these out of the hard bucket.
+    for (let d = 60; d >= 0; d -= 2) runs.push(mkRun(d, { distanceM: 9000, avgHr: 120 }));
+    const { analytics } = compose(runs);
+    expect(analytics.intensityAdvice.status).toBe("balanced");
+  });
+
+  it("never calls the state line balanced with nothing run this week", () => {
+    const { home } = compose(blockThenGap(11));
+    expect(home.today.stateLine).not.toMatch(/intensity balanced/i);
+  });
+});
+
 describe("a currently training athlete is unaffected", () => {
   // The whole point is to suppress claims that are wrong, not to mute the app.
   it("still says plenty, and may legitimately mention quality work", () => {

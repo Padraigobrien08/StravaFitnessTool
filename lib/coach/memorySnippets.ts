@@ -29,7 +29,11 @@ export function buildMemorySnippets(analytics: DashboardInsights | null): Memory
       id: "intensity",
       label: "Intensity pattern",
       text: analytics.intensityAdvice.recommendations[0],
-      confidence: analytics.intensityAdvice.status === "insufficient_data" ? "low" : "medium",
+      confidence:
+        analytics.intensityAdvice.status === "insufficient_data" ||
+        analytics.intensityAdvice.status === "paused"
+          ? "low"
+          : "medium",
     });
   }
 

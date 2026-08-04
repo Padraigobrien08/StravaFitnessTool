@@ -439,7 +439,15 @@ function buildAdaptationTrends(
 function buildDistribution(analytics: DashboardInsights): PerformanceDistributionView {
   const adv = analytics.intensityAdvice;
   const correlations: string[] = [];
-  if (analytics.efficiencySummary.trend === "improving" && adv.currentEasyPct >= 70) {
+  // The distribution below is real, but with nothing run this week it belongs
+  // to the last block: say so instead of reading it as the current balance.
+  const paused = adv.status === "paused";
+  if (paused) {
+    correlations.push(
+      "This distribution is from your last block: nothing has been run in the last 7 days.",
+    );
+  }
+  if (!paused && analytics.efficiencySummary.trend === "improving" && adv.currentEasyPct >= 70) {
     correlations.push(
       "Recent gains align with a strong easy-volume base and controlled hard-session density.",
     );

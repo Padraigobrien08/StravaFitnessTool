@@ -403,13 +403,15 @@ function buildHero(
 
   const limiter =
     r.gaps[0]?.metric ??
-    (analytics.fatigue.tsb < -10
-      ? "Fatigue accumulation"
-      : analytics.intensityAdvice.status === "too_hard"
-        ? "Threshold density slightly elevated"
-        : r.volumePct < 60
-          ? "Volume below target block"
-          : "Limited race-specific benchmarks");
+    (analytics.intensityAdvice.status === "paused"
+      ? "Time away from running"
+      : analytics.fatigue.tsb < -10
+        ? "Fatigue accumulation"
+        : analytics.intensityAdvice.status === "too_hard"
+          ? "Threshold density slightly elevated"
+          : r.volumePct < 60
+            ? "Volume below target block"
+            : "Limited race-specific benchmarks");
 
   const targetDisplay = goal?.targetTimeSec
     ? formatDuration(goal.targetTimeSec)
