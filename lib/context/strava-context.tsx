@@ -23,6 +23,7 @@ import { FitRunDetailSchema } from "@/lib/strava/fitTypes";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useGoalStore } from "@/stores/goal-store";
+import { useReturnTargetStore } from "@/stores/return-target-store";
 import { useFeelStore, selectTodayLegFeel } from "@/stores/feel-store";
 import { buildDemoImport, demoRaceGoal, DEMO_EXPORT_LABEL } from "@/lib/demo/generateDemoData";
 
@@ -198,6 +199,7 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
   const defaultWeeklyRuns = useSettingsStore((s) => s.defaultWeeklyRuns);
   const maxWeeklyKm = useSettingsStore((s) => s.maxWeeklyKm);
   const raceGoal = useGoalStore((s) => s.raceGoal);
+  const returnTargetKm = useReturnTargetStore((s) => s.weeklyKm);
   const legFeel = useFeelStore(selectTodayLegFeel);
   const feelByDate = useFeelStore((s) => s.byDate);
   const feelHistory = useMemo(
@@ -220,12 +222,22 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
         maxWeeklyKm > 0 ? maxWeeklyKm : undefined,
         legFeel,
         feelHistory,
+        returnTargetKm,
       );
     } catch (err) {
       console.error("computeInsights failed:", err);
       return null;
     }
-  }, [effectiveImport, fitDetails, defaultWeeklyRuns, raceGoal, maxWeeklyKm, legFeel, feelHistory]);
+  }, [
+    effectiveImport,
+    fitDetails,
+    defaultWeeklyRuns,
+    raceGoal,
+    maxWeeklyKm,
+    legFeel,
+    feelHistory,
+    returnTargetKm,
+  ]);
 
   const importFitFiles = useCallback(
     async (files: File[]) => {

@@ -129,7 +129,7 @@ export function getPrimaryRecommendation(
   const returning = analytics.returning;
   if (returning) {
     const context = returning.baseline
-      ? ` You're rebuilding from ${stalenessClause(analytics.fatigue)}: at this rate you're back to your usual ${returning.baseline.weeklyKm} km week in about ${returning.weeksToBaseline} weeks.`
+      ? ` You're rebuilding from ${stalenessClause(analytics.fatigue)}: at this rate you reach ${returning.target?.weeklyKm ?? returning.baseline.weeklyKm} km/wk in about ${returning.weeksToTarget} weeks.`
       : ` You're rebuilding from ${stalenessClause(analytics.fatigue)}: judge next week from how these feel.`;
     return returning.firstStep + context;
   }

@@ -198,7 +198,14 @@ describe("the comeback week comes from the athlete's own baseline", () => {
       gapDays: 21,
       baseline: { weeklyKm: 40, longestRunKm: 16, weeksSampled: 4 },
       retention: { aerobicPct: 95, sharpnessPct: 88, note: "Endurance holds up." },
-      weeksToBaseline: 9,
+      weeksToTarget: 9,
+      target: {
+        source: "pre-gap" as const,
+        weeklyKm: 40,
+        label: "Back to before the gap",
+        detail: "",
+      },
+      targetOptions: [],
       firstStep: "Start with 3 easy runs this week.",
       weeks: [
         {

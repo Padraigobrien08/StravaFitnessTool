@@ -6,6 +6,7 @@ import { Eyebrow, Panel, StatItem } from "@/components/console/console-kit";
 import { coachUrl } from "@/lib/coach/domainLinks";
 import { formatKm } from "@/lib/utils";
 import type { ReturnToRunningPlan } from "@/lib/returning/returnToRunning";
+import { useReturnTargetStore } from "@/stores/return-target-store";
 
 /**
  * Shown instead of the usual verdict when the athlete has been away. Load-based
@@ -40,13 +41,26 @@ export function ReturningCard({ plan }: { plan: ReturnToRunningPlan }) {
 
       {plan.baseline ? (
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-[var(--border-subtle)] pt-3">
-          <StatItem label="Your usual week" value={formatKm(plan.baseline.weeklyKm)} />
+          {/* "Before the gap", not "your usual week": this is a description of
+              the weeks sampled, and those can be a wind-down after a goal race
+              as easily as normal training. */}
+          <StatItem label="Before the gap" value={`${formatKm(plan.baseline.weeklyKm)}/wk`} />
           <StatItem label="Week 1 target" value={formatKm(first!.targetKm)} hot />
-          <StatItem
-            label="Back to usual"
-            value={`~${plan.weeksToBaseline} wk${plan.weeksToBaseline === 1 ? "" : "s"}`}
-          />
+          {plan.target ? (
+            <StatItem
+              label={`To ${formatKm(plan.target.weeklyKm)}/wk`}
+              value={`~${plan.weeksToTarget} wk${plan.weeksToTarget === 1 ? "" : "s"}`}
+            />
+          ) : null}
         </div>
+      ) : null}
+
+      {plan.targetOptions.length > 1 ? (
+        <TargetPicker plan={plan} />
+      ) : plan.target ? (
+        <p className="mt-2 text-[11px] leading-snug text-zinc-500">
+          Building back toward {formatKm(plan.target.weeklyKm)}/wk. {plan.target.detail}
+        </p>
       ) : null}
 
       {plan.weeks.length > 0 ? (
@@ -70,8 +84,9 @@ export function ReturningCard({ plan }: { plan: ReturnToRunningPlan }) {
       ) : null}
 
       <p className="mt-3 text-[10px] leading-snug text-zinc-600">
-        Built from your own pre-gap training. Conservative on purpose, and not medical advice: if
-        you are coming back from injury or illness, follow whoever is treating you.
+        The ramp starts from what you were running before the gap and climbs about 10% a week.
+        Conservative on purpose, and not medical advice: if you are coming back from injury or
+        illness, follow whoever is treating you.
       </p>
 
       <Link
@@ -81,6 +96,48 @@ export function ReturningCard({ plan }: { plan: ReturnToRunningPlan }) {
         Plan the comeback in Coach <ArrowRight className="h-3 w-3" />
       </Link>
     </Panel>
+  );
+}
+
+/**
+ * Lets the athlete say where they are heading.
+ *
+ * Whether the weeks before a gap were normal training or a wind-down after a
+ * goal race decides the target, and no volume statistic can tell the two apart
+ * — measurement over seven real gaps had every estimator wrong by 2× or more in
+ * both directions. Asking is both more accurate and cheaper than inferring.
+ */
+function TargetPicker({ plan }: { plan: ReturnToRunningPlan }) {
+  const setWeeklyKm = useReturnTargetStore((s) => s.setWeeklyKm);
+  const chosen = plan.target;
+
+  return (
+    <div className="mt-3 border-t border-[var(--border-subtle)] pt-3">
+      <Eyebrow className="mb-2">Building back toward</Eyebrow>
+      <div className="flex flex-wrap gap-1.5">
+        {plan.targetOptions.map((o) => {
+          const active = chosen?.weeklyKm === o.weeklyKm;
+          return (
+            <button
+              key={o.source}
+              type="button"
+              onClick={() => setWeeklyKm(o.weeklyKm)}
+              aria-pressed={active}
+              className={`rounded-full px-2.5 py-1 text-[11px] font-medium ring-1 transition-colors ${
+                active
+                  ? "bg-[var(--home-signal)] text-black ring-transparent"
+                  : "bg-[var(--surface-subdued)] text-zinc-300 ring-[var(--border-subtle)] hover:text-foreground"
+              }`}
+            >
+              {o.label} · {formatKm(o.weeklyKm)}/wk
+            </button>
+          );
+        })}
+      </div>
+      {chosen ? (
+        <p className="mt-2 text-[11px] leading-snug text-zinc-500">{chosen.detail}</p>
+      ) : null}
+    </div>
   );
 }
 
