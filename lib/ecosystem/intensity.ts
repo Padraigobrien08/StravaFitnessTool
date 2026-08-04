@@ -1,4 +1,5 @@
 import type { IntensityInference, NormalizedActivity, PerceivedIntensity } from "./types";
+import { sportTypeLabel } from "./modality";
 
 const HEAVY_KEYWORDS = [
   "heavy",
@@ -138,7 +139,7 @@ export function inferActivityIntensity(
     return {
       level: "low",
       confidence: "low",
-      evidence: [`${sportType} without HR: low-moderate assumed`],
+      evidence: [`${sportTypeLabel(sportType)} without HR: low-moderate assumed`],
     };
   }
 
@@ -156,7 +157,7 @@ export function inferActivityIntensity(
     return {
       level: movingTimeSec > 3600 ? "moderate" : "low",
       confidence: "low",
-      evidence: [`${sportType} cross-training duration-based estimate`],
+      evidence: [`${sportTypeLabel(sportType)} cross-training duration-based estimate`],
     };
   }
 
@@ -211,7 +212,7 @@ export function inferActivityPurpose(
   if (modality === "aerobic_cross_training") {
     return perceivedIntensity === "low"
       ? "Low-impact aerobic support"
-      : `${sportType} cross-training: supports endurance base`;
+      : `${sportTypeLabel(sportType)} cross-training: supports endurance base`;
   }
   return "General training activity";
 }

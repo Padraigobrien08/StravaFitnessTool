@@ -107,6 +107,15 @@ export function formatTrajectoryDisplay(item: StateEvolutionItem): {
   const interp = item.interpretation.replace(/^·\s*/, "").trim();
   const dir = item.direction.trim();
 
+  // The interpretation is already currency-aware; the decorative defaults below
+  // are not, because they are inferred from `trend` alone. During a layoff the
+  // interpretation says everything there is to say, so it stands on its own.
+  if (item.stale) {
+    if (item.id === "volume" || item.id === "freshness" || item.id === "efficiency") {
+      return { headline: interp || dir, sub: "" };
+    }
+  }
+
   if (item.id === "readiness") {
     const level = item.trend === "flat" ? "Stable" : dir;
     return {

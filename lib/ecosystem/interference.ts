@@ -3,6 +3,7 @@ import type { RaceGoal } from "@/lib/analytics/readiness";
 import type { InterferenceFlag, NormalizedActivity } from "./types";
 import { isQualityRun } from "./aggregates";
 import { inWindow } from "./aggregates";
+import { sportTypeLabel } from "./modality";
 
 const MS_DAY = 86400000;
 const MS_HOUR = 3600000;
@@ -50,10 +51,10 @@ export function detectInterference(
           // scheduled session, most visibly for an athlete with no plan saved
           // and no run in over a week.
           nrTime < runTime
-            ? `${nr.sportType} landed ${Math.round(hours)}h before a key run: that run's quality may have been compromised.`
-            : `${nr.sportType} followed a key run within ${Math.round(hours)}h: recovery context may be compressed.`,
+            ? `${sportTypeLabel(nr.sportType)} landed ${Math.round(hours)}h before a key run: that run's quality may have been compromised.`
+            : `${sportTypeLabel(nr.sportType)} followed a key run within ${Math.round(hours)}h: recovery context may be compressed.`,
         evidence: [
-          `Non-run: ${nr.sportType}, ${Math.round(nr.movingTimeSec / 60)} min, ${nr.perceivedIntensity} intensity`,
+          `Non-run: ${sportTypeLabel(nr.sportType)}, ${Math.round(nr.movingTimeSec / 60)} min, ${nr.perceivedIntensity} intensity`,
           `Run anchor: ${run.name}`,
           `Separation: ${Math.round(hours)} hours`,
         ],
@@ -135,7 +136,9 @@ export function detectHybridLoadClusters(
         nonRunDate: sorted[i].startDate,
         hoursApart: clusterDays * 24,
         message: `Hard run + HIIT/strength clustered within ${clusterDays} days: hybrid load concentration.`,
-        evidence: cluster.map((a) => `${a.sportType}: ${a.name} (${a.perceivedIntensity})`),
+        evidence: cluster.map(
+          (a) => `${sportTypeLabel(a.sportType)}: ${a.name} (${a.perceivedIntensity})`,
+        ),
         confidence: "medium",
       });
       i += cluster.length - 1;
@@ -175,8 +178,8 @@ export function detectRaceWeekInterference(
         hoursApart: Math.round(daysToRace * 24),
         message:
           daysToRace <= 2
-            ? `High-load ${a.sportType} within ${Math.round(daysToRace)}d of race: may increase fatigue before race day.`
-            : `${a.sportType} in race week: monitor stacking with taper runs.`,
+            ? `High-load ${sportTypeLabel(a.sportType)} within ${Math.round(daysToRace)}d of race: may increase fatigue before race day.`
+            : `${sportTypeLabel(a.sportType)} in race week: monitor stacking with taper runs.`,
         evidence: [
           `Race date: ${raceGoal.date}`,
           `Activity ${Math.round(daysToRace)}d before race`,

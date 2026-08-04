@@ -9,6 +9,7 @@ import type { WeekPlan, PlannedSession } from "@/lib/training/planEngine";
 import { formatKm, formatKmRange, formatKmValue } from "@/lib/utils";
 import { WORKOUT_TYPE_LABELS } from "@/lib/analytics/workoutType";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
+import { isTrainingCurrent, stalenessClause } from "@/lib/insights/consistency";
 
 export type TrainingStateSeverity = "positive" | "neutral" | "warning" | "critical";
 
@@ -427,18 +428,31 @@ export function buildTrainingPageView(
   }));
 
   const mom = analytics.efficiencyMoM;
-  const adaptationHeadline =
-    analytics.efficiencySummary.trend === "improving"
+  // The efficiency reading is only as current as the running behind it. After a
+  // layoff it is a record of where the athlete left off, so it cannot be a
+  // present-tense trend and fatigue cannot be the thing to check.
+  const trainingCurrent = isTrainingCurrent(analytics.fatigue);
+  const gap = stalenessClause(analytics.fatigue);
+  const adaptationHeadline = !trainingCurrent
+    ? `Aerobic efficiency untested: last read before ${gap}`
+    : analytics.efficiencySummary.trend === "improving"
       ? "Aerobic efficiency improving"
       : analytics.efficiencySummary.trend === "declining"
         ? "Efficiency slipping: check fatigue"
         : "Aerobic efficiency stable";
 
-  const adaptationInterp =
-    mom.narrative ??
-    (analytics.efficiencySummary.trend === "improving"
-      ? "You are tending to run faster at similar heart rates versus your prior block."
-      : "Efficiency index tracks pace÷HR: lower is better. Needs more HR-tagged runs for precision.");
+  const adaptationInterp = !trainingCurrent
+    ? `Where you left off: ${
+        analytics.efficiencySummary.trend === "declining"
+          ? "the trend was softening"
+          : analytics.efficiencySummary.trend === "improving"
+            ? "the trend was improving"
+            : "the trend was flat"
+      }. Re-measure it over your first two weeks back before reading anything into it.`
+    : (mom.narrative ??
+      (analytics.efficiencySummary.trend === "improving"
+        ? "You are tending to run faster at similar heart rates versus your prior block."
+        : "Efficiency index tracks pace÷HR: lower is better. Needs more HR-tagged runs for precision."));
 
   return {
     hero,

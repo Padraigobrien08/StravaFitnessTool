@@ -1,5 +1,6 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import { archetypeDisplayLabel, modalityLabel } from "@/lib/ecosystem";
+import { sportTypeLabel } from "@/lib/ecosystem/modality";
 import type { ActivityModality, TrainingEcosystemAnalysis } from "@/lib/ecosystem/types";
 
 export interface ModalityDistributionRow {
@@ -148,7 +149,7 @@ export function buildTrainingEcosystemView(analytics: DashboardInsights): Traini
     .map((f) => ({
       id: f.id,
       severity: f.severity,
-      title: `${f.nonRunSportType} · ${f.kind.replace(/_/g, " ")}`,
+      title: `${sportTypeLabel(f.nonRunSportType)} · ${f.kind.replace(/_/g, " ")}`,
       message: f.message,
       evidence: f.evidence,
     }));
@@ -219,7 +220,7 @@ export function buildReportEcosystemView(analytics: DashboardInsights): ReportEc
       .slice(0, 4),
     limitations: eco.limitations,
     sportMix: eco.totalContext.sportMix.map((s) => ({
-      label: `${modalityLabel(s.modality)} · ${s.sportType}`,
+      label: `${modalityLabel(s.modality)} · ${sportTypeLabel(s.sportType)}`,
       count: s.count,
     })),
   };
