@@ -58,7 +58,7 @@ export function IntelligenceRecommendationOutcomes({
       <p className="mt-1 text-[11px] text-zinc-600">
         {summary.adherenceRatePct != null
           ? `${summary.adherenceRatePct}% adherence across ${summary.resolved} evaluated`
-          : `${summary.total} recorded — evaluating as days pass`}
+          : `${summary.total} recorded, evaluating as days pass`}
         {summary.signalEvaluated > 0
           ? ` · ${summary.supported} worked${summary.contradicted > 0 ? `, ${summary.contradicted} backfired` : ""}`
           : ""}

@@ -56,7 +56,7 @@ export function calendarConstraintsForCoach(payload: CalendarCoachPayload): stri
   if (payload.savedCalendarWeek) {
     notes.push(payload.summaryText);
     notes.push(
-      "User may ask to modify the saved plan — return changes as an updated weekly plan preview; user must save to calendar.",
+      "User may ask to modify the saved plan: return changes as an updated weekly plan preview; user must save to calendar.",
     );
   }
   if (payload.unsavedGeneratedPlan) {

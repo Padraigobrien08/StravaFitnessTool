@@ -129,9 +129,9 @@ function buildProjection(
     confidenceReducers.push("Incomplete training load on activities");
   }
   if (!goal?.targetTimeSec && primary && primary.spreadSec > 120) {
-    confidenceReducers.push("Wide model spread — outcome less certain");
+    confidenceReducers.push("Wide model spread: outcome less certain");
   }
-  confidenceReducers.push("No sleep/HRV — subjective freshness not modeled");
+  confidenceReducers.push("No sleep/HRV: subjective freshness not modeled");
 
   const confidenceLabel =
     analysis.confidence === "high"
@@ -168,7 +168,7 @@ function buildProjection(
     confidenceDrivers: confidenceDrivers.slice(0, 5),
     confidenceReducers: confidenceReducers.slice(0, 5),
     pacingNote: primary
-      ? `Even-effort ~${formatPace(primary.timeSec / primary.distanceKm)} — adjust for course and weather.`
+      ? `Even-effort ~${formatPace(primary.timeSec / primary.distanceKm)}. Adjust for course and weather.`
       : null,
     fadeRisk:
       analytics.fatigue.tsb < -15
@@ -288,7 +288,7 @@ function buildRisks(
     risks.push({
       title: "Elevated fatigue",
       severity: "high",
-      evidence: `TSB ${analytics.fatigue.tsb} — acute load exceeds recovery.`,
+      evidence: `TSB ${analytics.fatigue.tsb}: acute load exceeds recovery.`,
       mitigation: "Reduce intensity 5–7 days; prioritize sleep before race week.",
       confidence: "high",
     });
@@ -296,7 +296,7 @@ function buildRisks(
 
   for (const w of analytics.trainingEcosystem.raceWeekWarnings.slice(0, 2)) {
     risks.push({
-      title: "Race week — non-run intensity",
+      title: "Race week: non-run intensity",
       severity: w.severity === "high" ? "high" : "medium",
       evidence: w.message,
       mitigation:
@@ -348,7 +348,7 @@ function buildRisks(
       title: "Race-day variables",
       severity: "low",
       evidence:
-        "Training signals are balanced — weather, fueling, and pacing discipline still matter.",
+        "Training signals are balanced; weather, fueling, and pacing discipline still matter.",
       mitigation: "Rehearse nutrition and first 5 km pacing.",
       confidence: "medium",
     });
@@ -487,7 +487,7 @@ export function buildGoalsPageView(
         : "Single-anchor Riegel extrapolation for longer distances",
     ],
     limitations: [
-      "Not medical advice — confirm with coach or physician if injured.",
+      "Not medical advice: confirm with coach or physician if injured.",
       "Race-day adrenaline and course profile can shift outcomes ± model spread.",
       ...projection.confidenceReducers.slice(0, 2),
     ],
@@ -516,7 +516,7 @@ export function buildGoalsPageView(
         value:
           b < a
             ? "Consensus time trending faster over sampled weeks"
-            : "Consensus time stable or easing — check freshness",
+            : "Consensus time stable or easing: check freshness",
       });
     }
   }

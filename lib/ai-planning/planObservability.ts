@@ -93,7 +93,7 @@ export function buildExplainResponse(
         ? `Evidence: ${plan.rationale.evidenceUsed.join("; ")}`
         : "",
       plan.rationale.tradeoffs.join(" "),
-      "Hard sessions are capped and volume is reduced so you arrive rested — not to build new fitness.",
+      "Hard sessions are capped and volume is reduced so you arrive rested, not to build new fitness.",
     ]
       .filter(Boolean)
       .join("\n\n");
@@ -101,7 +101,7 @@ export function buildExplainResponse(
   if (topic === "pb") {
     return [
       "Chasing a PB on taper week is higher risk: the plan prioritizes freshness over sharpening load.",
-      "If you want more race-specific work, we can add a short controlled session — but that trades some freshness.",
+      "If you want more race-specific work, we can add a short controlled session, but that trades some freshness.",
       `Current plan confidence: ${plan.confidence}. Limitations: ${plan.limitations[0] ?? "adjust based on feel"}.`,
     ].join("\n\n");
   }

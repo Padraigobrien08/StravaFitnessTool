@@ -33,7 +33,7 @@ export function ProjectionCurvePanel({
     <Panel>
       <Eyebrow className="mb-2.5">Performance projection curve</Eyebrow>
       <p className="mb-3 text-xs leading-snug text-zinc-500">
-        Your efforts mapped to distance — shaded region is the best-fit corridor for{" "}
+        Your efforts mapped to distance. Shaded region is the best-fit corridor for{" "}
         {targetDistanceLabel}. Outliers are recent hard sessions, not necessarily race pace.
       </p>
 

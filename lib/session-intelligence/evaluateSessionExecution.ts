@@ -75,7 +75,7 @@ export function evaluateSessionExecution(
 
   let hrAssessment: string | undefined;
   if (scored.hrDriftPct != null && scored.hrDriftPct > 8) {
-    hrAssessment = "HR drift appears elevated — may indicate heat, fatigue, or pacing early";
+    hrAssessment = "HR drift appears elevated: may indicate heat, fatigue, or pacing early";
   } else if (run.avgHr != null) {
     hrAssessment = `Average HR ${run.avgHr} bpm for session type`;
   }

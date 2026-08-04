@@ -45,7 +45,7 @@ export function buildDefaultInvestigation(
   );
   if (analytics.raceReadiness?.daysUntilRace != null) {
     evidence.push(
-      `Race in ${analytics.raceReadiness.daysUntilRace} days — ${analytics.raceReadiness.distanceLabel}`,
+      `Race in ${analytics.raceReadiness.daysUntilRace} days: ${analytics.raceReadiness.distanceLabel}`,
     );
   }
   if (analytics.intensityAdvice.status === "too_hard") {
@@ -55,10 +55,10 @@ export function buildDefaultInvestigation(
   let recommendation =
     "Maintain aerobic rhythm and avoid stacking extra intensity before key sessions.";
   if (analytics.fatigue.tsb < -10) {
-    recommendation = "Prioritize recovery density — ease the next hard session until TSB rebounds.";
+    recommendation = "Prioritize recovery density: ease the next hard session until TSB rebounds.";
   } else if (analytics.raceReadiness && analytics.raceReadiness.daysUntilRace <= 14) {
     recommendation =
-      "Protect freshness — keep volume disciplined and prioritize race-specific work only.";
+      "Protect freshness: keep volume disciplined and prioritize race-specific work only.";
   } else if (analytics.efficiencySummary.trend === "improving") {
     recommendation =
       "Protect the positive efficiency trend with polarized easy days between quality work.";
@@ -87,13 +87,13 @@ export function buildDefaultInvestigation(
             : "Readiness reflects stable long-run and block volume relative to your goal.",
         analytics.efficiencySummary.trend === "improving"
           ? "Aerobic efficiency trend is positive on recent HR-backed runs."
-          : "Efficiency signal is flat — readiness is driven more by load balance than pace gains.",
+          : "Efficiency signal is flat: readiness is driven more by load balance than pace gains.",
       ],
       recommendation,
-      confidence: `${analytics.dataConfidence.charAt(0).toUpperCase()}${analytics.dataConfidence.slice(1)} — grounded in volume, freshness, and readiness engines`,
+      confidence: `${analytics.dataConfidence.charAt(0).toUpperCase()}${analytics.dataConfidence.slice(1)}, grounded in volume, freshness, and readiness engines`,
       evidence,
       limitations: [
-        "Preloaded from current analytics — ask a follow-up for tool-backed session comparison.",
+        "Preloaded from current analytics. Ask a follow-up for tool-backed session comparison.",
       ],
       followUps: followUps.slice(0, 4),
       memoryNotes: [],

@@ -87,8 +87,8 @@ export function buildSafeFallbackWeeklyPlan(
         distanceKm: 4,
         durationMin: 30,
         intensity: "easy",
-        purpose: "Easy run with 4–6 × 20 sec strides — not a workout",
-        constraintsApplied: ["No hard sessions before race — strides only"],
+        purpose: "Easy run with 4–6 × 20 sec strides, not a workout",
+        constraintsApplied: ["No hard sessions before race: strides only"],
       }),
       session({
         day: "Fri",
@@ -108,7 +108,7 @@ export function buildSafeFallbackWeeklyPlan(
           ? Math.round((context.goal.distanceMeters / 1000) * 10) / 10
           : 21.1,
         intensity: "hard",
-        purpose: "Race execution — even pacing, trust the taper",
+        purpose: "Race execution: even pacing, trust the taper",
       }),
     ];
     summary =
@@ -149,7 +149,7 @@ export function buildSafeFallbackWeeklyPlan(
         title: "Easy endurance",
         distanceKm: 7,
         intensity: "easy",
-        purpose: "Optional easy volume — stop if heavy",
+        purpose: "Optional easy volume: stop if heavy",
       }),
     ];
     summary = "Recovery week: reduced run volume, extra rest, no hard sessions.";
@@ -174,7 +174,7 @@ export function buildSafeFallbackWeeklyPlan(
         title: "Short tempo",
         distanceKm: 5,
         intensity: "moderate",
-        purpose: "Brief steady effort — not a full workout",
+        purpose: "Brief steady effort, not a full workout",
         constraintsApplied: ["Single quality session"],
       }),
       longSession(longKm, "Sat", {
@@ -247,7 +247,7 @@ export function buildSafeFallbackWeeklyPlan(
         title: "Steady tempo",
         distanceKm: km(Math.max(5, easyKm)),
         intensity: hardSessionCount > 0 ? "hard" : "moderate",
-        purpose: "Controlled quality — not all-out",
+        purpose: "Controlled quality, not all-out",
       }),
       session({
         day: "Fri",
@@ -269,7 +269,7 @@ export function buildSafeFallbackWeeklyPlan(
           title: "Strength support",
           durationMin: 35,
           intensity: "moderate",
-          purpose: "Maintain durability — avoid failure sets",
+          purpose: "Maintain durability: avoid failure sets",
           constraintsApplied: ["Not within 24h of hard run"],
         }),
       );
@@ -295,14 +295,14 @@ export function buildSafeFallbackWeeklyPlan(
     workouts,
     rationale: {
       primaryGoal,
-      evidenceUsed: evidence.length ? evidence : ["Limited data — conservative template"],
+      evidenceUsed: evidence.length ? evidence : ["Limited data: conservative template"],
       tradeoffs: ["Deterministic plan used when LLM output is unavailable or invalid"],
       risksManaged: guardrails.constraintNotes.slice(0, 4),
     },
     confidence: context.dataQuality.hrCoverage === "high" ? "medium" : "low",
     limitations: [
       "This is a rule-based fallback plan, not a personalized LLM synthesis.",
-      "Adjust sessions based on how you feel — not medical advice.",
+      "Adjust sessions based on how you feel, not medical advice.",
       ...context.dataQuality.confidenceLimitations.slice(0, 2),
     ],
   };

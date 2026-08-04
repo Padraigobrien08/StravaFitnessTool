@@ -62,7 +62,7 @@ const COACH_INVESTIGATIONS: {
     topic: "durability",
     label: "How durable is my aerobic engine?",
     hypothesis: "HR drift and late-run pace fade show how well you hold up under fatigue.",
-    query: "How durable am I — do I hold efficiency and pace deep into long runs?",
+    query: "How durable am I? Do I hold efficiency and pace deep into long runs?",
   },
   {
     topic: "capability-limiter",
@@ -444,7 +444,7 @@ function memoryEvidenceFallback(m: MemorySnippet): string {
     return "Repeated across recent blocks and session history.";
   }
   if (m.stability === "emerging") {
-    return "Limited observations — still forming.";
+    return "Limited observations, still forming.";
   }
   return "Mixed or inconsistent recent evidence.";
 }
@@ -467,7 +467,7 @@ export function IntelligenceEcosystemCompact({
           ? `${c.title} consistent`
           : c.trend === "warning"
             ? `${c.title} low`
-            : `${c.title} — ${c.detail}`,
+            : `${c.title}: ${c.detail}`,
     })),
     ...ecosystem.interferenceWarnings.slice(0, 1).map((w) => ({
       warn: true,

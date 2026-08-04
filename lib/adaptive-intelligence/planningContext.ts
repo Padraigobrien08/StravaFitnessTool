@@ -30,21 +30,21 @@ export function buildAdaptivePlanningNotes(params: {
   for (const s of params.adaptationSignals) {
     if (s.category === "freshness" && s.confidence !== "low") {
       if (/sensitive|stack|density/i.test(s.statement)) {
-        notes.push(`Adaptation: ${s.statement} — avoid stacking hard sessions`);
+        notes.push(`Adaptation: ${s.statement}; avoid stacking hard sessions`);
       }
     }
     if (s.category === "threshold" && /responds well|improve/i.test(s.statement)) {
-      notes.push(`Adaptation: ${s.statement} — maintain threshold support`);
+      notes.push(`Adaptation: ${s.statement}; maintain threshold support`);
     }
     if (s.category === "recovery" && params.raceWeek && /taper|fresh/i.test(s.statement)) {
-      notes.push(`Adaptation: ${s.statement} — preserve taper pattern`);
+      notes.push(`Adaptation: ${s.statement}; preserve taper pattern`);
     }
   }
 
   const contradicted = params.outcomes.filter((o) => o.evaluation === "contradicted");
   if (contradicted.length >= 2) {
     notes.push(
-      "Recent recommendations were contradicted — bias conservative until patterns clarify",
+      "Recent recommendations were contradicted: bias conservative until patterns clarify",
     );
   }
 

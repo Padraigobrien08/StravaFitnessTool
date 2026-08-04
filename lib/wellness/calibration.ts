@@ -58,7 +58,7 @@ export const DEFAULT_FEEL_CALIBRATION: FeelCalibration = {
   sampleCount: 0,
   reliability: 0.5,
   confidence: "low",
-  basis: "Default nudge — not enough history to personalise.",
+  basis: "Default nudge: not enough history to personalise.",
 };
 
 function median(nums: number[]): number {

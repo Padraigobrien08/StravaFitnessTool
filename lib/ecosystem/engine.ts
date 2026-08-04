@@ -45,7 +45,7 @@ function buildTotalContext(
   const headline =
     nonRun.length === 0
       ? "Modality-aware context needs non-run Strava activities (bike, strength, swim, etc.)."
-      : `${runs.length} runs · ${nonRun.length} non-run sessions (28d) — running stays primary for race performance.`;
+      : `${runs.length} runs · ${nonRun.length} non-run sessions (28d): running stays primary for race performance.`;
 
   return {
     last28Days: {
@@ -128,12 +128,12 @@ export function buildTrainingEcosystem(
 
   const limitations = [
     "Running remains primary for race performance, pacing, and run-specific adaptation.",
-    "Other modalities inform fatigue, recovery, durability, and balance — not race predictions.",
-    "Intensity inferred from sport_type, duration, HR when present — not power/TSS for all sports.",
+    "Other modalities inform fatigue, recovery, durability, and balance, not race predictions.",
+    "Intensity inferred from sport_type, duration, HR when present, not power/TSS for all sports.",
     "Strava API sport_type is canonical; legacy type field is not used for classification.",
   ];
   if (nonRunCount === 0) {
-    limitations.push("No non-run activities synced — ecosystem insights are limited.");
+    limitations.push("No non-run activities synced: ecosystem insights are limited.");
   }
 
   const readinessContextNote =

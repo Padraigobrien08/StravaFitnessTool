@@ -194,7 +194,7 @@ export function computeGoalScenarios(input: RaceForecastInput): GoalScenarioResu
         ...(longRunTargetKm ? [`long run → ~${longRunTargetKm} km`] : []),
       ],
       rationale: [
-        "Volume, quality, and long-run specificity together — the strongest realistic lever.",
+        "Volume, quality, and long-run specificity together: the strongest realistic lever.",
       ],
     },
   ];
@@ -238,7 +238,7 @@ export function computeGoalScenarios(input: RaceForecastInput): GoalScenarioResu
   ];
 
   const limitations: string[] = [];
-  if (!hasTarget) limitations.push("No target time set — set one to see probabilities.");
+  if (!hasTarget) limitations.push("No target time set. Add one to see probabilities.");
   if (input.efforts.length < 3)
     limitations.push("Few race-quality efforts on record; projections are lower-confidence.");
   if (baseline.confidence === "low")
@@ -284,13 +284,13 @@ function buildRecommendation(
   }
   const target = formatDuration(targetTimeSec!);
   if (baselineProbabilityPct != null && baselineProbabilityPct >= LIKELY_PCT) {
-    return `You're on track for ${target} — current training projects a ${baselineProbabilityPct}% chance. Hold specificity and freshness through race day.`;
+    return `You're on track for ${target}: current training projects a ${baselineProbabilityPct}% chance. Hold specificity and freshness through race day.`;
   }
   // Least-effort scenario (ladder order) that reaches "likely".
   const lift = scenarios.find((s) => s.id !== "maintain" && s.meetsTarget);
   if (lift) {
-    return `${target} looks reachable with "${lift.label}" (${lift.leverSummary}) — that raises the estimate from ${baselineProbabilityPct}% to ${lift.probabilityPct}%.`;
+    return `${target} looks reachable with "${lift.label}" (${lift.leverSummary}), which raises the estimate from ${baselineProbabilityPct}% to ${lift.probabilityPct}%.`;
   }
   const best = scenarios[scenarios.length - 1];
-  return `${target} is a stretch — even a full training block projects only ${best.probabilityPct}%. Consider a more conservative target near ${formatDuration(baseline.predictionIntervalSec.p50)} or a later race date.`;
+  return `${target} is a stretch: even a full training block projects only ${best.probabilityPct}%. Consider a more conservative target near ${formatDuration(baseline.predictionIntervalSec.p50)} or a later race date.`;
 }

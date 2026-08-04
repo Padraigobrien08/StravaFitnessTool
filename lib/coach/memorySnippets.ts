@@ -48,7 +48,7 @@ export function buildMemorySnippets(analytics: DashboardInsights | null): Memory
     out.push({
       id: "recent-block",
       label: "Current block",
-      text: `Recent training: ${recent.label} — ${recent.distanceKm} km across ${recent.runCount} runs.`,
+      text: `Recent training: ${recent.label}, ${recent.distanceKm} km across ${recent.runCount} runs.`,
       confidence: "medium",
       era: "Current",
     });
@@ -59,7 +59,7 @@ export function buildMemorySnippets(analytics: DashboardInsights | null): Memory
     out.push({
       id: "fade",
       label: "Long-run density",
-      text: `Longest recent run ${longest} km — when long-run frequency drops, late-run pace often softens past ~15 km.`,
+      text: `Longest recent run ${longest} km: when long-run frequency drops, late-run pace often softens past ~15 km.`,
       confidence: "medium",
     });
   }
@@ -91,7 +91,7 @@ export function buildMemorySnippets(analytics: DashboardInsights | null): Memory
     out.push({
       id: "pr",
       label: "Recent breakthrough",
-      text: `New ${prRecent.label} PR — training block before this phase showed ${analytics.consistencyScore.label.toLowerCase()} consistency.`,
+      text: `New ${prRecent.label} PR: training block before this phase showed ${analytics.consistencyScore.label.toLowerCase()} consistency.`,
       confidence: analytics.dataConfidence,
     });
   }

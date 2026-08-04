@@ -15,31 +15,31 @@ export function assessFreshness(input: RaceForecastInput): FreshnessAssessment {
   score = Math.round(Math.max(0, Math.min(100, freshness)));
 
   if (freshness >= 70) {
-    evidence.push(`Freshness ${Math.round(freshness)} — supports quality execution.`);
+    evidence.push(`Freshness ${Math.round(freshness)}: supports quality execution.`);
     timeAdjustmentSec -= Math.round(Math.min(45, (freshness - 65) * 0.8));
   } else if (freshness < 45) {
-    evidence.push(`Freshness ${Math.round(freshness)} — fatigue may suppress race-day pace.`);
+    evidence.push(`Freshness ${Math.round(freshness)}: fatigue may suppress race-day pace.`);
     timeAdjustmentSec += Math.round((45 - freshness) * 1.2);
     risks.push("Elevated fatigue heading into race window.");
   } else {
-    evidence.push(`Freshness ${Math.round(freshness)} — neutral race-day modifier.`);
+    evidence.push(`Freshness ${Math.round(freshness)}: neutral race-day modifier.`);
   }
 
   if (tsb > 8) {
-    evidence.push(`TSB +${Math.round(tsb)} — training balance favors recovery.`);
+    evidence.push(`TSB +${Math.round(tsb)}: training balance favors recovery.`);
     if (tsb > 20) {
-      risks.push("Very positive TSB after sharp volume drop — confirm taper vs detraining.");
+      risks.push("Very positive TSB after sharp volume drop: confirm taper vs detraining.");
     }
   } else if (tsb < -12) {
-    evidence.push(`TSB ${Math.round(tsb)} — acute load may outweigh freshness.`);
+    evidence.push(`TSB ${Math.round(tsb)}: acute load may outweigh freshness.`);
     timeAdjustmentSec += Math.round(Math.min(90, Math.abs(tsb) * 2));
-    risks.push("Fatigue balance strained — late-race fade risk elevated.");
+    risks.push("Fatigue balance strained: late-race fade risk elevated.");
   }
 
   if (hard14 >= 5) {
     score -= 8;
     timeAdjustmentSec += 25;
-    risks.push(`${hard14} hard sessions in 14 days — intensity stacking elevated.`);
+    risks.push(`${hard14} hard sessions in 14 days: intensity stacking elevated.`);
   } else if (hard14 <= 2 && freshness >= 65) {
     evidence.push("Hard-session density is controlled.");
   }
@@ -47,7 +47,7 @@ export function assessFreshness(input: RaceForecastInput): FreshnessAssessment {
   if (input.goal.raceDate) {
     const days = Math.ceil((new Date(input.goal.raceDate).getTime() - Date.now()) / 86400000);
     if (days > 0 && days <= 14) {
-      evidence.push(`${days} days to race — freshness window matters.`);
+      evidence.push(`${days} days to race: freshness window matters.`);
     }
   }
 

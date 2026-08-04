@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 
 export function ConfidenceBadge({ level }: { level: "low" | "medium" | "high" }) {
   const labels = {
-    low: "Limited data — trends are indicative",
-    medium: "Moderate sample — trends are reasonably reliable",
-    high: "Solid sample — trends are reliable",
+    low: "Limited data: trends are indicative",
+    medium: "Moderate sample: trends are reasonably reliable",
+    high: "Solid sample: trends are reliable",
   };
   const colors = {
     low: "border-amber-500/30 bg-amber-500/10 text-amber-400/90",

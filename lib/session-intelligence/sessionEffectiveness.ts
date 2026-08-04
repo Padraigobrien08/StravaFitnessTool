@@ -41,7 +41,7 @@ export function sessionEffectivenessSummary(sessions: SessionIntelligence[]): st
     );
   }
   if (highFatigue.length >= 2) {
-    out.push("Multiple recent sessions carry high fatigue cost — recovery spacing may help");
+    out.push("Multiple recent sessions carry high fatigue cost: recovery spacing may help");
   }
 
   const threshold = sessions.filter((s) =>

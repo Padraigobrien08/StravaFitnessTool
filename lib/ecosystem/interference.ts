@@ -46,7 +46,7 @@ export function detectInterference(
         message:
           nrTime < runTime
             ? `${nr.sportType} may interfere with upcoming key run (${Math.round(hours)}h apart).`
-            : `${nr.sportType} followed a key run within ${Math.round(hours)}h — recovery context may be compressed.`,
+            : `${nr.sportType} followed a key run within ${Math.round(hours)}h: recovery context may be compressed.`,
         evidence: [
           `Non-run: ${nr.sportType}, ${Math.round(nr.movingTimeSec / 60)} min, ${nr.perceivedIntensity} intensity`,
           `Run anchor: ${run.name}`,
@@ -85,7 +85,7 @@ export function detectWeeklyHighIntensityDensity(
       nonRunSportType: "mixed",
       nonRunDate: recent[recent.length - 1]?.startDate ?? new Date().toISOString(),
       hoursApart: 0,
-      message: `${hi.length} high-intensity sessions in 7 days may increase fatigue — recommendation confidence: medium.`,
+      message: `${hi.length} high-intensity sessions in 7 days may increase fatigue; recommendation confidence: medium.`,
       evidence: [
         `${hi.length} sessions at high perceived load (runs + HIIT + heavy strength)`,
         `Threshold context: >${maxPer7Days} hard sessions/week`,
@@ -129,7 +129,7 @@ export function detectHybridLoadClusters(
         nonRunSportType: "mixed",
         nonRunDate: sorted[i].startDate,
         hoursApart: clusterDays * 24,
-        message: `Hard run + HIIT/strength clustered within ${clusterDays} days — hybrid load concentration.`,
+        message: `Hard run + HIIT/strength clustered within ${clusterDays} days: hybrid load concentration.`,
         evidence: cluster.map((a) => `${a.sportType}: ${a.name} (${a.perceivedIntensity})`),
         confidence: "medium",
       });
@@ -170,8 +170,8 @@ export function detectRaceWeekInterference(
         hoursApart: Math.round(daysToRace * 24),
         message:
           daysToRace <= 2
-            ? `High-load ${a.sportType} within ${Math.round(daysToRace)}d of race — may increase fatigue before race day.`
-            : `${a.sportType} in race week — monitor stacking with taper runs.`,
+            ? `High-load ${a.sportType} within ${Math.round(daysToRace)}d of race: may increase fatigue before race day.`
+            : `${a.sportType} in race week: monitor stacking with taper runs.`,
         evidence: [
           `Race date: ${raceGoal.date}`,
           `Activity ${Math.round(daysToRace)}d before race`,

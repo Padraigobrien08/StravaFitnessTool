@@ -48,7 +48,7 @@ export function buildCommandCenterView(
   if (r) {
     raceContext = `${r.distanceLabel} in ${r.daysUntilRace}d · ${r.label.toLowerCase()}`;
   } else if (analytics.halfMarathonReadiness.score >= 70) {
-    raceContext = `HM fitness ${analytics.halfMarathonReadiness.label.toLowerCase()} — set a goal for race-specific planning`;
+    raceContext = `HM fitness ${analytics.halfMarathonReadiness.label.toLowerCase()}: set a goal for race-specific planning`;
   }
 
   const planHint = r

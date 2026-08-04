@@ -55,7 +55,7 @@ export function scoreAerobicSupport(
       ],
       confidence: sessions >= 3 ? "medium" : "low",
       limitations: [
-        "Not run-equivalent mileage — duration and modality only.",
+        "Not run-equivalent mileage, duration and modality only.",
         "Does not directly adjust race predictions.",
       ],
       directness: "supporting_context",
@@ -95,7 +95,7 @@ export function scoreStrength(activities: NormalizedActivity[]): {
               ],
               confidence: count >= 2 ? "medium" : "low",
               limitations: [
-                "Strava lacks set/rep/load — fatigue estimated from timing and duration.",
+                "Strava lacks set/rep/load: fatigue estimated from timing and duration.",
               ],
               directness: "supporting_context",
             },
@@ -231,7 +231,7 @@ export function scoreDurability(
           `Strength ${strengthScore}, mobility ${mobilityScore}`,
         ],
         confidence: "medium",
-        limitations: ["Training sustainability framing — not injury assessment."],
+        limitations: ["Training sustainability framing, not injury assessment."],
         directness: "supporting_context",
       },
     ],

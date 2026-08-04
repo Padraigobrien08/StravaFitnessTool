@@ -62,10 +62,10 @@ export function repairPlanFromIntegrity(
   const limitations = new Set(current.limitations);
   limitations.add("Plan adjusted for StrideIQ recommendation integrity (evidence and safety).");
   if (input.context.dataQuality.hrCoverage === "low") {
-    limitations.add("Limited HR coverage — treat paces and load as approximate.");
+    limitations.add("Limited HR coverage: treat paces and load as approximate.");
   }
   if (report.issues.some((i) => i.type === "medical_claim")) {
-    limitations.add("Not medical advice — consult a professional for injury or health concerns.");
+    limitations.add("Not medical advice: consult a professional for injury or health concerns.");
   }
 
   current = {

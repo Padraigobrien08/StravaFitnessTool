@@ -9,7 +9,7 @@ export function AdaptationSignalsPanel({ signals }: { signals: AdaptationSignalV
   return (
     <PanelChrome title="What this workout contributed" accent>
       <p className={`${dash.muted} mb-4`}>
-        Adaptation signals — why this session mattered in your block.
+        Adaptation signals: why this session mattered in your block.
       </p>
       <div className="space-y-2.5">
         {signals.map((s, i) => (

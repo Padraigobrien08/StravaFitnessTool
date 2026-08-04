@@ -31,14 +31,14 @@ export function inferModalityInteractions(analytics: DashboardInsights): Athlete
         id: "mod-strength-support",
         category: "modality",
         statement:
-          "Regular strength support appears consistent without overload signal — durability may benefit.",
+          "Regular strength support appears consistent without overload signal: durability may benefit.",
         evidence: [
           `${eco.totalContext.last28Days.strengthSessions} strength sessions (28d)`,
           `Strength support score ${eco.scores.strengthSupport}`,
         ],
         confidence: "low",
         counterEvidence:
-          eco.scores.interferenceRisk >= 50 ? ["Interference risk elevated — timing matters"] : [],
+          eco.scores.interferenceRisk >= 50 ? ["Interference risk elevated: timing matters"] : [],
         recommendedUse: "Keep strength moderate in build phases; reduce before race week.",
       }),
     );
@@ -49,7 +49,7 @@ export function inferModalityInteractions(analytics: DashboardInsights): Athlete
       createBelief({
         id: "mod-archetype",
         category: "modality",
-        statement: `${eco.archetype.label} — training mix should be interpreted through this lens.`,
+        statement: `${eco.archetype.label}: training mix should be interpreted through this lens.`,
         evidence: eco.archetype.evidence.slice(0, 3),
         confidence: eco.archetype.confidence,
         recommendedUse: eco.archetype.coachingNotes[0] ?? "Balance modalities around run priority.",

@@ -90,7 +90,7 @@ export function compareSessions(
     }
     if (sessions.some((s) => s.lateFadePct == null)) {
       limitations.push(
-        "Some sessions lack FIT pace streams — fade/decoupling metrics may be missing.",
+        "Some sessions lack FIT pace streams: fade/decoupling metrics may be missing.",
       );
     }
   }
@@ -102,7 +102,7 @@ export function compareSessions(
     const trend = sessions[0].qualityScore - sessions[sessions.length - 1].qualityScore;
     summary = `Best execution: ${best.name} (quality ${best.qualityScore}). Weakest: ${worst.name} (quality ${worst.qualityScore}). Recent vs oldest quality delta: ${trend > 0 ? "+" : ""}${trend} points.`;
   } else if (sessions.length === 1) {
-    summary = `Single ${WORKOUT_TYPE_LABELS[type]} session — quality ${sessions[0].qualityScore}/100.`;
+    summary = `Single ${WORKOUT_TYPE_LABELS[type]} session, quality ${sessions[0].qualityScore}/100.`;
   }
 
   return {

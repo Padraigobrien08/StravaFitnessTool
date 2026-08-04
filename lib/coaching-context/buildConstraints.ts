@@ -16,7 +16,7 @@ export function buildConstraints(
         (insights.previousWeek?.distanceKm ?? insights.currentWeek.distanceKm));
 
   if (raceWeek) {
-    notes.push("Race week — prioritize freshness over load accumulation.");
+    notes.push("Race week: prioritize freshness over load accumulation.");
   }
   if (tapering && !raceWeek) {
     notes.push("Taper or reduced-volume phase detected in recent weeks.");
@@ -25,7 +25,7 @@ export function buildConstraints(
     notes.push("Cap hard sessions; easy aerobic volume should lead the week.");
   }
   if (insights.fatigue.tsb < -12) {
-    notes.push("Negative TSB — avoid stacking quality days back-to-back.");
+    notes.push("Negative TSB: avoid stacking quality days back-to-back.");
   }
 
   const maxHardSessions =

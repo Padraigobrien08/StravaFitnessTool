@@ -26,7 +26,7 @@ function TrainingEvidenceBanner() {
         <Eyebrow>Training · Am I training correctly?</Eyebrow>
         <p className="mt-0.5 text-xs text-zinc-600">
           <JargonTerm term="load">Load</JargonTerm>, intensity mix,{" "}
-          <JargonTerm term="phase">phase</JargonTerm>, and cross-training — how your training is
+          <JargonTerm term="phase">phase</JargonTerm>, and cross-training: how your training is
           structured.
         </p>
       </div>

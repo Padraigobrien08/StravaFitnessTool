@@ -29,5 +29,5 @@ export function compareToHistoricalSessions(
   if (deltaPct < -3) {
     return `Execution appears faster than your previous ${peerPaces.length} comparable ${workout.type} sessions.`;
   }
-  return `Pace appears slower than your previous ${peerPaces.length} comparable ${workout.type} sessions — may reflect fatigue or conditions.`;
+  return `Pace appears slower than your previous ${peerPaces.length} comparable ${workout.type} sessions: may reflect fatigue or conditions.`;
 }

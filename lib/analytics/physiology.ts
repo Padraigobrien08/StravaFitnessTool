@@ -275,17 +275,17 @@ export function assessCriticalSpeed(efforts: EffortPoint[]): CriticalSpeedAssess
 
   const evidence = [
     `Fitted ${fit.n} best efforts (2–30 min) to distance = CS·t + D′, R²=${fit.rSquared.toFixed(2)}.`,
-    `Critical speed ${paceStr(csPace)} — the pace your aerobic system can hold with fatigue held roughly steady.`,
-    `Anaerobic reserve D′ ≈ ${Math.round(fit.dPrimeMeters)} m — the distance bank you can spend above critical speed.`,
+    `Critical speed ${paceStr(csPace)}, the pace your aerobic system can hold with fatigue held roughly steady.`,
+    `Anaerobic reserve D′ ≈ ${Math.round(fit.dPrimeMeters)} m, the distance bank you can spend above critical speed.`,
   ];
 
   const limitations: string[] = [];
   if (confidence === "low") {
-    limitations.push("Few or noisy efforts — treat CS and D′ as directional, not precise.");
+    limitations.push("Few or noisy efforts: treat CS and D′ as directional, not precise.");
   }
   if (fit.dPrimeMeters < 50) {
     limitations.push(
-      "Very small D′ — likely a shortage of short, fast efforts; add reps under ~3 min to sharpen it.",
+      "Very small D′: likely a shortage of short, fast efforts; add reps under ~3 min to sharpen it.",
     );
   }
 
@@ -355,10 +355,10 @@ export function assessFatigueResistance(efforts: EffortPoint[]): FatigueResistan
     const delta = recentFit.exponent - olderFit.exponent;
     if (delta <= -0.02) {
       trend = "improving";
-      trendDetail = `Exponent eased ${olderFit.exponent.toFixed(2)} → ${recentFit.exponent.toFixed(2)} — you're fading less over distance.`;
+      trendDetail = `Exponent eased ${olderFit.exponent.toFixed(2)} → ${recentFit.exponent.toFixed(2)}. You're fading less over distance.`;
     } else if (delta >= 0.02) {
       trend = "declining";
-      trendDetail = `Exponent rose ${olderFit.exponent.toFixed(2)} → ${recentFit.exponent.toFixed(2)} — fade over distance has grown.`;
+      trendDetail = `Exponent rose ${olderFit.exponent.toFixed(2)} → ${recentFit.exponent.toFixed(2)}. Fade over distance has grown.`;
     } else {
       trend = "stable";
       trendDetail = `Exponent held near ${recentFit.exponent.toFixed(2)}.`;
@@ -367,9 +367,9 @@ export function assessFatigueResistance(efforts: EffortPoint[]): FatigueResistan
 
   const vsRef =
     exponent > ref + 0.005
-      ? `above the ~${ref} reference — you fade ${extra > 0 ? `~${extra}%` : "slightly"} more per doubling of distance`
+      ? `above the ~${ref} reference, you fade ${extra > 0 ? `~${extra}%` : "slightly"} more per doubling of distance`
       : exponent < ref - 0.005
-        ? `below the ~${ref} reference — you hold pace ${Math.abs(extra)}% better per doubling than the textbook runner`
+        ? `below the ~${ref} reference, you hold pace ${Math.abs(extra)}% better per doubling than the textbook runner`
         : `right at the ~${ref} reference`;
 
   const evidence = [
@@ -380,7 +380,7 @@ export function assessFatigueResistance(efforts: EffortPoint[]): FatigueResistan
 
   const limitations: string[] = [];
   if (confidence === "low") {
-    limitations.push("Sparse or noisy efforts — the exponent is directional, not precise.");
+    limitations.push("Sparse or noisy efforts: the exponent is directional, not precise.");
   }
   if (trend == null) {
     limitations.push("Not enough efforts in each period to establish a trend yet.");
@@ -520,7 +520,7 @@ export function assessDurability(
 
   const limitations: string[] = [];
   if (confidence === "low") {
-    limitations.push("Few endurance runs with streams — treat the score as directional.");
+    limitations.push("Few endurance runs with streams: treat the score as directional.");
   }
   if (trend == null) {
     limitations.push("Not enough long runs across periods to establish a durability trend.");
@@ -535,7 +535,7 @@ export function assessDurability(
     trend,
     sampleSize: samples.length,
     confidence,
-    interpretation: `Durability ${score}/100 — ${label} at holding efficiency and pace deep into long runs.`,
+    interpretation: `Durability ${score}/100, ${label} at holding efficiency and pace deep into long runs.`,
     evidence,
     limitations,
   };
@@ -666,16 +666,16 @@ export function assessThresholdEconomy(
 
   const limitations: string[] = [];
   if (!hasThreshold) {
-    limitations.push("No tempo/threshold sessions classified yet — LT pace not estimated.");
+    limitations.push("No tempo/threshold sessions classified yet. LT pace not estimated.");
   }
   if (ltHr == null && hasThreshold) {
-    limitations.push("Threshold sessions lack HR — LT heart rate not estimated.");
+    limitations.push("Threshold sessions lack HR. LT heart rate not estimated.");
   }
   if (economyTrend == null && economyIndex != null) {
     limitations.push("Not enough steady runs across periods for an economy trend.");
   }
   if (confidence === "low") {
-    limitations.push("Sparse threshold/economy data — treat these as directional.");
+    limitations.push("Sparse threshold/economy data: treat these as directional.");
   }
 
   const interpretation =
@@ -779,8 +779,8 @@ export function assessConditionNormalization(
       evidence: [],
       limitations: [
         withTemp.length < 6
-          ? "Fewer than 6 runs have weather temperature — heat normalization needs richer weather coverage."
-          : "Weather-temperature coverage is thin — treat heat adjustments as approximate.",
+          ? "Fewer than 6 runs have weather temperature. Heat normalization needs richer weather coverage."
+          : "Weather-temperature coverage is thin: treat heat adjustments as approximate.",
       ],
     };
   }
@@ -851,9 +851,9 @@ export function assessConditionNormalization(
 
   const limitations: string[] = [];
   if (confidence === "low") {
-    limitations.push("Weather coverage is modest — heat adjustments are approximate.");
+    limitations.push("Weather coverage is modest: heat adjustments are approximate.");
   }
-  limitations.push("Humidity, wind, and sun are not modeled — temperature only.");
+  limitations.push("Humidity, wind, and sun are not modeled; temperature only.");
 
   return {
     available: true,

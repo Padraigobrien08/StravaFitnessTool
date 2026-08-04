@@ -162,7 +162,7 @@ export function computeCapabilityRadar(
       demandImportance: null,
       isLimiter: false,
       confidence: confidenceFromN(ctlSeries.length),
-      evidence: `Current fitness index ${Math.round(ctlCurrent!)} — ${aerobicScore}th percentile of your history.`,
+      evidence: `Current fitness index ${Math.round(ctlCurrent!)}, ${aerobicScore}th percentile of your history.`,
     });
   }
 
@@ -257,7 +257,7 @@ export function computeCapabilityRadar(
     demandImportance: null,
     isLimiter: false,
     confidence: consistencyScore.streakWeeks >= 6 ? "high" : "medium",
-    evidence: `${consistencyScore.label} — ${consistencyScore.evidence[0] ?? `${consistencyScore.streakWeeks}-week streak`}.`,
+    evidence: `${consistencyScore.label}: ${consistencyScore.evidence[0] ?? `${consistencyScore.streakWeeks}-week streak`}.`,
   });
 
   if (axes.length < 3) {
@@ -299,7 +299,7 @@ export function computeCapabilityRadar(
     }
   } else {
     limitations.push(
-      "No race goal set — showing capabilities vs your own history only, without a demand profile or limiter.",
+      "No race goal set: showing capabilities vs your own history only, without a demand profile or limiter.",
     );
   }
 
@@ -311,7 +311,7 @@ export function computeCapabilityRadar(
   const interpretation = biggestLimiter
     ? `Biggest limiter for your ${goalDistanceLabel}: ${biggestLimiter.label} (${biggestLimiter.score}/100).`
     : raceGoal
-      ? `Well-rounded for your ${goalDistanceLabel} — no single axis stands out as a limiter.`
+      ? `Well-rounded for your ${goalDistanceLabel}: no single axis stands out as a limiter.`
       : "Capabilities scored against your own history.";
 
   const strongest = [...axes].sort((a, b) => b.score - a.score)[0];

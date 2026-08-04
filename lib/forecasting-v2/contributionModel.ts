@@ -129,7 +129,7 @@ export function buildContributors(
       direction: "negative",
       magnitude: "large",
       component: "uncertainty",
-      evidence: `Models spread ${Math.round(components.modelSpreadSec)}s — widens prediction interval.`,
+      evidence: `Models spread ${Math.round(components.modelSpreadSec)}s: widens prediction interval.`,
       confidence: "high",
     });
   }

@@ -102,7 +102,7 @@ export function runSafetyChecks(input: WeeklyPlanIntegrityInput): Recommendation
         issues.push({
           type: "unsafe_progression",
           severity: "medium",
-          message: "Back-to-back hard days — only appropriate with strong freshness evidence",
+          message: "Back-to-back hard days: only appropriate with strong freshness evidence",
           suggestedFix: "Add easy day between hard sessions unless explicitly justified",
         });
       }

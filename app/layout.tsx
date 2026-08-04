@@ -20,7 +20,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: "StrideIQ — Strava Running Insights",
+  title: "StrideIQ: Strava Running Insights",
   description:
     "Local-first running analytics from your Strava bulk export. Pace, HR zones, PRs, and training load.",
 };

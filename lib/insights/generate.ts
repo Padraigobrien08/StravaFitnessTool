@@ -61,7 +61,7 @@ export function generateInsights(
       title: "Efficiency has dipped recently",
       severity: "warning",
       evidence: [
-        "Pace at a given HR has worsened vs your prior block — fatigue or heat may be a factor.",
+        "Pace at a given HR has worsened vs your prior block: fatigue or heat may be a factor.",
       ],
       recommendation: "Consider an easy week or check sleep and hydration before adding intensity.",
       confidence: analytics.dataConfidence,
@@ -94,7 +94,7 @@ export function generateInsights(
       severity: "warning",
       evidence: [
         `${easyHard.hard} of ${easyHard.easy + easyHard.hard} runs classified as hard (≥80% max HR).`,
-        `Only ${easyPct.toFixed(0)}% easy — polarized plans often target ~80% easy.`,
+        `Only ${easyPct.toFixed(0)}% easy: polarized plans often target ~80% easy.`,
       ],
       recommendation: "Add 1–2 low-HR easy runs per week to support recovery and aerobic base.",
       confidence: quality.fieldCoverage.find((f) => f.label === "Heart rate")?.level ?? "medium",
@@ -122,7 +122,7 @@ export function generateInsights(
       title: `Fatigue elevated (${fatigue.label})`,
       severity: "warning",
       evidence: fatigue.evidence,
-      recommendation: "Consider an easy week — limit hard sessions and keep most runs in Z1–Z2.",
+      recommendation: "Consider an easy week: limit hard sessions and keep most runs in Z1–Z2.",
       confidence: analytics.dataConfidence,
     });
   } else if (fatigue.freshness >= 75) {
@@ -168,9 +168,7 @@ export function generateInsights(
       question: "training",
       title: "Good easy-run balance",
       severity: "positive",
-      evidence: [
-        `${easyPct.toFixed(0)}% of runs are easy effort — aligns with polarized training.`,
-      ],
+      evidence: [`${easyPct.toFixed(0)}% of runs are easy effort, aligns with polarized training.`],
       confidence: "medium",
     });
   }

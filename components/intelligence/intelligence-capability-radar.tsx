@@ -68,7 +68,7 @@ export function IntelligenceCapabilityRadar({ data }: { data: CapabilityRadar })
           Biggest limiter:{" "}
           <span className="font-medium text-amber-300/90">{data.biggestLimiter.label}</span>{" "}
           <span className="text-zinc-600">
-            ({data.biggestLimiter.score}/100) — {data.biggestLimiter.evidence}
+            ({data.biggestLimiter.score}/100). {data.biggestLimiter.evidence}
           </span>
         </p>
       ) : (

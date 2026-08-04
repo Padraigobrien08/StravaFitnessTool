@@ -30,7 +30,7 @@ function weekChangeNotes(prev: RecentTrainingWeek | undefined, cur: RecentTraini
     notes.push("More hard runs than prior week");
   }
   if (cur.hardRunCount < prev.hardRunCount - 1 && prev.hardRunCount > 0) {
-    notes.push("Fewer hard runs — possible taper or recovery");
+    notes.push("Fewer hard runs: possible taper or recovery");
   }
   if (cur.longRunDistanceKm > prev.longRunDistanceKm + 3) {
     notes.push("Long run extended");

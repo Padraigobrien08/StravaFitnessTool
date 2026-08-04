@@ -53,7 +53,7 @@ export default function ReportPage() {
                 Athlete Intelligence Report
               </h1>
               <p className="mt-1 text-sm text-zinc-500">
-                Coach-ready briefing — optimized for print and PDF
+                Coach-ready briefing, optimized for print and PDF
               </p>
             </div>
             <Button onClick={() => window.print()} className="gap-2">

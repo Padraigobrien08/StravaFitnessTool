@@ -7,7 +7,7 @@ export function HistoricalReadinessPanel({ items }: { items: { label: string; va
     <Panel>
       <Eyebrow className="mb-2.5">Historical readiness context</Eyebrow>
       <p className="mb-4 text-xs leading-snug text-zinc-500">
-        Background from your training archive — anchors how current readiness compares to prior
+        Background from your training archive: anchors how current readiness compares to prior
         blocks.
       </p>
       <dl className="space-y-2.5">

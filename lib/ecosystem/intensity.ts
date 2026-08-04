@@ -62,7 +62,7 @@ export function inferActivityIntensity(
     return {
       level: "high",
       confidence: "medium",
-      evidence: ["HIIT/CrossFit sport_type — fatigue context assumed high"],
+      evidence: ["HIIT/CrossFit sport_type: fatigue context assumed high"],
     };
   }
 
@@ -96,7 +96,7 @@ export function inferActivityIntensity(
     return {
       level: "moderate",
       confidence: "low",
-      evidence: [...evidence, "No HR or label — moderate assumed"],
+      evidence: [...evidence, "No HR or label: moderate assumed"],
     };
   }
 
@@ -138,7 +138,7 @@ export function inferActivityIntensity(
     return {
       level: "low",
       confidence: "low",
-      evidence: [`${sportType} without HR — low-moderate assumed`],
+      evidence: [`${sportType} without HR: low-moderate assumed`],
     };
   }
 
@@ -147,7 +147,7 @@ export function inferActivityIntensity(
     return {
       level: "moderate",
       confidence: "low",
-      evidence: ["Sport session — mixed intensity, fatigue relevant"],
+      evidence: ["Sport session: mixed intensity, fatigue relevant"],
     };
   }
 
@@ -188,11 +188,11 @@ export function inferActivityPurpose(
   }
   if (modality === "bike") {
     return perceivedIntensity === "high"
-      ? "Cycling load — aerobic support with fatigue context"
+      ? "Cycling load: aerobic support with fatigue context"
       : "Cycling aerobic support without run impact";
   }
   if (modality === "swim") {
-    return "Swim aerobic support — preserves run specificity for race predictions";
+    return "Swim aerobic support: preserves run specificity for race predictions";
   }
   if (modality === "strength") {
     return perceivedIntensity === "high"
@@ -204,14 +204,14 @@ export function inferActivityPurpose(
   if (modality === "high_intensity_cross_training") {
     return "High-intensity non-run conditioning (fatigue context only)";
   }
-  if (modality === "sport") return "Sport session — mixed intensity, fatigue relevant";
+  if (modality === "sport") return "Sport session: mixed intensity, fatigue relevant";
   if (modality === "outdoor_endurance") {
-    return "Outdoor endurance — aerobic support, not run-equivalent";
+    return "Outdoor endurance: aerobic support, not run-equivalent";
   }
   if (modality === "aerobic_cross_training") {
     return perceivedIntensity === "low"
       ? "Low-impact aerobic support"
-      : `${sportType} cross-training — supports endurance base`;
+      : `${sportType} cross-training: supports endurance base`;
   }
   return "General training activity";
 }

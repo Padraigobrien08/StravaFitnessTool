@@ -80,7 +80,7 @@ describe("recommendation integrity", () => {
       workouts: [],
       rationale: {
         primaryGoal: "Optimize",
-        evidenceUsed: ["HRV trending up 12% — schedule hard Tuesday"],
+        evidenceUsed: ["HRV trending up 12%: schedule hard Tuesday"],
         tradeoffs: [],
         risksManaged: [],
       },

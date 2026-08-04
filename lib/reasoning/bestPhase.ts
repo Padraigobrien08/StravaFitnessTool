@@ -46,7 +46,7 @@ export function findBestPhase(
 
   const limitations: string[] = [];
   if (blocks.length < 3) {
-    limitations.push("Fewer than 3 four-week blocks — phase ranking has low confidence.");
+    limitations.push("Fewer than 3 four-week blocks: phase ranking has low confidence.");
   }
   if (metric === "efficiency" && blocks.every((b) => b.meanEfficiency == null)) {
     limitations.push("Insufficient HR+pace data for efficiency-based phase ranking.");
@@ -62,7 +62,7 @@ export function findBestPhase(
 
   const evidence = best
     ? [
-        `Best ${metric} block: ${best.label} — ${best.distanceKm} km, ${best.runCount} runs, hard ${best.hardPct}%`,
+        `Best ${metric} block: ${best.label}, ${best.distanceKm} km, ${best.runCount} runs, hard ${best.hardPct}%`,
         best.meanEfficiency != null
           ? `Mean aerobic efficiency index ${best.meanEfficiency}`
           : "Efficiency index unavailable for this block",

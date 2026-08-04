@@ -256,7 +256,7 @@ export function buildRacePredictionAnalysis(
       id: "riegel",
       name: "Riegel (1981)",
       description:
-        "Classic endurance scaling — assumes performance decays predictably as distance grows.",
+        "Classic endurance scaling: assumes performance decays predictably as distance grows.",
       formula: "T₂ = T₁ × (D₂/D₁)^1.06",
       anchorLabel: `${anchor.runName} (${anchor.distanceKm.toFixed(1)} km, ${formatShortTime(anchor.timeSec)})`,
       exponent: 1.06,
@@ -266,7 +266,7 @@ export function buildRacePredictionAnalysis(
       id: "cameron",
       name: "Cameron (1982)",
       description:
-        "Alternative equivalence model — often more conservative for marathon extrapolation.",
+        "Alternative equivalence model: often more conservative for marathon extrapolation.",
       formula: "T₂ = T₁ × (D₂/D₁) × (2 − D₁/D₂)",
       anchorLabel: `${anchor.runName}`,
       predictions: predictFromAnchor(anchor, "cameron"),
@@ -277,7 +277,7 @@ export function buildRacePredictionAnalysis(
     models.push({
       id: "regression",
       name: "Your performance curve",
-      description: `Power-law fit through ${regression.pointCount} efforts in your data — personalized exponent.`,
+      description: `Power-law fit through ${regression.pointCount} efforts in your data, personalized exponent.`,
       formula: `T = ${regression.coefficient.toFixed(1)} × D^${regression.exponent.toFixed(3)}`,
       exponent: regression.exponent,
       rSquared: regression.rSquared,
@@ -336,10 +336,10 @@ export function buildRacePredictionAnalysis(
       ? `Single-effort models anchor on your fastest effort in the 4–15 km range: "${anchor.runName}" (${formatShortTime(anchor.timeSec)} at ${anchor.distanceKm.toFixed(1)} km, ${anchor.source}).`
       : "No strong anchor effort found in the 4–15 km range.",
     regression
-      ? `The regression line fits time vs distance in your data (exponent ${regression.exponent.toFixed(2)}, R²=${regression.rSquared.toFixed(2)}) — steeper exponent means pace fades faster with distance.`
+      ? `The regression line fits time vs distance in your data (exponent ${regression.exponent.toFixed(2)}, R²=${regression.rSquared.toFixed(2)}). Steeper exponent means pace fades faster with distance.`
       : "Not enough efforts for a reliable personalized curve (need ≥3 between 3–30 km).",
     `Consensus times are the average across ${models.length} models; the spread shows model agreement (tighter = more confident).`,
-    "Predictions are estimates — course, weather, training, and tactics on race day will shift real results.",
+    "Predictions are estimates: course, weather, training, and tactics on race day will shift real results.",
   ];
 
   return {

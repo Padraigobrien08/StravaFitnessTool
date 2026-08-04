@@ -179,10 +179,9 @@ export function computeWorkoutQuality(
     evidence.push(`Aerobic decoupling ${decouplingPct > 0 ? "+" : ""}${decouplingPct}%`);
   }
   if (!fit) {
-    limitations.push("No FIT lap/stream data — quality metrics require synced streams.");
+    limitations.push("No FIT lap/stream data: quality metrics require synced streams.");
   } else {
-    if (laps.length < 2)
-      limitations.push("Fewer than 2 laps recorded — repeatability unavailable.");
+    if (laps.length < 2) limitations.push("Fewer than 2 laps recorded: repeatability unavailable.");
     if (decouplingPct == null)
       limitations.push("Pace or HR stream too sparse for aerobic decoupling.");
   }

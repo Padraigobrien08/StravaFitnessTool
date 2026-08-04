@@ -112,7 +112,7 @@ function classifyDay(w: CalendarWorkout, runs: RunActivity[], todayIso: string):
         actualRuns: [],
         plannedLabel: planned,
         actualLabel: null,
-        note: "Marked done — no matching import activity",
+        note: "Marked done: no matching import activity",
       };
     }
     const actualKm = runs.reduce((s, r) => s + r.distanceM / 1000, 0);
@@ -144,7 +144,7 @@ function classifyDay(w: CalendarWorkout, runs: RunActivity[], todayIso: string):
       actualRuns: runs,
       plannedLabel: planned,
       actualLabel: formatRunSummary(runs),
-      note: "Rest day — extra activity logged",
+      note: "Rest day: extra activity logged",
     };
   }
 

@@ -98,7 +98,7 @@ export function buildWeeklyNarrative(
     const priorMax = maxLongestRunPriorWeeks(runs, input.athleteMaxHr, beforeStart, 4);
     if (priorMax > 0 && current.longestRunKm >= priorMax) {
       paragraphs.push(
-        `Your longest run was ${current.longestRunKm} km — a high point in the last month.`,
+        `Your longest run was ${current.longestRunKm} km, a high point in the last month.`,
       );
     } else if (priorMax > 0) {
       paragraphs.push(
@@ -134,7 +134,7 @@ export function buildWeeklyNarrative(
   // 5. Efficiency optional
   if (input.efficiencySummary.trend === "improving") {
     paragraphs.push(
-      "Aerobic efficiency is trending up — you're running faster at similar heart rates recently.",
+      "Aerobic efficiency is trending up. You're running faster at similar heart rates recently.",
     );
     bullets.push("Efficiency trend: improving");
   }
@@ -206,7 +206,7 @@ export function buildMonthlyNarrative(input: MonthlyNarrativeInput): MonthlyNarr
       volumeDropSharp = pct <= -25;
       const dir = pct > 0 ? "up" : pct < 0 ? "down" : "flat";
       paragraphs.push(
-        `You covered ${round1(current.distanceKm)} km across ${current.runCount} run${current.runCount === 1 ? "" : "s"} — ${dir} ${Math.abs(pct)}% from ${round1(prior.distanceKm)} km the month before.`,
+        `You covered ${round1(current.distanceKm)} km across ${current.runCount} run${current.runCount === 1 ? "" : "s"}, ${dir} ${Math.abs(pct)}% from ${round1(prior.distanceKm)} km the month before.`,
       );
       highlights.push(`Volume ${round1(current.distanceKm)} km (${pct > 0 ? "+" : ""}${pct}% MoM)`);
     } else {
@@ -223,7 +223,7 @@ export function buildMonthlyNarrative(input: MonthlyNarrativeInput): MonthlyNarr
     const isBest = input.bestBlock.weekStart === latest.weekStart;
     if (isBest) {
       paragraphs.push(
-        `Your most recent 4-week block (${round1(latest.distanceKm)} km) is your biggest in the tracked window — fitness is building.`,
+        `Your most recent 4-week block (${round1(latest.distanceKm)} km) is your biggest in the tracked window. Fitness is building.`,
       );
       highlights.push("Biggest 4-week block to date");
     } else {
@@ -250,7 +250,7 @@ export function buildMonthlyNarrative(input: MonthlyNarrativeInput): MonthlyNarr
   // 5. Consistency.
   if (input.consistencyScore.streakWeeks >= 3) {
     paragraphs.push(
-      `Consistency is ${input.consistencyScore.label.toLowerCase()} — ${input.consistencyScore.streakWeeks} weeks running without a gap.`,
+      `Consistency is ${input.consistencyScore.label.toLowerCase()}: ${input.consistencyScore.streakWeeks} weeks running without a gap.`,
     );
     highlights.push(`${input.consistencyScore.streakWeeks}-week streak`);
   }
@@ -259,7 +259,7 @@ export function buildMonthlyNarrative(input: MonthlyNarrativeInput): MonthlyNarr
   const hard = input.workoutTypeMix.find((b) => b.type === "tempo" || b.type === "interval");
   if (hard && hard.pct >= 30) {
     paragraphs.push(
-      `Intensity leaned hard — ${hard.pct}% of runs were tempo or interval work this window.`,
+      `Intensity leaned hard: ${hard.pct}% of runs were tempo or interval work this window.`,
     );
   }
 
@@ -269,11 +269,11 @@ export function buildMonthlyNarrative(input: MonthlyNarrativeInput): MonthlyNarr
   else if ((volumeUp || input.recentPrs.length > 0) && effImproving) severity = "positive";
 
   const headline = volumeDropSharp
-    ? "A lighter month — volume stepped back"
+    ? "A lighter month: volume stepped back"
     : input.recentPrs.length > 0
-      ? `A breakthrough month — ${input.recentPrs.length} PR${input.recentPrs.length === 1 ? "" : "s"}`
+      ? `A breakthrough month: ${input.recentPrs.length} PR${input.recentPrs.length === 1 ? "" : "s"}`
       : volumeUp
-        ? "Building month — volume trending up"
+        ? "Building month: volume trending up"
         : "Steady month";
 
   const confidence: MonthlyNarrative["confidence"] =
@@ -323,7 +323,7 @@ export function buildPreRaceNarrative(input: PreRaceNarrativeInput): PreRaceNarr
 
   // 1. Readiness.
   paragraphs.push(
-    `${days} day${days === 1 ? "" : "s"} out from your ${r.distanceLabel}, readiness is ${r.score}/100 (${r.label})${r.probabilityBand ? ` — ${r.probabilityBand}` : ""}.`,
+    `${days} day${days === 1 ? "" : "s"} out from your ${r.distanceLabel}, readiness is ${r.score}/100 (${r.label})${r.probabilityBand ? `, ${r.probabilityBand}` : ""}.`,
   );
   highlights.push(`Readiness ${r.score}/100`);
 
@@ -331,14 +331,14 @@ export function buildPreRaceNarrative(input: PreRaceNarrativeInput): PreRaceNarr
   const fresh = Math.round(input.fatigue.freshness);
   let freshnessOk = true;
   if (input.fatigue.freshness >= 50) {
-    paragraphs.push(`Freshness is ${fresh} — you're carrying little fatigue into race week.`);
+    paragraphs.push(`Freshness is ${fresh}. You're carrying little fatigue into race week.`);
   } else if (input.fatigue.freshness < 35) {
     freshnessOk = false;
     paragraphs.push(
-      `Freshness is only ${fresh} — you're still carrying fatigue; ease off to arrive rested.`,
+      `Freshness is only ${fresh}. You're still carrying fatigue; ease off to arrive rested.`,
     );
   } else {
-    paragraphs.push(`Freshness is ${fresh} — trending toward race-ready with a proper taper.`);
+    paragraphs.push(`Freshness is ${fresh}, trending toward race-ready with a proper taper.`);
   }
   highlights.push(`Freshness ${fresh}`);
 

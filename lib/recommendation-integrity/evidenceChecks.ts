@@ -84,7 +84,7 @@ export function runEvidenceChecks(input: WeeklyPlanIntegrityInput): Recommendati
     issues.push({
       type: "missing_evidence",
       severity: "medium",
-      message: "Only one evidence item — plan may be under-justified",
+      message: "Only one evidence item: plan may be under-justified",
       suggestedFix: "Add at least one more context-backed evidence point",
     });
   }

@@ -4,7 +4,7 @@ import type { WorkoutType } from "@/lib/analytics/workoutType";
 const HARD_TYPES: WorkoutType[] = ["tempo", "interval", "race"];
 
 const MEDICAL_DISCLAIMER =
-  "Not a substitute for a coach or medical advice — adjust based on how you feel.";
+  "Not a substitute for a coach or medical advice: adjust based on how you feel.";
 
 export interface SafetyAdjustments {
   plan: WeekPlan;

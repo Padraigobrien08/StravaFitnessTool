@@ -152,7 +152,7 @@ function synthesizeSignals(
   } else {
     signals.push({
       text: "Long-run density still building toward race distance.",
-      significance: `Longest ${r.longestRunKm} km — extend gradually before taper.`,
+      significance: `Longest ${r.longestRunKm} km: extend gradually before taper.`,
       tone: "warning",
     });
   }
@@ -165,7 +165,7 @@ function synthesizeSignals(
     });
   } else if (analytics.efficiencySummary.trend === "declining") {
     signals.push({
-      text: "Aerobic efficiency slipping — check recovery.",
+      text: "Aerobic efficiency slipping: check recovery.",
       significance: analytics.efficiencyMoM.narrative ?? "Review fatigue and easy-day discipline.",
       tone: "warning",
     });
@@ -186,7 +186,7 @@ function synthesizeSignals(
   } else if (hardPct >= 12 && hardPct <= 25) {
     signals.push({
       text: "Threshold support is well distributed.",
-      significance: `${analytics.intensityAdvice.currentEasyPct}% easy efforts — quality spaced appropriately.`,
+      significance: `${analytics.intensityAdvice.currentEasyPct}% easy efforts: quality spaced appropriately.`,
       tone: "positive",
     });
   }
@@ -200,7 +200,7 @@ function synthesizeSignals(
   } else if (analytics.fatigue.tsb < -12) {
     signals.push({
       text: "Recovery distribution slightly insufficient.",
-      significance: "Acute load exceeds recovery — prioritize sleep and easy volume.",
+      significance: "Acute load exceeds recovery: prioritize sleep and easy volume.",
       tone: "warning",
     });
   }
@@ -251,7 +251,7 @@ function buildExecutive(
     readiness.score >= 72
       ? `Strong likelihood of successful ${dist} completion if pacing and fueling hold.`
       : readiness.score >= 55
-        ? `Moderate readiness — targeted long runs and taper will sharpen outcome probability.`
+        ? `Moderate readiness: targeted long runs and taper will sharpen outcome probability.`
         : `Build volume and long-run support before expecting race-day confirmation.`;
 
   return {
@@ -280,7 +280,7 @@ function buildRaceBriefing(
     confidence: goals.projection.primary?.confidence ?? analytics.dataConfidence,
     strongestSignal: goals.hero.strongestSignal,
     largestRisk: goals.risks[0]?.title
-      ? `${goals.risks[0].title} — ${goals.risks[0].evidence}`
+      ? `${goals.risks[0].title}: ${goals.risks[0].evidence}`
       : goals.hero.biggestLimiter,
     pacingGuidance: goals.projection.pacingNote,
     projectedRange: primary ? `${primary.timeDisplay} ${primary.spreadDisplay}` : null,
@@ -364,7 +364,7 @@ function buildCharts(analytics: DashboardInsights): ReportChartSpec[] {
     charts.push({
       id: "load",
       title: "Fatigue & load balance",
-      caption: "CTL vs ATL — gap indicates training stress balance.",
+      caption: "CTL vs ATL: gap indicates training stress balance.",
       whyItMatters:
         "When acute load (ATL) rises faster than fitness (CTL), late-race fade risk increases.",
     });

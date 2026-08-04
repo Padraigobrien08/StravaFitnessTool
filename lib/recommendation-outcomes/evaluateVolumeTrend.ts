@@ -42,7 +42,7 @@ export function evaluateVolumeTrendAdherence(
     return {
       adherence: "pending",
       matchedRunIds: [],
-      note: `Too soon to judge — ${ageDays}d of ${MIN_AGE_DAYS} elapsed.`,
+      note: `Too soon to judge: ${ageDays}d of ${MIN_AGE_DAYS} elapsed.`,
     };
   }
 

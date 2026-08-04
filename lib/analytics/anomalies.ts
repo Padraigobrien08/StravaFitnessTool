@@ -85,7 +85,7 @@ export function computeAnomalies(
       anomalies: [],
       evidence: [],
       limitations: [
-        "Personal z-scores aren't available yet — need enough comparable sessions to detect what's abnormal.",
+        "Personal z-scores aren't available yet: need enough comparable sessions to detect what's abnormal.",
       ],
     };
   }
@@ -119,7 +119,7 @@ export function computeAnomalies(
 
   const evidence = anomalies.slice(0, 3).map((a) => a.headline);
   const limitations = [
-    "Causes are contextual associations from temperature, elevation, and recent load — not proven explanations.",
+    "Causes are contextual associations from temperature, elevation, and recent load, not proven explanations.",
   ];
 
   return { available: true, anomalies, evidence, limitations };
@@ -173,7 +173,7 @@ function buildAnomaly(
     if (causes.length === 0) {
       causes.push({
         cause: "unexplained",
-        detail: "no obvious heat, hills, or recent-load explanation — worth a look",
+        detail: "no obvious heat, hills, or recent-load explanation; worth a look",
       });
     }
   } else {
@@ -185,8 +185,7 @@ function buildAnomaly(
       favs.push("flat");
     causes.push({
       cause: "favorable",
-      detail:
-        favs.length > 0 ? `standout — ${favs.join(", ")}` : "standout — no adverse conditions",
+      detail: favs.length > 0 ? `standout: ${favs.join(", ")}` : "standout: no adverse conditions",
     });
   }
 
@@ -197,7 +196,7 @@ function buildAnomaly(
         ? "doesn't fit your model"
         : `likely ${causes.map((c) => c.cause).join(" + ")}`
       : "overperformed";
-  const headline = `${s.typeLabel} ${sigma} — ${causeText}.`;
+  const headline = `${s.typeLabel} ${sigma}: ${causeText}.`;
 
   return {
     runId: s.runId,

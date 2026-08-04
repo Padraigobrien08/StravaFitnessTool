@@ -39,7 +39,7 @@ export function IntelligenceProgressionBurndown({ data }: { data: ProgressionBur
       ) : null}
 
       <Link
-        href={signalCoachLink("Am I on pace to be ready for my race — long run and volume?")}
+        href={signalCoachLink("Am I on pace to be ready for my race (long run and volume)?")}
         className="mt-2 inline-block text-[10px] text-zinc-600 hover:text-zinc-400"
       >
         Ask Coach

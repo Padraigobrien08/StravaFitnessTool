@@ -102,7 +102,7 @@ export function computeUncertaintyEstimates(
         "Aerobic efficiency",
         "pace/HR",
         effCi,
-        `Current aerobic efficiency ${effCi.point.toFixed(3)} (pace ÷ HR; lower = better) — ${CI_PCT}% CI ${effCi.lo.toFixed(3)}–${effCi.hi.toFixed(3)} across ${effCi.n} recent runs.`,
+        `Current aerobic efficiency ${effCi.point.toFixed(3)} (pace ÷ HR; lower = better), ${CI_PCT}% CI ${effCi.lo.toFixed(3)}–${effCi.hi.toFixed(3)} across ${effCi.n} recent runs.`,
       ),
     );
   }
@@ -120,7 +120,7 @@ export function computeUncertaintyEstimates(
         "Weekly volume",
         "km/wk",
         volCi,
-        `Typical weekly volume ~${Math.round(volCi.point)} km — ${CI_PCT}% CI ${Math.round(volCi.lo)}–${Math.round(volCi.hi)} km across ${volCi.n} recent weeks.`,
+        `Typical weekly volume ~${Math.round(volCi.point)} km, ${CI_PCT}% CI ${Math.round(volCi.lo)}–${Math.round(volCi.hi)} km across ${volCi.n} recent weeks.`,
       ),
     );
   }
@@ -145,7 +145,7 @@ export function computeUncertaintyEstimates(
         "Easy-run pace",
         "/km",
         paceCi,
-        `Easy-run pace around ${paceLabel(paceCi.point)} — ${CI_PCT}% CI ${paceLabel(paceCi.hi)}–${paceLabel(paceCi.lo)} across ${paceCi.n} recent easy runs.`,
+        `Easy-run pace around ${paceLabel(paceCi.point)}, ${CI_PCT}% CI ${paceLabel(paceCi.hi)}–${paceLabel(paceCi.lo)} across ${paceCi.n} recent easy runs.`,
       ),
     );
   }
@@ -165,7 +165,7 @@ export function computeUncertaintyEstimates(
   const limitations: string[] = [];
   if (lowN > 0) {
     limitations.push(
-      `${lowN} estimate${lowN === 1 ? "" : "s"} rest on a small recent sample (<8) — the interval is wide for a reason.`,
+      `${lowN} estimate${lowN === 1 ? "" : "s"} rest on a small recent sample (<8): the interval is wide for a reason.`,
     );
   }
 

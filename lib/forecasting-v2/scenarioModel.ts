@@ -20,7 +20,7 @@ export function buildScenarios(opts: {
       name: "Conservative",
       predictedTimeSec: opts.conservativeTimeSec,
       description:
-        "Slight fade or cautious first half — accounts for execution and durability buffers.",
+        "Slight fade or cautious first half: accounts for execution and durability buffers.",
     },
     {
       name: "Optimistic",
@@ -36,7 +36,7 @@ export function buildScenarios(opts: {
         opts.mostLikelyTimeSec + opts.execution.conservativePaddingSec * 1.4,
       ),
       description:
-        "Aggressive early pace — current evidence suggests elevated second-half fade risk.",
+        "Aggressive early pace: current evidence suggests elevated second-half fade risk.",
     });
   }
 

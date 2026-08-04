@@ -55,7 +55,7 @@ export function buildIntensityAdvice(
       hardRunsLast14d: easyHard14d.hard,
       recommendations: [
         ...recommendations,
-        "No runs in the last 7 days — resume with one easy 30–40 minute run.",
+        "No runs in the last 7 days: resume with one easy 30–40 minute run.",
       ],
       suggestedWeekPlan: [
         { type: "easy", description: "1 easy run: 30–40 min, conversational pace" },
@@ -66,7 +66,7 @@ export function buildIntensityAdvice(
   if (currentEasyPct < 30 && easyHard14d.hard >= 2) {
     recommendations.push(
       "Next 7 days: cap hard sessions at 1; add 2 easy runs of 30–45 min in Z1–Z2.",
-      `${easyHard14d.hard} hard runs in the last 14 days — recovery may be lagging volume.`,
+      `${easyHard14d.hard} hard runs in the last 14 days: recovery may be lagging volume.`,
     );
     suggestedWeekPlan.push(
       { type: "easy", description: "2 easy runs: 30–45 min, HR below 80% max" },
@@ -84,7 +84,7 @@ export function buildIntensityAdvice(
 
   if (currentEasyPct >= 60) {
     recommendations.push(
-      "Polarized balance looks good — keep most runs easy and limit hard days to 1–2 per week.",
+      "Polarized balance looks good: keep most runs easy and limit hard days to 1–2 per week.",
     );
     suggestedWeekPlan.push(
       { type: "easy", description: "3–4 easy aerobic runs" },
@@ -101,7 +101,7 @@ export function buildIntensityAdvice(
   }
 
   if (currentEasyPct < 40) {
-    recommendations.push("Add more easy volume — aim for ~80% of runs below 80% max HR.");
+    recommendations.push("Add more easy volume: aim for ~80% of runs below 80% max HR.");
     suggestedWeekPlan.push({
       type: "easy",
       description: "2–3 easy runs before the next hard session",
@@ -116,7 +116,7 @@ export function buildIntensityAdvice(
     };
   }
 
-  recommendations.push("Mixed intensity — track easy days explicitly to avoid creeping fatigue.");
+  recommendations.push("Mixed intensity: track easy days explicitly to avoid creeping fatigue.");
   return {
     status: "balanced",
     easyTargetPct,

@@ -79,11 +79,11 @@ function interpret(kind: ChangePointKind, label: string, before: number, after: 
   const shift = `slope ${before >= 0 ? "+" : ""}${before}→${after >= 0 ? "+" : ""}${after}/wk`;
   switch (kind) {
     case "reversal_up":
-      return `Fitness turned upward around ${label} — a build phase took hold (${shift}).`;
+      return `Fitness turned upward around ${label}, a build phase took hold (${shift}).`;
     case "reversal_down":
       return after < -1
-        ? `Fitness dropped sharply around ${label} — a break or setback (${shift}).`
-        : `Fitness peaked and eased off around ${label} — taper or a lighter stretch (${shift}).`;
+        ? `Fitness dropped sharply around ${label}, a break or setback (${shift}).`
+        : `Fitness peaked and eased off around ${label}, taper or a lighter stretch (${shift}).`;
     case "acceleration":
       return `Fitness ramp steepened around ${label} (${shift}).`;
     case "deceleration":

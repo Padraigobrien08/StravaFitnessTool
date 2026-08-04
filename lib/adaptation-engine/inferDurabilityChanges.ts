@@ -12,7 +12,7 @@ export function inferDurabilityChanges(analytics: DashboardInsights): Adaptation
     out.push({
       id: "durability-long-run",
       category: "durability",
-      statement: `Recent block includes ${last.longestRunKm} km long run — durability stimulus present`,
+      statement: `Recent block includes ${last.longestRunKm} km long run: durability stimulus present`,
       confidence: "low",
       supportingEvidence: [
         `Block ${last.label}: ${last.distanceKm} km`,

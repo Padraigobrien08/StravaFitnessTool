@@ -9,7 +9,7 @@ export function buildActivityGpx(
   const latlng = streams?.latlng?.data as [number, number][] | undefined;
   const time = streams?.time?.data as number[] | undefined;
   if (!latlng?.length) {
-    throw new Error("No GPS latlng stream on activity — cannot build GPX");
+    throw new Error("No GPS latlng stream on activity: cannot build GPX");
   }
 
   const name = escapeXml(activityName || `Activity ${activityId}`);

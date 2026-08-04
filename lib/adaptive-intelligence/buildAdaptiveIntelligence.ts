@@ -111,7 +111,7 @@ function buildRecentlyLearned(
     if (o.evaluation === "supported") {
       items.push(`Recommendation supported: ${o.recommendation.slice(0, 90)}`);
     } else if (o.evaluation === "contradicted") {
-      items.push(`Prior advice contradicted — ${o.recommendation.slice(0, 70)}`);
+      items.push(`Prior advice contradicted: ${o.recommendation.slice(0, 70)}`);
     }
   }
 

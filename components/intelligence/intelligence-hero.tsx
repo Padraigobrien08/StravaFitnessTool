@@ -39,7 +39,7 @@ export function IntelligenceHero({
         </Eyebrow>
         <p className="font-mono text-[10px] text-zinc-500">
           System confidence: <span className="text-zinc-400">{confidence.level}</span>
-          <span className="text-zinc-600"> — {confidence.reason}</span>
+          <span className="text-zinc-600">, {confidence.reason}</span>
         </p>
       </div>
 

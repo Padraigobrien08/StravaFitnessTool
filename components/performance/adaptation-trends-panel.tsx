@@ -11,7 +11,7 @@ export function AdaptationTrendsPanel({ trends }: { trends: AdaptationTrendView[
     <Panel>
       <PanelHeader title="Adaptation trends" />
       <p className={cn(dash.muted, "mb-4 max-w-2xl")}>
-        Signals that explain whether you are getting faster — charts support the narrative, not the
+        Signals that explain whether you are getting faster. Charts support the narrative, not the
         other way around.
       </p>
       <div className="grid gap-3 sm:grid-cols-2">

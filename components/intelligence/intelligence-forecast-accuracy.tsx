@@ -23,7 +23,7 @@ export function IntelligenceForecastAccuracy({ data }: { data: ForecastCalibrati
     <Panel title="Forecast accuracy" hint="how well predictions have held up">
       {summary.evaluated === 0 ? (
         <p className="mt-1 text-[12px] text-zinc-500">
-          {summary.logged} forecast{summary.logged === 1 ? "" : "s"} logged — graded once you race
+          {summary.logged} forecast{summary.logged === 1 ? "" : "s"} logged, graded once you race
           that distance again.
         </p>
       ) : (

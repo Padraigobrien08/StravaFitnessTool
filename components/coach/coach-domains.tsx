@@ -45,7 +45,7 @@ export function CoachDomains({
             Coaching domains
           </p>
           <p className="mt-0.5 text-xs text-zinc-600">
-            Live context — tap to open a reasoning thread
+            Live context: tap to open a reasoning thread
           </p>
         </div>
       </div>

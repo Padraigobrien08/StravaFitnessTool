@@ -11,7 +11,7 @@ export function StravaMcpScopesCard({ connected }: { connected: boolean }) {
       <Eyebrow className="mb-3">Strava & MCP</Eyebrow>
       <div className="space-y-4 text-sm">
         <p className="text-muted-foreground">
-          The built-in StrideIQ MCP server uses your app OAuth token — connect Strava here, then
+          The built-in StrideIQ MCP server uses your app OAuth token. Connect Strava here, then
           configure Claude/Cursor with <code className="text-zinc-300">STRIDEIQ_API_KEY</code>. See{" "}
           <span className="text-accent">docs/MCP_INTEGRATION.md</span>.
         </p>

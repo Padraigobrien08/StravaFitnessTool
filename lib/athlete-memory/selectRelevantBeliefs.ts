@@ -72,13 +72,13 @@ export function selectRelevantBeliefs(
   if (opts?.forPlanning) {
     for (const b of beliefs) {
       if (b.category === "fatigue" && /hard|density|stack/i.test(b.statement)) {
-        planningNotes.push("Memory: avoid stacking hard sessions — " + b.recommendedUse);
+        planningNotes.push("Memory: avoid stacking hard sessions. " + b.recommendedUse);
       }
       if (b.category === "modality" && /interference/i.test(b.statement)) {
         planningNotes.push("Memory: separate hard cross-training from key runs");
       }
       if (b.category === "taper" && raceWeek) {
-        planningNotes.push("Memory: prioritise taper/freshness — " + b.recommendedUse);
+        planningNotes.push("Memory: prioritise taper/freshness. " + b.recommendedUse);
       }
     }
   }

@@ -52,14 +52,14 @@ export function detectAthleteArchetype(
     archetype = "triathlete";
     label = "Triathlon / multisport endurance profile";
     coachingNotes.push(
-      "Bike and swim add aerobic support — do not treat as wasted volume.",
+      "Bike and swim add aerobic support: do not treat as wasted volume.",
       "Race predictions remain run-specific unless explicitly calibrated.",
     );
   } else if (bikePct >= 50 && runPct < 40) {
     archetype = "cyclist";
     label = "Cycling-dominant profile";
     coachingNotes.push(
-      "Cycling may carry fatigue into run quality days — watch interference near key runs.",
+      "Cycling may carry fatigue into run quality days: watch interference near key runs.",
     );
   } else if (strengthPct >= 20 && hiitPct >= 15 && runPct >= 25) {
     archetype = "strength_endurance";
@@ -73,13 +73,13 @@ export function detectAthleteArchetype(
     label = "Hybrid runner (run + strength/HIIT)";
     coachingNotes.push(
       "Respect gym fatigue; separate hard non-run work from quality runs.",
-      "Strength supports durability — not equivalent to easy running volume.",
+      "Strength supports durability, not equivalent to easy running volume.",
     );
   } else if (sportPct + (dist.unknown ?? 0) > totalSessions * 0.25) {
     archetype = "multisport";
     label = "Broad multisport profile";
     coachingNotes.push(
-      "Multiple sport types present — use modality balance and interference tools.",
+      "Multiple sport types present: use modality balance and interference tools.",
     );
   } else if (runPct >= 50) {
     archetype = "runner";

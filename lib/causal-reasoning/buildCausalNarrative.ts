@@ -5,7 +5,7 @@ export function buildCausalNarrative(explanation: CausalExplanation): string {
 
   for (const d of explanation.likelyDrivers.slice(0, 3)) {
     const ev = d.evidence[0] ? ` (${d.evidence[0]})` : "";
-    lines.push(`• ${d.driver} — likely ${d.impact} impact, ${d.confidence} confidence${ev}`);
+    lines.push(`• ${d.driver}: likely ${d.impact} impact, ${d.confidence} confidence${ev}`);
   }
 
   if (explanation.uncertainties.length) {

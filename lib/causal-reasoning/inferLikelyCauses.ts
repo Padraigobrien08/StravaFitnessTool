@@ -14,7 +14,7 @@ export function inferLikelyCauses(
   const uncertainties: string[] = [];
 
   if (analytics.dataConfidence === "low" || analytics.summary.runCount < 8) {
-    uncertainties.push("Limited training history — causal attribution is tentative");
+    uncertainties.push("Limited training history: causal attribution is tentative");
   }
   if (analytics.dataConfidence === "low") {
     uncertainties.push("Low data confidence may obscure load and efficiency drivers");
@@ -71,7 +71,7 @@ export function inferLikelyCauses(
         uncertainties.push("Stacking may suppress readiness if maintained");
       }
       if (delta != null && Math.abs(delta) < 3) {
-        uncertainties.push("Readiness change is small — multiple factors may cancel");
+        uncertainties.push("Readiness change is small: multiple factors may cancel");
       }
 
       return {
@@ -151,10 +151,10 @@ export function inferLikelyCauses(
         uncertainties,
         summary:
           trend === "improving"
-            ? "Efficiency appears to be improving — likely supported by consistent easy volume."
+            ? "Efficiency appears to be improving, likely supported by consistent easy volume."
             : trend === "declining"
-              ? "Efficiency appears under pressure — fatigue or intensity may be contributors."
-              : "Efficiency signal is flat — insufficient trend to attribute causes.",
+              ? "Efficiency appears under pressure: fatigue or intensity may be contributors."
+              : "Efficiency signal is flat: insufficient trend to attribute causes.",
       };
     }
 
@@ -191,11 +191,11 @@ export function inferLikelyCauses(
 
 function buildSummary(label: string, drivers: CausalDriver[], statePhrase: string): string {
   if (drivers.length === 0) {
-    return `${label} ${statePhrase} — no dominant driver identified from current evidence.`;
+    return `${label} ${statePhrase}; no dominant driver identified from current evidence.`;
   }
   const top = drivers
     .slice(0, 2)
     .map((d) => d.driver.toLowerCase())
     .join(" and ");
-  return `${label} ${statePhrase} — appears influenced primarily by ${top}.`;
+  return `${label} ${statePhrase}, appears influenced primarily by ${top}.`;
 }

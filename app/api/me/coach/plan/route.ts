@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   if (!route) {
     return NextResponse.json(
-      { error: "Not a planning request — use Coach chat for general questions." },
+      { error: "Not a planning request. Use Coach chat for general questions." },
       { status: 400 },
     );
   }

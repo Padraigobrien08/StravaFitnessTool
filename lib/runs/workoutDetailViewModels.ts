@@ -214,7 +214,7 @@ function buildStreamAnnotations(
     const mid = hr[Math.floor(hr.length / 2)];
     notes.push({
       kind: "hr",
-      text: `HR profile spans ${Math.round(hr.at(-1)!.elapsedSec / 60)} min — mid-session avg ~${Math.round(mid.hr)} bpm.`,
+      text: `HR profile spans ${Math.round(hr.at(-1)!.elapsedSec / 60)} min; mid-session avg ~${Math.round(mid.hr)} bpm.`,
     });
   }
   if (fit?.hrDriftPct != null) {
@@ -222,8 +222,8 @@ function buildStreamAnnotations(
       kind: "hr",
       text:
         fit.hrDriftPct <= 5
-          ? "HR stabilized relative to first half — limited cardiac drift."
-          : `HR drift +${Math.round(fit.hrDriftPct)}% — expect higher perceived effort late.`,
+          ? "HR stabilized relative to first half: limited cardiac drift."
+          : `HR drift +${Math.round(fit.hrDriftPct)}%: expect higher perceived effort late.`,
     });
   }
   if (fit && fit.paceStream.length > 20) {
@@ -236,14 +236,14 @@ function buildStreamAnnotations(
     } else if (first != null && last != null) {
       notes.push({
         kind: "pace",
-        text: "Pace held steady across the session — good rhythm discipline.",
+        text: "Pace held steady across the session: good rhythm discipline.",
       });
     }
   }
   if (fit && fit.laps.length >= 4) {
     notes.push({
       kind: "general",
-      text: `${fit.laps.length} lap segments detected — use segment table for interval-level review.`,
+      text: `${fit.laps.length} lap segments detected. Use segment table for interval-level review.`,
     });
   }
   execution.insights.slice(0, 1).forEach((i) => {
@@ -269,7 +269,7 @@ function buildAdaptations(
   if (execution.qualityScore >= 70) {
     items.push({
       title: "Pacing discipline",
-      evidence: `Execution score ${execution.qualityScore}/100 — repeatable rhythm supports progression.`,
+      evidence: `Execution score ${execution.qualityScore}/100: repeatable rhythm supports progression.`,
       confidence: execution.qualityScore >= 80 ? "high" : "medium",
     });
   }
@@ -277,7 +277,7 @@ function buildAdaptations(
   if (run.trainingLoad != null && run.trainingLoad > 80) {
     items.push({
       title: "Training load stimulus",
-      evidence: `Load ${Math.round(run.trainingLoad)} — meaningful stress for fitness adaptation.`,
+      evidence: `Load ${Math.round(run.trainingLoad)}: meaningful stress for fitness adaptation.`,
       confidence: "medium",
     });
   }
@@ -342,7 +342,7 @@ function buildHistorical(
         const avg = avgHrSimilar.reduce((s, r) => s + (r.avgHr ?? 0), 0) / avgHrSimilar.length;
         if (run.avgHr < avg - 3) {
           items.push({
-            text: "Lower average HR than prior comparable sessions — improved efficiency.",
+            text: "Lower average HR than prior comparable sessions: improved efficiency.",
             tone: "positive",
           });
         }
@@ -412,7 +412,7 @@ export function buildWorkoutDetailView(
 
   const summary =
     execution.insights[0]?.body ??
-    `${WORKOUT_TYPE_LABELS[workout.type]} work — ${formatDistanceKm(run.distanceM)} in ${formatDuration(run.movingSec || run.elapsedSec)}.`;
+    `${WORKOUT_TYPE_LABELS[workout.type]} work: ${formatDistanceKm(run.distanceM)} in ${formatDuration(run.movingSec || run.elapsedSec)}.`;
 
   const hero: WorkoutHeroView = {
     sessionTitle,
@@ -427,10 +427,10 @@ export function buildWorkoutDetailView(
     primaryAdaptation: ADAPTATION_BY_TYPE[workout.type],
     recommendation:
       grade.grade === "strong"
-        ? "Absorb with easy running — you executed well; avoid stacking intensity too soon."
+        ? "Absorb with easy running. You executed well; avoid stacking intensity too soon."
         : grade.grade === "mixed" || execution.qualityScore < 50
-          ? "Consider extra recovery — execution signals accumulated fatigue."
-          : "Review segment table and streams — refine pacing or recovery between reps.",
+          ? "Consider extra recovery: execution signals accumulated fatigue."
+          : "Review segment table and streams. Refine pacing or recovery between reps.",
     characteristics,
     workoutType: workout.type,
     confidence: workout.confidence,
@@ -489,8 +489,8 @@ export function buildWorkoutDetailView(
         streamConf === "high"
           ? "Strong HR and pace streams support lap-level interpretation."
           : streamConf === "medium"
-            ? "Partial streams — summary metrics reliable; segment detail may be limited."
-            : "Sparse stream data — rely on summary metrics and classification signals.",
+            ? "Partial streams: summary metrics reliable; segment detail may be limited."
+            : "Sparse stream data: rely on summary metrics and classification signals.",
       hrCoverage: hasHr,
       paceCoverage: hasPace,
       lapCount: fit?.laps.length ?? 0,

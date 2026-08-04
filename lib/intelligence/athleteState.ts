@@ -35,7 +35,9 @@ export interface TrajectorySeries {
 }
 
 function signalHeadline(text: string): string {
-  const first = text.split(/[.—]/)[0]?.trim();
+  // Clause break: observation copy leads with a headline, then explains after a
+  // colon/semicolon/period. (Em dash kept so LLM-authored text still splits.)
+  const first = text.split(/[.:;—]/)[0]?.trim();
   return first && first.length < 72 ? first : text.slice(0, 68).trim() + "…";
 }
 
@@ -118,13 +120,13 @@ export function getPrimaryRecommendation(
   analytics: DashboardInsights,
 ): string {
   if (analytics.fatigue.tsb < -12) {
-    return "Prioritize recovery — cap hard sessions and protect easy aerobic rhythm until freshness rebounds.";
+    return "Prioritize recovery: cap hard sessions and protect easy aerobic rhythm until freshness rebounds.";
   }
   if (analytics.raceReadiness && analytics.raceReadiness.daysUntilRace <= 14) {
     return "Preserve freshness. Cap hard sessions at one per week and use easy aerobic work to maintain rhythm before race day.";
   }
   if (analytics.intensityAdvice.status === "too_hard") {
-    return "Reduce intensity stacking — redistribute hard days and add easy volume between quality sessions.";
+    return "Reduce intensity stacking: redistribute hard days and add easy volume between quality sessions.";
   }
   if (analytics.efficiencySummary.trend === "improving") {
     return "Protect the aerobic adaptation trend with polarized easy days between quality work.";

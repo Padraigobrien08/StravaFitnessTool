@@ -194,7 +194,7 @@ export function computePersonalZScores(
   const lowCohorts = scored.filter((s) => s.confidence === "low").length;
   if (lowCohorts > 0) {
     limitations.push(
-      `${lowCohorts} session${lowCohorts === 1 ? "" : "s"} scored against a small cohort (<5) — treat those σ as directional.`,
+      `${lowCohorts} session${lowCohorts === 1 ? "" : "s"} scored against a small cohort (<5): treat those σ as directional.`,
     );
   }
 
@@ -221,5 +221,5 @@ function buildHeadline(typeLabel: string, z: number, metric: "efficiency" | "pac
           ? "well above"
           : "well below";
   const lens = metric === "efficiency" ? "faster-per-HR" : "faster";
-  return `This ${typeLabel.toLowerCase()} was ${dir}${mag.toFixed(1)}σ — ${quality} your typical ${typeLabel.toLowerCase()}${z >= 0.5 ? ` (${lens})` : ""}.`;
+  return `This ${typeLabel.toLowerCase()} was ${dir}${mag.toFixed(1)}σ, ${quality} your typical ${typeLabel.toLowerCase()}${z >= 0.5 ? ` (${lens})` : ""}.`;
 }

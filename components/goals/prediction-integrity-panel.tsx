@@ -15,7 +15,7 @@ export function PredictionIntegrityPanel({ projection }: { projection: RaceProje
       </div>
 
       <p className="mb-4 text-sm text-zinc-400">
-        Evidence-based estimate — not a guarantee. Spread reflects model agreement and data
+        Evidence-based estimate, not a guarantee. Spread reflects model agreement and data
         completeness.
       </p>
 

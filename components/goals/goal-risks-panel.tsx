@@ -16,7 +16,7 @@ export function GoalRisksPanel({ risks }: { risks: GoalRiskView[] }) {
     <Panel>
       <Eyebrow className="mb-2.5">What could prevent success?</Eyebrow>
       <p className="mb-4 text-xs leading-snug text-zinc-500">
-        Risks ranked by training evidence — each includes a mitigation you can act on this week.
+        Risks ranked by training evidence. Each includes a mitigation you can act on this week.
       </p>
       <div className="space-y-3">
         {risks.map((risk, i) => (

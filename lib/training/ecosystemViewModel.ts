@@ -112,7 +112,7 @@ export function buildTrainingEcosystemView(analytics: DashboardInsights): Traini
         .flatMap((s) => s.evidence)
         .slice(0, 3),
       confidence: eco.confidence,
-      limitations: ["Duration-based — not sets/reps from Strava."],
+      limitations: ["Duration-based, not sets/reps from Strava."],
     },
     {
       id: "mobility",

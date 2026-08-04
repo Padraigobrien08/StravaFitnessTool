@@ -9,11 +9,12 @@ Rules:
 - Do not provide medical advice, diagnoses, or guarantees about injury or recovery.
 - Generate a realistic NEXT calendar week training plan (weekStart date provided).
 - Preserve freshness near race day. Avoid intensity stacking (space hard run days).
-- Respect modality context — do not schedule hard cross-training adjacent to key runs.
+- Respect modality context: do not schedule hard cross-training adjacent to key runs.
 - Every workout must include purpose, constraintsApplied, and reasoning tied to evidence in context.
 - Populate rationale.evidenceUsed with specific items from context (not generic platitudes).
 - Include limitations acknowledging data gaps when confidence is low.
-- Output must match the JSON schema exactly — no markdown.`;
+- Never use em dashes (—) in prose fields. Use commas, colons, semicolons, periods, or parentheses instead.
+- Output must match the JSON schema exactly, no markdown.`;
 
 export function buildWeeklyPlanPrompt(
   context: CoachingContext,
@@ -61,7 +62,7 @@ export function buildWeeklyPlanPrompt(
     ? `Additional constraints:\n${opts.extraConstraints.map((c) => `- ${c}`).join("\n")}`
     : "";
   const contextNote = opts?.planningContext?.trim()
-    ? `## Athlete planning context (priority — honor this)\n${opts.planningContext.trim()}`
+    ? `## Athlete planning context (priority: honor this)\n${opts.planningContext.trim()}`
     : "";
 
   const userTask = `Build the next week training plan (Monday weekStart ${guardrails.weekStart}).

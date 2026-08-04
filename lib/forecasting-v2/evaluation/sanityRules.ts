@@ -224,7 +224,7 @@ export function runSanityRules(
         "marathon_durability_penalty",
         "components",
         "warning",
-        `Longest run ${longest} km vs ${targetKm.toFixed(1)} km race — durability should be weaker.`,
+        `Longest run ${longest} km vs ${targetKm.toFixed(1)} km race: durability should be weaker.`,
       ),
     );
   }
@@ -297,7 +297,7 @@ export function runSanityRules(
 
   if (input.efforts.length < 3 && confidenceRank(forecast.confidence) <= 2) {
     rules.push(
-      pass("low_data_confidence_cap", "data_quality", "Sparse efforts — confidence is not high."),
+      pass("low_data_confidence_cap", "data_quality", "Sparse efforts: confidence is not high."),
     );
   } else if (input.efforts.length < 3) {
     rules.push(
@@ -339,7 +339,7 @@ export function runSanityRules(
         "high_agreement_low_specificity",
         "confidence",
         "warning",
-        "Models agree tightly but specificity is low — agreement may reflect shared extrapolation, not target fitness.",
+        "Models agree tightly but specificity is low: agreement may reflect shared extrapolation, not target fitness.",
         [
           `specificity ${forecast.componentScores.specificity}`,
           `spread ${forecast.modelAgreement.spreadSec}s`,

@@ -14,7 +14,7 @@ function makeRec(overrides: Partial<LoggedRecommendation> = {}): LoggedRecommend
     issuedAt: "2026-08-15T08:00:00.000Z",
     targetDate: "2026-08-15",
     kind: "tempo",
-    headline: "Tempo — 8–10 km",
+    headline: "Tempo, 8–10 km",
     distanceKmMin: 8,
     distanceKmMax: 10,
     ...overrides,

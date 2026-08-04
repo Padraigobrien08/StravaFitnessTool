@@ -114,7 +114,7 @@ function detectNegativeBalanceStreak(i: RiskPatternInput): RiskPattern | null {
       `Current freshness ${Math.round(i.fatigue.freshness)} (TSB ${Math.round(i.fatigue.tsb)}).`,
     ],
     mitigation:
-      "Schedule a recovery week — reduce volume ~30% and cut hard sessions to rebuild freshness.",
+      "Schedule a recovery week: reduce volume ~30% and cut hard sessions to rebuild freshness.",
     confidence: loadConfidence(i.fatigue, i.loadHistory.length),
   };
 }

@@ -45,7 +45,7 @@ function formatEffortClause(forecast: ForecastV2View): string | null {
   if (parts.length === 1) {
     return `Your recent ${parts[0]} run`;
   }
-  return `Your recent efforts — ${parts.join(" and ")}`;
+  return `Your recent efforts: ${parts.join(" and ")}`;
 }
 
 function buildBelief(forecast: ForecastV2View, goal: RaceGoal | null): string {
@@ -59,7 +59,7 @@ function buildBelief(forecast: ForecastV2View, goal: RaceGoal | null): string {
     if (forecast.targetRealistic) {
       return `${opener} Your ${target} goal aligns with this forecast.`;
     }
-    return `${opener} Your ${target} goal is more ambitious — ${forecast.targetGapDisplay.toLowerCase()}.`;
+    return `${opener} Your ${target} goal is more ambitious: ${forecast.targetGapDisplay.toLowerCase()}.`;
   }
 
   return opener;
@@ -69,15 +69,15 @@ function buildEvidenceBullets(forecast: ForecastV2View): string[] {
   const bullets: string[] = [];
 
   for (const c of forecast.positiveContributors.slice(0, 2)) {
-    bullets.push(`${c.label} — ${c.evidence}`);
+    bullets.push(`${c.label}: ${c.evidence}`);
   }
   for (const c of forecast.negativeContributors.slice(0, 3)) {
-    bullets.push(`${c.label} — ${c.evidence}`);
+    bullets.push(`${c.label}: ${c.evidence}`);
   }
   if (bullets.length < 4) {
     for (const d of forecast.uncertaintyDrivers.slice(0, 2)) {
       if (bullets.length >= 5) break;
-      bullets.push(`${d.label} (${d.impact} impact) — ${d.explanation}`);
+      bullets.push(`${d.label} (${d.impact} impact): ${d.explanation}`);
     }
   }
 
@@ -86,7 +86,7 @@ function buildEvidenceBullets(forecast: ForecastV2View): string[] {
 
 function buildConfidenceLine(forecast: ForecastV2View): string {
   const drivers = forecast.uncertaintyDrivers.slice(0, 2).map((d) => d.label.toLowerCase());
-  const why = drivers.length > 0 ? ` — mainly because of ${drivers.join(" and ")}.` : ".";
+  const why = drivers.length > 0 ? `, mainly because of ${drivers.join(" and ")}.` : ".";
   return `${forecast.confidence} confidence${why} Model agreement is ${forecast.modelAgreement.label} (spread ${forecast.modelAgreement.spread}).`;
 }
 

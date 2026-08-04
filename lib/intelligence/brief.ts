@@ -31,10 +31,10 @@ export function buildIntelligenceBrief(
   }));
 
   const limitations = [
-    "Not medical advice — adjust by feel and consult a professional if injured.",
+    "Not medical advice: adjust by feel and consult a professional if injured.",
     ...quality.warnings.slice(0, 2),
     ...(quality.overallConfidence === "low"
-      ? ["Small or incomplete dataset — treat trends as indicative."]
+      ? ["Small or incomplete dataset: treat trends as indicative."]
       : []),
   ];
 
