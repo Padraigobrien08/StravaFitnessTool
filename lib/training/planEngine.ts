@@ -6,6 +6,7 @@ import { RACE_READINESS_CONFIG } from "@/lib/analytics/readiness";
 import type { WeekSnapshot } from "@/lib/analytics/week";
 import type { WeeklyVolume } from "@/lib/analytics/volume";
 import type { WorkoutType } from "@/lib/analytics/workoutType";
+import type { ReturnToRunningPlan } from "@/lib/returning/returnToRunning";
 import { validatePlan } from "./safety";
 import {
   addWeeks,
@@ -46,6 +47,8 @@ export interface PlanContext {
   runsPerWeekTarget: number;
   maxWeeklyKm?: number;
   longestRunKm: number;
+  /** Non-null when the athlete is coming back from a gap. See lib/returning. */
+  returning: ReturnToRunningPlan | null;
 }
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
@@ -324,6 +327,93 @@ function buildEasyBalancePlan(
   };
 }
 
+/** Non-consecutive days, so rest days outnumber run days early in a comeback. */
+const RETURN_DAYS: Record<number, string[]> = {
+  1: ["Wed"],
+  2: ["Tue", "Sat"],
+  3: ["Tue", "Thu", "Sun"],
+  4: ["Mon", "Wed", "Fri", "Sun"],
+  5: ["Mon", "Tue", "Thu", "Sat", "Sun"],
+};
+
+/**
+ * The comeback week, built from the athlete's own pre-gap baseline.
+ *
+ * The planner used to answer a layoff with a fixed 12–20 km and two generic
+ * runs, which told a 22 km/week athlete to do roughly their usual volume and a
+ * 70 km/week athlete to do a quarter of theirs. lib/returning already works the
+ * ramp out from what they were running before the gap and how long they were
+ * away, so the planner reads it rather than guessing a second time. Keeping one
+ * source also stops Home and Plan quoting different numbers for the same week.
+ */
+function buildReturnPlan(
+  ctx: PlanContext,
+  week: { weekStart: string; weekLabel: string },
+  returning: ReturnToRunningPlan,
+): WeekPlan {
+  const w = returning.weeks[0]!;
+
+  // One run carries the week's longest effort and the rest split what remains,
+  // so the sessions add up to the ramp's target rather than drifting past it.
+  // Two guards keep that arithmetic sane on the smallest weeks a long layoff
+  // produces: drop a run rather than prescribe a token one, and fall back to an
+  // even split when the remainder would make an "easy" run longer than the long
+  // one.
+  const MIN_RUN_KM = 2;
+  let runCount = w.runs;
+  let longKm = w.longestRunKm;
+  let perOther = (w.targetKm - longKm) / Math.max(1, runCount - 1);
+  while (runCount > 2 && perOther < MIN_RUN_KM) {
+    runCount -= 1;
+    perOther = (w.targetKm - longKm) / Math.max(1, runCount - 1);
+  }
+  if (perOther > longKm) {
+    perOther = w.targetKm / runCount;
+    longKm = perOther;
+  }
+  perOther = Math.round(perOther * 10) / 10;
+  longKm = Math.round(longKm * 10) / 10;
+
+  const days = RETURN_DAYS[runCount] ?? RETURN_DAYS[3];
+
+  // Unlike the other templates, the session ranges here are a budget rather
+  // than guidance: each tops out at its own share, so running the upper end of
+  // every session lands on the week's target instead of 20% past it.
+  const sessions: PlannedSession[] = days.map((day, i) => {
+    // After the even-split fallback every run is the same length, so there is
+    // no "longest" to single out.
+    const isLong = i === days.length - 1 && longKm > perOther;
+    const km = i === days.length - 1 ? longKm : perOther;
+    return {
+      day,
+      type: "easy" as WorkoutType,
+      distanceKmRange: [Math.round(km * 0.85 * 10) / 10, Math.round(km * 10) / 10],
+      description: isLong
+        ? `Longest run of the week: up to ${km} km easy, conversational throughout`
+        : "Easy run: conversational pace, stop while it still feels comfortable",
+    };
+  });
+
+  const rationale = [
+    w.focus + ".",
+    returning.baseline
+      ? `Rebuilding from ${returning.gapDays} days off toward your pre-gap ${returning.baseline.weeklyKm} km week: about ${returning.weeksToBaseline} weeks at this rate.`
+      : `Rebuilding from ${returning.gapDays} days off.`,
+    returning.retention.note,
+  ];
+
+  return {
+    ...week,
+    template: "return",
+    totalKmRange: [Math.round(w.targetKm * 0.85 * 10) / 10, w.targetKm],
+    sessions,
+    warnings: w.quality
+      ? []
+      : ["No quality work this week: easy running first, however good the legs feel."],
+    rationale,
+  };
+}
+
 function buildBasePlan(ctx: PlanContext, week: { weekStart: string; weekLabel: string }): WeekPlan {
   const base = baselineWeeklyKm(ctx);
   let cap = Math.round(base * 1.05 * 10) / 10;
@@ -403,8 +493,25 @@ export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
   const raceInPlanWeek =
     raceDate && daysUntilRace !== null && isRaceInPlanWeek(raceDate, week.weekStart);
 
+  const comingBack = ctx.returning?.weeks.length ? ctx.returning : null;
+
   if (raceDate && daysUntilRace !== null && daysUntilRace <= 14 && raceInPlanWeek) {
+    // Race day is fixed and the plan has to cover it, even mid-comeback: say so
+    // rather than quietly tapering someone who has not run in weeks.
     plan = buildRaceWeekPlan(ctx, week, daysUntilRace, raceDate);
+    if (comingBack) {
+      plan = {
+        ...plan,
+        warnings: [
+          ...plan.warnings,
+          `You have not run in ${comingBack.gapDays} days: treat this as a participation effort, not a target race.`,
+        ],
+      };
+    }
+  } else if (comingBack) {
+    // Coming back outranks the remaining branches: they all shape a training
+    // week, and there is no training week to shape yet.
+    plan = buildReturnPlan(ctx, week, comingBack);
   } else if (ctx.fatigue.freshness < 40 && (daysUntilRace === null || daysUntilRace > 3)) {
     plan = buildFatiguePlan(ctx, week);
   } else if (daysUntilRace !== null && daysUntilRace <= 14) {
@@ -412,6 +519,7 @@ export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
   } else if (ctx.intensityAdvice.status === "too_hard") {
     plan = buildEasyBalancePlan(ctx, week);
   } else if (ctx.currentWeek.runCount === 0 && (ctx.previousWeek?.runCount ?? 0) === 0) {
+    // No pre-gap history to size a ramp from, so this stays generic.
     plan = {
       ...week,
       template: "return",
@@ -454,6 +562,7 @@ export function buildPlanContextFromInsights(
     easyHard: { easyPct: number };
     goalProgress: { targetPerWeek: number } | null;
     halfMarathonReadiness: { longestRunKm: number };
+    returning?: ReturnToRunningPlan | null;
   },
   options: { runsPerWeekTarget: number; maxWeeklyKm?: number },
 ): PlanContext {
@@ -470,5 +579,6 @@ export function buildPlanContextFromInsights(
     maxWeeklyKm: options.maxWeeklyKm,
     longestRunKm:
       analytics.raceReadiness?.longestRunKm ?? analytics.halfMarathonReadiness.longestRunKm,
+    returning: analytics.returning ?? null,
   };
 }

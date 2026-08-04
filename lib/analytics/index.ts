@@ -365,6 +365,10 @@ export function computeInsights(
   const correlations = computeCorrelations(runs);
   const changePoints = computeFitnessChangePoints(fitnessIndexPoints);
 
+  // Built before the plan so the planner can ramp from the athlete's own
+  // pre-gap baseline rather than inventing a second set of comeback numbers.
+  const returning = buildReturnToRunning(runs, fatigue);
+
   const nextWeekPlan = buildNextWeekPlan(
     buildPlanContextFromInsights(
       {
@@ -378,6 +382,7 @@ export function computeInsights(
         easyHard,
         goalProgress,
         halfMarathonReadiness: hmReadiness,
+        returning,
       },
       {
         runsPerWeekTarget: goalProgress?.targetPerWeek ?? defaultWeeklyRuns,
@@ -479,7 +484,7 @@ export function computeInsights(
         raceReadiness: raceReadinessResult,
       }),
     ),
-    returning: buildReturnToRunning(runs, fatigue),
+    returning,
   };
 }
 
