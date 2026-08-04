@@ -135,6 +135,7 @@ const fatigue = (freshness: number): FatigueSnapshot => ({
   tsb: 5,
   freshness,
   label: "fresh",
+  readiness: { balance: "fresh", currency: "current", volumeRatio: null },
   restDaysSinceLastRun: 1,
   evidence: [],
   usesProxyLoad: false,

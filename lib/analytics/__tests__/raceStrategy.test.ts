@@ -38,6 +38,7 @@ const fatigue: FatigueSnapshot = {
   tsb: -5,
   freshness: 50,
   label: "Neutral",
+  readiness: { balance: "neutral", currency: "current", volumeRatio: null },
   restDaysSinceLastRun: 1,
   evidence: [],
   usesProxyLoad: false,

@@ -140,16 +140,28 @@ function classifyState(
   analytics: DashboardInsights,
 ): { classification: string; severity: TrainingStateSeverity } {
   const adv = analytics.intensityAdvice;
-  if (fatigue.label === "Fatigued" || fatigue.tsb < -20) {
+  // Branch on the axes rather than the display string: the label can now read
+  // Rusty / Detrained / Returning, which a `=== "Fresh"` test would silently
+  // treat as neither fresh nor fatigued.
+  const { balance, currency } = fatigue.readiness;
+  const stale = currency === "rusty" || currency === "detrained" || currency === "returning";
+
+  if (stale) {
+    return {
+      classification: currency === "returning" ? "Returning to running" : "Training not current",
+      severity: "warning",
+    };
+  }
+  if (balance === "fatigued" || fatigue.tsb < -20) {
     return { classification: "Load accumulation", severity: "warning" };
   }
   if (adv.status === "too_hard") {
     return { classification: "Intensity elevated", severity: "warning" };
   }
-  if (fatigue.label === "Fresh" && analytics.efficiencySummary.trend === "improving") {
+  if (balance === "fresh" && analytics.efficiencySummary.trend === "improving") {
     return { classification: "Fresh & adapting", severity: "positive" };
   }
-  if (fatigue.label === "Fresh") {
+  if (balance === "fresh") {
     return { classification: "Fresh", severity: "positive" };
   }
   if (analytics.efficiencySummary.trend === "improving") {
@@ -232,8 +244,11 @@ function loadStateChips(
   history: DashboardInsights["loadHistory"],
 ): LoadStateChip[] {
   const chips: LoadStateChip[] = [];
-  if (fatigue.label === "Fresh") chips.push("Fresh");
-  if (fatigue.label === "Neutral") chips.push("Neutral");
+  const { balance, currency } = fatigue.readiness;
+  const current = currency === "current" || currency === "light-gap";
+  // A stale athlete must not be chipped "Fresh" on load balance alone.
+  if (balance === "fresh" && current) chips.push("Fresh");
+  if (balance === "neutral") chips.push("Neutral");
   if (fatigue.tsb < -12) chips.push("Accumulating fatigue");
   if (history.length >= 3) {
     const prev = history.at(-2);
@@ -247,10 +262,16 @@ function loadStateChips(
 }
 
 function loadInterpretation(fatigue: FatigueSnapshot): string {
-  if (fatigue.label === "Fresh" && fatigue.tsb > 8) {
+  const { balance, currency } = fatigue.readiness;
+  // The positive balance of a layoff is not a green light, so this has to be
+  // checked before the freshness branch below.
+  if (currency === "rusty" || currency === "detrained" || currency === "returning") {
+    return `Your balance looks positive only because training stopped: ${fatigue.restDaysSinceLastRun} days since the last run. Rebuild easy volume before any quality work.`;
+  }
+  if (balance === "fresh" && fatigue.tsb > 8) {
     return "You have positive training balance. Quality sessions are well supported if feel matches the data.";
   }
-  if (fatigue.label === "Fatigued") {
+  if (balance === "fatigued") {
     return "Acute load is outpacing recovery. Prioritize easy volume and sleep before adding intensity.";
   }
   if (fatigue.tsb < -10) {
