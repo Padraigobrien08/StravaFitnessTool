@@ -17,7 +17,7 @@ export function buildLearningObservabilityReport(params: {
 
   for (const b of beliefs) {
     if (b.counterEvidence.length > 0) {
-      contradictions.push(`${b.statement.slice(0, 60)}… — counter: ${b.counterEvidence[0]}`);
+      contradictions.push(`${b.statement.slice(0, 60)}…; counter: ${b.counterEvidence[0]}`);
     }
     if (b.confidence === "low" || b.stability === "emerging") {
       uncertainties.push(`Emerging/low-confidence: ${b.statement.slice(0, 72)}…`);

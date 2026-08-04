@@ -350,12 +350,12 @@ function buildProjectionView(analytics: DashboardInsights): RaceProjectionView {
   let fadeRisk: string | null = null;
   if (primary) {
     const pace = primary.timeSec / primary.distanceKm;
-    pacingNote = `Even-effort pacing ~${formatPace(pace)} avg — adjust for course and conditions.`;
+    pacingNote = `Even-effort pacing ~${formatPace(pace)} avg. Adjust for course and conditions.`;
     if (primary.distanceKm >= 20 && analytics.fatigue.tsb < -15) {
       fadeRisk = "Elevated fatigue may increase late-race fade risk vs projection.";
     } else if (primary.distanceKm >= 20) {
       fadeRisk =
-        "Moderate fade risk if fueling or heat are unmanaged — projection assumes steady effort.";
+        "Moderate fade risk if fueling or heat are unmanaged; projection assumes steady effort.";
     }
   }
 
@@ -403,7 +403,7 @@ function buildAdaptationTrends(
       interpretation:
         mom.narrative ??
         (analytics.efficiencySummary.trend === "improving"
-          ? "Pace÷HR index improving — faster at similar heart rates."
+          ? "Pace÷HR index improving: faster at similar heart rates."
           : "Track easy runs with HR for clearer efficiency signal."),
       data: progression.trends.efficiency.data,
       positive: progression.trends.efficiency.positive,
@@ -413,22 +413,22 @@ function buildAdaptationTrends(
       id: "pace",
       label: "Pace velocity",
       interpretation: progression.trends.pace.positive
-        ? "Recent runs trending faster — speed responding to training."
-        : "Pace stable or easing — may reflect fatigue, heat, or intentional easy running.",
+        ? "Recent runs trending faster: speed responding to training."
+        : "Pace stable or easing: may reflect fatigue, heat, or intentional easy running.",
       data: progression.trends.pace.data,
       positive: progression.trends.pace.positive,
     },
     {
       id: "volume",
       label: "Volume consistency",
-      interpretation: `Weekly volume ${progression.trends.volume.positive ? "holding or building" : "softening"} — endurance base ${progression.trends.volume.positive ? "supported" : "needs attention"}.`,
+      interpretation: `Weekly volume ${progression.trends.volume.positive ? "holding or building" : "softening"}: endurance base ${progression.trends.volume.positive ? "supported" : "needs attention"}.`,
       data: progression.trends.volume.data,
       positive: progression.trends.volume.positive,
     },
     {
       id: "consistency",
       label: "Training rhythm",
-      interpretation: `${analytics.consistencyScore.overall}/100 consistency — ${analytics.consistencyScore.label.toLowerCase()}.`,
+      interpretation: `${analytics.consistencyScore.overall}/100 consistency: ${analytics.consistencyScore.label.toLowerCase()}.`,
       data: analytics.weeklyVolume.slice(-10).map((w) => w.runCount),
       positive: analytics.consistencyScore.overall >= 65,
       caption: `${analytics.currentWeek.runCount} runs this week`,
@@ -446,7 +446,7 @@ function buildDistribution(analytics: DashboardInsights): PerformanceDistributio
   }
   if (adv.status === "too_hard") {
     correlations.push(
-      "Hard-run share is elevated — threshold work may be outpacing recovery for current freshness.",
+      "Hard-run share is elevated: threshold work may be outpacing recovery for current freshness.",
     );
   }
   if (correlations.length === 0) {
@@ -496,10 +496,10 @@ function buildIntegrity(
     basedOn,
     missing: [...new Set(missing)].slice(0, 5),
     limitations: [
-      "Projections are evidence-based estimates — not guarantees.",
+      "Projections are evidence-based estimates, not guarantees.",
       "Course, weather, fueling, and taper execution materially affect race day.",
       analytics.racePredictionAnalysis.regression
-        ? `Curve fit R² = ${analytics.racePredictionAnalysis.regression.rSquared.toFixed(2)} — wider spread when efforts disagree.`
+        ? `Curve fit R² = ${analytics.racePredictionAnalysis.regression.rSquared.toFixed(2)}: wider spread when efforts disagree.`
         : "Single-anchor models widen uncertainty at longer distances.",
     ],
     fieldCoverage: (quality?.fieldCoverage ?? []).slice(0, 4).map((f) => ({

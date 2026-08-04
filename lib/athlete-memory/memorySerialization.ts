@@ -7,7 +7,7 @@ export function serializeAthleteMemoryForLLM(
 ): string {
   const list = beliefs ?? allBeliefs(profile).slice(0, 8);
   if (list.length === 0) {
-    return "No structured athlete memory yet — rely on current analytics only.";
+    return "No structured athlete memory yet: rely on current analytics only.";
   }
 
   const sections = list.map((b) => {

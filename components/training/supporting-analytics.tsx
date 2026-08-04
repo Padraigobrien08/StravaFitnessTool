@@ -38,7 +38,7 @@ export function SupportingAnalytics({
       {!defaultCollapsed || open ? (
         <>
           <p className="mb-4 text-xs text-zinc-600">
-            Elevation cost and block history — evidence behind the coaching view, not the primary
+            Elevation cost and block history: evidence behind the coaching view, not the primary
             decision layer.
           </p>
 

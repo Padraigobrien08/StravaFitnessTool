@@ -22,7 +22,7 @@ export function buildOutcomeEvidenceFromAnalytics(
   if (prior?.readiness != null) {
     evidence.push(`Readiness ${r.score}/100 (was ${prior.readiness})`);
   } else {
-    evidence.push(`Readiness ${r.score}/100 — ${r.label}`);
+    evidence.push(`Readiness ${r.score}/100: ${r.label}`);
   }
 
   if (analytics.efficiencySummary.trend) {

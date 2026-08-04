@@ -201,9 +201,9 @@ export function computeOutcomeCalibration(
   const phrase = SIGNAL_PHRASE[dominant];
   const basis =
     reliability > 0.55
-      ? `Your reports predicted ${phrase} ${rawPct}% of the time across ${pairs} sessions — carrying more weight.`
+      ? `Your reports predicted ${phrase} ${rawPct}% of the time across ${pairs} sessions, carrying more weight.`
       : reliability < 0.45
-        ? `Your reports matched ${phrase} only ${rawPct}% of the time across ${pairs} sessions — carrying a little less weight.`
+        ? `Your reports matched ${phrase} only ${rawPct}% of the time across ${pairs} sessions, carrying a little less weight.`
         : `Personalised from ${pairs} sessions of reported-feel vs. ${phrase}.`;
 
   return { heavyDelta, freshDelta, sampleCount: pairs, reliability, confidence, basis };

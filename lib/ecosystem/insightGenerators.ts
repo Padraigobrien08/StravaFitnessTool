@@ -31,7 +31,7 @@ export function buildEcosystemInsightList(input: {
       recommendation:
         "Separate HIIT, CrossFit, or heavy strength from tempo, intervals, and long runs by 24–48h when possible.",
       confidence: hiFlags[0].confidence,
-      limitations: ["May interfere with run quality — not a medical assessment."],
+      limitations: ["May interfere with run quality, not a medical assessment."],
       directness: "fatigue_context",
     });
   }
@@ -46,7 +46,7 @@ export function buildEcosystemInsightList(input: {
       evidence: cluster.evidence,
       recommendation:
         archetype.archetype === "hybrid_runner" || archetype.archetype === "strength_endurance"
-          ? "Spread gym, HIIT, and quality runs — avoid stacking within 3 days."
+          ? "Spread gym, HIIT, and quality runs: avoid stacking within 3 days."
           : "Review weekly intensity distribution on Training.",
       confidence: "medium",
       limitations: ["Based on session timing and modality only."],
@@ -64,7 +64,7 @@ export function buildEcosystemInsightList(input: {
       evidence: aerobicSig.evidence,
       recommendation:
         archetype.archetype === "triathlete"
-          ? "Bike/swim support race aerobic base — keep run specificity for pace work."
+          ? "Bike/swim support race aerobic base: keep run specificity for pace work."
           : "Keep cross-training easy-moderate on days adjacent to quality runs.",
       confidence: aerobicSig.confidence,
       limitations: aerobicSig.limitations,
@@ -144,7 +144,7 @@ export function buildEcosystemInsightList(input: {
       ],
       recommendation: "Am I stacking too much intensity? Review interference panel.",
       confidence: "medium",
-      limitations: ["Session counts — not TRIMP or TSS."],
+      limitations: ["Session counts, not TRIMP or TSS."],
       directness: "fatigue_context",
     });
   }

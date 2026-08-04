@@ -27,7 +27,7 @@ export function buildDataQualityContext(
     ...insights.trainingEcosystem.limitations.slice(0, 3),
   ];
   if (insights.dataConfidence === "low") {
-    limitations.push("Overall analytics confidence is low — treat coaching as directional.");
+    limitations.push("Overall analytics confidence is low: treat coaching as directional.");
   }
   if (quality.overallConfidence === "low") {
     limitations.push("Import quality is limited (sparse HR, streams, or history).");

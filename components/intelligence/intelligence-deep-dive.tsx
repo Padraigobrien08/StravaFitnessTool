@@ -89,7 +89,7 @@ export function IntelligenceDeepDive({ data }: { data: DeepDiveData }) {
         <div className="border-t border-[var(--border-subtle)] px-4 py-2.5 sm:px-5">
           <Link
             href={signalCoachLink(
-              "Walk me through the statistical signals in my data — anomalies, correlations, and fitness change-points.",
+              "Walk me through the statistical signals in my data: anomalies, correlations, and fitness change-points.",
             )}
             className="inline-flex items-center gap-1 font-mono text-[11px] text-accent hover:text-accent/80"
           >

@@ -32,7 +32,7 @@ function section(title: string, body: string[]): string {
 
 function formatRunCoachDetail(d: RunCoachDetail): string {
   const head =
-    `**${d.date} — ${d.name}** (${d.workoutTypeLabel}, ${d.distanceKm} km, ${d.durationMin} min` +
+    `**${d.date}, ${d.name}** (${d.workoutTypeLabel}, ${d.distanceKm} km, ${d.durationMin} min` +
     (d.pace ? `, ${d.pace}/km` : "") +
     `)`;
   const vitals = [
@@ -137,7 +137,7 @@ export function serializeCoachingContextForLLM(
                 `- ${n.date} ${n.label}` +
                 (n.distanceKm != null ? ` ${n.distanceKm} km` : "") +
                 (n.durationMin != null ? ` ${n.durationMin} min` : "") +
-                ` — ${n.note}`,
+                `, ${n.note}`,
             )
             .join("\n")
         : "",
@@ -232,7 +232,7 @@ export function serializeCoachingContextForLLM(
   if (out.length > maxChars) {
     out =
       out.slice(0, maxChars - 80) +
-      "\n\n[Context truncated for token budget — use tools for detail.]";
+      "\n\n[Context truncated for token budget, use tools for detail.]";
   }
   return out;
 }

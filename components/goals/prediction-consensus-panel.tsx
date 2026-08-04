@@ -36,7 +36,7 @@ export function PredictionConsensusPanel({
       <Eyebrow className="mb-2.5">Prediction consensus</Eyebrow>
       <p className="mb-4 text-xs leading-snug text-zinc-500">
         Where models agree, trust the corridor. Wider spread at longer distances usually means
-        extrapolation — pace conservatively.
+        extrapolation. Pace conservatively.
       </p>
 
       <div className="space-y-3">

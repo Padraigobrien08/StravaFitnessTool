@@ -67,7 +67,7 @@ export function IntelligenceReport({
         <ReportSection
           number={2}
           title="Key signals & insights"
-          subtitle="Synthesized intelligence — not a metrics dump."
+          subtitle="Synthesized intelligence, not a metrics dump."
         >
           <ReportKeySignals signals={view.signals} />
         </ReportSection>
@@ -90,7 +90,7 @@ export function IntelligenceReport({
           <ReportSection
             number={4}
             title="Training ecosystem"
-            subtitle="Run volume, cross-training, durability support, and interference — running stays primary for race performance."
+            subtitle="Run volume, cross-training, durability support, and interference; running stays primary for race performance."
           >
             <ReportTrainingEcosystem data={view.ecosystem} />
           </ReportSection>
@@ -99,7 +99,7 @@ export function IntelligenceReport({
         <ReportSection
           number={view.ecosystem ? 5 : 4}
           title="Race readiness briefing"
-          subtitle="Strategic readiness — score, risks, and projected corridor."
+          subtitle="Strategic readiness: score, risks, and projected corridor."
         >
           <ReportRaceBriefing data={view.raceBriefing} />
         </ReportSection>
@@ -116,7 +116,7 @@ export function IntelligenceReport({
         <ReportSection
           number={view.ecosystem ? 7 : 6}
           title="Performance metrics"
-          subtitle="Curated clusters — only what supports the briefing."
+          subtitle="Curated clusters: only what supports the briefing."
         >
           <ReportMetrics clusters={view.metrics} />
         </ReportSection>
@@ -139,7 +139,7 @@ export function IntelligenceReport({
       </div>
 
       <footer className="report-footer mt-14 border-t border-zinc-300 pt-6 text-xs text-zinc-500 print:mt-10">
-        StrideIQ — endurance intelligence from your training export. Not medical advice. Predictions
+        StrideIQ: endurance intelligence from your training export. Not medical advice. Predictions
         are estimates; race-day execution, weather, and fueling can shift outcomes.
       </footer>
     </article>

@@ -266,7 +266,7 @@ export async function handleStravaMcpAction(
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         if (msg.includes("403")) {
-          throw new Error("Cannot star segment — check Strava app scopes include segment access.");
+          throw new Error("Cannot star segment: check Strava app scopes include segment access.");
         }
         throw e;
       }

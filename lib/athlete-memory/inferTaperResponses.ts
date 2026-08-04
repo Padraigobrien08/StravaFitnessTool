@@ -43,7 +43,7 @@ export function inferTaperResponses(analytics: DashboardInsights): AthleteBelief
           `Freshness ${Math.round(analytics.fatigue.freshness)}`,
         ],
         confidence: "low",
-        recommendedUse: "No stacked quality — one optional sharpener at most, then race execution.",
+        recommendedUse: "No stacked quality: one optional sharpener at most, then race execution.",
       }),
     );
   }

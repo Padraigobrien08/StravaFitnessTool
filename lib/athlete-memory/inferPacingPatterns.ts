@@ -14,7 +14,7 @@ export function inferPacingPatterns(analytics: DashboardInsights): AthleteBelief
         id: "pace-late-fade",
         category: "pacing",
         statement:
-          "When long-run frequency drops, late-run pace often softens past ~15 km — even pacing early matters.",
+          "When long-run frequency drops, late-run pace often softens past ~15 km; even pacing early matters.",
         evidence: [
           `Longest recent run ${longest} km`,
           `${analytics.summary.runCount} runs in history`,
@@ -52,7 +52,7 @@ export function inferPacingPatterns(analytics: DashboardInsights): AthleteBelief
         id: "pace-consistency",
         category: "pacing",
         statement:
-          "Consistent weekly rhythm supports predictable pacing — erratic weeks correlate with volatile sessions.",
+          "Consistent weekly rhythm supports predictable pacing; erratic weeks correlate with volatile sessions.",
         evidence: [
           analytics.consistencyScore.label,
           `Score ${analytics.consistencyScore.overall}/100`,

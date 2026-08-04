@@ -58,7 +58,7 @@ export function PerformanceTrajectoryPanel({
                 ))
               ) : (
                 <li className="py-2 text-xs text-zinc-500">
-                  No PR milestones yet — keep building aerobic volume.
+                  No PR milestones yet. Keep building aerobic volume.
                 </li>
               )}
             </ul>

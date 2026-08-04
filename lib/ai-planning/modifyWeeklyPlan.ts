@@ -115,7 +115,7 @@ export function applyPlanModification(
                 intensity: "moderate" as const,
                 type: "tempo",
                 title: "Controlled tempo",
-                purpose: "Modest quality touch — still within guardrails",
+                purpose: "Modest quality touch, still within guardrails",
                 constraintsApplied: [
                   ...w.constraintsApplied,
                   "Aggressive-but-safe: one quality upgrade",

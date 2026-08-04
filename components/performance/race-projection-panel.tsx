@@ -58,7 +58,7 @@ export function RaceProjectionPanel({
           </div>
 
           <p className="mt-3 text-xs text-zinc-600">
-            Estimate — not a guarantee. Spread reflects model disagreement and sample size.
+            Estimate, not a guarantee. Spread reflects model disagreement and sample size.
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2">

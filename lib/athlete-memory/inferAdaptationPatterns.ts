@@ -30,7 +30,7 @@ export function inferAdaptationPatterns(analytics: DashboardInsights): AthleteBe
         id: "adapt-efficiency-down",
         category: "adaptation",
         statement:
-          "Aerobic efficiency may be flattening — extra fatigue or intensity may be masking adaptation.",
+          "Aerobic efficiency may be flattening: extra fatigue or intensity may be masking adaptation.",
         evidence: [
           "Efficiency trend: declining",
           `Freshness ${Math.round(analytics.fatigue.freshness)}`,

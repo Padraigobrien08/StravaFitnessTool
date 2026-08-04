@@ -162,7 +162,7 @@ function buildTodayFocus(
       why:
         planned.purpose ||
         planned.reasoning ||
-        "Scheduled in your saved week — stay aligned with the plan rhythm.",
+        "Scheduled in your saved week: stay aligned with the plan rhythm.",
       stateLine: buildOperationalStateLine(analytics),
       fromPlan: true,
     };
@@ -173,7 +173,7 @@ function buildTodayFocus(
       title: "Recovery / rest",
       why:
         planned.purpose ||
-        "Rest day in your saved plan — absorb recent load before the next quality session.",
+        "Rest day in your saved plan: absorb recent load before the next quality session.",
       stateLine: buildOperationalStateLine(analytics),
       fromPlan: true,
     };

@@ -50,7 +50,7 @@ export function compareTaperToHistory(
   const summary =
     freshness >= 55
       ? "Current taper appears to be preserving freshness more effectively than typical build weeks."
-      : "Taper is active but freshness has not clearly rebounded yet — monitor easy density.";
+      : "Taper is active but freshness has not clearly rebounded yet: monitor easy density.";
 
   return {
     id: "taper-vs-history",

@@ -29,7 +29,7 @@ export function inferLikelyAdaptation(
 
   if (type === "long") {
     if (lateFadePct != null && lateFadePct > 8) {
-      out.push("Durability signal mixed — late fade suggests aerobic limit under length");
+      out.push("Durability signal mixed: late fade suggests aerobic limit under length");
     } else if (executionQuality === "strong" || executionQuality === "excellent") {
       out.push("Supports HM durability and glycogen management patterns");
     } else {

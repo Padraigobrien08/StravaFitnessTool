@@ -293,7 +293,7 @@ function buildNotableSessions(
       title: "Strongest aerobic efficiency",
       meta: best.label,
       why: "Fastest pace relative to HR in the recent block.",
-      adaptation: "Aerobic efficiency signal — durable fitness.",
+      adaptation: "Aerobic efficiency signal: durable fitness.",
       goalRelation: "Protect with easy volume between quality days.",
       significance: "critical",
       rank: 90,
@@ -350,8 +350,8 @@ function buildNotableSessions(
       meta: workoutMap.get(byLoad.r.id)
         ? WORKOUT_TYPE_LABELS[workoutMap.get(byLoad.r.id)!.type]
         : "—",
-      why: "Largest training stress recently — recovery timing matters.",
-      adaptation: "Fatigue accumulation — space easy days after.",
+      why: "Largest training stress recently: recovery timing matters.",
+      adaptation: "Fatigue accumulation: space easy days after.",
       goalRelation: "Watch stacking into the next hard session.",
       significance: "supporting",
       rank: 50,
@@ -378,7 +378,7 @@ function buildPatterns(
     patterns.push({
       id: "mix-lean",
       title: `${top.label}-heavy block`,
-      body: `${roundPct(top.pct)}% of recent sessions are ${top.label.toLowerCase()} — this defines your current training identity.`,
+      body: `${roundPct(top.pct)}% of recent sessions are ${top.label.toLowerCase()}. This defines your current training identity.`,
       tone: top.type === "easy" || top.type === "recovery" ? "positive" : "neutral",
       coachQuery: `Why is my training ${top.label.toLowerCase()}-heavy right now?`,
     });
@@ -388,7 +388,7 @@ function buildPatterns(
     patterns.push({
       id: "threshold-density",
       title: "Threshold density elevated",
-      body: `${roundPct(hardPct)}% quality share — monitor freshness between hard sessions.`,
+      body: `${roundPct(hardPct)}% quality share: monitor freshness between hard sessions.`,
       tone: "warning",
       coachQuery: "Is my threshold density too high for my current freshness?",
     });
@@ -396,7 +396,7 @@ function buildPatterns(
     patterns.push({
       id: "polarized",
       title: "Aerobic-base rhythm",
-      body: `${roundPct(analytics.intensityAdvice.currentEasyPct)}% easy running — supports durable aerobic development.`,
+      body: `${roundPct(analytics.intensityAdvice.currentEasyPct)}% easy running: supports durable aerobic development.`,
       tone: "positive",
       coachQuery: "Is my easy-volume base appropriate for my goal?",
     });
@@ -406,7 +406,7 @@ function buildPatterns(
     patterns.push({
       id: "pace-stability",
       title: "Pace stability improving",
-      body: "Execution consistency is improving — faster paces at similar heart rates.",
+      body: "Execution consistency is improving: faster paces at similar heart rates.",
       tone: "positive",
       coachQuery: "What drove my improving aerobic efficiency?",
     });
@@ -417,7 +417,7 @@ function buildPatterns(
     patterns.push({
       id: "long-gap",
       title: "Long-run gap emerging",
-      body: "No 18+ km long run recently — durability may need an aerobic anchor.",
+      body: "No 18+ km long run recently: durability may need an aerobic anchor.",
       tone: "warning",
       coachQuery: "Should I schedule a long run this week?",
     });
@@ -428,7 +428,7 @@ function buildPatterns(
     patterns.push({
       id: "interval-regular",
       title: "Regular interval stimulus",
-      body: `${intervalCount} interval sessions in the window — top-end speed is being trained.`,
+      body: `${intervalCount} interval sessions in the window: top-end speed is being trained.`,
       tone: "neutral",
       coachQuery: "Are my intervals spaced correctly for recovery?",
     });
@@ -438,7 +438,7 @@ function buildPatterns(
     patterns.push({
       id: "establishing",
       title: "Establishing training rhythm",
-      body: `${labels.length} classified sessions — patterns sharpen as HR and stream coverage grow.`,
+      body: `${labels.length} classified sessions: patterns sharpen as HR and stream coverage grow.`,
       tone: "neutral",
       coachQuery: "What patterns are emerging in my training?",
     });
@@ -525,7 +525,7 @@ function classificationConfidenceNote(labels: RunWorkoutLabel[]): {
   const note =
     ratio >= 0.5
       ? "High for interval and distance-anchored sessions; medium for tempo/recovery without HR."
-      : "Medium overall — add HR and FIT lap data to sharpen tempo vs easy distinction.";
+      : "Medium overall: add HR and FIT lap data to sharpen tempo vs easy distinction.";
 
   return { note, byType };
 }

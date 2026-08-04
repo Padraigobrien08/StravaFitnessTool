@@ -54,9 +54,9 @@ function modelAgreement(
     spreadSec,
     explanation:
       label === "high"
-        ? "Capability models cluster tightly — forecast stability is higher."
+        ? "Capability models cluster tightly: forecast stability is higher."
         : label === "low"
-          ? "Models diverge — treat the prediction interval as wider."
+          ? "Models diverge: treat the prediction interval as wider."
           : "Moderate spread across capability models.",
   };
 }
@@ -293,7 +293,7 @@ export function buildRaceForecastV2(input: RaceForecastInput): RaceForecastV2 {
       explanation:
         gapSec <= 0
           ? "Current evidence suggests the target is within reach at most-likely execution."
-          : `Target is ~${Math.round(gapSec)}s faster than most-likely forecast — would need stronger capability or durability.`,
+          : `Target is ~${Math.round(gapSec)}s faster than most-likely forecast: would need stronger capability or durability.`,
     };
   }
 

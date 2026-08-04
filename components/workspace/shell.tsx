@@ -104,7 +104,7 @@ export function AppWorkspaceShell({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={openCommandPalette}
             aria-label="Open command palette"
-            title="Search — ⌘K"
+            title="Search (⌘K)"
             className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-zinc-500 transition-colors hover:bg-white/[0.04] hover:text-zinc-200"
           >
             <Search className="h-4 w-4" />

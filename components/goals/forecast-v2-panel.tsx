@@ -65,7 +65,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
       <Panel>
         <Eyebrow className="mb-2.5">How we got this number</Eyebrow>
         <p className="mb-3 text-xs text-zinc-500">
-          From raw capability to the most-likely time — each step and what it added.
+          From raw capability to the most-likely time: each step and what it added.
         </p>
         <div className="overflow-x-auto">
           <ul className="min-w-[420px] space-y-1.5">
@@ -331,7 +331,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
                     +{u.widthSec}s
                   </span>
                   <span className="text-zinc-500">
-                    <span className="text-zinc-400">{u.label}</span> — {u.explanation}
+                    <span className="text-zinc-400">{u.label}</span>: {u.explanation}
                   </span>
                 </li>
               ))}

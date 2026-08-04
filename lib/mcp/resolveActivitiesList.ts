@@ -52,7 +52,7 @@ export async function resolveActivitiesList(
     source: "strava_api",
     lastSyncAt: sync.lastSyncAt,
     note: sync.activityCount
-      ? "Database cache stale — live Strava API used"
+      ? "Database cache stale: live Strava API used"
       : "No synced activities in database",
   };
 }

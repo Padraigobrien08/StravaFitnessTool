@@ -159,7 +159,7 @@ export function racePredictions(
     label: t.label,
     distanceKm: t.km,
     predictedSec: predictRaceTime(anchorDistM, anchor.timeSec, t.km * 1000),
-    basedOn: `${sourceLabel} (${formatDurationShort(anchor.timeSec)}) on ${new Date(anchor.date).toLocaleDateString()} — ${anchor.runName}`,
+    basedOn: `${sourceLabel} (${formatDurationShort(anchor.timeSec)}) on ${new Date(anchor.date).toLocaleDateString()}, ${anchor.runName}`,
   }));
 }
 

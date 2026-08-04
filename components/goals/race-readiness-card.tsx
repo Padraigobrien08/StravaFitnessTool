@@ -97,7 +97,7 @@ export function RaceReadinessCard({
           </div>
         ) : (
           <p className="text-sm text-accent/90">
-            No major gaps — keep tapering and staying healthy before race day.
+            No major gaps. Keep tapering and staying healthy before race day.
           </p>
         )}
       </CardContent>

@@ -4,7 +4,7 @@ export const COACH_PROMPT_GROUPS: CoachPromptGroup[] = [
   {
     id: "understand",
     title: "Understand my training",
-    description: "Reasoning over your history — not generic advice.",
+    description: "Reasoning over your history, not generic advice.",
     prompts: [
       "Why did my readiness change this week?",
       "What likely caused my recent improvement?",

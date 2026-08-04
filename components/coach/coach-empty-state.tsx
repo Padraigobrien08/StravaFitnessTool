@@ -30,7 +30,7 @@ export function CoachEmptyState({
           {athleteName ? `${athleteName}, ` : ""}your endurance reasoning workspace
         </h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500">
-          Not a chatbot — a grounded analyst that compares sessions, explains readiness, and
+          Not a chatbot, but a grounded analyst that compares sessions, explains readiness, and
           remembers how your body responds over time.
         </p>
       </div>

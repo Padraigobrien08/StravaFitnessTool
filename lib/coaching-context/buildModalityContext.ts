@@ -21,12 +21,12 @@ export function buildModalityContext(insights: DashboardInsights): CoachingModal
   const strengthSummary =
     ctx.strengthSessions === 0
       ? "No logged strength work in 28d."
-      : `${ctx.strengthSessions} strength session(s) in 28d — support score ${eco.scores.strengthSupport}.`;
+      : `${ctx.strengthSessions} strength session(s) in 28d, support score ${eco.scores.strengthSupport}.`;
 
   const mobilitySummary =
     ctx.mobilitySessions === 0
       ? "No logged mobility/recovery sessions in 28d."
-      : `${ctx.mobilitySessions} mobility/recovery session(s) — mobility support ${eco.scores.mobilitySupport}.`;
+      : `${ctx.mobilitySessions} mobility/recovery session(s), mobility support ${eco.scores.mobilitySupport}.`;
 
   const interferenceRisks = eco.interferenceFlags
     .filter((f) => f.severity !== "low")

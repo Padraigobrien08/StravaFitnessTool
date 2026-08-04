@@ -30,7 +30,7 @@ export function ConnectedSourcesPanel({
     <Panel>
       <Eyebrow className="mb-3">Connected training sources</Eyebrow>
       <p className="mb-4 text-[13px] text-muted-foreground">
-        API and export sources merge — nothing is replaced without your action.
+        API and export sources merge: nothing is replaced without your action.
       </p>
 
       <div className="space-y-3">
@@ -91,8 +91,8 @@ export function ConnectedSourcesPanel({
                 , set <span className="text-zinc-400">Authorization Callback Domain</span> to{" "}
                 <code className="rounded bg-[var(--surface-subdued)] px-1 text-zinc-300">
                   localhost
-                </code>{" "}
-                — no “http://”, no port.
+                </code>
+                , no “http://”, no port.
               </p>
             ) : null}
 

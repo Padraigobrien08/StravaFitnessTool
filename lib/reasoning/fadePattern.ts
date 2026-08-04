@@ -39,7 +39,7 @@ export function analyzeFadePattern(
   if (longRuns.length === 0) {
     limitations.push(`No runs at or above ${threshold} km in your history.`);
   } else if (withFade.length === 0) {
-    limitations.push("Long runs found but no FIT pace streams — sync streams or import FIT files.");
+    limitations.push("Long runs found but no FIT pace streams: sync streams or import FIT files.");
   }
 
   const fades = withFade.map((w) => w.fade).sort((a, b) => a - b);

@@ -134,7 +134,7 @@ export function fadeRiskScore(
   if (longestRatio < 0.8) {
     score += 35;
     factors.push(
-      `Longest run ${longestRunKm.toFixed(1)} km is ${Math.round(longestRatio * 100)}% of race distance — pacing conservatively is safer.`,
+      `Longest run ${longestRunKm.toFixed(1)} km is ${Math.round(longestRatio * 100)}% of race distance. Pacing conservatively is safer.`,
     );
   }
 
@@ -147,10 +147,10 @@ export function fadeRiskScore(
 
   if (tsb < -10) {
     score += 35;
-    factors.push(`Training stress balance is ${tsb} — fatigue may amplify late-race fade.`);
+    factors.push(`Training stress balance is ${tsb}: fatigue may amplify late-race fade.`);
   } else if (tsb < -5) {
     score += 20;
-    factors.push(`Slightly negative TSB (${tsb}) — watch early pace discipline.`);
+    factors.push(`Slightly negative TSB (${tsb}): watch early pace discipline.`);
   }
 
   if (score === 0) {
@@ -171,7 +171,7 @@ function uncertaintyNote(distance: RaceGoal["distance"]): string {
     case "hm":
       return "Typical prediction error at half marathon: ±2–4 minutes.";
     case "marathon":
-      return "Typical prediction error at marathon: ±5–8 minutes — weather and fueling matter.";
+      return "Typical prediction error at marathon: ±5–8 minutes. Weather and fueling matter.";
     default:
       return "Race-day conditions can shift finish time materially.";
   }
@@ -197,9 +197,9 @@ function strategyNarrative(mode: StrategyMode, fade: "low" | "medium" | "high"):
     );
   }
   if (fade === "high") {
-    lines.push("High fade risk — consider conservative mode or revise target time.");
+    lines.push("High fade risk: consider conservative mode or revise target time.");
   } else if (fade === "medium") {
-    lines.push("Moderate fade risk — start at the slower end of each split range.");
+    lines.push("Moderate fade risk: start at the slower end of each split range.");
   }
   return lines;
 }
@@ -241,7 +241,7 @@ export function simulateRaceStrategy(
     const gap = goal.targetTimeSec - consensus.timeSec;
     if (gap < -consensus.spreadSec * 0.5) {
       warnings.push(
-        "Goal time is faster than consensus predictions — aggressive unless recent workouts support it.",
+        "Goal time is faster than consensus predictions: aggressive unless recent workouts support it.",
       );
     }
   }

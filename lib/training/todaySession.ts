@@ -64,7 +64,7 @@ function make(
   return {
     kind,
     typeLabel,
-    headline: dist ? `${typeLabel} — ${dist}` : typeLabel,
+    headline: dist ? `${typeLabel}, ${dist}` : typeLabel,
     distanceKmRange,
     intensity,
     rationale,
@@ -90,13 +90,13 @@ export function recommendTodaySession(i: TodaySessionInput): TodaySessionRecomme
   if (days != null && days <= 1) {
     return make(
       "rest",
-      days === 0 ? "Rest — race day" : "Rest or shakeout",
+      days === 0 ? "Rest: race day" : "Rest or shakeout",
       null,
       "rest",
       [
         days === 0
-          ? "Race day — trust the taper; nothing to gain from training now."
-          : "Day before your race — rest, or a 10–15 min shakeout with a few strides.",
+          ? "Race day: trust the taper; nothing to gain from training now."
+          : "Day before your race: rest, or a 10–15 min shakeout with a few strides.",
       ],
       ["10–15 min easy shakeout with 3–4 strides"],
       confidence,
@@ -112,7 +112,7 @@ export function recommendTodaySession(i: TodaySessionInput): TodaySessionRecomme
       kmRange(Math.min(i.typicalRunKm * 0.6, 6)),
       "easy",
       [
-        `Fatigue is high (freshness ${freshness}) — take a rest day or a very easy short jog to absorb load before your next quality session.`,
+        `Fatigue is high (freshness ${freshness}). Take a rest day or a very easy short jog to absorb load before your next quality session.`,
       ],
       ["Full rest day"],
       confidence,
@@ -128,7 +128,7 @@ export function recommendTodaySession(i: TodaySessionInput): TodaySessionRecomme
       kmRange(Math.min(i.typicalRunKm, 8)),
       "easy",
       [
-        "Taper week — keep the effort easy and add 4–6 short strides to stay sharp without adding fatigue.",
+        "Taper week: keep the effort easy and add 4–6 short strides to stay sharp without adding fatigue.",
       ],
       ["Rest if your legs feel heavy"],
       confidence,
@@ -144,7 +144,7 @@ export function recommendTodaySession(i: TodaySessionInput): TodaySessionRecomme
       kmRange(i.typicalRunKm),
       "easy",
       [
-        `Intensity has been high (${i.intensityAdvice.hardRunsLast14d} hard runs in 14 days; easy share ${Math.round(i.intensityAdvice.currentEasyPct)}% vs a ${Math.round(i.intensityAdvice.easyTargetPct)}% target) — keep today easy.`,
+        `Intensity has been high (${i.intensityAdvice.hardRunsLast14d} hard runs in 14 days; easy share ${Math.round(i.intensityAdvice.currentEasyPct)}% vs a ${Math.round(i.intensityAdvice.easyTargetPct)}% target). Keep today easy.`,
       ],
       ["Recovery run"],
       confidence,
@@ -161,7 +161,7 @@ export function recommendTodaySession(i: TodaySessionInput): TodaySessionRecomme
       kmRange(i.typicalRunKm),
       "hard",
       [
-        `You're fresh (freshness ${freshness}) and it's been ${gap} since a quality session — a good day for a tempo/threshold effort.`,
+        `You're fresh (freshness ${freshness}) and it's been ${gap} since a quality session, a good day for a tempo/threshold effort.`,
       ],
       ["Intervals (e.g. 5–6 × 3 min hard)", "Easy run if you're not feeling it"],
       confidence,
@@ -182,7 +182,7 @@ export function recommendTodaySession(i: TodaySessionInput): TodaySessionRecomme
       kmRange(i.longestRunKm * 0.9),
       "moderate",
       [
-        `It's been ${i.daysSinceLastLong} days since your last long run — a good day to extend endurance at easy effort.`,
+        `It's been ${i.daysSinceLastLong} days since your last long run, a good day to extend endurance at easy effort.`,
       ],
       ["Easy run if time-limited"],
       confidence,

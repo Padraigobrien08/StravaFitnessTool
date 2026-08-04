@@ -69,7 +69,7 @@ export default function SettingsPage() {
           {importData && (
             <ul className="list-inside list-disc space-y-1 text-zinc-500">
               <li>
-                Data: {dataSourceLabel ?? "loaded"} — {importData.runs.length} runs
+                Data: {dataSourceLabel ?? "loaded"}, {importData.runs.length} runs
               </li>
               <li>Strava API: {apiConnected ? "connected" : "not connected"}</li>
               <li>Local export file: {dataSources.localExport ? "yes" : "no"}</li>

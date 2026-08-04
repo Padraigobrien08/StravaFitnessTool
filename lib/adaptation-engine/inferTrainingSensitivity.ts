@@ -11,8 +11,7 @@ export function inferTrainingSensitivity(analytics: DashboardInsights): Adaptati
       {
         id: "sensitivity-intensity-heavy",
         category: "freshness",
-        statement:
-          "Athlete appears sensitive to intensity-heavy weeks — freshness may drop quickly",
+        statement: "Athlete appears sensitive to intensity-heavy weeks: freshness may drop quickly",
         confidence: analytics.summary.runCount >= 20 ? "medium" : "low",
         supportingEvidence: [
           `Easy ${Math.round(hardPct)}% vs target ${target}%`,

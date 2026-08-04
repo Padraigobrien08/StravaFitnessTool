@@ -218,7 +218,7 @@ function buildMissingGuidance(
     items.push({
       title: "Partial heart rate coverage",
       severity: "warning",
-      impact: "Readiness and intensity advice use proxies — confidence is reduced.",
+      impact: "Readiness and intensity advice use proxies: confidence is reduced.",
       action: "Wear a chest or optical HR monitor on easy and quality runs.",
     });
   }
@@ -236,7 +236,7 @@ function buildMissingGuidance(
     items.push({
       title: "Data foundation is solid",
       severity: "info",
-      impact: "Continue syncing — the system refines readiness and projections as you train.",
+      impact: "Continue syncing: the system refines readiness and projections as you train.",
       action: "Sync after big weeks; add FIT files for key workouts.",
     });
   }
@@ -270,7 +270,7 @@ export function buildImportPageView(
       subtitle: "Connect sources to unlock intelligence",
       ingestionSummary: "No runs ingested yet",
       qualityNarrative:
-        "StrideIQ analyzes locally — nothing leaves your device without Strava API sync.",
+        "StrideIQ analyzes locally: nothing leaves your device without Strava API sync.",
       fitNarrative: "FIT streams are optional but unlock the deepest workout intelligence.",
       recommendation:
         "Start with Strava API for seamless sync, or import a full export for history.",
@@ -408,16 +408,16 @@ export function buildImportPageView(
     ingestionSummary: opts.dataSourceLabel ?? "Local training archive",
     qualityNarrative: hrHigh
       ? "Strong pace + HR analysis available."
-      : "Pace trends available — HR coverage limits effort modeling.",
+      : "Pace trends available; HR coverage limits effort modeling.",
     fitNarrative:
       streamPct >= 50
         ? "FIT stream coverage supports advanced workout intelligence."
         : streamPct > 0
-          ? "FIT stream coverage partially complete — add more for full execution analysis."
-          : "No FIT streams yet — summaries only on workout pages.",
+          ? "FIT stream coverage partially complete. Add more for full execution analysis."
+          : "No FIT streams yet: summaries only on workout pages.",
     recommendation:
       streamPct < 30
-        ? "Upload FIT activities or sync streams — biggest lift to prediction and workout depth."
+        ? "Upload FIT activities or sync streams: biggest lift to prediction and workout depth."
         : report.runCount < 25
           ? "Import full history or sync more runs for sharper progression curves."
           : "Maintain sync after key weeks; system confidence improves automatically.",
@@ -492,7 +492,7 @@ export function buildImportPageView(
       confidenceGain:
         streamPct < 50
           ? "Adding FIT streams typically raises workout and race confidence one tier."
-          : "Stream depth is strong — focus on consistent HR on easy days.",
+          : "Stream depth is strong. Focus on consistent HR on easy days.",
     },
     missingGuidance: buildMissingGuidance(report, opts.apiConnected, true),
     trustTopics: defaultTrustTopics(),
@@ -517,15 +517,15 @@ function defaultTrustTopics(): TrustTopicView[] {
     },
     {
       title: "How workouts are classified",
-      body: "Easy, tempo, interval, and long runs are inferred from pace, HR zones, and duration — not manual tags.",
+      body: "Easy, tempo, interval, and long runs are inferred from pace, HR zones, and duration, not manual tags.",
     },
     {
       title: "Readiness estimates",
-      body: "Scores combine recent volume, longest run, fatigue (TSB), and consistency — not medical clearance.",
+      body: "Scores combine recent volume, longest run, fatigue (TSB), and consistency, not medical clearance.",
     },
     {
       title: "Race predictions",
-      body: "Models extrapolate from quality efforts; spread reflects disagreement and sample size — not guarantees.",
+      body: "Models extrapolate from quality efforts; spread reflects disagreement and sample size, not guarantees.",
     },
   ];
 }

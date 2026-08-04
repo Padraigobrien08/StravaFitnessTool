@@ -29,7 +29,7 @@ export function ReadinessIntelligencePanel({
         </p>
       ) : (
         <p className="mb-4 text-xs text-zinc-500">
-          General half-marathon readiness — set a race goal for distance-specific scoring.
+          General half-marathon readiness. Set a race goal for distance-specific scoring.
         </p>
       )}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -153,12 +153,12 @@ export function buildFatigueSnapshot(
   if (history.length >= 2) {
     const prev = history.at(-2);
     if (prev && atl > prev.atl) {
-      evidence.push("Acute load has risen recently — prioritize recovery if adding intensity.");
+      evidence.push("Acute load has risen recently: prioritize recovery if adding intensity.");
     }
   }
 
   if (legFeel === "heavy") {
-    evidence.push("Adjusted down for reported heavy legs — protect the block today.");
+    evidence.push("Adjusted down for reported heavy legs: protect the block today.");
   } else if (legFeel === "fresh") {
     evidence.push("Nudged up for reported fresh legs.");
   }

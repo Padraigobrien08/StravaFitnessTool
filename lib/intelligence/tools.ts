@@ -201,7 +201,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
     case "get_goal_scenarios": {
       if (!raceGoal) {
         return wrapIntelligence(
-          { error: "No race goal set — set a goal on the Goals page or sync preferences." },
+          { error: "No race goal set. Set a goal on the Goals page or sync preferences." },
           quality,
           [],
           ["Goal scenarios require a race goal with a distance (and ideally a target time)."],
@@ -328,7 +328,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
     case "explain_prediction": {
       if (!raceGoal) {
         return wrapIntelligence(
-          { error: "No race goal set — set a goal on the Goals page or sync preferences." },
+          { error: "No race goal set. Set a goal on the Goals page or sync preferences." },
           quality,
           [],
           ["Prediction explanation requires a race goal with a distance."],
@@ -392,7 +392,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
           .filter((s) => s.deltaSec !== 0)
           .map(
             (s) =>
-              `${s.label}: ${s.deltaSec > 0 ? "+" : ""}${s.deltaSec}s${s.evidence ? ` — ${s.evidence}` : ""}`,
+              `${s.label}: ${s.deltaSec > 0 ? "+" : ""}${s.deltaSec}s${s.evidence ? ` (${s.evidence})` : ""}`,
           ),
         f.limitations.map((l) => l.detail).slice(0, 3),
       );
@@ -740,9 +740,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
             ]
           : [],
         s.evaluated === 0
-          ? [
-              "No forecasts have been scored yet — they're graded once you race that distance again.",
-            ]
+          ? ["No forecasts have been scored yet. They're graded once you race that distance again."]
           : [],
       );
     }
@@ -763,7 +761,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         .slice(0, 8)
         .map(
           (r) =>
-            `${r.targetDate} ${r.kind}: ${r.adherence ?? "pending"}${r.outcomeSignal ? ` / ${r.outcomeSignal}` : ""}${r.evaluationNote ? ` — ${r.evaluationNote}` : ""}`,
+            `${r.targetDate} ${r.kind}: ${r.adherence ?? "pending"}${r.outcomeSignal ? ` / ${r.outcomeSignal}` : ""}${r.evaluationNote ? ` (${r.evaluationNote})` : ""}`,
         );
       return wrapIntelligence(
         {
@@ -782,7 +780,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
         quality,
         evidence,
         result.summary.total === 0
-          ? ["No recommendations recorded yet — they log as the Coach makes them."]
+          ? ["No recommendations recorded yet. They log as the Coach makes them."]
           : [],
       );
     }
@@ -791,7 +789,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       const mode = ((call.arguments as GetRaceStrategyArgs)?.mode ?? "even") as StrategyMode;
       if (!raceGoal) {
         return wrapIntelligence(
-          { error: "No race goal set — set goal on Goals page or sync preferences." },
+          { error: "No race goal set. Set goal on Goals page or sync preferences." },
           quality,
           [],
           ["Race strategy requires a race goal with date and distance."],
@@ -806,7 +804,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       );
       if (!strategy) {
         return wrapIntelligence(
-          { error: "Could not build strategy — need predictions for this distance." },
+          { error: "Could not build strategy. Need predictions for this distance." },
           quality,
         );
       }
@@ -864,7 +862,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       if (!run) {
         return wrapIntelligence(
           {
-            error: "Run not found — pass runId from list_recent_runs or a YYYY-MM-DD date.",
+            error: "Run not found. Pass runId from list_recent_runs or a YYYY-MM-DD date.",
           },
           quality,
           [],
@@ -1072,7 +1070,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_monthly_narrative",
     description:
-      "A prose summary of the athlete's training month — volume trajectory, best 4-week block, PRs, efficiency, consistency, and intensity mix. Use for 'how did my month go?', 'summarize my last month', or a monthly recap.",
+      "A prose summary of the athlete's training month: volume trajectory, best 4-week block, PRs, efficiency, consistency, and intensity mix. Use for 'how did my month go?', 'summarize my last month', or a monthly recap.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -1084,31 +1082,31 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_training_phases",
     description:
-      "A catalog of the athlete's recent training phases (base, build, sharpening, taper, recovery, off) as a timeline — each with its week span, average weekly volume, and a one-line characterization. Use for 'what phases have I been through?', 'am I in a build or base phase?', or a training-history overview. Distinct from get_race_strategy; this segments history, it does not pick a single best block.",
+      "A catalog of the athlete's recent training phases (base, build, sharpening, taper, recovery, off) as a timeline: each with its week span, average weekly volume, and a one-line characterization. Use for 'what phases have I been through?', 'am I in a build or base phase?', or a training-history overview. Distinct from get_race_strategy; this segments history, it does not pick a single best block.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_risk_patterns",
     description:
-      "Detect dangerous training patterns from the athlete's series — acute-load spikes (ACWR), rapid volume ramps, overreaching streaks, excessive intensity, long-run jumps — each with severity, evidence, and a mitigation. Use for 'am I at risk of injury/overtraining?', 'is my ramp too aggressive?', or a safety check.",
+      "Detect dangerous training patterns from the athlete's series: acute-load spikes (ACWR), rapid volume ramps, overreaching streaks, excessive intensity, long-run jumps, each with severity, evidence, and a mitigation. Use for 'am I at risk of injury/overtraining?', 'is my ramp too aggressive?', or a safety check.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "explain_prediction",
     description:
-      "Explain WHY the race prediction is what it is — the step-by-step derivation from raw capability through durability, specificity, and freshness/taper adjustments to the most-likely time; each capability model's estimate and weight; what widens the prediction range; and which training levers (long run, volume, quality, freshness) would move the time most. Use for 'why do you think I'll run that?', 'how did you get that time?', or 'what would make me faster?'.",
+      "Explain WHY the race prediction is what it is: the step-by-step derivation from raw capability through durability, specificity, and freshness/taper adjustments to the most-likely time; each capability model's estimate and weight; what widens the prediction range; and which training levers (long run, volume, quality, freshness) would move the time most. Use for 'why do you think I'll run that?', 'how did you get that time?', or 'what would make me faster?'.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_physiology",
     description:
-      "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance — the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend; (3) durability — a 0–100 score for how well efficiency (HR drift) and pace hold up deep into long runs, with a trend; (4) threshold/economy — estimated lactate-threshold pace and HR from tempo/threshold sessions, plus running economy as a grade-adjusted pace-per-HR trend; (5) condition normalization — efficiency adjusted for heat (weather temperature) and grade so trends are apples-to-apples, including an example where accounting for heat changes how a session reads. Each with confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how durable is my aerobic engine?', 'what's my threshold pace/HR?', 'is my running economy improving?', 'was that hot run actually bad?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
+      "Elite physiology fitted to this athlete: (1) Critical Speed (aerobic ceiling, as a pace) and D′ (anaerobic distance reserve) from the two-parameter critical-speed model on their own 2–30 min best efforts; (2) personalized fatigue-resistance: the power-law exponent (time ∝ distance^exponent) vs the ~1.06 Riegel reference, how much more they fade per doubling of distance, and its trend; (3) durability: a 0–100 score for how well efficiency (HR drift) and pace hold up deep into long runs, with a trend; (4) threshold/economy: estimated lactate-threshold pace and HR from tempo/threshold sessions, plus running economy as a grade-adjusted pace-per-HR trend; (5) condition normalization: efficiency adjusted for heat (weather temperature) and grade so trends are apples-to-apples, including an example where accounting for heat changes how a session reads. Each with confidence. Use for 'what's my critical speed?', 'aerobic vs anaerobic capacity', 'do I fade over distance?', 'how durable is my aerobic engine?', 'what's my threshold pace/HR?', 'is my running economy improving?', 'was that hot run actually bad?', or physiological-ceiling questions. Distinct from race predictions (this is capacity, not a finish-time forecast).",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_capability_radar",
     description:
-      "The athlete's capability profile across six axes — aerobic base, threshold, top-end speed, durability, economy, consistency — each scored 0–100 vs their OWN history (50 ≈ personal baseline), plus how much each matters for the goal race (demand profile) and the auto-flagged biggest limiter (the axis that matters for the race and is weakest). Use for 'what's my biggest limiter?', 'where am I strong or weak?', 'what should I work on for my race?', or a capability overview. This is the diagnosis; pair with goal scenarios for the prescription.",
+      "The athlete's capability profile across six axes (aerobic base, threshold, top-end speed, durability, economy, consistency), each scored 0–100 vs their OWN history (50 ≈ personal baseline), plus how much each matters for the goal race (demand profile) and the auto-flagged biggest limiter (the axis that matters for the race and is weakest). Use for 'what's my biggest limiter?', 'where am I strong or weak?', 'what should I work on for my race?', or a capability overview. This is the diagnosis; pair with goal scenarios for the prescription.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -1120,37 +1118,37 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_session_zscores",
     description:
-      "How each recent session stacks up against the athlete's OWN distribution for that workout type, as a z-score ('this tempo was +1.8σ — faster-per-HR than your typical tempo'). Returns the standout best/worst recent sessions plus recent scores, each with cohort size and confidence. Use for 'was that a good tempo/long run?', 'how does this session compare to my usual?', 'which recent session stood out?'. Personal, not population — a small cohort reads as directional.",
+      "How each recent session stacks up against the athlete's OWN distribution for that workout type, as a z-score ('this tempo was +1.8σ, faster-per-HR than your typical tempo'). Returns the standout best/worst recent sessions plus recent scores, each with cohort size and confidence. Use for 'was that a good tempo/long run?', 'how does this session compare to my usual?', 'which recent session stood out?'. Personal, not population: a small cohort reads as directional.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_anomalies",
     description:
-      "Recent runs that don't fit the athlete's personal model (large personal z-score), each flagged with a likely cause — heat (weather temp), terrain (elevation per km), or fatigue (heavy preceding load) — or marked 'unexplained' when none of those account for it. Use for 'why was that run off?', 'any weird sessions lately?', 'was that a bad day or just conditions?'. Causes are contextual associations, not proven explanations.",
+      "Recent runs that don't fit the athlete's personal model (large personal z-score), each flagged with a likely cause (heat from weather temp, terrain from elevation per km, or fatigue from heavy preceding load), or marked 'unexplained' when none of those account for it. Use for 'why was that run off?', 'any weird sessions lately?', 'was that a bad day or just conditions?'. Causes are contextual associations, not proven explanations.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_uncertainty",
     description:
-      "Descriptive metrics as intervals, not points — aerobic efficiency, typical weekly volume, and easy-run pace each bootstrapped from the athlete's own recent runs into a 90% confidence interval with sample size. Use for 'what's my current efficiency/volume, and how sure are we?', 'how variable is my easy pace?', or when a point number needs its honest range. Bootstrap of the athlete's own data — no population assumptions.",
+      "Descriptive metrics as intervals, not points: aerobic efficiency, typical weekly volume, and easy-run pace each bootstrapped from the athlete's own recent runs into a 90% confidence interval with sample size. Use for 'what's my current efficiency/volume, and how sure are we?', 'how variable is my easy pace?', or when a point number needs its honest range. Bootstrap of the athlete's own data: no population assumptions.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_correlations",
     description:
-      "Honest personal correlations between the athlete's own metrics — cadence vs efficiency, prior-week load vs efficiency/pace, temperature vs pace — each with Pearson r, sample size n, a conservative strength label, and a plain reading. Use for 'does higher cadence help my efficiency?', 'does training load affect my pace?', 'what's associated with my good/bad runs?'. Always association, never causation — confounders overlap; report the caveats.",
+      "Honest personal correlations between the athlete's own metrics (cadence vs efficiency, prior-week load vs efficiency/pace, temperature vs pace), each with Pearson r, sample size n, a conservative strength label, and a plain reading. Use for 'does higher cadence help my efficiency?', 'does training load affect my pace?', 'what's associated with my good/bad runs?'. Always association, never causation: confounders overlap; report the caveats.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_change_points",
     description:
-      "Inflection points in the athlete's fitness trajectory (weekly CTL) where the slope meaningfully changed — a build taking hold (reversal_up), a peak then decline or break/setback (reversal_down), a ramp steepening (acceleration), or gains flattening (deceleration) — each dated with a plain reading. Use for 'when did my fitness turn around?', 'did that block work?', 'when did things drop off?'. CTL is a load-based proxy; these are descriptive markers, not diagnoses.",
+      "Inflection points in the athlete's fitness trajectory (weekly CTL) where the slope meaningfully changed: a build taking hold (reversal_up), a peak then decline or break/setback (reversal_down), a ramp steepening (acceleration), or gains flattening (deceleration), each dated with a plain reading. Use for 'when did my fitness turn around?', 'did that block work?', 'when did things drop off?'. CTL is a load-based proxy; these are descriptive markers, not diagnoses.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_forecast_accuracy",
     description:
-      "How well-calibrated the race forecaster has been — of past predictions that a real effort later tested, what share landed in the predicted p10–p90 range, the model's bias (optimistic/conservative), and mean absolute error. Use for 'how accurate are your predictions?', 'can I trust your forecast?', or a calibration check.",
+      "How well-calibrated the race forecaster has been: of past predictions that a real effort later tested, what share landed in the predicted p10–p90 range, the model's bias (optimistic/conservative), and mean absolute error. Use for 'how accurate are your predictions?', 'can I trust your forecast?', or a calibration check.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -1284,7 +1282,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "pr_context",
     description:
-      "Summarize training in the 8 weeks before a PR vs the prior 8 weeks — what changed.",
+      "Summarize training in the 8 weeks before a PR vs the prior 8 weeks: what changed.",
     input_schema: {
       type: "object",
       properties: {
@@ -1395,7 +1393,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "generate_next_week_training_plan",
     description:
-      "Generate an AI-native adaptive weekly training plan from coaching context, guardrails, and validation. REQUIRED for 'build my next week', race week plans, taper plans, and plan adjustments — never invent a plan without this tool. Returns structured WeeklyTrainingPlan with evidence, constraints, and limitations.",
+      "Generate an AI-native adaptive weekly training plan from coaching context, guardrails, and validation. REQUIRED for 'build my next week', race week plans, taper plans, and plan adjustments. Never invent a plan without this tool. Returns structured WeeklyTrainingPlan with evidence, constraints, and limitations.",
     input_schema: {
       type: "object",
       properties: {

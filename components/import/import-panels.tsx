@@ -43,7 +43,7 @@ export function DataConfidencePanel({
     <Panel>
       <Eyebrow className="mb-3">Data confidence</Eyebrow>
       <p className="mb-4 text-[13px] text-muted-foreground">
-        Coverage drives model trust — gaps explain reduced readiness and prediction confidence.
+        Coverage drives model trust: gaps explain reduced readiness and prediction confidence.
       </p>
       <div className="space-y-3">
         {coverage.map((row) => (
@@ -87,7 +87,7 @@ export function ModalityCoveragePanel({ rows }: { rows: ModalityCoverageRow[] })
     <Panel>
       <Eyebrow className="mb-3">Modality coverage</Eyebrow>
       <p className="mb-3 text-[13px] text-muted-foreground">
-        Strava <span className="text-zinc-400">sport_type</span> distribution — StrideIQ is
+        Strava <span className="text-zinc-400">sport_type</span> distribution. StrideIQ is
         modality-aware; running stays primary for race intelligence.
       </p>
       <div className="flex flex-wrap gap-2">
@@ -124,11 +124,11 @@ export function HistoricalImportPanel({
       <Eyebrow className="mb-3">Historical import</Eyebrow>
       <p className="mb-3 text-[13px] text-muted-foreground">
         Bulk exports unlock long-term progression, performance curves, historical readiness trends,
-        and pacing adaptation modeling — especially before API history exists.
+        and pacing adaptation modeling, especially before API history exists.
       </p>
       <ul className="mb-4 space-y-1 text-xs text-zinc-500">
         <li>· Full Strava archive (activities.csv + optional FIT folder)</li>
-        <li>· Merges with API data — does not wipe existing import</li>
+        <li>· Merges with API data, does not wipe existing import</li>
         <li>· Best for athletes with years of training history</li>
       </ul>
       <UploadZone
@@ -165,7 +165,7 @@ export function FitIntelligencePanel({
     <Panel className="h-full">
       <Eyebrow className="mb-3">Advanced workout intelligence</Eyebrow>
       <p className="mb-4 text-[13px] text-muted-foreground">
-        FIT streams are StrideIQ&apos;s deepest signal — interval structure, drift, and execution
+        FIT streams are StrideIQ&apos;s deepest signal: interval structure, drift, and execution
         scoring all depend on them.
       </p>
 
@@ -203,7 +203,7 @@ export function FitIntelligencePanel({
 
       <p className="mb-3 text-xs text-zinc-500">
         <span className="font-medium text-zinc-400">{comparison.coverageLabel}</span>
-        {" — "}
+        {": "}
         {comparison.confidenceGain}
       </p>
 

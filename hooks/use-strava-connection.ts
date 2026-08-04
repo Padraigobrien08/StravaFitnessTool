@@ -50,7 +50,7 @@ export function useStravaConnection(
     setSyncing(true);
     setMessage(null);
     try {
-      setMessage("Step 1/2 — syncing activities…");
+      setMessage("Step 1/2: syncing activities…");
       const res = await fetch("/api/sync/strava", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,7 +63,7 @@ export function useStravaConnection(
       const missing = statusNow.runsMissingStreams ?? 0;
 
       if (missing > 0) {
-        setMessage(`Step 2/2 — syncing streams for up to 40 runs (${missing} pending)…`);
+        setMessage(`Step 2/2: syncing streams for up to 40 runs (${missing} pending)…`);
         const streamRes = await fetch("/api/sync/strava/streams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

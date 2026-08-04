@@ -85,7 +85,7 @@ export function assessImportQuality(data: StravaImport): ImportQualityReport {
 
   const warnings: string[] = [];
   if (withHr < total * 0.5) {
-    warnings.push("Many runs lack HR — effort zones and load may be incomplete.");
+    warnings.push("Many runs lack HR: effort zones and load may be incomplete.");
   }
   if (withFitRef > 0 && fitParsed < withFitRef * 0.5) {
     warnings.push(
@@ -93,7 +93,7 @@ export function assessImportQuality(data: StravaImport): ImportQualityReport {
     );
   }
   if (total < 15) {
-    warnings.push("Small sample size — trends and predictions are indicative only.");
+    warnings.push("Small sample size: trends and predictions are indicative only.");
   }
 
   const levels = fieldCoverage.map((f) => f.level);

@@ -64,7 +64,7 @@ export function UploadZone({
         </p>
         <p className="mt-1 max-w-md text-center text-xs text-zinc-500 sm:text-sm">
           Needs <code className="text-accent/90">activities.csv</code>
-          {compact ? "" : " — include "}
+          {compact ? "" : ", plus "}
           {!compact && (
             <>
               <code className="text-accent/90">activities/*.fit.gz</code> for streams.

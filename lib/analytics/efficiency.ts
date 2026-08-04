@@ -112,7 +112,7 @@ export function efficiencyMonthOverMonth(points: EfficiencyPoint[]): EfficiencyM
   if (pctChange !== null && pctChange > 2) {
     narrative = `Your aerobic efficiency is improving: you're running faster at similar heart rates compared with ${priorLabel} (${pctChange}% better index in ${currentLabel}).`;
   } else if (pctChange !== null && pctChange < -2) {
-    narrative = `Efficiency dipped vs ${priorLabel} — fatigue, heat, or harder sessions may explain it.`;
+    narrative = `Efficiency dipped vs ${priorLabel}: fatigue, heat, or harder sessions may explain it.`;
   }
 
   return {

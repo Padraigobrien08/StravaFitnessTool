@@ -108,7 +108,7 @@ export async function runOpenAICoachChat(
   }
 
   return {
-    reply: "I hit the tool loop limit — try a simpler question.",
+    reply: "I hit the tool loop limit, try a simpler question.",
     toolsUsed,
   };
 }

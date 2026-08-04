@@ -18,7 +18,7 @@ export function inferDurabilitySignals(analytics: DashboardInsights): AthleteBel
         statement:
           longPct >= 75
             ? "Long-run exposure relative to race distance appears adequate for current goal."
-            : "Long-run consistency supports durability — extending long run may still be a limiter.",
+            : "Long-run consistency supports durability; extending long run may still be a limiter.",
         evidence: [
           `Longest run ${longest} km (${Math.round(longPct)}% of race distance)`,
           rr ? `${rr.fourWeekVolumeKm} km / 4 weeks` : `4-week volume context available`,
@@ -48,7 +48,7 @@ export function inferDurabilitySignals(analytics: DashboardInsights): AthleteBel
         ],
         confidence: "low",
         recommendedUse:
-          "Pair durability work with easy aerobic volume — avoid same-day hard stacks.",
+          "Pair durability work with easy aerobic volume: avoid same-day hard stacks.",
       }),
     );
   }

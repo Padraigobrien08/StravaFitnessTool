@@ -57,7 +57,7 @@ export function buildActiveObservations(
   } else if (analytics.efficiencySummary.trend === "declining") {
     push({
       id: "eff-down",
-      text: "Efficiency has dipped — fatigue or heat may be compressing aerobic returns.",
+      text: "Efficiency has dipped: fatigue or heat may be compressing aerobic returns.",
       tone: "warning",
       domain: "Fatigue",
       confidence: "medium",
@@ -67,7 +67,7 @@ export function buildActiveObservations(
   if (analytics.intensityAdvice.status === "too_hard") {
     push({
       id: "intensity",
-      text: `Intensity concentration is elevated — ${analytics.intensityAdvice.hardRunsLast14d} hard sessions in 14 days.`,
+      text: `Intensity concentration is elevated: ${analytics.intensityAdvice.hardRunsLast14d} hard sessions in 14 days.`,
       tone: "warning",
       domain: "Fatigue",
       confidence: "medium",
@@ -85,7 +85,7 @@ export function buildActiveObservations(
   } else if (analytics.fatigue.tsb < -12) {
     push({
       id: "fatigue",
-      text: "Fatigue balance is strained — acute load is outpacing recovery.",
+      text: "Fatigue balance is strained: acute load is outpacing recovery.",
       tone: "warning",
       domain: "Fatigue",
       confidence: "high",
@@ -154,7 +154,7 @@ export function deriveCurrentFocus(
   if (analytics.raceReadiness && (analytics.raceReadiness.daysUntilRace ?? 99) <= 21) {
     return {
       focus: "Race-week execution",
-      rationale: `${analytics.raceReadiness.daysUntilRace} days to race — prioritize freshness and specificity.`,
+      rationale: `${analytics.raceReadiness.daysUntilRace} days to race: prioritize freshness and specificity.`,
     };
   }
   if (analytics.intensityAdvice.status === "too_hard") {
@@ -166,7 +166,7 @@ export function deriveCurrentFocus(
   if (analytics.efficiencySummary.trend === "improving") {
     return {
       focus: "Aerobic adaptation",
-      rationale: "Efficiency trend is positive — protect the block with polarized easy days.",
+      rationale: "Efficiency trend is positive: protect the block with polarized easy days.",
     };
   }
   const warn = observations.find((o) => o.tone === "warning");
@@ -381,7 +381,7 @@ export function buildRisksAndOpportunities(
   if (analytics.fatigue.tsb < -12) {
     out.push({
       id: "tsb",
-      text: "Acute load outpacing recovery — freshness under pressure",
+      text: "Acute load outpacing recovery: freshness under pressure",
       kind: "risk",
       domain: "Load",
     });
@@ -398,7 +398,7 @@ export function buildRisksAndOpportunities(
   if (analytics.efficiencySummary.trend === "improving") {
     out.push({
       id: "eff",
-      text: "Aerobic efficiency trend improving — protect with easy volume",
+      text: "Aerobic efficiency trend improving: protect with easy volume",
       kind: "opportunity",
       domain: "Adaptation",
     });
@@ -422,7 +422,7 @@ export function buildRisksAndOpportunities(
   if (analytics.raceReadiness && analytics.raceReadiness.daysUntilRace <= 21) {
     out.push({
       id: "taper",
-      text: "Race taper window — specificity and freshness alignment matter",
+      text: "Race taper window: specificity and freshness alignment matter",
       kind: "opportunity",
       domain: "Race prep",
     });

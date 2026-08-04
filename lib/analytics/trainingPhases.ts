@@ -93,13 +93,13 @@ function characterize(type: TrainingPhaseType, avgKm: number, hardPct: number): 
     case "build":
       return `Volume building to ~${avgKm} km/wk`;
     case "peak":
-      return `Sharpening — ${hardPct}% hard work at ~${avgKm} km/wk`;
+      return `Sharpening: ${hardPct}% hard work at ~${avgKm} km/wk`;
     case "taper":
       return `Easing volume into race day (~${avgKm} km/wk)`;
     case "recovery":
-      return `Recovery — volume down to ~${avgKm} km/wk`;
+      return `Recovery: volume down to ~${avgKm} km/wk`;
     case "gap":
-      return "Break — little or no running";
+      return "Break: little or no running";
   }
 }
 

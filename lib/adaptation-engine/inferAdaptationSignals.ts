@@ -47,7 +47,7 @@ export function inferAdaptationSignals(
           ...(analytics.efficiencyMoM.narrative ? [analytics.efficiencyMoM.narrative] : []),
         ],
         contradictoryEvidence:
-          analytics.fatigue.tsb < -12 ? ["TSB negative — load may mask adaptation"] : [],
+          analytics.fatigue.tsb < -12 ? ["TSB negative: load may mask adaptation"] : [],
       }),
     );
   }

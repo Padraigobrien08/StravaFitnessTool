@@ -34,7 +34,7 @@ function DemoCallout() {
       <div>
         <p className="text-sm font-semibold text-accent">No Strava export handy? Try the demo.</p>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Loads a full 12-month sample athlete so you can explore every insight instantly — no
+          Loads a full 12-month sample athlete so you can explore every insight instantly, no
           account, database, or API key required.
         </p>
       </div>

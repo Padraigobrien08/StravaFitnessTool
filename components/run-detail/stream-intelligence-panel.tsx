@@ -49,7 +49,7 @@ export function StreamIntelligencePanel({
     return (
       <PanelChrome title="Stream intelligence" subdued>
         <p className="text-sm text-zinc-500">
-          No stream data — sync from Strava or re-import FIT for telemetry interpretation.
+          No stream data: sync from Strava or re-import FIT for telemetry interpretation.
         </p>
       </PanelChrome>
     );

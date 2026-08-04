@@ -122,7 +122,7 @@ export function attributeImprovement(
         ? "aerobic efficiency (pace/HR)"
         : "follow-on volume";
 
-  const narrative = `Periods that likely supported your best ${metricLabel} had ${factors[0].description}, ${factors[1].description}, and ${factors[2].description}. This is association from ${scored.length} historical blocks — not proven causation.`;
+  const narrative = `Periods that likely supported your best ${metricLabel} had ${factors[0].description}, ${factors[1].description}, and ${factors[2].description}. This is association from ${scored.length} historical blocks, not proven causation.`;
 
   return {
     payload: { metric, factors, narrative },
@@ -132,9 +132,9 @@ export function attributeImprovement(
     ),
     assumptions: [
       "Outcome measured in the 4 weeks after each block ends.",
-      "Correlation only — other life factors not modeled.",
+      "Correlation only, other life factors not modeled.",
     ],
-    limitations: blocks.length < 6 ? ["Limited block count — treat rankings as directional."] : [],
+    limitations: blocks.length < 6 ? ["Limited block count: treat rankings as directional."] : [],
     confidence: blocks.length >= 8 ? "medium" : confidenceFromRuns(ctx.runs.length),
   };
 }

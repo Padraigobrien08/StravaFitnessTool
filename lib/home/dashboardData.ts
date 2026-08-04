@@ -463,7 +463,7 @@ export function buildInsightRows(
       title: "High intensity ratio",
       summary: `${adv.hardRunsLast14d} hard sessions in 14 days · ${Math.round(adv.currentEasyPct)}% easy (target ~${adv.easyTargetPct}%)`,
       whyItMatters:
-        "When hard days stack up, recovery lags and aerobic gains stall — easy volume needs to lead the week.",
+        "When hard days stack up, recovery lags and aerobic gains stall. Easy volume needs to lead the week.",
       pills: [
         `${adv.hardRunsLast14d} hard runs`,
         `${Math.round(adv.currentEasyPct)}% easy`,
@@ -485,7 +485,7 @@ export function buildInsightRows(
       title: "Aerobic stress elevated",
       summary: `${z3.count} of ${z3.total} HR runs spent above Z3`,
       whyItMatters:
-        "Too much moderate-hard running blurs recovery — polarize with more true easy days.",
+        "Too much moderate-hard running blurs recovery. Polarize with more true easy days.",
       pills: [`${z3.count} above Z3`, `${Math.round((z3.count / z3.total) * 100)}% of HR runs`],
       recommendation: "Cap intensity to 1–2 sessions this week; fill gaps with easy aerobic runs.",
       recommendationHref: "/training",
@@ -503,7 +503,7 @@ export function buildInsightRows(
       title: fatigueInsight.title,
       summary: fatigueInsight.evidence[0] ?? "Fatigue signals are elevated.",
       whyItMatters:
-        "Accumulated load is outpacing adaptation — backing off now protects the next training block.",
+        "Accumulated load is outpacing adaptation. Backing off now protects the next training block.",
       pills: [
         `freshness ${analytics.fatigue.freshness}`,
         `TSB ${analytics.fatigue.tsb > 0 ? "+" : ""}${Math.round(analytics.fatigue.tsb)}`,
@@ -528,7 +528,7 @@ export function buildInsightRows(
           ? `${pct > 0 ? "+" : ""}${pct}% vs prior month at comparable effort`
           : "Pace at a given heart rate is trending faster.",
       whyItMatters:
-        "Improving efficiency means the same HR buys more speed — a hallmark of durable fitness.",
+        "Improving efficiency means the same HR buys more speed, a hallmark of durable fitness.",
       pills: [
         pct != null ? `${pct > 0 ? "+" : ""}${pct}% efficiency` : "trend up",
         analytics.consistencyScore.label,
@@ -546,7 +546,7 @@ export function buildInsightRows(
       title: "Polarized balance on track",
       summary: `${Math.round(adv.currentEasyPct)}% easy · ${adv.hardRunsLast14d} hard in 14 days`,
       whyItMatters:
-        "Your easy/hard split supports recovery between quality sessions — maintain this rhythm.",
+        "Your easy/hard split supports recovery between quality sessions. Maintain this rhythm.",
       pills: [`${Math.round(adv.currentEasyPct)}% easy`, "polarized"],
       recommendation: adv.recommendations[0],
       trend: { text: "Balance OK", positive: true },
@@ -583,7 +583,7 @@ export function buildInsightRows(
       title: "Training ecosystem",
       summary: ecoHeadline,
       whyItMatters:
-        "StrideIQ tracks strength, mobility, cross-training, and HIIT alongside runs — non-run work shapes fatigue and durability context, not race pace directly.",
+        "StrideIQ tracks strength, mobility, cross-training, and HIIT alongside runs: non-run work shapes fatigue and durability context, not race pace directly.",
       pills: [
         analytics.trainingEcosystem.archetype.label,
         `${analytics.trainingEcosystem.totalContext.last28Days.nonRunSessions} non-run sessions`,
@@ -626,7 +626,7 @@ export function buildInsightRows(
       confidence: conf,
       title: "Training load stable",
       summary: `TSB ${analytics.fatigue.tsb > 0 ? "+" : ""}${Math.round(analytics.fatigue.tsb)} · freshness ${analytics.fatigue.freshness}/100`,
-      whyItMatters: "No critical overload flags — good window to execute planned quality work.",
+      whyItMatters: "No critical overload flags: good window to execute planned quality work.",
       pills: [`freshness ${analytics.fatigue.freshness}`],
       trend: { text: "Stable", positive: null },
     });
@@ -713,10 +713,10 @@ export function buildProgressionView(
   const best = analytics.bestBlock;
   const trajectory =
     analytics.efficiencySummary.trend === "improving"
-      ? "Trajectory trending up — aerobic response improving."
+      ? "Trajectory trending up: aerobic response improving."
       : analytics.efficiencySummary.trend === "declining"
-        ? "Trajectory softening — prioritize recovery before adding load."
-        : "Trajectory steady — maintain consistency before pushing intensity.";
+        ? "Trajectory softening: prioritize recovery before adding load."
+        : "Trajectory steady: maintain consistency before pushing intensity.";
 
   const milestones: AchievementItem[] = [];
   if (analytics.consistencyScore.overall >= 70) {

@@ -391,7 +391,7 @@ export function ReportTrainingEcosystem({ data }: { data: ReportEcosystemView })
       </div>
       {data.interferenceCount > 0 ? (
         <p className="text-sm text-amber-800">
-          {data.interferenceCount} interference flag(s) — hard non-run sessions within 24–48h of
+          {data.interferenceCount} interference flag(s): hard non-run sessions within 24–48h of
           quality runs.
         </p>
       ) : (

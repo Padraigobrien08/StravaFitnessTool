@@ -14,7 +14,7 @@ export function assessExecution(input: RaceForecastInput): ExecutionAssessment {
     evidence.push("Aerobic efficiency improving at comparable heart rate.");
   } else if (trend === "declining") {
     score -= 12;
-    evidence.push("Efficiency softening — execution risk on long efforts.");
+    evidence.push("Efficiency softening: execution risk on long efforts.");
   }
 
   if (easyPct >= 55) {
@@ -22,7 +22,7 @@ export function assessExecution(input: RaceForecastInput): ExecutionAssessment {
     evidence.push("Easy-day share supports sustainable pacing.");
   } else if (easyPct < 40) {
     score -= 10;
-    evidence.push("Low easy-day share — positive split / fade risk.");
+    evidence.push("Low easy-day share: positive split / fade risk.");
   }
 
   const hard14 = ctx.hardRunsLast14d ?? 0;
@@ -47,7 +47,7 @@ export function assessExecution(input: RaceForecastInput): ExecutionAssessment {
 
   const recommendation =
     fadeRisk === "high"
-      ? "Start conservatively; protect the second half — current patterns suggest late fade."
+      ? "Start conservatively; protect the second half: current patterns suggest late fade."
       : fadeRisk === "low"
         ? "Stable execution patterns support even pacing at projected effort."
         : "Use controlled early pace; monitor drift in the second half.";

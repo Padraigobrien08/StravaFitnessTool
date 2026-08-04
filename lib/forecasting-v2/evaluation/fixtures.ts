@@ -269,7 +269,7 @@ export const FORECAST_FIXTURES: ForecastFixtureProfile[] = [
   {
     id: "near_race_evidence",
     label: "Near-race evidence (20.5k + 10 mi)",
-    description: "Recent 1:53 20.5k and 1:22 10-mile — HM forecast should be clearly under 2:00.",
+    description: "Recent 1:53 20.5k and 1:22 10-mile: HM forecast should be clearly under 2:00.",
     input: nearRaceEvidenceRunnerInput,
     expectations: {
       minConfidence: "medium",

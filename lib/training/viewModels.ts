@@ -166,10 +166,10 @@ function heroTitle(
   if (top?.title) return top.title;
   const readiness = analytics.raceReadiness ?? analytics.halfMarathonReadiness;
   if (classification === "Fresh & adapting") {
-    return `Fresh and adapting — ${readiness.label.toLowerCase()}`;
+    return `Fresh and adapting: ${readiness.label.toLowerCase()}`;
   }
   if (classification === "Load accumulation") {
-    return "Fatigue building — ease intensity";
+    return "Fatigue building: ease intensity";
   }
   return readiness.label;
 }
@@ -248,15 +248,15 @@ function loadStateChips(
 
 function loadInterpretation(fatigue: FatigueSnapshot): string {
   if (fatigue.label === "Fresh" && fatigue.tsb > 8) {
-    return "You have positive training balance — quality sessions are well supported if feel matches the data.";
+    return "You have positive training balance. Quality sessions are well supported if feel matches the data.";
   }
   if (fatigue.label === "Fatigued") {
-    return "Acute load is outpacing recovery — prioritize easy volume and sleep before adding intensity.";
+    return "Acute load is outpacing recovery. Prioritize easy volume and sleep before adding intensity.";
   }
   if (fatigue.tsb < -10) {
     return "Fatigue is accumulating; keep hard sessions spaced and watch for declining efficiency.";
   }
-  return "Load is in a neutral band — steady progression is appropriate with one quality touchpoint.";
+  return "Load is in a neutral band. Steady progression is appropriate with one quality touchpoint.";
 }
 
 function loadTrendNote(history: DashboardInsights["loadHistory"]): string {
@@ -266,10 +266,10 @@ function loadTrendNote(history: DashboardInsights["loadHistory"]): string {
   const atlDelta = cur.atl - prev.atl;
   const ctlDelta = cur.ctl - prev.ctl;
   if (atlDelta > 5 && ctlDelta >= 0) {
-    return "Acute load rising faster than chronic fitness — recovery matters this week.";
+    return "Acute load rising faster than chronic fitness. Recovery matters this week.";
   }
-  if (atlDelta < -3) return "Acute load easing — recovery trend in progress.";
-  if (ctlDelta > 3) return "Fitness (CTL) trending up — adaptation window if freshness holds.";
+  if (atlDelta < -3) return "Acute load easing: recovery trend in progress.";
+  if (ctlDelta > 3) return "Fitness (CTL) trending up: adaptation window if freshness holds.";
   return "Load stable week over week.";
 }
 
@@ -314,11 +314,11 @@ function buildExplain(
   missing.push("Sleep, HRV, and subjective recovery");
 
   const limitations: string[] = [
-    "Recommendations are heuristic — confirm with feel, soreness, and life stress.",
+    "Recommendations are heuristic: confirm with feel, soreness, and life stress.",
     "Race plans assume your stated goal date and recent volume are accurate.",
   ];
   if (analytics.intensityAdvice.status === "insufficient_data") {
-    limitations.push("Limited recent running — plan is conservative until volume returns.");
+    limitations.push("Limited recent running: plan is conservative until volume returns.");
   }
 
   const top = related[0];
@@ -366,7 +366,7 @@ export function buildTrainingPageView(
       top?.recommendation ??
       plan.rationale[0] ??
       analytics.intensityAdvice.recommendations[0] ??
-      "Follow the adaptive week below — adjust by feel.",
+      "Follow the adaptive week below. Adjust by feel.",
     severity,
     confidence: analytics.dataConfidence,
     readinessScore: readiness.score,
@@ -407,14 +407,14 @@ export function buildTrainingPageView(
     analytics.efficiencySummary.trend === "improving"
       ? "Aerobic efficiency improving"
       : analytics.efficiencySummary.trend === "declining"
-        ? "Efficiency slipping — check fatigue"
+        ? "Efficiency slipping: check fatigue"
         : "Aerobic efficiency stable";
 
   const adaptationInterp =
     mom.narrative ??
     (analytics.efficiencySummary.trend === "improving"
       ? "You are tending to run faster at similar heart rates versus your prior block."
-      : "Efficiency index tracks pace÷HR — lower is better. Needs more HR-tagged runs for precision.");
+      : "Efficiency index tracks pace÷HR: lower is better. Needs more HR-tagged runs for precision.");
 
   return {
     hero,
@@ -479,7 +479,7 @@ export function buildTrainingPageView(
         highlight: analytics.bestBlock?.weekStart === b.weekStart,
       })),
       bestBlock: analytics.bestBlock
-        ? `${analytics.bestBlock.label} — ${formatKm(analytics.bestBlock.distanceKm)} (${analytics.bestBlock.runCount} runs)`
+        ? `${analytics.bestBlock.label}, ${formatKm(analytics.bestBlock.distanceKm)} (${analytics.bestBlock.runCount} runs)`
         : null,
     },
   };
@@ -494,7 +494,7 @@ export function formatPlanForReport(plan: WeekPlan): string[] {
     ...plan.rationale.map((r) => `• ${r}`),
     ...plan.sessions.map(
       (s) =>
-        `• ${s.day ? s.day + ": " : ""}${WORKOUT_TYPE_LABELS[s.type]} — ${s.description} (${formatKmRange(s.distanceKmRange[0], s.distanceKmRange[1])})`,
+        `• ${s.day ? s.day + ": " : ""}${WORKOUT_TYPE_LABELS[s.type]}: ${s.description} (${formatKmRange(s.distanceKmRange[0], s.distanceKmRange[1])})`,
     ),
   ];
   if (plan.warnings.length) {

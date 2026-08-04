@@ -40,7 +40,7 @@ export function assessDurability(input: RaceForecastInput): DurabilityAssessment
 
   if (recent && recent.runCount >= 3) {
     score += 6;
-    evidence.push(`${recent.runCount} runs in recent block — rhythm maintained.`);
+    evidence.push(`${recent.runCount} runs in recent block: rhythm maintained.`);
   } else if (recent && recent.runCount <= 1) {
     score -= 8;
     penalties.push("Sparse run frequency in recent block.");
@@ -82,8 +82,8 @@ export function assessDurability(input: RaceForecastInput): DurabilityAssessment
     label === "strong"
       ? "Recent long-run support suggests you can sustain projected capability over race distance."
       : label === "moderate"
-        ? "Partial long-run support — forecast may need modest durability discount."
-        : "Limited long-run evidence — sustaining race distance is a primary uncertainty.";
+        ? "Partial long-run support: forecast may need modest durability discount."
+        : "Limited long-run evidence: sustaining race distance is a primary uncertainty.";
 
   return {
     score,

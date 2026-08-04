@@ -149,7 +149,7 @@ function buildFatiguePlan(
     ],
     warnings: [],
     rationale: [
-      `Freshness is ${ctx.fatigue.freshness}/100 (${ctx.fatigue.label}) — prioritizing recovery.`,
+      `Freshness is ${ctx.fatigue.freshness}/100 (${ctx.fatigue.label}), prioritizing recovery.`,
       `TSB ${ctx.fatigue.tsb > 0 ? "+" : ""}${ctx.fatigue.tsb} suggests backing off intensity.`,
     ],
   };
@@ -181,16 +181,16 @@ function buildTaperPlan(
         day: "Sat",
         type: "long",
         distanceKmRange: [longKm - 1, longKm + 1],
-        description: "Easy long run — last moderate effort before race week",
+        description: "Easy long run: last moderate effort before race week",
       },
       { day: "Sun", type: "recovery", distanceKmRange: [3, 5], description: "Easy recovery" },
     ],
     warnings: [],
     rationale: [
-      `Race in ${daysUntilRace} days — pre-race week; volume ~${Math.round((1 - factor) * 100)}% below baseline.`,
+      `Race in ${daysUntilRace} days: pre-race week; volume ~${Math.round((1 - factor) * 100)}% below baseline.`,
       ctx.raceReadiness
         ? `${ctx.raceReadiness.distanceLabel} readiness: ${ctx.raceReadiness.score}/100.`
-        : "Race goal set — protect freshness before race day.",
+        : "Race goal set: protect freshness before race day.",
     ],
   };
 }
@@ -219,7 +219,7 @@ function buildRaceWeekPlan(
       day: "Mon",
       type: "easy",
       distanceKmRange: [5, 7],
-      description: "Easy aerobic — stay relaxed",
+      description: "Easy aerobic: stay relaxed",
     });
     sessions.push({
       day: lastQualityDay,
@@ -241,7 +241,7 @@ function buildRaceWeekPlan(
       day: preRaceShake,
       type: "easy",
       distanceKmRange: [3, 5],
-      description: "Pre-race shakeout — easy jog or rest; no fatigue",
+      description: "Pre-race shakeout: easy jog or rest; no fatigue",
     });
   }
 
@@ -253,8 +253,8 @@ function buildRaceWeekPlan(
       Math.round(cfg.raceDistanceKm * 1.02 * 10) / 10,
     ],
     description: readiness.targetTimeSec
-      ? `${readiness.distanceLabel} — target ${formatRaceTarget(readiness.targetTimeSec)}; trust the taper`
-      : `${readiness.distanceLabel} — race day; even pacing, fuel early`,
+      ? `${readiness.distanceLabel}: target ${formatRaceTarget(readiness.targetTimeSec)}; trust the taper`
+      : `${readiness.distanceLabel}: race day; even pacing, fuel early`,
   });
 
   return {
@@ -262,9 +262,9 @@ function buildRaceWeekPlan(
     template: "race_week",
     totalKmRange: [Math.round(cap * 0.75 * 10) / 10, cap],
     sessions,
-    warnings: ["No long run this week — race replaces the weekend long effort."],
+    warnings: ["No long run this week: race replaces the weekend long effort."],
     rationale: [
-      `Race week (${readiness.distanceLabel} on ${raceDay}) — ${daysUntilRace} day(s) out.`,
+      `Race week (${readiness.distanceLabel} on ${raceDay}), ${daysUntilRace} day(s) out.`,
       `Volume capped ~${Math.round((1 - factor) * 100)}% below baseline; freshness over fitness.`,
       `${readiness.distanceLabel} readiness: ${readiness.score}/100.`,
     ],
@@ -318,7 +318,7 @@ function buildEasyBalancePlan(
     ],
     warnings: [],
     rationale: [
-      `Only ${ctx.easyHardPct.toFixed(0)}% of runs classified easy — resetting intensity balance.`,
+      `Only ${ctx.easyHardPct.toFixed(0)}% of runs classified easy, resetting intensity balance.`,
       ctx.intensityAdvice.recommendations[0] ?? "Add easy volume before the next hard session.",
     ],
   };
@@ -354,7 +354,7 @@ function buildBasePlan(ctx: PlanContext, week: { weekStart: string; weekLabel: s
       day: "Sat",
       type: "long",
       distanceKmRange: [longKm - 1, longKm + 2],
-      description: `Long easy run — build toward ${longKm.toFixed(0)} km`,
+      description: `Long easy run: build toward ${longKm.toFixed(0)} km`,
     },
   ];
 
@@ -388,7 +388,7 @@ function buildBasePlan(ctx: PlanContext, week: { weekStart: string; weekLabel: s
       `Consistency ${ctx.consistencyScore.overall}/100 · freshness ${ctx.fatigue.freshness}/100.`,
       allowQuality
         ? "One quality session fits current freshness and intensity balance."
-        : "Quality session held — freshness or intensity balance suggests more easy work first.",
+        : "Quality session held: freshness or intensity balance suggests more easy work first.",
     ],
   };
 }
@@ -431,7 +431,7 @@ export function buildNextWeekPlan(ctx: PlanContext): WeekPlan {
         },
       ],
       warnings: [],
-      rationale: ["Little recent running — rebuild gradually before adding intensity."],
+      rationale: ["Little recent running: rebuild gradually before adding intensity."],
     };
   } else {
     plan = buildBasePlan(ctx, week);

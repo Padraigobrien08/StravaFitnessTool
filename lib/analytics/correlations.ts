@@ -20,6 +20,8 @@ export interface Correlation {
   n: number;
   strength: CorrelationStrength;
   direction: "positive" | "negative" | "none";
+  /** Plain-language reading of the association, on its own so the UI never parses `interpretation`. */
+  reading: string;
   interpretation: string;
   caveat: string;
 }
@@ -35,7 +37,7 @@ export interface CorrelationReport {
 const MIN_N = 8;
 
 const CAUSATION_CAVEAT =
-  "Associations in your own data — not causation; weather, terrain, and fatigue overlap as confounders.";
+  "Associations in your own data, not causation; weather, terrain, and fatigue overlap as confounders.";
 
 /** Pearson r; null when n is too small or either variable has no spread. */
 export function pearson(xs: number[], ys: number[]): number | null {
@@ -178,7 +180,8 @@ export function computeCorrelations(runs: RunActivity[]): CorrelationReport {
       n: xs.length,
       strength,
       direction,
-      interpretation: `${spec.label}: ${strength === "none" ? "no meaningful association" : `${strength} ${direction}`} (r=${r.toFixed(2)}, n=${xs.length}) — ${reading}.`,
+      reading,
+      interpretation: `${spec.label}: ${strength === "none" ? "no meaningful association" : `${strength} ${direction}`} (r=${r.toFixed(2)}, n=${xs.length}). ${reading}.`,
       caveat: caveatParts.join("; "),
     });
   }

@@ -17,7 +17,7 @@ export function SegmentAnalysisPanel({ segments }: { segments: SegmentRowView[] 
     return (
       <PanelChrome title="Segment performance analysis" subdued>
         <p className="text-sm text-zinc-500">
-          Lap data unavailable — FIT or Strava lap streams unlock segment analysis.
+          Lap data unavailable: FIT or Strava lap streams unlock segment analysis.
         </p>
       </PanelChrome>
     );

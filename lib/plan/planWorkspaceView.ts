@@ -146,7 +146,7 @@ export function buildTodayInPlan(week: TrainingCalendarWeek): PlanTodayFocus | n
     focus:
       workout.reasoning ??
       workout.purpose ??
-      "Execute as planned — stay within prescribed intensity.",
+      "Execute as planned: stay within prescribed intensity.",
     avoid: inferAvoid(workout, week),
     workout,
   };
@@ -168,7 +168,7 @@ function inferAvoid(workout: CalendarWorkout, week: TrainingCalendarWeek): strin
     return "Additional threshold work or heavy gym sessions.";
   }
   if (/race/i.test(workout.type + workout.title)) {
-    return "Pushing early — trust the taper and race-day pacing.";
+    return "Pushing early: trust the taper and race-day pacing.";
   }
   if (workout.intensity === "hard") {
     return "Stacking another quality session within 48 hours.";

@@ -93,7 +93,7 @@ export function getInterferenceRisks(analytics: DashboardInsights, window: Ecosy
     interferenceRiskScore: e.scores.interferenceRisk,
     flags: flags.slice(0, 10),
     raceWeekWarnings: e.raceWeekWarnings,
-    limitations: ["Language: may interfere / could increase fatigue — not medical certainty."],
+    limitations: ["Language: may interfere / could increase fatigue, not medical certainty."],
     confidence: flags.some((f) => f.severity === "high") ? "medium" : "low",
   };
 }
@@ -179,7 +179,7 @@ export function getStrengthMobilitySupport(
         : e.scores.interferenceRisk >= 55
           ? "Defer heavy strength until interference risk eases."
           : "Consider 1–2 strength sessions for durability if run load is rising.",
-    limitations: ["No set/rep/load from Strava — timing and duration only."],
+    limitations: ["No set/rep/load from Strava, timing and duration only."],
     confidence: e.confidence,
   };
 }
@@ -200,7 +200,7 @@ export function buildFullEcosystemCoachPayload(
     coachNotes: [
       "Use sport_type from Strava API as canonical classifier.",
       "Running = performance/readiness/predictions; other modalities = context.",
-      "Never invent session counts — use tool payloads only.",
+      "Never invent session counts: use tool payloads only.",
     ],
   };
 }

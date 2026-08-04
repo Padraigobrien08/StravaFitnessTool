@@ -45,7 +45,7 @@ export function PostRunFeel({ runDate }: { runDate: string }) {
       </div>
       {selected ? (
         <p className="mt-2 text-[11px] text-zinc-500">
-          Logged — this is what the model learns your feel against the numbers.
+          Logged: this is what the model learns your feel against the numbers.
         </p>
       ) : null}
     </Panel>

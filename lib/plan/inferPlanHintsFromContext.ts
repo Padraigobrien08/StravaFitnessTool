@@ -30,7 +30,7 @@ export function inferPlanHintsFromContext(text: string): PlanContextHints {
     notes.push("Athlete requested conservative loading");
   }
   if (travel) {
-    notes.push("Schedule constraints mentioned — respect unavailable days");
+    notes.push("Schedule constraints mentioned: respect unavailable days");
   }
 
   return { planTypeHint, notes };

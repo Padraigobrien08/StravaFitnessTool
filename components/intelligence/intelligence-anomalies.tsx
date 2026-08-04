@@ -19,7 +19,7 @@ export function IntelligenceAnomalies({ data }: { data: AnomalyReport }) {
   if (!data.available || data.anomalies.length === 0) return null;
 
   return (
-    <Panel title="Anomalies" hint="runs that don't fit your model — and why">
+    <Panel title="Anomalies" hint="runs that don't fit your model, and why">
       <ul className="mt-2 space-y-2">
         {data.anomalies.slice(0, 5).map((a) => (
           <AnomalyRow key={a.runId} anomaly={a} />

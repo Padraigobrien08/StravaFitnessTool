@@ -37,7 +37,7 @@ export function PhaseCatalogPanel({ phases }: { phases: TrainingPhase[] }) {
     <Panel>
       <Eyebrow className="mb-2">Training phases</Eyebrow>
       <p className="mb-2 text-xs text-zinc-500">
-        The shape of your last {totalWeeks} weeks — base, build, sharpening, taper, and recovery.
+        The shape of your last {totalWeeks} weeks: base, build, sharpening, taper, and recovery.
       </p>
 
       {/* Band timeline: each segment's width is proportional to its week count. */}

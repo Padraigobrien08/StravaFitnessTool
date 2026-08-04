@@ -21,7 +21,7 @@ export function assessSpecificity(input: RaceForecastInput): SpecificityAssessme
     gaps.push("No race-quality efforts near target distance.");
   } else {
     score += 8;
-    gaps.push("Limited target-distance race efforts — extrapolation dominates.");
+    gaps.push("Limited target-distance race efforts: extrapolation dominates.");
   }
 
   const recentVol = blocks[blocks.length - 1]?.distanceKm ?? 0;

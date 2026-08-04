@@ -181,7 +181,7 @@ export function buildCapabilityModelEstimates(input: RaceForecastInput): Forecas
             .padStart(2, "0")}/km, D′ ${Math.round(csFit.dPrimeMeters)} m`,
         ],
         limitations: targetBeyondBand
-          ? ["CS model extrapolates optimistically beyond ~25 km — durability confounds the line."]
+          ? ["CS model extrapolates optimistically beyond ~25 km: durability confounds the line."]
           : [],
       });
     }

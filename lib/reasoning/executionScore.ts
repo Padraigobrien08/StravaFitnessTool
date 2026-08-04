@@ -62,21 +62,21 @@ export function scoreSessionExecution(
     if (drift <= 4) {
       insights.push({
         title: "HR drift controlled",
-        body: `Cardiac drift was +${drift}% — fatigue remained manageable through the session.`,
+        body: `Cardiac drift was +${drift}%. Fatigue remained manageable through the session.`,
         tone: "positive",
       });
       quality += 12;
     } else if (drift > 8) {
       insights.push({
         title: "Elevated HR drift",
-        body: `Drift reached +${drift}% — heat, duration, or intensity may have accumulated late.`,
+        body: `Drift reached +${drift}%. Heat, duration, or intensity may have accumulated late.`,
         tone: "warning",
       });
       quality -= 10;
     } else {
       insights.push({
         title: "Moderate HR drift",
-        body: `Drift +${drift}% — typical for sustained threshold or long aerobic work.`,
+        body: `Drift +${drift}%: typical for sustained threshold or long aerobic work.`,
         tone: "neutral",
       });
     }
@@ -90,14 +90,14 @@ export function scoreSessionExecution(
     if (cv < 0.04) {
       insights.push({
         title: "Pacing remained stable",
-        body: "Lap-to-lap pace variability was low — strong execution discipline.",
+        body: "Lap-to-lap pace variability was low: strong execution discipline.",
         tone: "positive",
       });
       quality += 10;
     } else if (cv > 0.12) {
       insights.push({
         title: "Pace variability elevated",
-        body: "Intervals or terrain may explain spread — check recovery between reps.",
+        body: "Intervals or terrain may explain spread. Check recovery between reps.",
         tone: "neutral",
       });
     }
@@ -108,14 +108,14 @@ export function scoreSessionExecution(
     if (lateFadePct < 2) {
       insights.push({
         title: "Minimal late-session fade",
-        body: "Final third pace held close to opening rhythm — good fatigue resistance.",
+        body: "Final third pace held close to opening rhythm: good fatigue resistance.",
         tone: "positive",
       });
       quality += 8;
     } else if (lateFadePct > 6) {
       insights.push({
         title: "Late-session pace decay",
-        body: `Pace slowed ~${lateFadePct.toFixed(0)}% in the final third — monitor recovery before next quality day.`,
+        body: `Pace slowed ~${lateFadePct.toFixed(0)}% in the final third. Monitor recovery before next quality day.`,
         tone: "warning",
       });
       quality -= 6;
@@ -132,12 +132,12 @@ export function scoreSessionExecution(
 
   const fatigueInterpretation =
     drift != null && drift > 7
-      ? "Fatigue accumulated — prioritize easy volume before the next hard session."
+      ? "Fatigue accumulated. Prioritize easy volume before the next hard session."
       : drift != null && drift <= 4
-        ? "Fatigue response was controlled — body absorbed workload well."
+        ? "Fatigue response was controlled: body absorbed workload well."
         : workout.type === "recovery" || workout.type === "easy"
-          ? "Low stress session — supports absorption of prior load."
-          : "Fatigue impact depends on recent block — pair with freshness on Home.";
+          ? "Low stress session: supports absorption of prior load."
+          : "Fatigue impact depends on recent block. Pair with freshness on Home.";
 
   quality = Math.max(0, Math.min(100, quality));
   pacingStability = Math.max(0, Math.min(100, pacingStability));

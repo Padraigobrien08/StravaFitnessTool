@@ -122,7 +122,7 @@ function buildMetric(
     status === "met"
       ? `${label} target of ${target} km already met (${current} km).`
       : status === "stalled"
-        ? `${label} at ${current} km isn't trending up — needs ~${neededPerWeek} km/wk to reach ${target} km in time.`
+        ? `${label} at ${current} km isn't trending up: needs ~${neededPerWeek} km/wk to reach ${target} km in time.`
         : `${label} ${current} → ${target} km: rising ~${recentRatePerWeek} km/wk, needs ~${neededPerWeek} km/wk (${
             weeksBehind === 0
               ? "on the line"
@@ -133,7 +133,7 @@ function buildMetric(
 
   const limitation =
     current < target && neededPerWeek > safeStepKm
-      ? `${label} needs ~${neededPerWeek} km/wk to hit ${target} km in time — above the safe ~${round1(safeStepKm)} km/wk ramp; consider a longer runway or a nearer target.`
+      ? `${label} needs ~${neededPerWeek} km/wk to hit ${target} km in time, above the safe ~${round1(safeStepKm)} km/wk ramp; consider a longer runway or a nearer target.`
       : null;
 
   return {
@@ -177,7 +177,7 @@ export function computeProgressionBurndown(
   }
   const weeksToRace = rr.daysUntilRace / 7;
   if (weeksToRace <= 0) {
-    return unavailable("Race date has passed — no build runway to project.");
+    return unavailable("Race date has passed: no build runway to project.");
   }
   const cfg = RACE_READINESS_CONFIG[rr.distance];
   const weeksToDeadline = Math.max(1, weeksToRace - PEAK_BUFFER_WEEKS);
@@ -213,12 +213,12 @@ export function computeProgressionBurndown(
     .sort((a, b) => (b.weeksBehind ?? 99) - (a.weeksBehind ?? 99));
   let headline: string;
   if (behind.length === 0) {
-    headline = `On pace for your ${cfg.label} — build targets tracking to ${deadlineLabel}.`;
+    headline = `On pace for your ${cfg.label}: build targets tracking to ${deadlineLabel}.`;
   } else {
     const m = behind[0];
     headline =
       m.status === "stalled"
-        ? `${m.label} has stalled at ${m.current} ${m.unit} — off pace for ${m.target} by ${deadlineLabel}.`
+        ? `${m.label} has stalled at ${m.current} ${m.unit}: off pace for ${m.target} by ${deadlineLabel}.`
         : `${m.label} ${m.current} → ${m.target} ${m.unit} by ${deadlineLabel}: ~${m.weeksBehind}w behind.`;
   }
 

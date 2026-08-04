@@ -21,7 +21,7 @@ export function AchievementTimeline({ milestones }: { milestones: AchievementMil
     <Panel>
       <PanelHeader title="Achievement timeline" />
       <p className={cn(dash.muted, "mb-4")}>
-        PRs and milestones with context — not a flat results table.
+        PRs and milestones with context, not a flat results table.
       </p>
 
       {milestones.length === 0 ? (

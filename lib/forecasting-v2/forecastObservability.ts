@@ -87,7 +87,7 @@ export function buildForecastObservability(
     weight: e.weight,
     reason:
       e.limitations.length > 0
-        ? `${e.assumptions[0] ?? "Model fit"} — ${e.limitations[0]}`
+        ? `${e.assumptions[0] ?? "Model fit"}: ${e.limitations[0]}`
         : (e.assumptions[0] ?? "Distance-weighted capability estimate"),
   }));
 
@@ -138,7 +138,7 @@ export function buildForecastObservability(
   }
 
   const summary =
-    `Most likely ${formatSec(opts.mostLikelyTimeSec)} — capability ${opts.capabilityScore}, ` +
+    `Most likely ${formatSec(opts.mostLikelyTimeSec)}: capability ${opts.capabilityScore}, ` +
     `durability ${opts.durability.label}, specificity ${opts.specificity.label}, ` +
     `confidence ${opts.uncertainty.confidenceLabel}.`;
 

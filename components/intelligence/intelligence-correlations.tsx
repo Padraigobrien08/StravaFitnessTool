@@ -51,7 +51,7 @@ function CorrelationRow({ c }: { c: Correlation }) {
       <p className="text-[10px] text-zinc-600">
         {c.strength === "none"
           ? "no meaningful association"
-          : c.interpretation.split("—").slice(1).join("—").trim() || `${c.strength} ${c.direction}`}
+          : c.reading.trim() || `${c.strength} ${c.direction}`}
       </p>
     </li>
   );

@@ -29,7 +29,7 @@ export function inferFatiguePatterns(analytics: DashboardInsights): AthleteBelie
         id: "fatigue-negative-tsb",
         category: "fatigue",
         statement:
-          "Acute load is outpacing recovery — freshness tends to compress until volume or intensity eases.",
+          "Acute load is outpacing recovery: freshness tends to compress until volume or intensity eases.",
         evidence: [
           `TSB ${Math.round(fatigue.tsb)}`,
           `Freshness ${Math.round(fatigue.freshness)} (${fatigue.label})`,

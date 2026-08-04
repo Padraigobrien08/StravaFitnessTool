@@ -23,7 +23,7 @@ const MODES: { id: StrategyMode; label: string; desc: string }[] = [
   { id: "even", label: "Even split", desc: "Steady effort, slight second-half drift" },
   { id: "negative", label: "Negative split", desc: "Controlled first half, faster finish" },
   { id: "conservative", label: "Conservative", desc: "Easier start, limit late fade" },
-  { id: "aggressive", label: "Aggressive", desc: "Faster early — higher fade risk" },
+  { id: "aggressive", label: "Aggressive", desc: "Faster early, higher fade risk" },
 ];
 
 const fadeColor = {
