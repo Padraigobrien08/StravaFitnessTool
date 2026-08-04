@@ -1,6 +1,6 @@
 # Proposal — Readiness model: gap-aware load + detraining
 
-**Status:** spec, not built · **Risk:** medium (touches the number ~36 files read) · **Evidence:** measured on the live 73-run account, 2026-08-04
+**Status:** P1–P3 shipped · **Remaining:** the ~12 absolute TSB thresholds (see "Scope changed by measurement"), and P4 · **Evidence:** measured on the live 73-run account, 2026-08-04
 
 Today the app tells an athlete who has not run in 11 days that they are **"FRESH · Freshness 100 · TSB +90 · freshness supports a quality session window"**. That is the opposite of true. Two independent defects combine to produce it.
 
@@ -114,14 +114,20 @@ Synthetic fixtures replicate the live pattern (a 3-week block, then an 11-day ga
 
 ## Phasing
 
-| Phase             | Scope                                                                                             | Est.     |
-| ----------------- | ------------------------------------------------------------------------------------------------- | -------- |
-| **P1**            | Load model: zero-fill + ATL memory, with invariants 1–2. Recalibrate the ~12 absolute thresholds. | ~0.5 day |
-| **P2**            | Currency axis + caps + new labels, invariants 3–6, migrate the 7 logic sites.                     | ~1 day   |
-| **P3**            | Fold `forecasting-v2/freshnessModel` into the shared model.                                       | ~0.5 day |
-| **P4** (optional) | Daily internal model, weekly-aggregated `loadHistory` for chart consumers.                        | ~1 day   |
+| Phase             | Scope                                                                         | Est.     |
+| ----------------- | ----------------------------------------------------------------------------- | -------- |
+| **P1** ✅         | Load model: zero-fill + ATL memory, with invariants 1–2.                      | ~0.5 day |
+| **P2** ✅         | Currency axis + caps + new labels, invariants 3–6, migrate the 7 logic sites. | ~1 day   |
+| **P3** ✅         | Give `forecasting-v2/freshnessModel` the shared currency signal.              | ~0.5 day |
+| **P4** (optional) | Daily internal model, weekly-aggregated `loadHistory` for chart consumers.    | ~1 day   |
 
-P1 and P2 should ship together: the load fix is meaningless while interpretation stays monotonic, and interpretation is untrustworthy while CTL is inflated 2.5×.
+P1 and P2 shipped together: the load fix is meaningless while interpretation stays monotonic, and interpretation is untrustworthy while CTL is inflated 2.5×.
+
+### Scope changed by measurement
+
+**P1 did not recalibrate the ~12 absolute thresholds.** Comparing old and new parameters on identical series showed steady state stays at TSB 0 and every threshold still fires in the same qualitative case (a hard week moves −72 to −38, a missed week +214 to +114), so rescaling would have been an unrequested behavioural change needing its own calibration. It remains open as follow-up.
+
+**P3 did not merge the two models.** The race forecast's `assessFreshness` keeps its own scoring, because it answers a different question (what does this do to a predicted finish time) and folding it in would have meant reworking the four models that consume its `label`. Instead it now receives `currency` and honours the same guarantee: stale training can never read as `fresh`, and it charges time rather than granting sharpness (+45 s rusty, +100 s detrained, +160 s returning). Its old `tsb > 20` "confirm taper vs detraining" guess now only fires when no currency was supplied.
 
 ## Risks
 
