@@ -13,7 +13,7 @@ import type {
   RiskOpportunity,
 } from "@/lib/coach/types";
 import type { MemorySnippet } from "@/lib/coach/memorySnippets";
-import { isTrainingCurrent, stalenessClause, dedupeByText } from "@/lib/insights/consistency";
+import { isTrainingCurrent, stalenessClause } from "@/lib/insights/consistency";
 import { buildTrainingEcosystemView } from "@/lib/training/ecosystemViewModel";
 import type { TrainingEcosystemView } from "@/lib/training/ecosystemViewModel";
 
@@ -120,6 +120,19 @@ export function getPrimaryRecommendation(
   state: CoachWorkspaceState,
   analytics: DashboardInsights,
 ): string {
+  // A comeback outranks everything below it. The other branches all answer
+  // "how should this week's training be shaped", which is the wrong question
+  // for someone whose training has stopped: the answer is to start again, and
+  // the returning plan already works out what that looks like from their own
+  // pre-gap baseline. Without this the hero recommended protecting an aerobic
+  // trend measured a fortnight before the athlete last ran.
+  const returning = analytics.returning;
+  if (returning) {
+    const context = returning.baseline
+      ? ` You're rebuilding from ${stalenessClause(analytics.fatigue)}: at this rate you're back to your usual ${returning.baseline.weeklyKm} km week in about ${returning.weeksToBaseline} weeks.`
+      : ` You're rebuilding from ${stalenessClause(analytics.fatigue)}: judge next week from how these feel.`;
+    return returning.firstStep + context;
+  }
   if (analytics.fatigue.tsb < -12) {
     return "Prioritize recovery: cap hard sessions and protect easy aerobic rhythm until freshness rebounds.";
   }

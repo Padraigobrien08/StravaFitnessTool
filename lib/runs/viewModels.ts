@@ -374,11 +374,17 @@ function buildPatterns(
       .filter((m) => ["tempo", "interval", "race"].includes(m.type))
       .reduce((s, m) => s + m.pct, 0) ?? 0;
 
+  // With nothing run this week the mix still describes something real, but it
+  // is the block the athlete left, not who they are training as right now.
+  const paused = analytics.intensityAdvice.status === "paused";
+
   if (top && top.pct >= 35) {
     patterns.push({
       id: "mix-lean",
       title: `${top.label}-heavy block`,
-      body: `${roundPct(top.pct)}% of recent sessions are ${top.label.toLowerCase()}. This defines your current training identity.`,
+      body: paused
+        ? `${roundPct(top.pct)}% of the sessions in your last block were ${top.label.toLowerCase()}.`
+        : `${roundPct(top.pct)}% of recent sessions are ${top.label.toLowerCase()}. This defines your current training identity.`,
       tone: top.type === "easy" || top.type === "recovery" ? "positive" : "neutral",
       coachQuery: `Why is my training ${top.label.toLowerCase()}-heavy right now?`,
     });
@@ -392,7 +398,7 @@ function buildPatterns(
       tone: "warning",
       coachQuery: "Is my threshold density too high for my current freshness?",
     });
-  } else if (analytics.intensityAdvice.currentEasyPct >= 75) {
+  } else if (!paused && analytics.intensityAdvice.currentEasyPct >= 75) {
     patterns.push({
       id: "polarized",
       title: "Aerobic-base rhythm",

@@ -45,6 +45,7 @@ const intensityTitles: Record<DashboardInsights["intensityAdvice"]["status"], st
   balanced: "Intensity balance looks sound",
   too_hard: "Training skews too hard",
   too_easy: "Mostly easy running",
+  paused: "Training is paused",
   insufficient_data: "Need more recent runs",
 };
 
