@@ -25,6 +25,7 @@ import {
 } from "@/components/console/console-kit";
 import { LegFeelCard } from "@/components/home/console/leg-feel-card";
 import { JargonTerm } from "@/components/jargon-term";
+import { ReturningCard } from "@/components/home/console/returning-card";
 import type { DashboardInsights } from "@/lib/analytics";
 import type { HomeOperatingSystemView } from "@/lib/home/operatingSystemView";
 import type {
@@ -115,6 +116,10 @@ export function HomeConsole({
           <LegFeelCard />
         </div>
       </div>
+
+      {/* After a gap, load-based advice has nothing recent to reason about, so the
+          comeback takes the lead instead of sitting below the fold. */}
+      {analytics.returning ? <ReturningCard plan={analytics.returning} /> : null}
 
       <WeekStrip
         savedWeek={savedWeek}

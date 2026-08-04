@@ -1,6 +1,7 @@
 import type { StravaImport } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { LegFeel } from "@/lib/wellness/types";
+import { buildReturnToRunning, type ReturnToRunningPlan } from "@/lib/returning/returnToRunning";
 import {
   computeFeelCalibration,
   type FeelHistoryPoint,
@@ -153,6 +154,12 @@ export interface DashboardInsights {
   trainingEcosystem: TrainingEcosystemAnalysis;
   riskPatterns: RiskPattern[];
   trainingPhases: TrainingPhase[];
+  /**
+   * Present only when the athlete has been away long enough that "what should I
+   * do today" stops being the right question. Its presence is the signal that
+   * this athlete is coming back rather than training.
+   */
+  returning: ReturnToRunningPlan | null;
 }
 
 const DEFAULT_MAX_HR = 190;
@@ -472,6 +479,7 @@ export function computeInsights(
         raceReadiness: raceReadinessResult,
       }),
     ),
+    returning: buildReturnToRunning(runs, fatigue),
   };
 }
 
