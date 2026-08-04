@@ -1,8 +1,10 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { AdaptationSignal } from "./types";
+import { isTrainingCurrent, stalenessClause } from "@/lib/insights/consistency";
 
 export function inferFatigueResponses(analytics: DashboardInsights): AdaptationSignal[] {
   const out: AdaptationSignal[] = [];
+  const trainingCurrent = isTrainingCurrent(analytics.fatigue);
 
   if (analytics.fatigue.tsb < -15) {
     out.push({
@@ -20,7 +22,11 @@ export function inferFatigueResponses(analytics: DashboardInsights): AdaptationS
     out.push({
       id: "fatigue-positive-balance",
       category: "freshness",
-      statement: "Load balance appears to support freshness for quality sessions",
+      // A positive balance means recovered-between-sessions only while sessions
+      // are happening. During a layoff the same numbers mean detrained.
+      statement: trainingCurrent
+        ? "Load balance appears to support freshness for quality sessions"
+        : `Load balance reads positive only because training stopped: ${stalenessClause(analytics.fatigue)}`,
       confidence: "low",
       supportingEvidence: [
         `Freshness ${Math.round(analytics.fatigue.freshness)}`,

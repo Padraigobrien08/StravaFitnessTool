@@ -15,6 +15,7 @@ import {
   getCoachingStateBullets,
 } from "@/lib/intelligence/athleteState";
 import { buildAdaptiveSnapshotFromAnalytics } from "@/lib/intelligence/adaptiveState";
+import { dedupeIntelligenceSlots } from "@/lib/intelligence/presentation";
 import { beliefsToMemoryDisplay } from "@/lib/athlete-memory";
 
 /** Shared intelligence model for /intelligence and /coach */
@@ -60,6 +61,15 @@ export function useAthleteIntelligence(
       raceGoal,
     );
 
+    // Each slot is generated independently, so the same sentence can arrive in
+    // several of them at once; filter across them before rendering.
+    const slots = dedupeIntelligenceSlots({
+      primaryRecommendation: getPrimaryRecommendation(state, analytics),
+      risksAndOpportunities: getRisksAndOpportunities(state),
+      coachingBullets: getCoachingStateBullets(state, analytics),
+      recentlyLearned: adaptive.recentlyLearned,
+    });
+
     return {
       loading,
       analytics,
@@ -76,14 +86,14 @@ export function useAthleteIntelligence(
           ...adaptive.memory.durabilitySignals,
         ].slice(0, 6),
       ),
-      risksAndOpportunities: getRisksAndOpportunities(state),
+      risksAndOpportunities: slots.risksAndOpportunities,
       ecosystem: getTrainingEcosystem(analytics),
       trajectories: getTrajectorySeries(analytics),
-      primaryRecommendation: getPrimaryRecommendation(state, analytics),
-      coachingBullets: getCoachingStateBullets(state, analytics),
+      primaryRecommendation: slots.primaryRecommendation,
+      coachingBullets: slots.coachingBullets,
       defaultInvestigation: getCoachDefaultInvestigation(analytics, raceGoal),
       adaptive,
-      recentlyLearned: adaptive.recentlyLearned,
+      recentlyLearned: slots.recentlyLearned,
       adaptationSignals: adaptive.adaptationSignals,
       longitudinalComparisons: adaptive.longitudinalComparisons,
     };

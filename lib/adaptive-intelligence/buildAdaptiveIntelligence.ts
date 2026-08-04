@@ -55,7 +55,7 @@ export function buildAdaptiveIntelligence(
     analytics,
     5,
   );
-  const sessionSummary = sessionEffectivenessSummary(recentSessions);
+  const sessionSummary = sessionEffectivenessSummary(recentSessions, analytics.fatigue);
 
   if (sessionSummary.length) {
     memory = updateAthleteMemoryProfile(memory, {

@@ -1,9 +1,16 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import { createBelief } from "./beliefUtils";
 import type { AthleteBelief } from "./types";
+import { isTrainingCurrent, stalenessClause } from "@/lib/insights/consistency";
 
 export function inferAdaptationPatterns(analytics: DashboardInsights): AthleteBelief[] {
   const out: AthleteBelief[] = [];
+  // Beliefs are meant to be durable, so they are phrased in the present tense.
+  // That phrasing stops being true once training stops: an efficiency dip is no
+  // longer being masked by fatigue, and a block is no longer translating to
+  // anything. Where the belief still holds, it is restated as history.
+  const trainingCurrent = isTrainingCurrent(analytics.fatigue);
+  const gap = stalenessClause(analytics.fatigue);
 
   if (analytics.efficiencySummary.trend === "improving") {
     out.push(
@@ -29,14 +36,19 @@ export function inferAdaptationPatterns(analytics: DashboardInsights): AthleteBe
       createBelief({
         id: "adapt-efficiency-down",
         category: "adaptation",
-        statement:
-          "Aerobic efficiency may be flattening: extra fatigue or intensity may be masking adaptation.",
+        statement: trainingCurrent
+          ? "Aerobic efficiency may be flattening: extra fatigue or intensity may be masking adaptation."
+          : `Aerobic efficiency was flattening in your last block, measured before ${gap}.`,
         evidence: [
           "Efficiency trend: declining",
-          `Freshness ${Math.round(analytics.fatigue.freshness)}`,
+          trainingCurrent
+            ? `Freshness ${Math.round(analytics.fatigue.freshness)}`
+            : `Last measured before ${gap}`,
         ],
         confidence: "low",
-        recommendedUse: "Prioritize recovery and easy volume before adding quality.",
+        recommendedUse: trainingCurrent
+          ? "Prioritize recovery and easy volume before adding quality."
+          : "Treat as a question to re-test on the way back, not a current reading.",
       }),
     );
   }
@@ -66,12 +78,14 @@ export function inferAdaptationPatterns(analytics: DashboardInsights): AthleteBe
       createBelief({
         id: "adapt-pr-breakthrough",
         category: "adaptation",
-        statement:
-          "Recent breakthrough efforts suggest the current block is translating to performance when freshness is adequate.",
+        statement: trainingCurrent
+          ? "Recent breakthrough efforts suggest the current block is translating to performance when freshness is adequate."
+          : "Breakthrough efforts in your last block show that training translated to performance when you were consistent.",
         evidence: [`New ${prRecent.label} PR`, `Consistency: ${analytics.consistencyScore.label}`],
         confidence: "low",
-        recommendedUse:
-          "Anchor confidence on recent proof efforts but avoid stacking quality immediately after.",
+        recommendedUse: trainingCurrent
+          ? "Anchor confidence on recent proof efforts but avoid stacking quality immediately after."
+          : "Use as evidence the base responds, not as a current fitness estimate.",
       }),
     );
   }
