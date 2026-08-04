@@ -1,4 +1,5 @@
 import type { TrainingBlock } from "@/lib/analytics/block";
+import type { ReadinessCurrency } from "@/lib/analytics/fatigue";
 import type { NormalizedActivity } from "@/lib/ecosystem/types";
 
 /** Race-quality effort used by capability models */
@@ -38,6 +39,13 @@ export type RaceForecastInput = {
     easyPct?: number;
     efficiencyTrend?: "improving" | "declining" | "stable" | null;
     archetypeLabel?: string;
+    /**
+     * Whether the training behind these numbers is still current. Without it
+     * this model reads a layoff's positive balance as taper-sharpness.
+     * See docs/proposals/readiness-model.md.
+     */
+    currency?: ReadinessCurrency;
+    restDaysSinceLastRun?: number;
   };
   /** Prior forecast for observability delta */
   previousMostLikelyTimeSec?: number;
@@ -64,10 +72,19 @@ export type DurabilityAssessment = {
 
 export type FreshnessAssessment = {
   score: number;
+  /**
+   * Deliberately still three values. Stale training reports as `fatigued`,
+   * because that is the conservative branch every downstream model already
+   * takes (wider uncertainty, no optimistic scenario, negative contribution).
+   * Read `currency` to tell detraining apart from acute fatigue; the evidence
+   * and risk copy says which one it is.
+   */
   label: "fatigued" | "neutral" | "fresh";
   timeAdjustmentSec: number;
   evidence: string[];
   risks: string[];
+  /** Undefined when the caller supplied no currency (older inputs, fixtures). */
+  currency?: ReadinessCurrency;
 };
 
 export type SpecificityAssessment = {

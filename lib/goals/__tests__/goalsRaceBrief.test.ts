@@ -37,6 +37,8 @@ function minimalAnalytics(): DashboardInsights {
       atl: 45,
       rampRate: 0,
       label: "neutral",
+      restDaysSinceLastRun: 1,
+      readiness: { balance: "neutral", currency: "current", volumeRatio: null },
     },
     intensityAdvice: {
       hardRunsLast14d: 2,

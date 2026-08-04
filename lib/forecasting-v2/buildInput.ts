@@ -79,6 +79,11 @@ export function buildRaceForecastInput(opts: {
       hardRunsLast14d: analytics.intensityAdvice.hardRunsLast14d,
       easyPct: analytics.intensityAdvice.currentEasyPct,
       efficiencyTrend: analytics.efficiencySummary.trend,
+      // Optional-chained on purpose: callers cast analytics past the type in
+      // places, and a forecast should degrade to the rest-days fallback in
+      // assessFreshness rather than throw if readiness is absent.
+      currency: analytics.fatigue.readiness?.currency,
+      restDaysSinceLastRun: analytics.fatigue.restDaysSinceLastRun,
     },
     previousMostLikelyTimeSec: opts.previousMostLikelyTimeSec,
   };
