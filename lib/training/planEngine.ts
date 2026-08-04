@@ -397,7 +397,7 @@ function buildReturnPlan(
   const rationale = [
     w.focus + ".",
     returning.baseline
-      ? `Rebuilding from ${returning.gapDays} days off toward your pre-gap ${returning.baseline.weeklyKm} km week: about ${returning.weeksToBaseline} weeks at this rate.`
+      ? `Rebuilding from ${returning.gapDays} days off toward ${returning.target?.weeklyKm ?? returning.baseline.weeklyKm} km/wk: about ${returning.weeksToTarget} weeks at this rate.`
       : `Rebuilding from ${returning.gapDays} days off.`,
     returning.retention.note,
   ];

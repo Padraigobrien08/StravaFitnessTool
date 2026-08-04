@@ -248,7 +248,7 @@ describe("the primary action tells a returning athlete to start running", () => 
 
   it("says how long the way back is", () => {
     const { analytics, home } = compose(runs);
-    expect(home.hero.primaryAction).toContain(String(analytics.returning!.weeksToBaseline));
+    expect(home.hero.primaryAction).toContain(String(analytics.returning!.weeksToTarget));
   });
 
   it("still answers the training question once the athlete is back", () => {

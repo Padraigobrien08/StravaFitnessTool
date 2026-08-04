@@ -253,6 +253,7 @@ export function computeInsights(
   maxWeeklyKm?: number,
   legFeel?: LegFeel,
   feelHistory?: FeelHistoryPoint[],
+  returnTargetKm?: number | null,
 ): DashboardInsights {
   const { runs, profile, goals, allActivities } = data;
   const athleteMaxHr = profile.maxHeartRate ?? DEFAULT_MAX_HR;
@@ -367,7 +368,10 @@ export function computeInsights(
 
   // Built before the plan so the planner can ramp from the athlete's own
   // pre-gap baseline rather than inventing a second set of comeback numbers.
-  const returning = buildReturnToRunning(runs, fatigue);
+  const returning = buildReturnToRunning(runs, fatigue, new Date(), {
+    targetKm: returnTargetKm,
+    bestBlock: bestTrainingBlock(blocks),
+  });
 
   const nextWeekPlan = buildNextWeekPlan(
     buildPlanContextFromInsights(
