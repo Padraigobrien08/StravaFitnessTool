@@ -2,9 +2,11 @@ import { differenceInDays, parseISO } from "date-fns";
 import {
   collectEffortPoints,
   fitPowerLawRegression,
+  isRaceLikeEffort,
   type EffortPoint,
 } from "@/lib/analytics/predictions";
 import { predictRaceTime, findPersonalRecords } from "@/lib/analytics/records";
+import type { RunWorkoutLabel } from "@/lib/analytics/workoutType";
 import { fitCriticalSpeed, criticalSpeedPredictSec } from "@/lib/analytics/physiology";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
@@ -250,18 +252,24 @@ export function computeWeightedCapability(
   return { baseTimeSec, weightedEstimates: normalized, spreadSec };
 }
 
-/** Build efforts from runs + optional fit (for adapter) */
+/**
+ * Build efforts from runs + optional fit (for adapter).
+ *
+ * `workoutLabels` does double duty: it keeps easy running out of the effort set, and
+ * it lets a whole activity that was actually raced count as race-like. Without it,
+ * only FIT-derived lap blocks and best-effort windows ever qualified, so an athlete
+ * with no FIT data had zero race-like efforts even after racing.
+ */
 export function effortsFromRuns(
   runs: RunActivity[],
   fitDetails: FitRunDetail[] = [],
+  workoutLabels?: RunWorkoutLabel[],
 ): RaceQualityEffort[] {
   const prs = findPersonalRecords(runs, fitDetails);
-  return collectEffortPoints(runs, fitDetails, prs).map((e) => ({
+  const typeById = new Map((workoutLabels ?? []).map((l) => [l.runId, l.classification.type]));
+  return collectEffortPoints(runs, fitDetails, prs, { workoutLabels }).map((e) => ({
     ...e,
     hasHr: !!runs.find((r) => r.id === e.runId)?.avgHr,
-    isRaceLike:
-      e.distanceKm >= 4 &&
-      e.distanceKm <= 22 &&
-      (e.source.includes("Lap") || e.source.includes("Best")),
+    isRaceLike: isRaceLikeEffort(e, typeById.get(e.runId)),
   }));
 }

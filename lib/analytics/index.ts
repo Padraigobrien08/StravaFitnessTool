@@ -313,7 +313,9 @@ export function computeInsights(
   const fatigue = buildFatigueSnapshot(runs, legFeel, feelCalibration);
   const efficiencyMoM = efficiencyMonthOverMonth(efficiencyPoints);
   const personalRecords = findPersonalRecords(runs, fitDetails);
-  const racePredictionAnalysis = buildRacePredictionAnalysis(runs, fitDetails);
+  // Pass the workout classifications so whole activities only count as comparable
+  // efforts when they were actually raced or run as quality work.
+  const racePredictionAnalysis = buildRacePredictionAnalysis(runs, fitDetails, { workoutLabels });
   // A race whose date has passed is no longer an active target — treat it as no goal
   // so taper/race-week/projection logic doesn't stay stuck on a lapsed race (see isRaceUpcoming).
   const activeRaceGoal = isRaceUpcoming(raceGoal) ? raceGoal : null;

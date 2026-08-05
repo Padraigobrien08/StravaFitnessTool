@@ -2,6 +2,7 @@ import type { DashboardInsights } from "@/lib/analytics";
 import type { RunActivity } from "@/lib/strava/types";
 import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import { RACE_READINESS_CONFIG, type RaceGoal } from "@/lib/analytics/readiness";
+import { isRaceLikeEffort } from "@/lib/analytics/predictions";
 import { effortsFromRuns } from "./capabilityModels";
 import { prepareCapabilityEfforts } from "./effortSelection";
 import type { RaceForecastInput, RaceQualityEffort } from "./forecastTypes";
@@ -31,13 +32,15 @@ function effortsFromAnalysis(
   analytics: DashboardInsights,
   runs: RunActivity[],
 ): RaceQualityEffort[] {
+  // Callers may hand in a partial DashboardInsights; without labels an effort is
+  // judged on its source alone, as it was before classifications were threaded through.
+  const typeById = new Map(
+    (analytics.workoutLabels ?? []).map((l) => [l.runId, l.classification.type]),
+  );
   return analytics.racePredictionAnalysis.efforts.map((e) => ({
     ...e,
     hasHr: runs.some((r) => r.id === e.runId && r.avgHr != null),
-    isRaceLike:
-      e.distanceKm >= 4 &&
-      e.distanceKm <= 22 &&
-      (e.source.includes("Lap") || e.source.includes("Best")),
+    isRaceLike: isRaceLikeEffort(e, typeById.get(e.runId)),
   }));
 }
 
@@ -66,7 +69,9 @@ export function buildRaceForecastInput(opts: {
   const runs = opts.runs ?? [];
   const fitDetails = opts.fitDetails ?? [];
   const rawEfforts =
-    runs.length > 0 ? effortsFromRuns(runs, fitDetails) : effortsFromAnalysis(analytics, runs);
+    runs.length > 0
+      ? effortsFromRuns(runs, fitDetails, analytics.workoutLabels)
+      : effortsFromAnalysis(analytics, runs);
   const efforts = prepareCapabilityEfforts(rawEfforts);
   const normalized = runsToNormalized(runs);
   const cfg = RACE_READINESS_CONFIG[distance];
