@@ -3,6 +3,7 @@ import type { FitRunDetail } from "@/lib/strava/fitTypes";
 import type { PersonalRecord } from "./records";
 import { findPersonalRecords, predictRaceTime } from "./records";
 import { paceSecPerKm } from "./pace";
+import type { RunWorkoutLabel, WorkoutType } from "./workoutType";
 
 export const RACE_TARGETS = [
   { key: "5k", label: "5K", distanceKm: 5 },
@@ -69,11 +70,48 @@ function runById(runs: RunActivity[], id: string) {
   return runs.find((r) => r.id === id);
 }
 
+/**
+ * Workout types a *whole activity* may be admitted under.
+ *
+ * A full activity is only a comparable effort if it was actually run as one. `easy`,
+ * `recovery` and `long` are excluded: a long run is distance-relevant but run at
+ * aerobic pace, and treating it as a race effort is what flattens the power-law
+ * exponent. Long-run support is modelled separately by `durabilityModel`.
+ */
+const EFFORT_WORKOUT_TYPES: ReadonlySet<WorkoutType> = new Set(["race", "tempo", "interval"]);
+
+/**
+ * Whether an effort is comparable to a race performance.
+ *
+ * Single definition shared with Forecasting V2, which previously carried two
+ * divergent inline copies (`buildInput.ts` and `capabilityModels.ts`) while V1's
+ * regression had none at all.
+ *
+ * A lap block or device best-effort window is a measured hard segment, so it counts.
+ * A whole activity only counts when it was actually raced — which the source string
+ * alone cannot tell you, hence the optional classification.
+ */
+export function isRaceLikeEffort(effort: EffortPoint, workoutType?: WorkoutType): boolean {
+  if (effort.distanceKm < 4 || effort.distanceKm > 22) return false;
+  if (effort.source.includes("Lap") || effort.source.includes("Best")) return true;
+  return workoutType === "race";
+}
+
+export interface CollectEffortOptions {
+  /**
+   * Per-run workout classifications. When supplied, whole activities must classify
+   * as a genuine effort to be admitted; without them the pace gate alone applies,
+   * which is the historical behaviour and keeps callers that have no labels working.
+   */
+  workoutLabels?: RunWorkoutLabel[];
+}
+
 /** Collect comparable race-effort points from FIT best efforts + quality runs. */
 export function collectEffortPoints(
   runs: RunActivity[],
   fitDetails: FitRunDetail[],
   personalRecords: PersonalRecord[],
+  opts: CollectEffortOptions = {},
 ): EffortPoint[] {
   const points: EffortPoint[] = [];
   const seen = new Set<string>();
@@ -115,11 +153,20 @@ export function collectEffortPoints(
     });
   }
 
+  // Whole activities. The pace gate alone (≤ 8:00/km) admitted ordinary easy running
+  // as a "race-quality effort", which dragged the fitted exponent toward 1.0 — i.e.
+  // toward "pace never fades with distance". Prefer the workout classification when
+  // the caller has it.
+  const typeById = opts.workoutLabels
+    ? new Map(opts.workoutLabels.map((l) => [l.runId, l.classification.type]))
+    : null;
+
   for (const run of runs) {
     const km = run.distanceM / 1000;
     if (km < 3 || km > 30) continue;
     const pace = paceSecPerKm(run);
     if (!pace || pace > 480) continue;
+    if (typeById && !EFFORT_WORKOUT_TYPES.has(typeById.get(run.id) ?? "unknown")) continue;
     add({
       distanceKm: km,
       timeSec: run.movingSec || run.elapsedSec,
@@ -230,7 +277,10 @@ function predictFromRegression(reg: RegressionFit): ModelPrediction[] {
 function predictMultiAnchor(efforts: EffortPoint[]): ModelPrediction[] {
   const anchors = [...efforts]
     .filter((e) => e.distanceKm >= 4 && e.distanceKm <= 21)
-    .sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.timeSec)
+    // `b.timeSec / b.timeSec` is always 1, so this comparator returned
+    // `pace(a) - 1` and never compared the two efforts: "top 3 by speed" picked
+    // arbitrarily rather than fastest-first.
+    .sort((a, b) => a.timeSec / a.distanceKm - b.timeSec / b.distanceKm)
     .slice(0, 3);
   if (anchors.length === 0) return [];
 
@@ -246,9 +296,10 @@ function predictMultiAnchor(efforts: EffortPoint[]): ModelPrediction[] {
 export function buildRacePredictionAnalysis(
   runs: RunActivity[],
   fitDetails: FitRunDetail[] = [],
+  opts: CollectEffortOptions = {},
 ): RacePredictionAnalysis {
   const personalRecords = findPersonalRecords(runs, fitDetails);
-  const efforts = collectEffortPoints(runs, fitDetails, personalRecords);
+  const efforts = collectEffortPoints(runs, fitDetails, personalRecords, opts);
   const anchor = pickAnchor(efforts);
   const regression = fitPowerLawRegression(efforts);
 
@@ -334,7 +385,9 @@ export function buildRacePredictionAnalysis(
   }
 
   const explanation: string[] = [
-    `We plot ${efforts.length} race-quality efforts from your runs (full runs, lap blocks, and best segments inside longer workouts).`,
+    opts.workoutLabels
+      ? `We plot ${efforts.length} comparable efforts: your personal bests, lap blocks and best segments inside longer workouts, plus whole runs you actually raced or ran as tempo/interval work. Easy and long runs are excluded — they would flatten the curve.`
+      : `We plot ${efforts.length} efforts from your runs (full runs, lap blocks, and best segments inside longer workouts). Without workout classification these are filtered by pace alone, so easy running may be included.`,
     anchor
       ? `Single-effort models anchor on your fastest effort in the 4–15 km range: "${anchor.runName}" (${formatShortTime(anchor.timeSec)} at ${anchor.distanceKm.toFixed(1)} km, ${anchor.source}).`
       : "No strong anchor effort found in the 4–15 km range.",

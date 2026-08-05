@@ -3,10 +3,26 @@ import {
   buildRacePredictionAnalysis,
   collectEffortPoints,
   fitPowerLawRegression,
+  isRaceLikeEffort,
   predictCameron,
+  type EffortPoint,
 } from "../predictions";
 import { predictRaceTime } from "../records";
+import type { RunWorkoutLabel, WorkoutType } from "../workoutType";
 import type { RunActivity } from "@/lib/strava/types";
+
+function label(runId: string, type: WorkoutType): RunWorkoutLabel {
+  return {
+    runId,
+    date: "2025-01-15",
+    runName: `Run ${runId}`,
+    classification: { type, confidence: "high", signals: [] },
+  };
+}
+
+function effort(distanceKm: number, timeSec: number, source: string, runId = "1"): EffortPoint {
+  return { distanceKm, timeSec, runId, runName: `e${runId}`, date: "2025-01-15", source };
+}
 
 function mockRun(id: string, km: number, paceMin: number, date = "2025-01-15"): RunActivity {
   const paceSec = paceMin * 60;
@@ -96,6 +112,126 @@ describe("fitPowerLawRegression", () => {
     const fit = fitPowerLawRegression(efforts)!;
     expect(fit.rSquared).toBeGreaterThanOrEqual(0);
     expect(fit.rSquared).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("collectEffortPoints effort quality", () => {
+  // 5 km at 4:00/km is a hard effort; 5 km at 5:50/km is easy running. Both used to
+  // be admitted as "race-quality", which is what flattened the fitted exponent.
+  const runs = [
+    mockRun("hard", 5, 4.0),
+    mockRun("tempo", 8, 4.2),
+    mockRun("easy", 6, 5.83),
+    mockRun("recovery", 4, 6.5),
+    mockRun("long", 20, 5.5),
+  ];
+
+  it("falls back to the pace gate alone when no classifications are given", () => {
+    // Historical behaviour, preserved for callers that have no labels (physiology's
+    // critical-speed fit, the V2 run adapter): every one of these is inside the
+    // 8:00/km gate, so easy and long running is admitted.
+    const ids = collectEffortPoints(runs, [], []).map((e) => e.runId);
+    expect(ids).toContain("easy");
+    expect(ids).toContain("long");
+  });
+
+  it("admits only genuine efforts once classifications are available", () => {
+    const labels = [
+      label("hard", "interval"),
+      label("tempo", "tempo"),
+      label("easy", "easy"),
+      label("recovery", "recovery"),
+      label("long", "long"),
+    ];
+    const ids = collectEffortPoints(runs, [], [], { workoutLabels: labels }).map((e) => e.runId);
+    expect(ids).toContain("hard");
+    expect(ids).toContain("tempo");
+    expect(ids).not.toContain("easy");
+    expect(ids).not.toContain("recovery");
+    // A long run is distance-relevant but run at aerobic pace — durability, not speed.
+    expect(ids).not.toContain("long");
+  });
+
+  it("admits a raced activity", () => {
+    const ids = collectEffortPoints(runs, [], [], {
+      workoutLabels: [label("easy", "race")],
+    }).map((e) => e.runId);
+    expect(ids).toContain("easy"); // same run, now known to have been raced
+  });
+
+  it("excludes an unclassified run rather than assuming it was an effort", () => {
+    const ids = collectEffortPoints(runs, [], [], { workoutLabels: [] }).map((e) => e.runId);
+    expect(ids).toEqual([]);
+  });
+
+  // The headline symptom: a set polluted with easy running fits an exponent near 1.0,
+  // meaning "pace never fades with distance". Real runners sit near Riegel's 1.06.
+  it("recovers a physiologically plausible exponent once easy running is excluded", () => {
+    const mixed = [
+      mockRun("r1", 5, 4.0),
+      mockRun("r2", 8, 4.2),
+      mockRun("r3", 10, 4.35),
+      mockRun("r4", 15, 4.6),
+      ...Array.from({ length: 20 }, (_, i) => mockRun(`easy${i}`, 6 + (i % 4), 5.9)),
+    ];
+    const labels = [
+      label("r1", "interval"),
+      label("r2", "tempo"),
+      label("r3", "tempo"),
+      label("r4", "race"),
+      ...Array.from({ length: 20 }, (_, i) => label(`easy${i}`, "easy")),
+    ];
+
+    const polluted = fitPowerLawRegression(collectEffortPoints(mixed, [], []))!;
+    const filtered = fitPowerLawRegression(
+      collectEffortPoints(mixed, [], [], { workoutLabels: labels }),
+    )!;
+
+    expect(polluted.exponent).toBeLessThan(1.02); // flattened by easy running
+    expect(filtered.exponent).toBeGreaterThan(1.02);
+    expect(filtered.exponent).toBeLessThan(1.15);
+  });
+});
+
+describe("isRaceLikeEffort", () => {
+  it("counts device-measured segments in the 4–22 km band", () => {
+    expect(isRaceLikeEffort(effort(10, 2400, "Lap block"))).toBe(true);
+    expect(isRaceLikeEffort(effort(10, 2400, "Best effort"))).toBe(true);
+  });
+
+  it("rejects a whole activity unless it was raced", () => {
+    expect(isRaceLikeEffort(effort(10, 2400, "Full run"))).toBe(false);
+    expect(isRaceLikeEffort(effort(10, 2400, "Full run"), "tempo")).toBe(false);
+    expect(isRaceLikeEffort(effort(10, 2400, "Full run"), "race")).toBe(true);
+  });
+
+  it("rejects anything outside the 4–22 km band", () => {
+    expect(isRaceLikeEffort(effort(3, 800, "Lap block"))).toBe(false);
+    expect(isRaceLikeEffort(effort(30, 9000, "Best effort"))).toBe(false);
+    expect(isRaceLikeEffort(effort(30, 9000, "Full run"), "race")).toBe(false);
+  });
+});
+
+describe("multi-anchor model", () => {
+  // The comparator read `b.timeSec / b.timeSec` (always 1), so it never compared the
+  // two efforts and "top 3 by speed" picked arbitrarily.
+  it("anchors on the fastest efforts, not an arbitrary three", () => {
+    const runs = [
+      mockRun("slow1", 10, 5.5),
+      mockRun("slow2", 10, 5.4),
+      mockRun("slow3", 10, 5.3),
+      mockRun("fast1", 10, 4.0),
+      mockRun("fast2", 10, 4.1),
+      mockRun("fast3", 10, 4.2),
+    ];
+    const analysis = buildRacePredictionAnalysis(runs, []);
+    const multi = analysis.models.find((m) => m.id === "multi")!;
+    const tenK = multi.predictions.find((p) => p.label === "10K")!;
+
+    // Averaging the three fastest 10 Ks (4:00–4:10/km) lands near 41–42 min; the
+    // three slowest would land near 54 min.
+    expect(tenK.timeSec).toBeLessThan(45 * 60);
+    expect(tenK.timeSec).toBeGreaterThan(38 * 60);
   });
 });
 
