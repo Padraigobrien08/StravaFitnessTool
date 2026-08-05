@@ -53,6 +53,35 @@ describe("scoreForecast", () => {
     const scored = scoreForecast(already, [effort(21.1, 5800, "2026-06-10")]);
     expect(scored.actualTimeSec).toBe(5400);
   });
+
+  // The effort set is not race-only, so a slow training run in the distance band
+  // must not be mistaken for the athlete's race result.
+  it("ignores an easy long run in the distance band", () => {
+    // 2:10:00 for 21 km — 40% slower than p90, i.e. nobody raced this.
+    const scored = scoreForecast(forecast(), [effort(21.0, 7800, "2026-05-04")]);
+    expect(scored.actualTimeSec).toBeUndefined();
+    expect(scored.withinInterval).toBeUndefined();
+  });
+
+  it("scores the real race even when an easy run happened first", () => {
+    const scored = scoreForecast(forecast(), [
+      effort(21.0, 7800, "2026-05-04"), // easy long run, three days later
+      effort(21.1, 5390, "2026-06-01"), // the actual goal race
+    ]);
+    expect(scored.actualTimeSec).toBe(5390);
+    expect(scored.actualDate).toBe("2026-06-01");
+    expect(scored.withinInterval).toBe(true);
+    expect(scored.signedErrorSec).toBe(-10);
+  });
+
+  it("still counts a genuinely bad race as a miss", () => {
+    // 1:44:10 — a blow-up, but a real attempt: must not be filtered away, or
+    // calibration would only ever see the model's successes.
+    const scored = scoreForecast(forecast(), [effort(21.1, 6250, "2026-06-10")]);
+    expect(scored.actualTimeSec).toBe(6250);
+    expect(scored.withinInterval).toBe(false);
+    expect(scored.signedErrorSec).toBe(850);
+  });
 });
 
 describe("summarizeCalibration", () => {
