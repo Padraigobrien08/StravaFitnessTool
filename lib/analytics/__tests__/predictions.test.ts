@@ -244,4 +244,36 @@ describe("predictCameron", () => {
     const cameron = predictCameron(d10, t10, d42);
     expect(cameron).toBeGreaterThan(riegel);
   });
+
+  // Pinned to published equivalence tables. The old implementation also satisfied
+  // "slower than Riegel at the marathon" — it inflated everything — so that
+  // assertion alone let a 57-minute error sit unnoticed. These pin the values.
+  it.each([
+    ["10K from a 20:00 5K", 5000, 1200, 10000, 41 * 60 + 40],
+    ["HM from a 20:00 5K", 5000, 1200, 21097, 91 * 60 + 51],
+    ["marathon from a 20:00 5K", 5000, 1200, 42195, 3 * 3600 + 15 * 60 + 11],
+    ["marathon from a 50:00 10K", 10000, 3000, 42195, 3 * 3600 + 54 * 60 + 16],
+  ])("matches published equivalence for %s", (_label, d1, t1, d2, expected) => {
+    expect(predictCameron(d1, t1, d2)).toBeCloseTo(expected, -1); // within ~5s
+  });
+
+  it("stays in the same family as the other models on a short anchor", () => {
+    // The regression case: a 5.52 km anchor in 1358s projected to 2:30:22 for a half
+    // marathon, ~57 min beyond Riegel's 1:33:45, because the old trailing factor
+    // approached 2 as the extrapolation grew.
+    const cameron = predictCameron(5520, 1358, 21097);
+    const riegel = predictRaceTime(5520, 1358, 21097);
+    expect(cameron).toBeGreaterThan(riegel * 0.95);
+    expect(cameron).toBeLessThan(riegel * 1.15);
+  });
+
+  it("is monotonic in distance and returns 0 on degenerate input", () => {
+    const t = (d: number) => predictCameron(5000, 1200, d);
+    expect(t(10000)).toBeGreaterThan(t(5000));
+    expect(t(21097)).toBeGreaterThan(t(10000));
+    expect(t(42195)).toBeGreaterThan(t(21097));
+    expect(predictCameron(0, 1200, 10000)).toBe(0);
+    expect(predictCameron(5000, 0, 10000)).toBe(0);
+    expect(predictCameron(5000, 1200, 0)).toBe(0);
+  });
 });

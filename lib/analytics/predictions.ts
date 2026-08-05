@@ -180,10 +180,37 @@ export function collectEffortPoints(
   return points.sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
-/** Cameron: T2 = T1 * (D2/D1) * (2 - D1/D2) — better for extrapolating up in distance */
+const METERS_PER_MILE = 1609.344;
+
+/**
+ * Cameron's distance-equivalence factor.
+ *
+ * `distanceMiles` must be in **miles** — the coefficients are fitted to imperial
+ * distances and produce nonsense when fed kilometres.
+ */
+function cameronFactor(distanceMiles: number): number {
+  return 13.49681 - 0.048865 * distanceMiles + 2.438936 / Math.pow(distanceMiles, 0.7905);
+}
+
+/**
+ * Cameron's equivalence model: T₂ = T₁ · (D₂/D₁) · (a(D₁)/a(D₂)).
+ *
+ * This previously computed `T₁ · (D₂/D₁) · (2 − D₁/D₂)`, which is not Cameron's
+ * model — or anyone's. That trailing factor tends to **2** as the extrapolation
+ * grows, so it roughly doubled predicted pace: the demo athlete's 5.5 km anchor
+ * projected to 2:30:22 for a half marathon where the other three models agreed on
+ * 1:33–1:43. Because the model is averaged into the consensus, one bad model moved
+ * the headline number by ~14 minutes.
+ *
+ * The published form reproduces standard equivalence tables — a 20:00 5K gives
+ * 41:40 for 10K and 3:15:11 for the marathon — and stays slower than Riegel at
+ * marathon distance, which is the property this model exists to provide.
+ */
 export function predictCameron(distanceM1: number, timeSec1: number, distanceM2: number): number {
-  const ratio = distanceM2 / distanceM1;
-  return timeSec1 * ratio * (2 - distanceM1 / distanceM2);
+  if (distanceM1 <= 0 || distanceM2 <= 0 || timeSec1 <= 0) return 0;
+  const d1 = distanceM1 / METERS_PER_MILE;
+  const d2 = distanceM2 / METERS_PER_MILE;
+  return timeSec1 * (d2 / d1) * (cameronFactor(d1) / cameronFactor(d2));
 }
 
 /** Fit T = k * D^b in log space via least squares */
@@ -321,7 +348,7 @@ export function buildRacePredictionAnalysis(
       name: "Cameron (1982)",
       description:
         "Alternative equivalence model: often more conservative for marathon extrapolation.",
-      formula: "T₂ = T₁ × (D₂/D₁) × (2 − D₁/D₂)",
+      formula: "T₂ = T₁ × (D₂/D₁) × (a(D₁)/a(D₂))",
       anchorLabel: `${anchor.runName}`,
       predictions: predictFromAnchor(anchor, "cameron"),
     });
