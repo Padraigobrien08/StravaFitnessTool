@@ -4,13 +4,7 @@ import type {
   RecommendationIntegrityInput,
 } from "./types";
 import { buildAllowedEvidenceTokens } from "./contextEvidence";
-
-const MEDICAL_PATTERNS = [
-  /\bdiagnos(e|is|ed)\b/i,
-  /\bprescri(be|ption)\b/i,
-  /\bmedically ready\b/i,
-  /\bguarantee(d)?\b.*\binjur/i,
-];
+import { containsMedicalClaim } from "@/lib/safety/medicalLanguage";
 
 const INVENTED = [/\bhrv\b/i, /\bvo2\s*max\s*=\s*\d+/i];
 
@@ -21,16 +15,13 @@ export function evaluateRecommendation(
   const text = input.text;
   const allowed = buildAllowedEvidenceTokens(input.context);
 
-  for (const p of MEDICAL_PATTERNS) {
-    if (p.test(text)) {
-      issues.push({
-        type: "medical_claim",
-        severity: "high",
-        message: "Recommendation may include medical certainty",
-        suggestedFix: "Remove diagnosis or medical readiness claims",
-      });
-      break;
-    }
+  if (containsMedicalClaim(text)) {
+    issues.push({
+      type: "medical_claim",
+      severity: "high",
+      message: "Recommendation may include medical diagnosis, treatment, or certainty",
+      suggestedFix: "Remove diagnosis, treatment, or medical readiness claims",
+    });
   }
 
   for (const p of INVENTED) {

@@ -3,7 +3,11 @@ import { computeWeeklyPlanGuardrails } from "@/lib/ai-planning/weeklyPlanGuardra
 import { parseWeeklyTrainingPlan } from "@/lib/ai-planning/weeklyPlanSchema";
 import { repairPlanFromIntegrity } from "../repairIntegrityPlan";
 import { evaluateRecommendation, evaluateWeeklyPlan } from "../index";
-import { contexts, invalidLlmPlan } from "@/lib/ai-planning/__tests__/fixtures";
+import {
+  contexts,
+  invalidLlmPlan,
+  invalidPlanMissingEvidence,
+} from "@/lib/ai-planning/__tests__/fixtures";
 import { nextPlanWeekStart } from "@/lib/ai-planning/weeklyPlanGuardrails";
 
 function guardrailsFor(ctx: ReturnType<typeof contexts.raceWeek>) {
@@ -233,6 +237,51 @@ describe("recommendation integrity", () => {
     });
     expect(report.issues.some((i) => i.type === "medical_claim")).toBe(true);
     expect(report.passed).toBe(false);
+  });
+
+  it("flags clinical treatment language and named conditions", () => {
+    const ctx = contexts.lowData();
+    const report = evaluateRecommendation({
+      text: "This plan will treat and cure your stress fracture, heal your tendinitis, and rehab your IT band syndrome.",
+      context: ctx,
+    });
+    expect(report.issues.some((i) => i.type === "medical_claim")).toBe(true);
+    expect(report.passed).toBe(false);
+  });
+
+  it("does not flag ordinary coaching language as a medical claim", () => {
+    const ctx = contexts.lowData();
+    const report = evaluateRecommendation({
+      text: "Keep most runs easy, treat this as a recovery week, and add achilles mobility work.",
+      context: ctx,
+    });
+    expect(report.issues.some((i) => i.type === "medical_claim")).toBe(false);
+  });
+
+  // Field coverage: medical language in the rationale and alternatives used to be
+  // excluded from the safety text entirely.
+  it("flags medical claims hiding in rationale and alternatives", () => {
+    const ctx = contexts.lowData();
+    const g = guardrailsFor(ctx);
+    const parsed = parseWeeklyTrainingPlan(invalidPlanMissingEvidence(g.weekStart));
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+
+    const plan = {
+      ...parsed.data,
+      summary: "A steady aerobic week within recent volume.",
+      limitations: ["Approximate paces."],
+      rationale: {
+        ...parsed.data.rationale,
+        primaryGoal: "Cure the tendinopathy before race day",
+      },
+      alternatives: [
+        { name: "Therapy week", summary: "Rehab focus for shin splints", changes: ["Add therapy"] },
+      ],
+    };
+
+    const report = evaluateWeeklyPlan({ plan, context: ctx, guardrails: g });
+    expect(report.issues.some((i) => i.type === "medical_claim")).toBe(true);
   });
 
   it("repair improves integrity score", () => {

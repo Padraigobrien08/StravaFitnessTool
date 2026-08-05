@@ -1,4 +1,5 @@
 import type { WeeklyPlanGuardrails, WeeklyTrainingPlan, PlannedWorkout } from "./types";
+import { softenMedicalLanguage } from "@/lib/safety/medicalLanguage";
 
 function isHardRun(w: PlannedWorkout): boolean {
   if (w.modality !== "run") return false;
@@ -109,21 +110,49 @@ export function repairWeeklyPlan(
   };
 }
 
+/**
+ * Soften medical wording across **every** prose field of the plan.
+ *
+ * Field coverage matters as much as vocabulary: this previously cleaned only
+ * `summary`, `purpose`, `reasoning` and `limitations`, so medical language in the
+ * rationale or alternatives reached the user untouched. Anything not rewritable
+ * is caught by `containsMedicalClaim` in the integrity layer, which fails the plan
+ * and ultimately swaps in the safe fallback.
+ *
+ * `day`, `weekStart`, `modality` and `intensity` are structural/enum fields and
+ * are deliberately left alone.
+ */
 export function stripMedicalLanguage(plan: WeeklyTrainingPlan): WeeklyTrainingPlan {
-  const clean = (s: string) =>
-    s
-      .replace(/\bdiagnos(e|ed|is)\b/gi, "assess")
-      .replace(/\bprescri(be|ption)\b/gi, "suggest")
-      .replace(/\bguaranteed\b/gi, "likely");
+  const clean = softenMedicalLanguage;
 
   return {
     ...plan,
     summary: clean(plan.summary),
     workouts: plan.workouts.map((w) => ({
       ...w,
+      type: clean(w.type),
+      title: clean(w.title),
       purpose: clean(w.purpose),
       reasoning: clean(w.reasoning),
+      constraintsApplied: w.constraintsApplied.map(clean),
     })),
     limitations: plan.limitations.map(clean),
+    rationale: {
+      ...plan.rationale,
+      primaryGoal: clean(plan.rationale.primaryGoal),
+      evidenceUsed: plan.rationale.evidenceUsed.map(clean),
+      tradeoffs: plan.rationale.tradeoffs.map(clean),
+      risksManaged: plan.rationale.risksManaged.map(clean),
+    },
+    ...(plan.alternatives
+      ? {
+          alternatives: plan.alternatives.map((a) => ({
+            ...a,
+            name: clean(a.name),
+            summary: clean(a.summary),
+            changes: a.changes.map(clean),
+          })),
+        }
+      : {}),
   };
 }
