@@ -1,9 +1,11 @@
 import { afterAll, describe, expect, it } from "vitest";
+import { hasTestDb } from "./testDatabase";
 import { getSql } from "../client";
 import { getForecasts, logForecast, saveForecastEvaluation } from "../forecast-log";
 import type { LoggedForecast } from "@/lib/forecasting-v2/calibration";
 
-const hasDb = !!process.env.DATABASE_URL;
+// Opt-in and local-only: these tests DELETE rows. See testDatabase.ts.
+const hasDb = hasTestDb;
 const TEST_USER = "00000000-0000-0000-0000-0000000000f7";
 const FC_ID = "forecast:hm:2026-05-01";
 

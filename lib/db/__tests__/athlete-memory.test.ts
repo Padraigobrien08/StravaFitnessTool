@@ -1,9 +1,11 @@
 import { afterAll, describe, expect, it } from "vitest";
+import { hasTestDb } from "./testDatabase";
 import { getSql } from "../client";
 import { getStoredBeliefMeta, upsertBeliefs } from "../athlete-memory";
 import type { AthleteBelief } from "@/lib/athlete-memory/types";
 
-const hasDb = !!process.env.DATABASE_URL;
+// Opt-in and local-only: these tests DELETE rows. See testDatabase.ts.
+const hasDb = hasTestDb;
 const TEST_USER = "00000000-0000-0000-0000-0000000000a6";
 const BELIEF_ID = "adapt-efficiency-up";
 

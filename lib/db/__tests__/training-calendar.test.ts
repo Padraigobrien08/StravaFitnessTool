@@ -1,12 +1,12 @@
 import { afterAll, describe, expect, it } from "vitest";
+import { hasTestDb } from "./testDatabase";
 import { getSql } from "../client";
 import { deleteSavedWeek, getSavedWeeks, upsertSavedWeek } from "../training-calendar";
 import type { TrainingCalendarWeek } from "@/lib/training-calendar/types";
 
-// Round-trips against a real local Postgres. Skipped when DATABASE_URL is unset
-// (CI without a DB, contributors without Docker) — same pattern as the FIT-export
-// tests that gate on a git-ignored fixture.
-const hasDb = !!process.env.DATABASE_URL;
+// Round-trips against a real local Postgres. These DELETE rows, so they are
+// opt-in via TEST_DATABASE_URL and refuse any non-local host — see testDatabase.ts.
+const hasDb = hasTestDb;
 
 const TEST_USER = "00000000-0000-0000-0000-0000000000f3";
 const WEEK_START = "2026-08-03";

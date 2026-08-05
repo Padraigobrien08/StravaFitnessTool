@@ -1,9 +1,11 @@
 import { afterAll, describe, expect, it } from "vitest";
+import { hasTestDb } from "./testDatabase";
 import { getSql } from "../client";
 import { getRecommendations, logRecommendation, saveEvaluation } from "../recommendation-log";
 import type { LoggedRecommendation } from "@/lib/recommendation-outcomes/types";
 
-const hasDb = !!process.env.DATABASE_URL;
+// Opt-in and local-only: these tests DELETE rows. See testDatabase.ts.
+const hasDb = hasTestDb;
 const TEST_USER = "00000000-0000-0000-0000-0000000000f6";
 const REC_ID = "today_session:2026-08-15";
 

@@ -31,6 +31,20 @@ npm run build   # production build
 - **Add or update tests** for behavior changes. Tests live next to code in `__tests__/`.
 - A handful of tests read a local, git-ignored Strava export fixture and **self-skip** when it's absent — that's expected in CI.
 
+### Database tests
+
+The suites in `lib/db/__tests__/` round-trip against a real Postgres and **`DELETE`
+rows**, so they are opt-in and skip by default. They are gated on `TEST_DATABASE_URL`
+— deliberately _not_ `DATABASE_URL`, which usually points at a real database — and a
+non-local host makes them **fail loudly** rather than skip:
+
+```bash
+docker compose up -d
+TEST_DATABASE_URL=postgresql://strideiq:strideiq@localhost:5432/strideiq npx vitest run lib/db
+```
+
+Never point `TEST_DATABASE_URL` at a database whose data you care about.
+
 ## Coding conventions
 
 - TypeScript, `strict` mode. No `any` unless unavoidable (and commented).
