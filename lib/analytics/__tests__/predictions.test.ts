@@ -66,6 +66,37 @@ describe("fitPowerLawRegression", () => {
     expect(fit!.exponent).toBeGreaterThan(1);
     expect(fit!.curve.length).toBeGreaterThan(10);
   });
+
+  // A perfect power law is the only case where the expected R² is known exactly,
+  // which makes it the assertion that pins down the goodness-of-fit maths.
+  it("reports R² ≈ 1 for a perfect power law", () => {
+    const efforts = [3, 5, 8, 10, 15, 21].map((km, i) => ({
+      distanceKm: km,
+      timeSec: 300 * Math.pow(km, 1.06),
+      runId: String(i),
+      runName: `effort ${i}`,
+      date: "2026-01-01",
+      source: "Full run",
+    }));
+    const fit = fitPowerLawRegression(efforts)!;
+    expect(fit.exponent).toBeCloseTo(1.06, 4);
+    expect(fit.coefficient).toBeCloseTo(300, 2);
+    expect(fit.rSquared).toBeCloseTo(1, 3);
+  });
+
+  it("keeps R² within [0, 1] on noisy real-world-shaped efforts", () => {
+    const efforts = [3, 4, 5, 6, 8, 10, 12, 15, 18, 21].map((km, i) => ({
+      distanceKm: km,
+      timeSec: 300 * Math.pow(km, 1.06) * (i % 3 === 0 ? 1.05 : 0.97),
+      runId: String(i),
+      runName: `effort ${i}`,
+      date: "2026-01-01",
+      source: "Full run",
+    }));
+    const fit = fitPowerLawRegression(efforts)!;
+    expect(fit.rSquared).toBeGreaterThanOrEqual(0);
+    expect(fit.rSquared).toBeLessThanOrEqual(1);
+  });
 });
 
 describe("predictCameron", () => {

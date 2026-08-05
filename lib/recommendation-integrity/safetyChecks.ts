@@ -1,16 +1,6 @@
 import type { RecommendationIssue, WeeklyPlanIntegrityInput } from "./types";
 import { DAY_ORDER } from "@/lib/ai-planning/weeklyPlanGuardrails";
-
-const MEDICAL_PATTERNS = [
-  /\bdiagnos(e|is|ed)\b/i,
-  /\bprescri(be|ption)\b/i,
-  /\bmedical advice\b/i,
-  /\binjury[- ]free guarantee\b/i,
-  /\bguarantee(d)?\b.*\b(injury|recovery)\b/i,
-  /\bcleared for\b.*\b(race|training)\b/i,
-  /\bmedically ready\b/i,
-  /\bprevent(s|ing)?\b.*\binjur/i,
-];
+import { containsMedicalClaim } from "@/lib/safety/medicalLanguage";
 
 const PRECISION_PATTERNS = [
   /\bexactly\s+\d+(\.\d+)?\s*km\b/i,
@@ -48,26 +38,26 @@ function recentWeeklyKm(context: WeeklyPlanIntegrityInput["context"]): number {
 export function runSafetyChecks(input: WeeklyPlanIntegrityInput): RecommendationIssue[] {
   const { plan, context, guardrails } = input;
   const issues: RecommendationIssue[] = [];
+  // Every prose field the athlete can read — the rationale and alternatives were
+  // previously excluded, so medical language there was never checked.
   const text = [
     plan.summary,
     ...plan.limitations,
-    ...plan.workouts.map((w) => `${w.purpose} ${w.reasoning} ${w.title}`),
+    ...plan.workouts.map((w) => `${w.purpose} ${w.reasoning} ${w.title} ${w.type}`),
+    plan.rationale.primaryGoal,
+    ...plan.rationale.evidenceUsed,
+    ...plan.rationale.tradeoffs,
+    ...plan.rationale.risksManaged,
+    ...(plan.alternatives ?? []).map((a) => `${a.name} ${a.summary} ${a.changes.join(" ")}`),
   ].join("\n");
 
-  const strippedMedical = text
-    .replace(/\bnot medical advice\b/gi, "")
-    .replace(/\bnot a substitute\b/gi, "");
-
-  for (const p of MEDICAL_PATTERNS) {
-    if (p.test(strippedMedical)) {
-      issues.push({
-        type: "medical_claim",
-        severity: "high",
-        message: "Plan text may include medical diagnosis or injury certainty",
-        suggestedFix: "Remove medical claims; use training-load language only",
-      });
-      break;
-    }
+  if (containsMedicalClaim(text)) {
+    issues.push({
+      type: "medical_claim",
+      severity: "high",
+      message: "Plan text may include medical diagnosis, treatment, or injury certainty",
+      suggestedFix: "Remove medical claims; use training-load language only",
+    });
   }
 
   const recentKm = recentWeeklyKm(context);

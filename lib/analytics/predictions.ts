@@ -160,7 +160,10 @@ export function fitPowerLawRegression(efforts: EffortPoint[]): RegressionFit | n
 
   const meanY = sumY / n;
   const ssTot = ys.reduce((s, y) => s + (y - meanY) ** 2, 0);
-  const ssRes = ys.reduce((s, x, i) => {
+  // Residuals are measured against the fitted line at each point's log-distance
+  // (xs[i]) — not its log-time. Reducing over `ys` here and using the accumulator
+  // callback's element as the predictor is what made this return negative R².
+  const ssRes = xs.reduce((s, x, i) => {
     const pred = intercept + exponent * x;
     return s + (ys[i] - pred) ** 2;
   }, 0);
