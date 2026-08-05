@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findUserIdByStravaAthleteId } from "@/lib/db/users";
 import { deleteActivityForUser, syncSingleActivityForUser } from "@/lib/sync/singleActivity";
-import { verifyWebhookSignature } from "@/lib/strava/webhooks/verify";
+import { verifyWebhookSignatureDetailed } from "@/lib/strava/webhooks/verify";
 
 export async function GET(request: NextRequest) {
   const verifyToken = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN;
@@ -25,9 +25,17 @@ interface WebhookEvent {
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
-  const signature = request.headers.get("x-hub-signature-256");
+  const signature = request.headers.get("x-strava-signature");
 
-  if (!verifyWebhookSignature(rawBody, signature)) {
+  const verification = verifyWebhookSignatureDetailed(rawBody, signature);
+  if (!verification.valid) {
+    // Log the reason: a silent 403 on every delivery is indistinguishable from
+    // Strava not calling at all, which is how the wrong header name went unnoticed.
+    console.error(
+      verification.reason === "no_signing_secret"
+        ? "[strava webhook] rejected: STRAVA_WEBHOOK_SIGNING_SECRET is not set"
+        : `[strava webhook] rejected: ${verification.reason}`,
+    );
     return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
   }
 

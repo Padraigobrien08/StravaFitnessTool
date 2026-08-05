@@ -52,10 +52,17 @@ Environment variables (Vercel → Settings → Environment Variables):
 
 ### Webhooks (optional auto-sync)
 
-| Variable                      | Value                                                      |
-| ----------------------------- | ---------------------------------------------------------- |
-| `STRAVA_WEBHOOK_VERIFY_TOKEN` | Random string you choose (Strava subscription + challenge) |
-| `STRAVA_WEBHOOK_CALLBACK_URL` | `https://YOUR_DOMAIN/api/webhooks/strava`                  |
+| Variable                        | Value                                                               |
+| ------------------------------- | ------------------------------------------------------------------- |
+| `STRAVA_WEBHOOK_VERIFY_TOKEN`   | Random string you choose (Strava subscription + challenge)          |
+| `STRAVA_WEBHOOK_CALLBACK_URL`   | `https://YOUR_DOMAIN/api/webhooks/strava`                           |
+| `STRAVA_WEBHOOK_SIGNING_SECRET` | Signing secret from your Strava API app — **not** the client secret |
+
+Strava signs each event POST as `X-Strava-Signature: t=<unix>,v1=<hmac>`, where the
+HMAC is SHA-256 over `<t>.<raw body>` keyed with the signing secret. Deliveries are
+rejected with 403 while `STRAVA_WEBHOOK_SIGNING_SECRET` is unset, so push sync stays
+inert until it is configured. Check the server log for
+`[strava webhook] rejected: …` if events are not landing.
 
 After deploy:
 
@@ -79,16 +86,17 @@ Strava will send `GET` challenge and `POST` activity events to `/api/webhooks/st
 
 Copy from [`.env.example`](../.env.example). Minimum for **full** MVP:
 
-| Variable                      | Required        | Notes                   |
-| ----------------------------- | --------------- | ----------------------- |
-| `DATABASE_URL`                | OAuth / Coach   | Neon pooled URL         |
-| `SESSION_SECRET`              | OAuth / Coach   | `openssl rand -hex 32`  |
-| `STRAVA_CLIENT_ID`            | OAuth           |                         |
-| `STRAVA_CLIENT_SECRET`        | OAuth           |                         |
-| `STRAVA_REDIRECT_URI`         | OAuth           | Production callback URL |
-| `OPENAI_API_KEY`              | Coach + AI plan | Or `ANTHROPIC_API_KEY`  |
-| `STRAVA_WEBHOOK_VERIFY_TOKEN` | Webhooks        | Optional                |
-| `STRAVA_WEBHOOK_CALLBACK_URL` | Webhooks        | Optional                |
+| Variable                        | Required        | Notes                   |
+| ------------------------------- | --------------- | ----------------------- |
+| `DATABASE_URL`                  | OAuth / Coach   | Neon pooled URL         |
+| `SESSION_SECRET`                | OAuth / Coach   | `openssl rand -hex 32`  |
+| `STRAVA_CLIENT_ID`              | OAuth           |                         |
+| `STRAVA_CLIENT_SECRET`          | OAuth           |                         |
+| `STRAVA_REDIRECT_URI`           | OAuth           | Production callback URL |
+| `OPENAI_API_KEY`                | Coach + AI plan | Or `ANTHROPIC_API_KEY`  |
+| `STRAVA_WEBHOOK_VERIFY_TOKEN`   | Webhooks        | Optional                |
+| `STRAVA_WEBHOOK_CALLBACK_URL`   | Webhooks        | Optional                |
+| `STRAVA_WEBHOOK_SIGNING_SECRET` | Webhooks        | Required for webhooks   |
 
 Optional:
 

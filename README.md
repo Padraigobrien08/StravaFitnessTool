@@ -269,14 +269,14 @@ Manual QA: [docs/SMOKE_TEST.md](docs/SMOKE_TEST.md).
 
 Copy [`.env.example`](.env.example) to `.env.local`. Never commit `.env.local`.
 
-| Variable                                                      | Required for            |
-| ------------------------------------------------------------- | ----------------------- |
-| `DATABASE_URL`                                                | Strava sync, Coach, MCP |
-| `SESSION_SECRET`                                              | Signed session cookies  |
-| `STRAVA_CLIENT_ID` / `SECRET` / `REDIRECT_URI`                | OAuth                   |
-| `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`                       | Coach + AI weekly plan  |
-| `STRAVA_WEBHOOK_VERIFY_TOKEN` / `STRAVA_WEBHOOK_CALLBACK_URL` | Push auto-sync          |
-| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID`               | MCP / automation        |
+| Variable                                                            | Required for            |
+| ------------------------------------------------------------------- | ----------------------- |
+| `DATABASE_URL`                                                      | Strava sync, Coach, MCP |
+| `SESSION_SECRET`                                                    | Signed session cookies  |
+| `STRAVA_CLIENT_ID` / `SECRET` / `REDIRECT_URI`                      | OAuth                   |
+| `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`                             | Coach + AI weekly plan  |
+| `STRAVA_WEBHOOK_VERIFY_TOKEN` / `_CALLBACK_URL` / `_SIGNING_SECRET` | Push auto-sync          |
+| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID`                     | MCP / automation        |
 
 Production values and callback URLs: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
