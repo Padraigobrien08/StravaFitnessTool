@@ -1,4 +1,8 @@
 import { selectRelevantBeliefs } from "@/lib/athlete-memory";
+import {
+  hydrateOutcomesForUser,
+  persistOutcomesForUser,
+} from "@/lib/recommendation-learning/persistence";
 import { buildAdaptiveIntelligence, buildAdaptivePlanningNotes } from "@/lib/adaptive-intelligence";
 import { buildCoachingContext } from "@/lib/coaching-context";
 import type { IntelligenceContext } from "@/lib/intelligence/types";
@@ -77,6 +81,9 @@ export async function executeGenerateNextWeekTrainingPlan(
     }
   }
 
+  // Load anything tracked in an earlier request so it can be judged now.
+  await hydrateOutcomesForUser(ctx.userId);
+
   const adaptive = buildAdaptiveIntelligence(
     bundle,
     resolved.raceGoal ?? null,
@@ -84,6 +91,9 @@ export async function executeGenerateNextWeekTrainingPlan(
     ctx.userId,
     { trackPrimaryRecommendation: true },
   );
+
+  // Write the working set back so a later request can close the loop.
+  await persistOutcomesForUser(ctx.userId);
 
   const memoryProfile = adaptive.memory;
   const memorySelection = selectRelevantBeliefs(memoryProfile, {

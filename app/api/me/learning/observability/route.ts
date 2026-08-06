@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  hydrateOutcomesForUser,
+  persistOutcomesForUser,
+} from "@/lib/recommendation-learning/persistence";
 import { buildAdaptiveIntelligence } from "@/lib/adaptive-intelligence";
 import { intelligenceContextFromRequest } from "@/lib/intelligence/auth";
 import { computeAthleteIntelligence, resolveIntelligenceContext } from "@/lib/intelligence/service";
@@ -20,6 +24,9 @@ export async function GET(req: NextRequest) {
       resolveIntelligenceContext(ctx.userId, ctx),
     ]);
 
+    // Load anything tracked in an earlier request so it can be judged now.
+    await hydrateOutcomesForUser(ctx.userId);
+
     const snap = buildAdaptiveIntelligence(
       bundle,
       resolved.raceGoal ?? null,
@@ -27,6 +34,9 @@ export async function GET(req: NextRequest) {
       ctx.userId,
       { trackPrimaryRecommendation: true },
     );
+
+    // Write the working set back so a later request can close the loop.
+    await persistOutcomesForUser(ctx.userId);
 
     return NextResponse.json(snap.observability);
   } catch (e) {

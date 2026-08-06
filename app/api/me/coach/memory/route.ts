@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  hydrateOutcomesForUser,
+  persistOutcomesForUser,
+} from "@/lib/recommendation-learning/persistence";
 import { z } from "zod";
 import { serializeMemoryForCoachAnswer } from "@/lib/athlete-memory";
 import { classifyMemoryQuestion } from "@/lib/athlete-memory/memoryIntent";
@@ -36,6 +40,9 @@ export async function POST(req: NextRequest) {
       resolveIntelligenceContext(ctx.userId, ctx),
     ]);
 
+    // Load anything tracked in an earlier request so it can be judged now.
+    await hydrateOutcomesForUser(ctx.userId);
+
     const adaptive = buildAdaptiveIntelligence(
       bundle,
       resolved.raceGoal ?? null,
@@ -43,6 +50,9 @@ export async function POST(req: NextRequest) {
       ctx.userId,
       { trackPrimaryRecommendation: true },
     );
+
+    // Write the working set back so a later request can close the loop.
+    await persistOutcomesForUser(ctx.userId);
 
     const msg = body.message ?? "";
     const adaptiveTopic = classifyAdaptiveCoachQuestion(msg);
