@@ -22,15 +22,15 @@ const MAX_STORED = 40;
 export const MIN_OBSERVATION_HOURS = 24;
 
 /**
- * In-memory store, per process.
+ * In-process working set.
  *
- * This is the reason the loop rarely closes in a serverless deployment: a pending
- * outcome does not survive to the next request, so the observation window above
- * usually expires with nothing left to evaluate. `db/migrations/005_recommendation_log.sql`
- * and `lib/db/recommendation-log.ts` already provide durable storage — used by
- * `lib/recommendation-outcomes/service.ts` — and moving this store onto it is what
- * would let the loop actually learn. Until then it is correct but mostly inert,
- * which is the right way round.
+ * This used to be the whole story, which is why the loop could not close in a
+ * serverless deployment: a pending outcome never survived to the request that could
+ * have judged it. Durability now lives in `recommendation_outcome_log` — server
+ * callers hydrate this map before building and persist it after, via
+ * `./persistence.ts`. Keeping the map as the working set is what lets
+ * `buildAdaptiveIntelligence` stay synchronous and lets the client path, which has no
+ * database, behave exactly as before.
  */
 const outcomeStore = new Map<string, TrackedRecommendationOutcome[]>();
 
@@ -100,6 +100,32 @@ export function evaluatePendingOutcomes(
   });
   outcomeStore.set(athleteKey, updated);
   return updated;
+}
+
+/**
+ * Load previously tracked outcomes into the working set.
+ *
+ * The store is a per-process Map, which is fine as a working set but cannot span
+ * requests on its own — that is why the loop could never close in a serverless
+ * deployment. Callers with database access hydrate before building and persist after,
+ * which keeps `buildAdaptiveIntelligence` synchronous and leaves the client path (no
+ * database, nothing tracked) working exactly as before.
+ *
+ * Stored outcomes are merged *under* anything already in memory for that key, so a
+ * fresher in-flight record is never clobbered by an older stored one.
+ */
+export function hydrateOutcomeStore(
+  athleteKey: string,
+  stored: TrackedRecommendationOutcome[],
+): void {
+  const existing = outcomeStore.get(athleteKey) ?? [];
+  const byId = new Map<string, TrackedRecommendationOutcome>();
+  for (const o of stored) byId.set(o.recommendationId, o);
+  for (const o of existing) byId.set(o.recommendationId, o);
+  const merged = [...byId.values()]
+    .sort((a, b) => Date.parse(b.issuedAt) - Date.parse(a.issuedAt))
+    .slice(0, MAX_STORED);
+  outcomeStore.set(athleteKey, merged);
 }
 
 export function clearOutcomeStore(athleteKey?: string): void {
