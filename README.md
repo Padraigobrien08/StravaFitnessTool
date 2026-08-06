@@ -102,7 +102,7 @@ That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half mar
 
 ### Engineering
 
-- **218+ Vitest tests** · production `next build`
+- **1,000+ Vitest tests** · production `next build`
 - **shadcn/ui** component layer · DM Sans + Syne typography
 - **MCP package** — same intelligence tools in Claude Desktop (`packages/strideiq-mcp`)
 
