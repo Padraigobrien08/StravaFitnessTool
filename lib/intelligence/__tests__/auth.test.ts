@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "fs";
 import { NextRequest } from "next/server";
 import { createSessionToken } from "@/lib/auth/session";
 
@@ -48,6 +49,67 @@ async function ctx(...args: Parameters<typeof req>) {
   return intelligenceContextFromRequest(req(...args));
 }
 
+describe("secretsMatch", () => {
+  async function match(a: string, b: string) {
+    const { secretsMatch } = await import("../auth");
+    return secretsMatch(a, b);
+  }
+
+  it("accepts an exact match", async () => {
+    await expect(match("s3cret-value", "s3cret-value")).resolves.toBe(true);
+  });
+
+  it.each([
+    ["a differing last byte", "s3cret-valuE", "s3cret-value"],
+    ["a differing first byte", "S3cret-value", "s3cret-value"],
+    ["a truncated prefix", "s3cret", "s3cret-value"],
+    ["a superstring", "s3cret-value-extra", "s3cret-value"],
+    ["an empty candidate", "", "s3cret-value"],
+  ])("rejects %s", async (_label, provided, expected) => {
+    await expect(match(provided, expected)).resolves.toBe(false);
+  });
+
+  // timingSafeEqual throws on differing buffer lengths rather than returning false,
+  // so the length guard has to come first or a short key raises a 500 instead of 401.
+  it("does not throw on a length mismatch", async () => {
+    await expect(match("x", "much-longer-secret")).resolves.toBe(false);
+  });
+
+  // Buffer.from(str) is UTF-8, so byte length and character length diverge here;
+  // comparing lengths in characters would let these two look equal.
+  it("compares bytes, not characters", async () => {
+    await expect(match("é", "e")).resolves.toBe(false);
+  });
+
+  /**
+   * The limit of the tests above, stated rather than glossed over.
+   *
+   * `===` and `timingSafeEqual` return *identical values* for every input — the
+   * vulnerability is in how long the answer takes, not what it is. Every assertion in
+   * this describe block passes against the vulnerable `===` implementation; they were
+   * run against it to confirm that. So they pin the comparison's correctness and are
+   * worth keeping, but they cannot catch a regression to `===`.
+   *
+   * A timing measurement would be the direct test and would be hopelessly flaky in
+   * CI. Reading the source is the reliable check available, so that is what this does.
+   */
+  it("is implemented with timingSafeEqual, not ===", () => {
+    const src = readFileSync("lib/intelligence/auth.ts", "utf8");
+    const body = src.slice(src.indexOf("export function secretsMatch"));
+    const fn = body.slice(0, body.indexOf("\n}"));
+    expect(fn).toMatch(/timingSafeEqual\(/);
+    expect(fn, "secretsMatch must not fall back to a short-circuiting compare").not.toMatch(
+      /provided\s*===\s*expected/,
+    );
+  });
+
+  it("no caller compares the API key directly", () => {
+    const src = readFileSync("lib/intelligence/auth.ts", "utf8");
+    expect(src).not.toMatch(/apiKey\s*===/);
+    expect(src).not.toMatch(/===\s*process\.env\.STRIDEIQ_API_KEY/);
+  });
+});
+
 describe("intelligenceContextFromRequest", () => {
   it("returns null with no credentials at all", async () => {
     await expect(ctx("/api/me/intelligence")).resolves.toBeNull();
@@ -77,6 +139,29 @@ describe("intelligenceContextFromRequest", () => {
     it("rejects a wrong key", async () => {
       await expect(
         ctx("/api/me/intelligence", { "x-strideiq-api-key": "wrong" }),
+      ).resolves.toBeNull();
+    });
+
+    // §F-3: the comparison used `===`, which returns on the first differing byte and
+    // so leaks the key one character at a time to anyone who can time the response.
+    // A same-length near-miss is the case a prefix-guessing attacker actually sends.
+    it("rejects a key matching every byte but the last", async () => {
+      const nearMiss = KEY.slice(0, -1) + "!";
+      expect(nearMiss).toHaveLength(KEY.length);
+      await expect(
+        ctx("/api/me/intelligence", { "x-strideiq-api-key": nearMiss }),
+      ).resolves.toBeNull();
+    });
+
+    it("rejects a correct prefix that is too short", async () => {
+      await expect(
+        ctx("/api/me/intelligence", { "x-strideiq-api-key": KEY.slice(0, 4) }),
+      ).resolves.toBeNull();
+    });
+
+    it("rejects the correct key with anything appended", async () => {
+      await expect(
+        ctx("/api/me/intelligence", { "x-strideiq-api-key": KEY + "x" }),
       ).resolves.toBeNull();
     });
 
