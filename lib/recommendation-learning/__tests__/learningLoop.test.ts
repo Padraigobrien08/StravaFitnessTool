@@ -154,14 +154,21 @@ describe("outcomes are scoped per athlete", () => {
 });
 
 /**
- * The store is an in-memory Map, so a pending outcome does not survive to the next
- * request. With the observation window above, that means the loop rarely closes in a
- * serverless deployment — correct, but mostly inert. Pinned here so the limitation is
- * visible rather than assumed, and so moving onto `lib/db/recommendation-log.ts`
- * has a test to flip.
+ * The store is a working set, not the durable record.
+ *
+ * This began as a pinned limitation: with the observation window above and nothing but
+ * an in-memory Map, the loop was correct but rarely closed in a serverless deployment.
+ * Durability now lives in `recommendation_outcome_log`, and server callers hydrate this
+ * map before building and persist it after (`../persistence.ts`).
+ *
+ * The assertion below is unchanged and still worth keeping — it is precisely *because*
+ * a cold start empties the map that hydration is required, so this pins the reason the
+ * persistence layer exists. What it must not be read as is a claim that outcomes are
+ * lost across requests; `__tests__/outcomePersistence.test.ts` covers the seam that
+ * carries them.
  */
-describe("known limitation: the store does not persist", () => {
-  it("a pending outcome is lost on a process restart", () => {
+describe("the in-memory store is per-process by design", () => {
+  it("a cold start empties the working set, which is why callers hydrate", () => {
     track("rec-old", hoursAgo(25));
     expect(getTrackedOutcomes(KEY)).toHaveLength(1);
     clearOutcomeStore(); // what a cold start does
