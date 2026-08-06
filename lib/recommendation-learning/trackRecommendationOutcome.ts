@@ -5,8 +5,44 @@ import type { OutcomeTrackingInput, TrackedRecommendationOutcome } from "./types
 
 const MAX_STORED = 40;
 
-/** In-memory store per process — replace with DB when persistence lands */
+/**
+ * How long a recommendation must stand before its outcome can be judged.
+ *
+ * `buildAdaptiveIntelligence` tracks a recommendation and then evaluates pending
+ * outcomes in the same call, so every recommendation was being graded in the instant
+ * it was issued, against the very analytics that produced it. A verdict of
+ * "supported" then meant "this advice matched the current state", not "this advice
+ * worked" — and `updateBeliefsFromOutcome` minted a belief captioned "Historical
+ * evidence suggests…" on that basis. Unearned beliefs are worse than no beliefs.
+ *
+ * A training recommendation needs at least a day before any signal could exist:
+ * freshness, readiness and efficiency all move on daily-or-slower timescales.
+ * Anything younger stays pending rather than being resolved on no evidence.
+ */
+export const MIN_OBSERVATION_HOURS = 24;
+
+/**
+ * In-memory store, per process.
+ *
+ * This is the reason the loop rarely closes in a serverless deployment: a pending
+ * outcome does not survive to the next request, so the observation window above
+ * usually expires with nothing left to evaluate. `db/migrations/005_recommendation_log.sql`
+ * and `lib/db/recommendation-log.ts` already provide durable storage — used by
+ * `lib/recommendation-outcomes/service.ts` — and moving this store onto it is what
+ * would let the loop actually learn. Until then it is correct but mostly inert,
+ * which is the right way round.
+ */
 const outcomeStore = new Map<string, TrackedRecommendationOutcome[]>();
+
+/** Has enough time passed since issue for an effect to be observable? */
+export function isObservable(
+  outcome: Pick<TrackedRecommendationOutcome, "issuedAt">,
+  now: Date = new Date(),
+): boolean {
+  const issued = Date.parse(outcome.issuedAt);
+  if (Number.isNaN(issued)) return false;
+  return now.getTime() - issued >= MIN_OBSERVATION_HOURS * 60 * 60 * 1000;
+}
 
 export function trackRecommendationOutcome(
   athleteKey: string,
@@ -38,11 +74,16 @@ export function evaluatePendingOutcomes(
   athleteKey: string,
   analytics: DashboardInsights,
   priorSnapshot?: { freshness?: number; tsb?: number; readiness?: number },
+  now: Date = new Date(),
 ): TrackedRecommendationOutcome[] {
   const list = outcomeStore.get(athleteKey) ?? [];
   const evidence = buildOutcomeEvidenceFromAnalytics(analytics, priorSnapshot);
   const updated = list.map((o) => {
     if (o.evaluatedAt && o.evaluation !== "inconclusive") return o;
+    // Too soon to tell. Leave it pending rather than resolving it on no evidence —
+    // `applyOutcomesToMemory` skips an outcome with no `evaluatedAt`, so an unjudged
+    // recommendation cannot reach a belief.
+    if (!isObservable(o, now)) return o;
     const withSignals = {
       ...o,
       observedSignals: evidence,

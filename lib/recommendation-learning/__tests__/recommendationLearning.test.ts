@@ -34,6 +34,9 @@ describe("recommendation learning", () => {
   it("strengthens evaluation when freshness recovers", () => {
     trackRecommendationOutcome("test", {
       recommendationId: "fresh",
+      // Issued two days ago: an outcome can only be observed after the recommendation
+      // has had time to take effect, and anything younger stays pending by design.
+      issuedAt: new Date(Date.now() - 48 * 3600_000).toISOString(),
       recommendation: "Prioritise recovery for freshness",
       expectedOutcome: ["freshness", "recovery"],
     });

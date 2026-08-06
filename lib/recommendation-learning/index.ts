@@ -13,6 +13,8 @@ export {
 } from "./evaluateRecommendationOutcome";
 export {
   trackRecommendationOutcome,
+  isObservable,
+  MIN_OBSERVATION_HOURS,
   getTrackedOutcomes,
   evaluatePendingOutcomes,
   clearOutcomeStore,
