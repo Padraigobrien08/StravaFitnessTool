@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   applyCurrency,
   buildFatigueSnapshot,
@@ -16,6 +16,20 @@ import { format, subDays, subWeeks, startOfWeek } from "date-fns";
  * "FRESH, freshness 100, quality session window", because rest only ever added
  * freshness and TSB had no upper turn.
  */
+
+/**
+ * Pinned clock. Every fixture below is built relative to "today", and the model
+ * buckets load into ISO weeks, so which weekday the suite happens to run on shifts
+ * the bucket boundaries and moves CTL/ATL. That made these assertions fail on some
+ * calendar days and pass on others.
+ */
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-08-05T09:00:00.000Z"));
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 function run(date: string, km: number, load: number): RunActivity {
   return {

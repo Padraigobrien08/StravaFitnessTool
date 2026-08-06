@@ -1,9 +1,22 @@
-import { describe, it, expect } from "vitest";
+import { afterAll, beforeAll, describe, it, expect, vi } from "vitest";
 import { buildDemoImport, demoRaceGoal, DEMO_EXPORT_LABEL } from "../generateDemoData";
 import { StravaImportSchema } from "@/lib/strava/types";
 import { computeInsights } from "@/lib/analytics";
 
 const NOW = new Date("2026-07-17T09:00:00.000Z");
+
+/**
+ * Pinned clock. The fixture data is generated from NOW, but `computeInsights` reads
+ * the real clock for recency and days-until-race, so the readiness score drifted as
+ * real time advanced past the demo athlete's race date.
+ */
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(NOW);
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 describe("buildDemoImport", () => {
   const demo = buildDemoImport(NOW);
