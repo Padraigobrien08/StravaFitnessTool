@@ -1,6 +1,23 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { getSessionUserId } from "@/lib/auth/session";
 import { syncStravaActivitiesForUser } from "@/lib/sync/stravaSync";
+import { MAX_STREAM_RUNS_PER_SYNC, DEFAULT_STREAM_RUNS_PER_SYNC } from "@/lib/sync/limits";
+
+/**
+ * `streamMaxRuns` previously accepted any number at all — `typeof x === "number"` is
+ * true for `-1`, `NaN`, `Infinity` and `1e9`. Each stream costs a Strava API call
+ * against a shared daily quota, so an unbounded value here burns the whole app's rate
+ * limit on one request. The ceiling is the real fix; the schema is how it is enforced.
+ *
+ * The body stays optional: the UI posts this route with no body at all.
+ */
+const bodySchema = z
+  .object({
+    skipStreams: z.boolean().optional(),
+    streamMaxRuns: z.number().int().min(1).max(MAX_STREAM_RUNS_PER_SYNC).optional(),
+  })
+  .strict();
 
 export async function POST(request: Request) {
   const userId = await getSessionUserId();
@@ -8,15 +25,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let skipStreams = false;
-  let streamMaxRuns = 40;
+  // An absent or empty body is the normal case, not an error.
+  let raw: unknown = {};
   try {
-    const body = await request.json();
-    if (body?.skipStreams === true) skipStreams = true;
-    if (typeof body?.streamMaxRuns === "number") streamMaxRuns = body.streamMaxRuns;
+    raw = (await request.json()) ?? {};
   } catch {
-    // no body
+    raw = {};
   }
+
+  const parsed = bodySchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: parsed.error.flatten() },
+      { status: 422 },
+    );
+  }
+
+  const skipStreams = parsed.data.skipStreams ?? false;
+  const streamMaxRuns = parsed.data.streamMaxRuns ?? DEFAULT_STREAM_RUNS_PER_SYNC;
 
   try {
     const { synced, streamsSynced } = await syncStravaActivitiesForUser(userId, {
