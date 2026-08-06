@@ -625,7 +625,7 @@ outranks race-week logic when both apply.
 
 | Feature             | Description                     | Location                           |
 | ------------------- | ------------------------------- | ---------------------------------- |
-| MapLibre map        | GPS track on basemap            | `components/route-replay/`         |
+| MapLibre map        | GPS track on basemap            | `components/route/`                |
 | Playback controls   | Play/pause, scrub timeline      | `lib/route-intelligence/replay.ts` |
 | Pace overlay        | Color by pace                   | `overlays.ts`                      |
 | HR overlay          | Color by heart rate             | `overlays.ts`                      |
