@@ -45,6 +45,38 @@ TEST_DATABASE_URL=postgresql://strideiq:strideiq@localhost:5432/strideiq npx vit
 
 Never point `TEST_DATABASE_URL` at a database whose data you care about.
 
+### Component tests
+
+The suite runs as two Vitest **projects**, because the two kinds of test need different
+environments:
+
+| Project | Environment | Covers                                                  |
+| ------- | ----------- | ------------------------------------------------------- |
+| `node`  | node        | Everything under `lib/`, `app/api/`, `stores/` — no DOM |
+| `ui`    | jsdom       | `components/**/*.test.tsx`, plus `app/**/*.ui.test.tsx` |
+
+```bash
+npx vitest run --project ui     # components only
+npx vitest run --project node   # everything else
+npx vitest run                  # both, which is what `npm run check` does
+```
+
+The split is deliberate rather than incidental. Several modules under `lib/` guard on
+`typeof window === "undefined"` to stay safe during SSR; giving them a jsdom global
+would quietly stop exercising the server path those guards exist for. It also keeps the
+node project fast, since jsdom costs roughly a second of setup per file.
+
+`test/ui-setup.ts` handles what every component test needs: `jest-dom` matchers,
+cleanup between tests, and no-op `ResizeObserver` / `IntersectionObserver` (jsdom
+implements no layout, so components that measure elements would otherwise crash on
+mount rather than fail an assertion).
+
+**Test what the component sends, not how it looks.** The valuable assertions are the
+arguments handed to a store or callback, and the accessible state a screen reader
+reads (`aria-pressed`, roles, labels). Class names and colours change constantly and
+pinning them buys nothing. Query by role and label rather than by test id, so the test
+fails when the component becomes unusable, not when it is restyled.
+
 ## Coding conventions
 
 - TypeScript, `strict` mode. No `any` unless unavoidable (and commented).

@@ -19,19 +19,31 @@ import { cn } from "@/lib/utils";
 
 const DISTANCES: RaceDistance[] = ["5k", "10k", "hm", "marathon"];
 
+/**
+ * Parse a target finish time into seconds.
+ *
+ * Accepts `h:mm:ss`, `mm:ss`, or bare minutes. The `> 0` guard applies to every path:
+ * the bare-number branch always had it, the colon branches did not, so "-1:00" parsed
+ * to minus sixty and the caller's `if (targetTimeSec)` waved it through as truthy. A
+ * negative goal then flows into the race-prediction comparisons as a real target.
+ */
 function parseTargetTime(value: string): number | undefined {
   const trimmed = value.trim();
   if (!trimmed) return undefined;
-  if (trimmed.includes(":")) {
-    const parts = trimmed.split(":").map(Number);
-    if (parts.some((n) => Number.isNaN(n))) return undefined;
-    if (parts.length === 2) return parts[0] * 60 + parts[1];
-    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-    return undefined;
-  }
-  const min = Number(trimmed);
-  if (!Number.isNaN(min) && min > 0) return Math.round(min * 60);
-  return undefined;
+
+  const seconds = (() => {
+    if (trimmed.includes(":")) {
+      const parts = trimmed.split(":").map(Number);
+      if (parts.some((n) => Number.isNaN(n))) return undefined;
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      return undefined;
+    }
+    const min = Number(trimmed);
+    return Number.isNaN(min) ? undefined : Math.round(min * 60);
+  })();
+
+  return seconds !== undefined && seconds > 0 ? seconds : undefined;
 }
 
 export function CompactRaceGoalForm() {

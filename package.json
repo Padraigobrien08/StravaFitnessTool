@@ -2,7 +2,7 @@
   "name": "strideiq",
   "version": "0.1.0",
   "private": true,
-  "description": "Private training intelligence for runners \u2014 import Strava data, get evidence-backed insights, and investigate your training with a tool-grounded Coach. Try it with zero setup via the built-in demo athlete.",
+  "description": "Private training intelligence for runners — import Strava data, get evidence-backed insights, and investigate your training with a tool-grounded Coach. Try it with zero setup via the built-in demo athlete.",
   "license": "MIT",
   "author": "Padraig O'Brien (https://github.com/Padraigobrien08)",
   "repository": {
@@ -87,6 +87,10 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.3",
     "@types/node": "^22.20.1",
     "@types/pako": "^2.0.4",
     "@types/papaparse": "^5.5.2",
@@ -98,6 +102,7 @@
     "eslint-config-next": "^16.3.0",
     "eslint-config-prettier": "^10.1.8",
     "fake-indexeddb": "^6.2.5",
+    "jsdom": "^29.1.1",
     "prettier": "^3.9.6",
     "shadcn": "^4.16.2",
     "tailwindcss": "^4",
