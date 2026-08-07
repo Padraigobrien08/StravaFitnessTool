@@ -86,7 +86,15 @@ export function StravaProvider({ children }: { children: React.ReactNode }) {
   const commitImport = useCallback(
     (data: StravaImport | null, sourcePatch?: Partial<DataSources>) => {
       setImportData(data);
-      if (data) saveImport(data);
+      // A failed write is worth saying out loud — the import works for this session
+      // but will not survive a reload — while still applying the rest of the commit.
+      // This used to throw, which crashed the import flow *and* skipped the source
+      // patch below, leaving the context half-applied.
+      if (data && !saveImport(data)) {
+        setError(
+          "Your data is loaded, but the browser would not save it (storage full or private browsing). It will be lost on reload.",
+        );
+      }
       if (sourcePatch) {
         setDataSources((prev) => ({ ...prev, ...sourcePatch }));
       }
