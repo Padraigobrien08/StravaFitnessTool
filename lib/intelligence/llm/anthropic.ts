@@ -1,8 +1,17 @@
 import { INTELLIGENCE_TOOL_DEFINITIONS } from "../tools";
-import { executeIntelligenceTool, parseToolName } from "../tools";
 import type { IntelligenceContext } from "../types";
 import { buildCoachSystemWithContext } from "./coachingContextPrompt";
+import { executeToolForModel } from "./toolExecution";
 import type { ChatMessage } from "./types";
+
+/** Text blocks the model produced so far, joined. */
+function textFrom(content: Array<{ type: string; text?: string }>): string {
+  return content
+    .filter((c) => c.type === "text" && typeof c.text === "string")
+    .map((c) => c.text as string)
+    .join("\n")
+    .trim();
+}
 
 export async function runAnthropicCoachChat(
   ctx: IntelligenceContext,
@@ -50,10 +59,7 @@ export async function runAnthropicCoachChat(
     anthropicMessages.push({ role: "assistant", content: data.content });
 
     if (data.stop_reason === "end_turn") {
-      const text = data.content
-        .filter((c): c is { type: "text"; text: string } => c.type === "text")
-        .map((c) => c.text)
-        .join("\n");
+      const text = textFrom(data.content);
       return { reply: text || "I couldn't generate a response.", toolsUsed };
     }
 
@@ -62,19 +68,18 @@ export async function runAnthropicCoachChat(
         type: "tool_result";
         tool_use_id: string;
         content: string;
+        is_error?: boolean;
       }> = [];
 
       for (const block of data.content) {
         if (block.type !== "tool_use") continue;
         toolsUsed.push(block.name);
-        const result = await executeIntelligenceTool(ctx, {
-          name: parseToolName(block.name),
-          arguments: block.input ?? {},
-        });
+        const outcome = await executeToolForModel(ctx, block.name, block.input ?? {});
         toolResults.push({
           type: "tool_result",
           tool_use_id: block.id,
-          content: JSON.stringify(result, null, 2),
+          content: outcome.content,
+          ...(outcome.isError ? { is_error: true } : {}),
         });
       }
 
@@ -82,6 +87,23 @@ export async function runAnthropicCoachChat(
       continue;
     }
 
+    /**
+     * Any other stop reason — `max_tokens` above all, but also `refusal` and
+     * `pause_turn` — used to fall through to the loop-limit message below. That threw
+     * away whatever the model had already written and replaced it with a wrong
+     * diagnosis: the athlete was told to simplify their question when the real cause
+     * was a truncated response.
+     */
+    const partial = textFrom(data.content);
+    if (partial) {
+      return {
+        reply:
+          data.stop_reason === "max_tokens"
+            ? `${partial}\n\n_(Response cut short at the length limit.)_`
+            : partial,
+        toolsUsed,
+      };
+    }
     break;
   }
 

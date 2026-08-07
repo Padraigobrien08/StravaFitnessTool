@@ -1,7 +1,7 @@
 import { INTELLIGENCE_TOOL_DEFINITIONS } from "../tools";
-import { executeIntelligenceTool, parseToolName } from "../tools";
 import type { IntelligenceContext } from "../types";
 import { buildCoachSystemWithContext } from "./coachingContextPrompt";
+import { executeToolForModel } from "./toolExecution";
 import type { ChatMessage } from "./types";
 
 const openaiTools = INTELLIGENCE_TOOL_DEFINITIONS.map((t) => ({
@@ -87,6 +87,19 @@ export async function runOpenAICoachChat(
       };
     }
 
+    // A `length` finish with tool calls means the arguments JSON was cut mid-write.
+    // Parsing it yields `{}` and the tool then runs on the wrong inputs, which is
+    // worse than not running: the model gets a confident answer to a question it did
+    // not ask. Return what was written instead.
+    if (choice.finish_reason === "length") {
+      return {
+        reply: msg.content?.trim()
+          ? `${msg.content.trim()}\n\n_(Response cut short at the length limit.)_`
+          : "My response was cut short before I could finish. Try a narrower question.",
+        toolsUsed,
+      };
+    }
+
     for (const tc of msg.tool_calls) {
       toolsUsed.push(tc.function.name);
       let args: Record<string, unknown> = {};
@@ -95,14 +108,11 @@ export async function runOpenAICoachChat(
       } catch {
         args = {};
       }
-      const result = await executeIntelligenceTool(ctx, {
-        name: parseToolName(tc.function.name),
-        arguments: args,
-      });
+      const outcome = await executeToolForModel(ctx, tc.function.name, args);
       openaiMessages.push({
         role: "tool",
         tool_call_id: tc.id,
-        content: JSON.stringify(result, null, 2),
+        content: outcome.content,
       });
     }
   }
