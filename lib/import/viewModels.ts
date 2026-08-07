@@ -530,13 +530,24 @@ function defaultTrustTopics(): TrustTopicView[] {
   ];
 }
 
+/**
+ * Progress checklist for the import page.
+ *
+ * Every step must read as pending, active or done — never none of the three. The
+ * ingest row previously used `done: !(loading || parsing)`, so as soon as FIT parsing
+ * began it went from active to *neither*: the first item sat unticked and unspinning
+ * while the second one worked, which reads as a stalled import.
+ *
+ * Parsing implies ingestion finished — there is nothing to parse otherwise — so it
+ * marks the ingest step done rather than leaving it in limbo.
+ */
 function buildProcessingSteps(opts: { parsing: boolean; loading: boolean }): ProcessingStepView[] {
   const active = opts.loading || opts.parsing;
   return [
     {
       label: "Ingest activities",
-      active: active && !opts.parsing,
-      done: !active,
+      active: opts.loading && !opts.parsing,
+      done: !opts.loading || opts.parsing,
     },
     {
       label: "Parse FIT streams",
