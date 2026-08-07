@@ -45,6 +45,22 @@ TEST_DATABASE_URL=postgresql://strideiq:strideiq@localhost:5432/strideiq npx vit
 
 Never point `TEST_DATABASE_URL` at a database whose data you care about.
 
+### Tests that expire
+
+Three suites have turned `main` red for no reason but the passage of time — a fixture
+anchored to a fixed date while the code measures against `Date.now()`, so the test has an
+expiry date rather than a bug. CI now runs the whole suite as if it were a year from now:
+
+```bash
+npm run test:time-travel                        # +1 year
+PROBE_NOW=2028-02-29T23:59:00Z npx vitest run   # a specific instant
+```
+
+If your test fails under time travel and passes normally, it depends on when it runs. Pin
+the clock with `vi.useFakeTimers({ toFake: ["Date"] })` and `vi.setSystemTime(...)`, anchored
+to the same date your fixtures use. Do not pin where the date is incidental — an unnecessary
+pin hides real drift.
+
 ### Component tests
 
 The suite runs as two Vitest **projects**, because the two kinds of test need different

@@ -1,11 +1,28 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { computePersonalZScores } from "../personalZScores";
 import type { RunActivity } from "@/lib/strava/types";
 import type { RunWorkoutLabel, WorkoutType } from "../workoutType";
 
+const ANCHOR = "2026-07-20T09:00:00.000Z";
+
+/**
+ * Pinned to the same anchor the fixtures use (D-8 class, as in #117).
+ *
+ * The sessions below are dated relative to a fixed instant, but the standout window
+ * `computePersonalZScores` applies is relative to `Date.now()`. That was fine while
+ * the anchor was recent and becomes a failure once enough real time passes — a test
+ * with an expiry date rather than a bug. Found by running the suite with the clock
+ * moved forward; it was still green 18 days past the anchor and failed at four months.
+ */
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ["Date"], shouldAdvanceTime: true });
+  vi.setSystemTime(new Date(ANCHOR));
+});
+afterAll(() => vi.useRealTimers());
+
 /** Recent dates so sessions land inside the standout window. */
 function dateNDaysAgo(n: number): string {
-  const d = new Date("2026-07-20T09:00:00.000Z");
+  const d = new Date(ANCHOR);
   d.setUTCDate(d.getUTCDate() - n);
   return d.toISOString();
 }

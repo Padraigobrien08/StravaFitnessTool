@@ -32,3 +32,17 @@ jobs:
       - run: npm ci
       # Coverage summary for visibility (non-blocking — no enforced thresholds).
       - run: npm run test:coverage
+
+  # Runs the suite as if it were a year from now. Three suites have turned `main` red
+  # purely because time passed, each found only when it broke; this catches the next
+  # one at authoring time instead. Cheap: same suite, one env var.
+  time-travel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:time-travel

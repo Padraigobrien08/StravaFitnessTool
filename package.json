@@ -2,7 +2,7 @@
   "name": "strideiq",
   "version": "0.1.0",
   "private": true,
-  "description": "Private training intelligence for runners — import Strava data, get evidence-backed insights, and investigate your training with a tool-grounded Coach. Try it with zero setup via the built-in demo athlete.",
+  "description": "Private training intelligence for runners \u2014 import Strava data, get evidence-backed insights, and investigate your training with a tool-grounded Coach. Try it with zero setup via the built-in demo athlete.",
   "license": "MIT",
   "author": "Padraig O'Brien (https://github.com/Padraigobrien08)",
   "repository": {
@@ -36,6 +36,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:time-travel": "PROBE_NOW=\"$(node -e \"const d=new Date();d.setFullYear(d.getFullYear()+1);console.log(d.toISOString())\")\" vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",

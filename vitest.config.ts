@@ -8,6 +8,10 @@ const alias = { "@": path.resolve(__dirname, ".") };
 // reports doubled counts.
 const exclude = ["**/node_modules/**", "**/dist/**", "**/.next/**", "**/.claude/**"];
 
+// Clock displacement is opt-in via PROBE_NOW and costs nothing when unset — see
+// test/time-travel.ts. Listed first so it runs before any other setup.
+const timeTravel = "./test/time-travel.ts";
+
 /**
  * Two projects, because the two kinds of test have genuinely different needs.
  *
@@ -28,6 +32,7 @@ export default defineConfig({
         test: {
           name: "node",
           environment: "node",
+          setupFiles: [timeTravel],
           exclude: [...exclude, "components/**", "app/**/__tests__/**/*.ui.test.*"],
         },
       },
@@ -41,7 +46,7 @@ export default defineConfig({
         test: {
           name: "ui",
           environment: "jsdom",
-          setupFiles: ["./test/ui-setup.ts"],
+          setupFiles: [timeTravel, "./test/ui-setup.ts"],
           include: ["components/**/*.test.{ts,tsx}", "app/**/*.ui.test.{ts,tsx}"],
           exclude,
         },
