@@ -129,6 +129,62 @@ describe("clearing", () => {
   });
 });
 
+describe("when the browser refuses to store", () => {
+  /**
+   * This key holds the entire training archive for an export-only athlete, so it is
+   * the single most likely thing in the app to exhaust a storage quota — and Safari in
+   * private browsing throws from setItem regardless of size.
+   *
+   * `commitImport` in strava-context calls this with no guard, after it has already
+   * set the in-memory state, so an uncaught throw both crashes the import flow and
+   * leaves the context half-applied.
+   */
+  it("reports failure instead of throwing when the quota is exhausted", async () => {
+    vi.stubGlobal("localStorage", {
+      ...store,
+      setItem: () => {
+        throw new DOMException("QuotaExceededError");
+      },
+    });
+    const { saveImport } = await mod();
+    expect(() => saveImport(validImport() as never)).not.toThrow();
+    expect(saveImport(validImport() as never)).toBe(false);
+  });
+
+  it("reports success when the write lands", async () => {
+    const { saveImport } = await mod();
+    expect(saveImport(validImport() as never)).toBe(true);
+  });
+
+  it("still surfaces a malformed import, which is a caller bug not a browser one", async () => {
+    const { saveImport } = await mod();
+    expect(() => saveImport({ nonsense: true } as never)).toThrow();
+  });
+
+  it("does not throw when reading is blocked", async () => {
+    vi.stubGlobal("localStorage", {
+      ...store,
+      getItem: () => {
+        throw new DOMException("SecurityError");
+      },
+    });
+    const { loadImport, hasStoredImport } = await mod();
+    expect(loadImport()).toBeNull();
+    expect(hasStoredImport()).toBe(false);
+  });
+
+  it("does not throw when clearing is blocked", async () => {
+    vi.stubGlobal("localStorage", {
+      ...store,
+      removeItem: () => {
+        throw new DOMException("SecurityError");
+      },
+    });
+    const { clearImport } = await mod();
+    expect(() => clearImport()).not.toThrow();
+  });
+});
+
 describe("server-side rendering", () => {
   // Every function is reachable during SSR, where neither global exists. They must
   // no-op rather than throw, or the page fails to render at all.
