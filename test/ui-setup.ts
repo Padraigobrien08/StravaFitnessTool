@@ -55,6 +55,11 @@ if (!window.matchMedia) {
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {};
 }
+// jsdom implements no scrolling, so anything that programmatically scrolls a
+// container (carousels, week boards keeping "today" in view) throws on mount.
+if (!Element.prototype.scrollTo) {
+  Element.prototype.scrollTo = () => {};
+}
 if (!Element.prototype.hasPointerCapture) {
   Element.prototype.hasPointerCapture = () => false;
   Element.prototype.setPointerCapture = () => {};
