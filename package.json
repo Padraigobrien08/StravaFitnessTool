@@ -101,7 +101,7 @@
     "prettier": "^3.9.6",
     "shadcn": "^4.16.2",
     "tailwindcss": "^4",
-    "typescript": "^5",
+    "typescript": "^7",
     "vitest": "^4.1.7"
   }
 }
