@@ -1,4 +1,5 @@
 import { getSql } from "./client";
+import { logger } from "@/lib/observability/logger";
 import type { StravaImport } from "@/lib/strava/types";
 import type { RunActivity } from "@/lib/strava/types";
 import {
@@ -18,7 +19,23 @@ export async function upsertActivities(
   if (activities.length === 0) return 0;
   const sql = getSql();
   let count = 0;
+  let skipped = 0;
   for (const a of activities) {
+    // `new Date(bad).toISOString()` throws, and this loop is not in a transaction, so
+    // one unusable record used to abort the batch mid-write. Worse than the partial
+    // write: the sync run is marked failed, the cursor never advances, and every later
+    // sync re-fetches the same record and dies in the same place — the athlete's sync
+    // is stuck permanently on one bad row. Skipping it lets the rest through.
+    const startDate = new Date(a.start_date);
+    if (Number.isNaN(startDate.getTime())) {
+      skipped++;
+      logger.warn({
+        event: "activity.unparseable_start_date",
+        stravaActivityId: a.id,
+        startDate: String(a.start_date),
+      });
+      continue;
+    }
     const run = mapStravaActivityToRun(a);
     const payload = run ?? mapStravaActivityToSummary(a);
     const sport = a.sport_type || a.type;
@@ -29,7 +46,7 @@ export async function upsertActivities(
         ${a.id},
         ${sport},
         ${JSON.stringify(payload)}::jsonb,
-        ${new Date(a.start_date).toISOString()}::timestamptz
+        ${startDate.toISOString()}::timestamptz
       )
       ON CONFLICT (user_id, strava_activity_id) DO UPDATE SET
         sport_type = EXCLUDED.sport_type,
@@ -38,6 +55,9 @@ export async function upsertActivities(
         synced_at = NOW()
     `;
     count++;
+  }
+  if (skipped > 0) {
+    logger.warn({ event: "activity.batch_partially_skipped", skipped, written: count });
   }
   return count;
 }

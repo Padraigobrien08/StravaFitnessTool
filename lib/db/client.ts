@@ -30,19 +30,43 @@ function isNeonUrl(url: string): boolean {
   if (override === "neon") return true;
   if (override === "postgres") return false;
   try {
-    return new URL(url).hostname.includes("neon.tech");
+    // Suffix match, not `includes`: a self-hosted server named
+    // `neon.tech.db.internal` is not Neon, and handing it the HTTP-only driver
+    // fails to connect rather than degrading.
+    const host = new URL(url).hostname.toLowerCase();
+    return host === "neon.tech" || host.endsWith(".neon.tech");
   } catch {
     return false;
   }
+}
+
+/**
+ * Translate the URL's SSL intent into what the postgres driver expects.
+ *
+ * This used to be `/sslmode=require|ssl=true/.test(url)`, which only recognised the
+ * literal `require`. `verify-ca` and `verify-full` are *stronger* requests, so an
+ * operator asking for a verified TLS connection silently got `ssl: false` — either a
+ * failed connection or, against a permissive server, an unencrypted one. The verify
+ * modes are passed through rather than flattened to `require`, since the difference
+ * between them is certificate validation and that is the whole point of asking.
+ *
+ * Absent or weaker modes (`prefer`, `allow`, `disable`) keep the previous behaviour of
+ * no SSL, which is what local Docker needs.
+ */
+function sslSetting(url: string): "require" | "verify-full" | false {
+  const mode = /[?&]sslmode=([a-z-]+)/i.exec(url)?.[1]?.toLowerCase();
+  if (mode === "verify-full" || mode === "verify-ca") return "verify-full";
+  if (mode === "require") return "require";
+  if (/[?&]ssl=true/i.test(url)) return "require";
+  return false;
 }
 
 function createClient(url: string): SqlClient {
   if (isNeonUrl(url)) {
     return neon(url) as unknown as SqlClient;
   }
-  const requireSsl = /sslmode=require|ssl=true/.test(url);
   return postgres(url, {
-    ssl: requireSsl ? "require" : false,
+    ssl: sslSetting(url),
     max: 10,
     // Neon's driver returns json/jsonb columns already parsed into objects;
     // the postgres driver hands them back as strings. Parse them here (by
