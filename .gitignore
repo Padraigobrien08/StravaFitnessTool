@@ -52,3 +52,6 @@ FUTURE_IDEAS.md
 
 # Impeccable design-tool artifacts
 .impeccable/
+
+# Audit workspace — assessment artifacts, deliberately not part of the repo
+.eval/
