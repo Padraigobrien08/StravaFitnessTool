@@ -37,9 +37,10 @@ export async function POST(request: Request) {
 
   try {
     const before = await countRunsMissingStreams(userId);
-    const { streamsSynced, skipped } = await syncStravaStreamsForUser(userId, {
-      maxRuns,
-    });
+    const { streamsSynced, skipped, rateLimited, notAttempted } = await syncStravaStreamsForUser(
+      userId,
+      { maxRuns },
+    );
     const remaining = await countRunsMissingStreams(userId);
     return NextResponse.json({
       ok: true,
@@ -47,6 +48,11 @@ export async function POST(request: Request) {
       skipped,
       remaining,
       requested: Math.min(maxRuns, before),
+      // Without this, a rate-limited run is indistinguishable from a finished one:
+      // both return ok:true with a low count. The client can now say "try later"
+      // instead of implying there was nothing left to fetch.
+      rateLimited,
+      notAttempted,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Stream sync failed";
