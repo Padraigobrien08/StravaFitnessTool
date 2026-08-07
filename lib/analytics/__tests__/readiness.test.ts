@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   raceReadiness,
   halfMarathonReadiness,
@@ -8,6 +8,24 @@ import {
 } from "../readiness";
 import { buildRacePredictionAnalysis } from "../predictions";
 import type { RunActivity } from "@/lib/strava/types";
+
+/**
+ * Pinned for the same reason as `readinessCurrency.test.ts` and
+ * `generateDemoData.test.ts` (D-8, fixed in #117): this suite builds a race date with
+ * `setDate(+21)` and then asserts on `daysUntilRace`, which floors a duration. Whether
+ * that lands on 21 or 20 or 19 depends on the time of day the suite happens to run, so
+ * on real timers it passes all morning and fails in the afternoon.
+ *
+ * This is the third file in that class. The first two were found when `main` went red
+ * overnight; this one when it went red mid-afternoon.
+ */
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-08-05T09:00:00.000Z"));
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 function mockRun(id: string, date: string, km: number): RunActivity {
   const movingSec = Math.round(km * 1000 * 5);
