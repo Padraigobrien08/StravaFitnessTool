@@ -2,7 +2,7 @@
   "name": "strideiq",
   "version": "0.1.0",
   "private": true,
-  "description": "Private training intelligence for runners — import Strava data, get evidence-backed insights, and investigate your training with a tool-grounded Coach. Try it with zero setup via the built-in demo athlete.",
+  "description": "Private training intelligence for runners \u2014 import Strava data, get evidence-backed insights, and investigate your training with a tool-grounded Coach. Try it with zero setup via the built-in demo athlete.",
   "license": "MIT",
   "author": "Padraig O'Brien (https://github.com/Padraigobrien08)",
   "repository": {
@@ -14,7 +14,7 @@
     "url": "https://github.com/Padraigobrien08/StravaFitnessTool/issues"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "keywords": [
     "running",
@@ -87,7 +87,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22.20.1",
     "@types/pako": "^2.0.4",
     "@types/papaparse": "^5.5.2",
     "@types/react": "^19",
