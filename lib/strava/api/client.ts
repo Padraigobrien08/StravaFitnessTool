@@ -52,6 +52,45 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+/** Bounds on how long a `Retry-After` may hold a request, in seconds. */
+const MIN_RETRY_SECONDS = 1;
+const MAX_RETRY_SECONDS = 60;
+const DEFAULT_RETRY_SECONDS = 2;
+
+/**
+ * Seconds to wait before retrying, from a `Retry-After` header.
+ *
+ * The header may be a number of seconds *or* an HTTP-date (RFC 9110 §10.2.3). This
+ * used to be `parseInt(header ?? "2")`, which yields NaN for the date form; `NaN` then
+ * survived the min/max clamp and `setTimeout(fn, NaN)` fires immediately. The result
+ * was a rate-limited request being retried with no delay at all — the behaviour most
+ * likely to turn a short throttle into a longer one.
+ */
+export function retryAfterSeconds(header: string | null): number {
+  // Trim first: `Number("   ")` is 0, not NaN, so an all-whitespace header would
+  // otherwise be read as "zero seconds" while an empty one fell through to the
+  // default. Both mean the same thing — the server said nothing usable.
+  const raw = header?.trim();
+  if (!raw) return DEFAULT_RETRY_SECONDS;
+
+  const asSeconds = Number(raw);
+  if (Number.isFinite(asSeconds)) {
+    return clampRetry(asSeconds);
+  }
+
+  const asDate = Date.parse(raw);
+  if (!Number.isNaN(asDate)) {
+    return clampRetry(Math.ceil((asDate - Date.now()) / 1000));
+  }
+
+  return DEFAULT_RETRY_SECONDS;
+}
+
+function clampRetry(seconds: number): number {
+  if (!Number.isFinite(seconds)) return DEFAULT_RETRY_SECONDS;
+  return Math.min(Math.max(seconds, MIN_RETRY_SECONDS), MAX_RETRY_SECONDS);
+}
+
 export async function stravaGet<T>(
   accessToken: string,
   path: string,
@@ -81,8 +120,7 @@ export async function stravaGet<T>(
     if (res.status === 404 && options?.allow404) return null;
 
     if (res.status === 429 && attempt === 0) {
-      const retryAfter = parseInt(res.headers.get("Retry-After") ?? "2", 10);
-      await sleep(Math.min(Math.max(retryAfter, 1), 60) * 1000);
+      await sleep(retryAfterSeconds(res.headers.get("Retry-After")) * 1000);
       attempt++;
       continue;
     }
