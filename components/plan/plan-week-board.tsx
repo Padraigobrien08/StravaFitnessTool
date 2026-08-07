@@ -534,9 +534,14 @@ function EditPanel({
           size="sm"
           className="h-auto p-0 text-[10px] text-accent hover:text-accent/80"
           onClick={() => {
+            // `Number("abc")` is NaN, and `distanceKm ? Number(...)` let it straight
+            // through: the patch reached the saved week as NaN, serialised to null,
+            // and the session then counted as zero in every volume total after it.
+            // Anything unparseable clears the distance instead, same as an empty box.
+            const parsed = Number(distanceKm);
             onPatch?.(w.id, {
               title,
-              distanceKm: distanceKm ? Number(distanceKm) : undefined,
+              distanceKm: Number.isFinite(parsed) && parsed > 0 ? parsed : undefined,
               status: "modified",
             });
             onClose();
