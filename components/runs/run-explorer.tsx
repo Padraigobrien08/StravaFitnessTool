@@ -193,7 +193,11 @@ export function RunExplorer({
             Activity explorer
           </h2>
           <span className="font-mono text-[10px] tabular-nums text-zinc-600">
-            {total} sessions · page {page + 1}/{totalPages}
+            {/* Clamped, because `paginateRows` clamps the rows it returns. Every
+                filter control resets `page`, so the two only diverge when `rows`
+                shrinks from outside — a sync returning fewer sessions — and the
+                indicator would then read "page 8/3" beside page 3's contents. */}
+            {total} sessions · page {Math.min(page + 1, totalPages)}/{totalPages}
           </span>
         </div>
 
