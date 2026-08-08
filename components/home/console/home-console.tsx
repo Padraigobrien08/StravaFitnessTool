@@ -101,20 +101,28 @@ export function HomeConsole({
       />
 
       {/* items-start: grid rows stretch by default, so the verdict panel grew to
-          match the taller Readiness + leg-feel column and left a large empty
-          block under its actions. */}
+          match the taller right column and left a large empty block under its
+          actions.
+
+          Leg-feel sits with the verdict, not with Readiness. Measured at 1440px the
+          three cards are 237 / 306 / 178, so stacking the two tallest on the right
+          left a 259px void beside a 237px verdict card — the single worst piece of
+          dead space on the page. Pairing the shortest with the shortest balances the
+          columns at 427 vs 306 and more than halves the gap. It also reads better:
+          the verdict and "how do the legs feel?" are both things you act on, while
+          Readiness is the number they are derived from. */}
       <div className="grid items-start gap-3 lg:grid-cols-[1.65fr_1fr]">
-        <TheCall
-          vm={vm}
-          today={today}
-          onGeneratePlan={onGeneratePlan}
-          planLoading={planLoading}
-          hasSavedPlan={vm.hero.hasSavedPlan}
-        />
         <div className="flex flex-col gap-3">
-          <Readiness analytics={analytics} hero={vm.hero} />
+          <TheCall
+            vm={vm}
+            today={today}
+            onGeneratePlan={onGeneratePlan}
+            planLoading={planLoading}
+            hasSavedPlan={vm.hero.hasSavedPlan}
+          />
           <LegFeelCard />
         </div>
+        <Readiness analytics={analytics} hero={vm.hero} />
       </div>
 
       {/* After a gap, load-based advice has nothing recent to reason about, so the
