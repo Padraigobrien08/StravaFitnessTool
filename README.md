@@ -440,6 +440,7 @@ Enable from **Settings** after OAuth is connected. Refresh the app after webhook
 | [docs/README.md](docs/README.md)                                                           | Documentation index                     |
 | [PRODUCT.md](PRODUCT.md)                                                                   | Product contract and IA rules           |
 | [docs/FEATURES.md](docs/FEATURES.md)                                                       | Complete feature catalog                |
+| [docs/LIMITATIONS.md](docs/LIMITATIONS.md)                                                 | What is validated, and what is not      |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                               | Layers, data flow, API                  |
 | [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md)                           | Intelligence vs Coach                   |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)                                                   | Vercel + Neon + Strava production setup |
@@ -469,6 +470,21 @@ Enable from **Settings** after OAuth is connected. Refresh the app after webhook
 - Saved training weeks live in browser `localStorage` (not synced per user to Neon).
 - Coach and full intelligence bundle require server env and LLM keys.
 - See [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md) for the full list.
+
+### What is validated, and what is not
+
+Those are scope gaps. The more important question for a tool that predicts race times is which
+of its numbers have been **checked against reality** — and the honest answer is: one race, and
+the model was 7.5% out.
+
+**[docs/LIMITATIONS.md](docs/LIMITATIONS.md)** sets that out in full: what has been backtested
+and what hasn't, why the forecast intervals are honesty floors rather than calibrated bands,
+the known result-matching defect in accuracy scoring, why marathon predictions are
+extrapolation, and which integrations have never run against the live system they talk to.
+
+Read it before trusting a number here. The distinction it keeps is between _implemented_,
+_unit-tested_, _integration-tested_, _exercised against the real external system_, and _proven
+in sustained use_ — 1,822 passing tests establish the second of those five, and nothing more.
 
 ---
 
