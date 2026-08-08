@@ -80,15 +80,22 @@ export async function importFromFiles(
   let fitRunIds: string[] = [];
 
   if (fitAvailable > 0 && fitFilenameById.size > 0) {
-    await clearFitDetails();
+    // Parse before clearing. The old streams used to be wiped first, so a parse
+    // failure left the athlete with neither the previous streams nor new ones.
     const { details: fitDetails } = await parseFitFilesFromUpload(
       files,
       fitFilenameById,
       onFitProgress,
     );
     if (fitDetails.length > 0) {
-      await saveFitDetails(fitDetails);
-      fitRunIds = fitDetails.map((d) => d.activityId);
+      await clearFitDetails();
+      // Streams are an enhancement over the activities already parsed above. A
+      // storage failure here used to throw and abort the whole import, losing run
+      // data that had nothing to do with IndexedDB; now the import completes without
+      // them and `fitRunIds` stays empty, which is what marks a run as stream-less.
+      if (await saveFitDetails(fitDetails)) {
+        fitRunIds = fitDetails.map((d) => d.activityId);
+      }
     }
   }
 

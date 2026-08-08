@@ -19,22 +19,38 @@ function openDb(): Promise<IDBDatabase> {
   });
 }
 
-export async function saveFitDetails(details: FitRunDetail[]): Promise<void> {
+export async function saveFitDetails(details: FitRunDetail[]): Promise<boolean> {
   return mergeFitDetails(details);
 }
 
-export async function mergeFitDetails(details: FitRunDetail[]): Promise<void> {
-  if (typeof indexedDB === "undefined") return;
-  const db = await openDb();
-  const tx = db.transaction(STORE, "readwrite");
-  const store = tx.objectStore(STORE);
-  for (const d of details) {
-    store.put(FitRunDetailSchema.parse(d));
+/**
+ * Write stream details, reporting whether they landed.
+ *
+ * Returns `false` rather than throwing when the browser refuses the write —
+ * `QuotaExceededError` above all, and a measured decade of running is ~110 MB, so
+ * this is reachable on a device that is already full.
+ *
+ * Every caller treats streams as an enhancement over the run data: the import flows
+ * have already parsed the athlete's activities by the time they get here. Throwing
+ * meant a storage failure aborted the entire import and lost work that had nothing to
+ * do with streams. A schema violation still throws, because that is a caller bug.
+ */
+export async function mergeFitDetails(details: FitRunDetail[]): Promise<boolean> {
+  if (typeof indexedDB === "undefined") return false;
+  const parsed = details.map((d) => FitRunDetailSchema.parse(d));
+  try {
+    const db = await openDb();
+    const tx = db.transaction(STORE, "readwrite");
+    const store = tx.objectStore(STORE);
+    for (const d of parsed) store.put(d);
+    return await new Promise<boolean>((resolve) => {
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+      tx.onabort = () => resolve(false);
+    });
+  } catch {
+    return false;
   }
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
 }
 
 export async function getFitDetail(activityId: string): Promise<FitRunDetail | null> {
