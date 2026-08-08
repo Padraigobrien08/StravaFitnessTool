@@ -430,12 +430,23 @@ function Readiness({
 
   return (
     <Panel>
-      <div className="mb-3 flex items-center justify-between">
+      {/* The TSB readout keeps its place; the link is the drill-in to the load detail
+          behind these numbers. Without it /training had no inbound link anywhere in the
+          app, which made the command palette its only route in. */}
+      <div className="mb-3 flex items-center justify-between gap-2">
         <Eyebrow>Readiness</Eyebrow>
-        <span className="font-mono text-[11px] text-zinc-500">
-          <JargonTerm term="tsb">TSB</JargonTerm> {fatigue.tsb > 0 ? "+" : ""}
-          {fatigue.tsb}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[11px] text-zinc-500">
+            <JargonTerm term="tsb">TSB</JargonTerm> {fatigue.tsb > 0 ? "+" : ""}
+            {fatigue.tsb}
+          </span>
+          <Link
+            href="/training"
+            className="text-[11px] text-zinc-500 transition-colors hover:text-zinc-300"
+          >
+            Load detail →
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4">
@@ -690,7 +701,9 @@ function ChangeFeed({ items }: { items: HomeOperatingSystemView["changeFeed"] })
         : "var(--hz-easy)";
   return (
     <Panel>
-      <Eyebrow className="mb-3">What changed recently</Eyebrow>
+      {/* The printable change summary is the long form of this list, and had no inbound
+          link either. Pairing them puts /report where a reader already is. */}
+      <PanelHeader title="What changed recently" href="/report" action="Full report" />
       {items.length === 0 ? (
         <p className="text-[13px] text-zinc-500">No notable changes this block.</p>
       ) : (

@@ -5,9 +5,19 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, CalendarRange, Footprints, MessageCircle, Brain } from "lucide-react";
 
-// Five destinations, one job each. Depth (Performance, Training, Reports,
-// Activity context) is reached by drilling into Home tiles or via ⌘K — it is
-// deliberately not top-level chrome. See docs/COACH_AND_INTELLIGENCE.md.
+// Five destinations, one job each. Depth is deliberately not top-level chrome, but it
+// does have to be reachable, and for a while this comment claimed a drill-in path that
+// did not exist: /training, /report and /context had no inbound link anywhere in the
+// app, and /performance was linked only from /training, which was itself unreachable.
+// The command palette was the sole route to all four.
+//
+//   /training     ← Readiness panel on Home ("Load detail")
+//   /report       ← change feed on Home ("Full report")
+//   /performance  ← load and adaptation panels on /training
+//   /context      ← ⌘K only, and that is the honest description of it
+//
+// The palette is not a hidden shortcut: the header carries a visible ⌘K button
+// (components/workspace/shell.tsx) that opens it by click.
 const primaryLinks = [
   { href: "/home", label: "Home", icon: LayoutDashboard },
   { href: "/plan", label: "Plan", icon: CalendarRange },
