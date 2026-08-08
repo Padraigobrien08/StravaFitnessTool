@@ -22,9 +22,25 @@ function readHistory(): HistoryIndex {
   }
 }
 
+/**
+ * Persist the history index, or give up quietly.
+ *
+ * `readHistory` above is wrapped and this was not, which made the asymmetry look
+ * deliberate rather than overlooked. It is not survivable: `pushWeekSnapshot` runs
+ * immediately before `clearWeek()` in the plan workspace, so a quota error threw out
+ * of the click handler — the athlete pressed "Clear", got an exception instead of a
+ * cleared week, and took the page down with it.
+ *
+ * Losing the ability to undo is worth a great deal less than losing the action itself,
+ * so a failed write degrades to "no history" and the clear proceeds.
+ */
 function writeHistory(index: HistoryIndex): void {
-  if (typeof globalThis.localStorage === "undefined") return;
-  globalThis.localStorage.setItem(HISTORY_KEY, JSON.stringify(index));
+  try {
+    if (typeof globalThis.localStorage === "undefined") return;
+    globalThis.localStorage.setItem(HISTORY_KEY, JSON.stringify(index));
+  } catch {
+    /* quota exhausted or storage blocked — undo is unavailable, the action is not */
+  }
 }
 
 export function pushWeekSnapshot(week: TrainingCalendarWeek): void {
