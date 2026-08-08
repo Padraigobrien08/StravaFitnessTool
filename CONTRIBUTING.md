@@ -45,6 +45,10 @@ TEST_DATABASE_URL=postgresql://strideiq:strideiq@localhost:5432/strideiq npx vit
 
 Never point `TEST_DATABASE_URL` at a database whose data you care about.
 
+CI runs them on every PR against a throwaway `postgres:17` service, so a change that
+breaks the persistence layer fails the build rather than passing quietly. Skipping is
+now the local default, not the CI default — if you change SQL, expect CI to check it.
+
 ### Tests that expire
 
 Three suites have turned `main` red for no reason but the passage of time — a fixture
