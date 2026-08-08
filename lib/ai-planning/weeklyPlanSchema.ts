@@ -1,5 +1,22 @@
 import { z } from "zod";
 
+/**
+ * A field the model may legitimately omit.
+ *
+ * OpenAI strict structured outputs has no notion of an optional property: every key
+ * must appear in `required`, and "absent" is expressed by allowing null. So the model
+ * sends `null`, which plain `.optional()` rejects — the plan would parse-fail and fall
+ * back for the sake of a missing distance. Accept null and erase it, keeping the
+ * downstream type `T | undefined` exactly as before.
+ */
+const optionalNumber = (min: number, max: number) =>
+  z
+    .number()
+    .min(min)
+    .max(max)
+    .nullish()
+    .transform((v) => v ?? undefined);
+
 const plannedWorkoutSchema = z.object({
   day: z.string().min(2).max(12),
   modality: z.enum([
@@ -14,8 +31,8 @@ const plannedWorkoutSchema = z.object({
   ]),
   type: z.string().min(1).max(80),
   title: z.string().min(1).max(120),
-  durationMin: z.number().min(0).max(600).optional(),
-  distanceKm: z.number().min(0).max(80).optional(),
+  durationMin: optionalNumber(0, 600),
+  distanceKm: optionalNumber(0, 80),
   intensity: z.enum(["easy", "moderate", "hard", "recovery", "rest"]),
   purpose: z.string().min(1).max(300),
   constraintsApplied: z.array(z.string().max(200)).max(8),
@@ -26,8 +43,8 @@ export const weeklyTrainingPlanSchema = z.object({
   weekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   planType: z.enum(["build", "maintain", "taper", "recovery", "race_week"]),
   summary: z.string().min(10).max(600),
-  totalRunDistanceKm: z.number().min(0).max(250).optional(),
-  totalTrainingMinutes: z.number().min(0).max(2000).optional(),
+  totalRunDistanceKm: optionalNumber(0, 250),
+  totalTrainingMinutes: optionalNumber(0, 2000),
   hardSessionCount: z.number().int().min(0).max(7),
   workouts: z.array(plannedWorkoutSchema).min(3).max(14),
   rationale: z.object({
@@ -47,7 +64,8 @@ export const weeklyTrainingPlanSchema = z.object({
       }),
     )
     .max(2)
-    .optional(),
+    .nullish()
+    .transform((v) => v ?? undefined),
 });
 
 export type WeeklyTrainingPlanParsed = z.infer<typeof weeklyTrainingPlanSchema>;
@@ -60,7 +78,26 @@ export function parseWeeklyTrainingPlan(
   return { success: false, error: result.error };
 }
 
-/** OpenAI structured output JSON schema (strict). */
+/**
+ * OpenAI structured output JSON schema (strict).
+ *
+ * In strict mode `required` must list **every** key in `properties`, at every level.
+ * A property that is genuinely optional is expressed by allowing null, not by being
+ * left out. Omitting three top-level keys and two inside `workouts.items` made the API
+ * reject this schema outright:
+ *
+ *   400 Invalid schema for response_format 'weekly_training_plan': in
+ *   context=('properties','workouts','items'), 'required' is required to be supplied
+ *   and to be an array including every key in properties. Missing 'durationMin'.
+ *
+ * `generateWeeklyPlanFromContext` caught that in a bare `catch` and returned the
+ * deterministic fallback, so every AI plan request since this schema was written
+ * produced a rule-based plan while reporting only "This is a fallback plan". The
+ * ladder was not protecting anyone from a bad model — the model was never reached.
+ *
+ * `__tests__/weeklyPlanSchema.test.ts` asserts the required/properties invariant
+ * recursively, which catches a repeat without spending an API call in CI.
+ */
 export const WEEKLY_TRAINING_PLAN_JSON_SCHEMA = {
   name: "weekly_training_plan",
   strict: true,
@@ -71,11 +108,14 @@ export const WEEKLY_TRAINING_PLAN_JSON_SCHEMA = {
       "weekStart",
       "planType",
       "summary",
+      "totalRunDistanceKm",
+      "totalTrainingMinutes",
       "hardSessionCount",
       "workouts",
       "rationale",
       "confidence",
       "limitations",
+      "alternatives",
     ],
     properties: {
       weekStart: { type: "string", description: "ISO date Monday yyyy-mm-dd" },
@@ -84,8 +124,8 @@ export const WEEKLY_TRAINING_PLAN_JSON_SCHEMA = {
         enum: ["build", "maintain", "taper", "recovery", "race_week"],
       },
       summary: { type: "string" },
-      totalRunDistanceKm: { type: "number" },
-      totalTrainingMinutes: { type: "number" },
+      totalRunDistanceKm: { type: ["number", "null"] },
+      totalTrainingMinutes: { type: ["number", "null"] },
       hardSessionCount: { type: "integer", minimum: 0, maximum: 7 },
       workouts: {
         type: "array",
@@ -99,6 +139,8 @@ export const WEEKLY_TRAINING_PLAN_JSON_SCHEMA = {
             "modality",
             "type",
             "title",
+            "durationMin",
+            "distanceKm",
             "intensity",
             "purpose",
             "constraintsApplied",
@@ -121,8 +163,8 @@ export const WEEKLY_TRAINING_PLAN_JSON_SCHEMA = {
             },
             type: { type: "string" },
             title: { type: "string" },
-            durationMin: { type: "number" },
-            distanceKm: { type: "number" },
+            durationMin: { type: ["number", "null"] },
+            distanceKm: { type: ["number", "null"] },
             intensity: {
               type: "string",
               enum: ["easy", "moderate", "hard", "recovery", "rest"],
@@ -153,7 +195,7 @@ export const WEEKLY_TRAINING_PLAN_JSON_SCHEMA = {
       },
       limitations: { type: "array", items: { type: "string" } },
       alternatives: {
-        type: "array",
+        type: ["array", "null"],
         items: {
           type: "object",
           additionalProperties: false,

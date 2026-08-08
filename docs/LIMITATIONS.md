@@ -132,6 +132,19 @@ subscription has been registered and no real webhook delivery has been received.
 every generated plan silently becomes the deterministic fallback. `lib/env.ts` warns about
 this at startup. Coach chat itself supports both providers.
 
+**AI weekly planning reached the model for the first time recently, and has one verified
+run.** The strict JSON schema sent to OpenAI omitted five properties from its `required`
+lists, which strict structured outputs rejects outright. Every request returned 400, the error
+was discarded by a bare `catch`, and the deterministic fallback was served in its place — so
+every AI plan ever generated was rule-based, while the only symptom was a plan describing
+itself as a fallback. Fixed, and confirmed by a live call returning a real plan.
+
+What that establishes is narrow: one successful generation against the demo athlete. The
+schema contract is now unit-tested in both directions, but a test cannot prove the API
+_accepts_ the schema — only a live request does, and CI makes none. If the structured-output
+rules change, CI stays green and planning silently reverts to fallback. The failure is now at
+least logged (`plan.llm_call_failed`) rather than swallowed.
+
 **`STRIDEIQ_API_KEY_USER_ID` is set by hand and can go stale.** A fresh Strava OAuth creates a
 new user row, leaving the variable pointing at a user with no data. The web UI is unaffected,
 so nothing looks wrong, while the API-key path and the MCP package authenticate to an empty
