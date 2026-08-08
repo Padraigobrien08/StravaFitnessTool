@@ -37,12 +37,9 @@ Open **[http://localhost:3000](http://localhost:3000)** and click **“Try the d
 
 That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half marathon) so you can explore _every_ client-side surface instantly — **no Strava account, no database, no API key**. Hit **Exit demo** in the header to clear it. Prefer your own data? Use **Import** (100% in-browser) — see [Quick start](#quick-start).
 
-<!--
-  📸 Screenshots: run the demo, then capture Home / Intelligence / Goals into
-  docs/screenshots/{home,intelligence,goals}.png — see docs/screenshots/README.md.
--->
+![StrideIQ Home — console briefing with today's focus, readiness and TSB, projected half-marathon finish, and the recent-change feed](docs/screenshots/home.png)
 
-![StrideIQ Home — command briefing, readiness ring, intelligence feed](docs/screenshots/home.png)
+<sub>All screenshots are the built-in demo athlete — every number shown is computed from the sample data by the same deterministic engines that run on your own.</sub>
 
 ---
 
@@ -99,6 +96,30 @@ That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half mar
 | **Intelligence**           | Persistent athlete belief model — signals, memory, ecosystem (not a chat UI)            |
 | **Coach**                  | Investigation workspace — threaded reasoning with server-backed tools                   |
 | **Report**                 | Printable training change summary                                                       |
+
+#### Intelligence — the curated belief model
+
+A read-first surface, not a chat window: what the system currently believes, how each signal is
+moving, and what to do about it. Every claim carries its evidence and confidence.
+
+![StrideIQ Intelligence — current focus and belief, how each signal is moving, and decision support split into risks, opportunities, and a primary action](docs/screenshots/intelligence.png)
+
+#### Goals — forecasts that admit what they don't know
+
+The forecast reports a range and a confidence, then names its own weakest assumption. Here the
+engine holds the band open because its models have never been scored against a race this athlete
+actually ran: _"The models agree with each other, which is not the same as being right."_
+
+![StrideIQ Goals — half-marathon forecast of 1h 37m with a p25–p75 range, evidence list, explicit confidence reasoning, and a limitations panel](docs/screenshots/goals.png)
+
+#### Coach — threaded investigation over deterministic tools
+
+The Coach orchestrates; it does not compute. Numbers come from the same
+[44 deterministic tools](#reasoning-tools-deterministic) the HTTP API exposes. Chat needs an LLM
+key, so the demo shows the reasoning workspace with the chat path disabled — the banner is the
+app telling you exactly what is and isn't live.
+
+![StrideIQ Coach — three-pane investigation workspace with domain navigation, suggested investigations, and an answer-context rail showing readiness, race, risk and opportunity](docs/screenshots/coach.png)
 
 ### Engineering
 
