@@ -124,6 +124,23 @@ export function checkEnvCoherence(env: Env = process.env): EnvIssue[] {
     });
   }
 
+  /**
+   * Coach accepts either provider; the weekly planner does not.
+   * `lib/ai-planning/generateWeeklyPlan.ts` reads `OPENAI_API_KEY` and `OPENAI_MODEL`
+   * and has no Anthropic path, and `/api/me/weekly-plan` quietly forces the
+   * deterministic template when that key is missing. So an Anthropic-only deployment
+   * looks entirely healthy — Coach answers, plans generate — while every plan is the
+   * rule-based fallback and nothing on screen says so.
+   */
+  if (set("ANTHROPIC_API_KEY") && !set("OPENAI_API_KEY")) {
+    issues.push({
+      level: "warn",
+      key: "OPENAI_API_KEY",
+      message:
+        "Only ANTHROPIC_API_KEY is set. Coach chat works, but AI weekly plans are OpenAI-only, so every plan will silently be the deterministic fallback.",
+    });
+  }
+
   return issues;
 }
 

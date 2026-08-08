@@ -36,10 +36,16 @@ export function useWeeklyPlan() {
           planningContext: planningContext || undefined,
         }),
       });
-      const data = await res.json();
+      // Record the status before touching the body. A gateway timeout or proxy error
+      // returns a status with an HTML body, and `res.json()` throws on it — so
+      // parsing first meant the status was lost in exactly the case the UI most needs
+      // it, leaving `planErrorPresentation` to render a JSON parse error instead of
+      // "the planner is unavailable".
+      if (!res.ok) setErrorStatus(res.status);
+
+      const data = await res.json().catch(() => ({}) as { error?: string });
       if (!res.ok) {
-        setErrorStatus(res.status);
-        throw new Error(data.error ?? "Failed to generate plan");
+        throw new Error(data.error ?? `Failed to generate plan (${res.status})`);
       }
       const payload: GenerateWeeklyPlanResult = {
         plan: data.plan,

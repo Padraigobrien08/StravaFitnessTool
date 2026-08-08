@@ -33,7 +33,7 @@ export default defineConfig({
           name: "node",
           environment: "node",
           setupFiles: [timeTravel],
-          exclude: [...exclude, "components/**", "app/**/__tests__/**/*.ui.test.*"],
+          exclude: [...exclude, "components/**", "hooks/**", "app/**/__tests__/**/*.ui.test.*"],
         },
       },
       {
@@ -47,7 +47,11 @@ export default defineConfig({
           name: "ui",
           environment: "jsdom",
           setupFiles: [timeTravel, "./test/ui-setup.ts"],
-          include: ["components/**/*.test.{ts,tsx}", "app/**/*.ui.test.{ts,tsx}"],
+          include: [
+            "components/**/*.test.{ts,tsx}",
+            "hooks/**/*.test.{ts,tsx}",
+            "app/**/*.ui.test.{ts,tsx}",
+          ],
           exclude,
         },
       },
