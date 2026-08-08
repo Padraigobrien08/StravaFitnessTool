@@ -2,6 +2,7 @@ import type { DashboardInsights } from "@/lib/analytics";
 import type { RaceGoal } from "@/lib/analytics/readiness";
 import { RACE_DISTANCE_LABELS } from "@/lib/analytics/readiness";
 import { formatDuration } from "@/lib/utils";
+import { isTrainingCurrent, stalenessClause } from "@/lib/insights/consistency";
 import type { CoachContextSnapshot } from "./types";
 
 export function buildCoachContextSnapshot(
@@ -12,6 +13,7 @@ export function buildCoachContextSnapshot(
     return {
       readinessScore: null,
       readinessLabel: null,
+      currencyNote: null,
       freshness: null,
       fatigueLabel: null,
       tsb: null,
@@ -40,6 +42,9 @@ export function buildCoachContextSnapshot(
   return {
     readinessScore: r.score,
     readinessLabel: r.label,
+    currencyNote: isTrainingCurrent(analytics.fatigue)
+      ? null
+      : `Measured before ${stalenessClause(analytics.fatigue)}`,
     freshness: analytics.fatigue.freshness,
     fatigueLabel: analytics.fatigue.label,
     tsb: analytics.fatigue.tsb,

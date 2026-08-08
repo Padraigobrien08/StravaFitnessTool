@@ -66,6 +66,20 @@ export function CoachMiniContext({
       <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
         <p className="mb-3 text-[13px] leading-snug text-zinc-400">{snapshot.currentFocus}</p>
 
+        {/* Above the numbers, not beside them: a caveat under a score is read after
+            the score has already been believed. */}
+        {snapshot.currencyNote ? (
+          <p
+            className="mb-2 rounded-md px-2.5 py-1.5 text-[11px] leading-snug"
+            style={{
+              background: "color-mix(in oklab, var(--hz-moderate) 12%, transparent)",
+              color: "var(--hz-moderate)",
+            }}
+          >
+            {snapshot.currencyNote}
+          </p>
+        ) : null}
+
         <div className="grid grid-cols-2 gap-2">
           {snapshot.readinessScore != null ? (
             <ContextRow
