@@ -36,7 +36,7 @@ StrideIQ MVP is a **local-first training intelligence dashboard**: import Strava
 
 ### Engineering
 
-- 1,022 Vitest tests, production `next build`
+- 1,800+ Vitest tests, production `next build`
 - shadcn/ui component layer + premium typography (DM Sans + Syne)
 - Docs: [FEATURES.md](FEATURES.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DEPLOYMENT.md](DEPLOYMENT.md), [SMOKE_TEST.md](SMOKE_TEST.md)
 

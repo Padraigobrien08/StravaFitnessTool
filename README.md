@@ -124,7 +124,7 @@ without runs limits what the answer can say.
 
 ### Engineering
 
-- **1,000+ Vitest tests** · production `next build`
+- **1,800+ Vitest tests** · production `next build` · DB suites run against Postgres in CI
 - **shadcn/ui** component layer · DM Sans + Syne typography
 - **MCP package** — same intelligence tools in Claude Desktop (`packages/strideiq-mcp`)
 
@@ -335,6 +335,7 @@ Hosted stack: **Vercel** (app) + **Neon** (database) + **Strava** (OAuth + optio
 | `/runs/[id]/route` | GPS replay (pace, HR, elevation)                  |
 | `/intelligence`    | Athlete Intelligence Model                        |
 | `/coach`           | Investigation chat                                |
+| `/context`         | Training mix and cross-training context           |
 | `/report`          | Printable summary                                 |
 | `/import`          | CSV, FIT, Strava OAuth                            |
 | `/settings`        | Units, privacy, webhooks, data quality            |
