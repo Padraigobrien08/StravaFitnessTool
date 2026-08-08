@@ -71,6 +71,13 @@ After deploy:
 
 Strava will send `GET` challenge and `POST` activity events to `/api/webhooks/strava`.
 
+> **This path is unexercised.** The handler, the signature check and the subscribe route are
+> unit-tested, and the signature scheme matches Strava's published reference implementation.
+> But no subscription has ever been created against this app and no live delivery has been
+> observed end to end, so treat the two steps above as derived from the code and Strava's
+> docs rather than from a working run. If events do not land, check the server log first —
+> and please report what you find so this note can be replaced with something better.
+
 ---
 
 ## 3. Vercel project

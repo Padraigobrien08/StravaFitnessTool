@@ -407,7 +407,7 @@ Strava CSV often references `activities/<id>.fit.gz` without bundling files. Upl
 | `GET/POST /api/webhooks/strava`           | Verification + activity events |
 | `GET/POST /api/webhooks/strava/subscribe` | Subscription management        |
 
-Enable from **Settings** after OAuth is connected. Refresh the app after webhook events (no live push to the client yet).
+Enable from **Settings** after OAuth is connected. Refresh the app after webhook events (no live push to the client yet). Note that this path is unit-tested but has never been exercised against a live Strava subscription — see [docs/DEPLOYMENT.md § Webhooks](docs/DEPLOYMENT.md#webhooks-optional-auto-sync).
 
 ---
 
