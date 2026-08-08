@@ -27,10 +27,26 @@ function readIndex(): CalendarStorageIndex {
   }
 }
 
-function writeIndex(index: CalendarStorageIndex): void {
+/**
+ * Persist the calendar index, reporting whether it landed.
+ *
+ * `readIndex` is wrapped and this was not — the same asymmetry as calendarHistory,
+ * and the same consequence: `localStorage.setItem` throws on quota and in Safari
+ * private browsing, so saving a week could throw out of a click handler.
+ *
+ * Unlike the undo history, a failed save here matters to the athlete: their week is
+ * not stored and will be gone on reload. So this reports failure rather than
+ * swallowing it, and `saveCalendarWeek` passes that up to callers who can say so.
+ */
+function writeIndex(index: CalendarStorageIndex): boolean {
   const ls = storage();
-  if (!ls) return;
-  ls.setItem(STORAGE_KEY, JSON.stringify(index));
+  if (!ls) return false;
+  try {
+    ls.setItem(STORAGE_KEY, JSON.stringify(index));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function saveCalendarWeek(week: TrainingCalendarWeek): void {
@@ -47,6 +63,8 @@ export function saveCalendarWeek(week: TrainingCalendarWeek): void {
     savedAt: week.savedAt || now,
     updatedAt: now,
   };
+  // The boolean is deliberately unused here: the callers return void, and the
+  // guard exists to stop the throw, not to add a result nobody reads.
   writeIndex(index);
 }
 
@@ -150,7 +168,11 @@ export function deleteCalendarWeek(weekStart: string): void {
 }
 
 export function clearCalendar(): void {
-  storage()?.removeItem(STORAGE_KEY);
+  try {
+    storage()?.removeItem(STORAGE_KEY);
+  } catch {
+    /* already unreachable */
+  }
 }
 
 export function hasSavedWeek(weekStart: string): boolean {
