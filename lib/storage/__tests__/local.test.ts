@@ -132,8 +132,9 @@ describe("clearing", () => {
 describe("when the browser refuses to store", () => {
   /**
    * This key holds the entire training archive for an export-only athlete, so it is
-   * the single most likely thing in the app to exhaust a storage quota — and Safari in
-   * private browsing throws from setItem regardless of size.
+   * the single most likely thing in the app to exhaust a storage quota. A private or
+   * ephemeral window gets a much smaller budget and so reaches it soonest, but a large
+   * enough export reaches it in an ordinary window too.
    *
    * `commitImport` in strava-context calls this with no guard, after it has already
    * set the in-memory state, so an uncaught throw both crashes the import flow and

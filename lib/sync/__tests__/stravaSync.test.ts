@@ -77,9 +77,9 @@ async function sync(options?: Record<string, unknown>) {
 const afterArg = () => fetchAthleteActivities.mock.calls[0]?.[1];
 
 describe("nextSyncCursor", () => {
-  // The old code took activities[length - 1]. Strava returns newest-first by default
-  // but ascending when `after` is set, so indexing either end silently depends on
-  // which query was issued; a max is right under both.
+  // The old code took activities[length - 1], which assumes an ordering the response
+  // is not required to hold and which has not been verified here. The test asserts the
+  // property that makes the assumption unnecessary: same answer under any order.
   it("takes the newest date regardless of array order", () => {
     const dates = ["2026-01-01T00:00:00Z", "2026-03-01T00:00:00Z", "2026-02-01T00:00:00Z"];
     expect(nextSyncCursor(dates)).toBe(at("2026-03-01T00:00:00Z"));

@@ -11,8 +11,9 @@ import { PLAN_CONTEXT_STORAGE_KEY } from "../planContextConstants";
  *
  * That cadence is what makes the failure modes matter: anything that throws here
  * throws inside a React effect on each character typed, which takes down the plan
- * page rather than losing a draft. `localStorage.setItem` throws on quota exhaustion
- * and in Safari private browsing, neither of which is exotic.
+ * page rather than losing a draft. `localStorage.setItem` throws once the quota is
+ * exhausted, and throws immediately where storage is disabled by settings or policy —
+ * neither of which is exotic.
  */
 
 function makeStorage(overrides: Partial<Storage> = {}) {
@@ -67,7 +68,7 @@ describe("server-side rendering", () => {
 
 describe("when the browser refuses to store", () => {
   /**
-   * Safari in private browsing, and any browser at quota, throw from `setItem`. This
+   * Any browser at quota throws from `setItem`, as does one with storage disabled. This
    * runs on every keystroke in the planning-context box, so an uncaught throw here is
    * not a lost draft — it is an exception inside a React effect while someone types.
    */

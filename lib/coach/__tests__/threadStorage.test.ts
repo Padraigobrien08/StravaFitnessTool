@@ -120,8 +120,8 @@ describe("when the browser refuses to store", () => {
   /**
    * The fourth module in this sweep with the same asymmetry: a guarded read path and
    * an unguarded write. Here the write path lacked even the `typeof window` check its
-   * reader has, so it threw a ReferenceError during SSR as well as a quota error in
-   * private browsing.
+   * reader has, so it threw a ReferenceError during SSR as well as a quota error once
+   * the store filled — and threads accumulate without bound, so it does fill.
    */
   it("does not throw when a thread cannot be saved", () => {
     vi.stubGlobal("localStorage", {

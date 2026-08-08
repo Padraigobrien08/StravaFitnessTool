@@ -7,8 +7,9 @@ const STORAGE_KEY = "strava-running-insights-v1";
  * Persist the athlete's import.
  *
  * For an export-only athlete this key *is* the database, which also makes it the most
- * likely thing in the app to exhaust a browser storage quota — and Safari in private
- * browsing throws from `setItem` whatever the size.
+ * likely thing in the app to exhaust a browser storage quota. A private or ephemeral
+ * window is the sharpest case, since those get a much smaller budget, but a large
+ * enough export reaches the limit in an ordinary one too.
  *
  * Returns whether the write landed rather than throwing, because the caller
  * (`commitImport`) sets in-memory state first: an uncaught throw crashed the import

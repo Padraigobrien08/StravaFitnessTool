@@ -118,8 +118,10 @@ describe("how big a whole athlete is", () => {
 
   it("a decade of running still fits inside a typical browser budget", () => {
     const tenYears = 2_500;
-    // Chrome grants IndexedDB a share of free disk measured in gigabytes; Safari is
-    // the tight one at roughly 1 GB. Both leave ample headroom at this size.
+    // Per vendor documentation (not measured here): Chrome grants IndexedDB a share of
+    // free disk measured in gigabytes, and Safari is the tight one at roughly 1 GB.
+    // Both leave ample headroom at this size. The 45.1 KB/run figure above *is* measured;
+    // these budgets are the cited yardstick it is compared against.
     expect(bytesOf(worstCaseDetail("x")) * tenYears).toBeLessThan(200 * MB);
   });
 

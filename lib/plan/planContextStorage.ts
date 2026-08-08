@@ -4,8 +4,9 @@ import { PLAN_CONTEXT_STORAGE_KEY } from "./planContextConstants";
  * Draft storage for the planning-context box.
  *
  * Every call is wrapped, because `localStorage` is not the reliable synchronous store
- * it looks like: `setItem` throws on quota exhaustion, and Safari in private browsing
- * throws from `getItem` and `setItem` alike. This module is called on **every
+ * it looks like: `setItem` throws once the quota is exhausted, and when storage is
+ * disabled by browser settings or enterprise policy even `getItem` throws. This
+ * module is called on **every
  * keystroke** in the planning-context field, so an uncaught throw is not a lost draft —
  * it is an exception inside a React effect while someone is typing, which takes the
  * plan page down with it.

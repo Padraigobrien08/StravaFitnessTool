@@ -29,8 +29,9 @@ export async function POST(request: NextRequest) {
 
   const verification = verifyWebhookSignatureDetailed(rawBody, signature);
   if (!verification.valid) {
-    // Log the reason: a silent 403 on every delivery is indistinguishable from
-    // Strava not calling at all, which is how the wrong header name went unnoticed.
+    // Log the reason. A silent 403 is indistinguishable from Strava not calling at
+    // all, and this endpoint has no other signal — the wrong header name sat here
+    // undetected precisely because nothing on either side said anything.
     console.error(
       verification.reason === "no_signing_secret"
         ? "[strava webhook] rejected: STRAVA_WEBHOOK_SIGNING_SECRET is not set"

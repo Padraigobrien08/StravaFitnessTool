@@ -25,9 +25,10 @@ function loadAll(): CoachThread[] {
  * Persist the thread list, or give up quietly.
  *
  * The read path above guards `window` and wraps its parse; this did neither, so it
- * threw a ReferenceError during SSR and a QuotaExceededError in Safari private
- * browsing — from inside the Coach page's send handler, taking the conversation down
- * with it. Losing thread history is an annoyance; losing the reply the athlete just
+ * threw a ReferenceError during SSR, and a QuotaExceededError once the quota filled —
+ * from inside the Coach page's send handler, taking the conversation down with it.
+ * Threads accumulate without bound, so filling it is a matter of time, not of an
+ * unusual browser. Losing thread history is an annoyance; losing the reply the athlete just
  * waited (and paid) for is not.
  *
  * This is the fourth module with the same asymmetry, after lib/plan, lib/storage and

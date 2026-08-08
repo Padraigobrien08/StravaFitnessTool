@@ -3,10 +3,16 @@ import { afterAll, vi } from "vitest";
 /**
  * Opt-in clock displacement, for finding tests that will fail on a future date.
  *
- * Three suites have gone red in production CI simply because time passed
- * (§D-8, #117, and two since). Each was found the same way: `main` broke at a
- * particular hour and someone went looking. This makes that check something you can
- * run on purpose:
+ * Two suites went red in CI simply because time passed: #117, where `main` broke
+ * overnight with no code change because `generateDemoData` and `readinessCurrency`
+ * read the real clock. Both were found the way such things usually are — the build
+ * broke at a particular hour and someone went looking.
+ *
+ * A third was found by running this probe instead (#122): `personalZScores.test.ts`
+ * anchors its fixtures to a hardcoded date while asserting on a window measured from
+ * `Date.now()`. It was **still green** when found, and due to fail about four months
+ * out. That is the case this exists for — a test with an expiry date, caught before
+ * the expiry rather than after.
  *
  *     npm run test:time-travel                 # one year ahead
  *     PROBE_NOW=2028-02-29T23:59:00Z npm test  # a specific instant

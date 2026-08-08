@@ -21,9 +21,12 @@ const CURSOR_OVERLAP_SEC = 7 * 24 * 60 * 60;
  * The cursor for the next sync.
  *
  * Deliberately a max rather than `activities[activities.length - 1]`, which is what
- * this used to be. Strava returns `/athlete/activities` newest-first by default but
- * ascending when `after` is supplied, so indexing into either end of the array
- * silently depends on which query was issued. A max is correct under both.
+ * this used to be. Indexing into either end of the array assumes an ordering the
+ * response is not contractually required to hold — `/athlete/activities` is generally
+ * reverse-chronological, but that has not been verified here against Strava's docs or
+ * a live response, and it is reportedly not the order returned when `after` is
+ * supplied. A max needs no such assumption: it is correct under any ordering, so the
+ * question does not have to be settled to trust the cursor.
  */
 export function nextSyncCursor(startDates: string[]): number | null {
   let max: number | null = null;

@@ -31,8 +31,9 @@ function readIndex(): CalendarStorageIndex {
  * Persist the calendar index, reporting whether it landed.
  *
  * `readIndex` is wrapped and this was not — the same asymmetry as calendarHistory,
- * and the same consequence: `localStorage.setItem` throws on quota and in Safari
- * private browsing, so saving a week could throw out of a click handler.
+ * and the same consequence: `localStorage.setItem` throws once the quota is exhausted,
+ * and throws immediately where storage is disabled outright, so saving a week could
+ * throw out of a click handler.
  *
  * Unlike the undo history, a failed save here matters to the athlete: their week is
  * not stored and will be gone on reload. So this reports failure rather than
