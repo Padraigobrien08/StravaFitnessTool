@@ -97,8 +97,37 @@ describe("checkEnvCoherence", () => {
       expect(issue?.message).toMatch(/Dashboards and forecasting are unaffected/);
     });
 
-    it.each(["OPENAI_API_KEY", "ANTHROPIC_API_KEY"])("is satisfied by %s alone", (key) => {
-      const issues = checkEnvCoherence({ DATABASE_URL: DB, SESSION_SECRET: SECRET, [key]: "x" });
+    it("is satisfied by OPENAI_API_KEY alone", () => {
+      const issues = checkEnvCoherence({
+        DATABASE_URL: DB,
+        SESSION_SECRET: SECRET,
+        OPENAI_API_KEY: "x",
+      });
+      expect(issues).toEqual([]);
+    });
+
+    /**
+     * Coach takes either provider, but the weekly planner is OpenAI-only, so an
+     * Anthropic-only deployment looks healthy while every plan is silently the
+     * deterministic fallback. A warning rather than an error: Coach genuinely works.
+     */
+    it("warns that Anthropic alone means no LLM weekly plans", () => {
+      const issues = checkEnvCoherence({
+        DATABASE_URL: DB,
+        SESSION_SECRET: SECRET,
+        ANTHROPIC_API_KEY: "x",
+      });
+      const issue = issues.find((i) => /weekly plans are OpenAI-only/.test(i.message));
+      expect(issue?.level).toBe("warn");
+    });
+
+    it("says nothing when both providers are configured", () => {
+      const issues = checkEnvCoherence({
+        DATABASE_URL: DB,
+        SESSION_SECRET: SECRET,
+        OPENAI_API_KEY: "x",
+        ANTHROPIC_API_KEY: "y",
+      });
       expect(issues).toEqual([]);
     });
   });
