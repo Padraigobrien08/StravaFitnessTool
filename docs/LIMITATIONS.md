@@ -15,7 +15,7 @@ Five things are easy to conflate, and most software quietly does:
 | **Externally exercised**    | It has run against the live third-party system it talks to       |
 | **Proven in sustained use** | It has produced correct results over time, on real data          |
 
-The suite is large — 1,822 tests, all green — but a passing test is tier two. Nothing below
+The suite is large — over 1,800 tests, all green — but a passing test is tier two. Nothing below
 is upgraded a tier because it is well covered.
 
 ---
@@ -129,7 +129,7 @@ subscription has been registered and no real webhook delivery has been received.
 [DEPLOYMENT.md](DEPLOYMENT.md#webhooks-optional-auto-sync).
 
 **AI weekly planning is OpenAI-only.** With only `ANTHROPIC_API_KEY` set, Coach chat works but
-every generated plan silently becomes the deterministic fallback. `lib/env.ts` warns about
+every generated plan silently becomes the deterministic fallback. `lib/env/index.ts` warns about
 this at startup. Coach chat itself supports both providers.
 
 **AI weekly planning reached the model for the first time recently, and has one verified
@@ -147,8 +147,16 @@ least logged (`plan.llm_call_failed`) rather than swallowed.
 
 **`STRIDEIQ_API_KEY_USER_ID` is set by hand and can go stale.** A fresh Strava OAuth creates a
 new user row, leaving the variable pointing at a user with no data. The web UI is unaffected,
-so nothing looks wrong, while the API-key path and the MCP package authenticate to an empty
-account. `lib/env.ts` checks the variable is set, not that it resolves.
+because a browser session carries its own id, so nothing looks wrong — while the API-key path
+and the MCP package authenticate successfully to an empty account and answer "no data" to
+every question. Authenticating as an empty account is worse than failing to authenticate: a
+401 is a bug report, an empty answer is a wrong one.
+
+`lib/env/index.ts` can only check the variable is _set_, since it is pure by design.
+`lib/env/apiKeyUser.ts` now resolves it against the database at boot and on `/api/health`
+(`api_key.ok`, `features.automation`). What that does **not** do is re-check per request: a
+deployment that goes stale after boot keeps serving empty answers until something restarts or
+someone loads the health probe.
 
 ---
 

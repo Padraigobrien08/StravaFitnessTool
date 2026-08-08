@@ -22,6 +22,19 @@ export async function register(): Promise<void> {
     ]);
 
     const issues = checkEnvCoherence();
+
+    // `checkEnvCoherence` is pure, so it can only see that the API-key user id is set,
+    // not that it resolves. That distinction is the whole failure: a later OAuth makes
+    // a new user row and the hand-set id quietly names an empty account, which the web
+    // UI never reveals because a browser session carries its own id.
+    try {
+      const { checkApiKeyUser } = await import("@/lib/env/apiKeyUser");
+      const apiKeyIssue = await checkApiKeyUser();
+      if (apiKeyIssue) issues.push(apiKeyIssue);
+    } catch {
+      // A database that is not up yet must not hold up the server.
+    }
+
     if (issues.length === 0) return;
 
     // Printed as prose as well as structured, because the audience for this one is a
