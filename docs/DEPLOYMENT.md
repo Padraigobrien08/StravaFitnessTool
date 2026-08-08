@@ -107,13 +107,19 @@ Copy from [`.env.example`](../.env.example). Minimum for **full** MVP:
 
 Optional:
 
-| Variable                                        | Purpose                                  |
-| ----------------------------------------------- | ---------------------------------------- |
-| `OPENAI_MODEL`                                  | Coach model (default `gpt-4o-mini`)      |
-| `OPENAI_WEEKLY_PLAN_MODEL`                      | Weekly plan generation                   |
-| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL`         | Coach fallback                           |
-| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` | MCP / automation                         |
-| `NEXT_PUBLIC_FORECAST_LAB=1`                    | Expose `/dev/forecast-lab` in production |
+| Variable                                        | Purpose                                                   |
+| ----------------------------------------------- | --------------------------------------------------------- |
+| `OPENAI_MODEL`                                  | Coach model (default `gpt-4o-mini`)                       |
+| `OPENAI_WEEKLY_PLAN_MODEL`                      | Weekly plan generation                                    |
+| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL`         | Coach fallback                                            |
+| `STRIDEIQ_API_KEY` + `STRIDEIQ_API_KEY_USER_ID` | MCP / automation                                          |
+| `NEXT_PUBLIC_FORECAST_LAB=1`                    | Expose `/dev/forecast-lab` in production (**build-time**) |
+
+`NEXT_PUBLIC_FORECAST_LAB` is not like the rest of this table. `/dev/forecast-lab` is
+statically prerendered, so the flag is read when the page is built, not when it is served:
+setting it on a deployment that has already been built changes nothing, and it must be set
+before the build and then redeployed. Verified both ways — built without it, a runtime value
+of `1` still returns 404, and the prerendered file on disk is the 404 page.
 
 Apply to **Production** (and Preview if you want OAuth on preview deployments — use a separate Strava callback or ngrok for previews).
 
