@@ -54,11 +54,13 @@ export async function importFitFilesOnly(
     );
   }
 
-  await mergeFitDetails(details);
+  // A storage failure leaves the run data intact and simply records no new stream
+  // ids, rather than throwing away an import the athlete has already waited for.
+  const stored = await mergeFitDetails(details);
 
-  const fitRunIds = Array.from(
-    new Set([...(existing.fitRunIds ?? []), ...details.map((d) => d.activityId)]),
-  );
+  const fitRunIds = stored
+    ? Array.from(new Set([...(existing.fitRunIds ?? []), ...details.map((d) => d.activityId)]))
+    : (existing.fitRunIds ?? []);
 
   return {
     parsed: details.length,

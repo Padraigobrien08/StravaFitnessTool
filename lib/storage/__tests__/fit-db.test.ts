@@ -73,7 +73,29 @@ describe("round trip", () => {
   });
 
   it("accepts an empty batch without opening a transaction it cannot close", async () => {
-    await expect(mergeFitDetails([])).resolves.toBeUndefined();
+    await expect(mergeFitDetails([])).resolves.toBe(true);
+  });
+
+  /**
+   * Writes report success rather than returning void, because every caller treats
+   * streams as an enhancement over run data that is already parsed. Throwing meant a
+   * storage failure aborted the whole import.
+   */
+  it("reports success when the write lands", async () => {
+    await expect(saveFitDetails([detail("ok")])).resolves.toBe(true);
+  });
+
+  it("reports failure instead of throwing when the store is unavailable", async () => {
+    const realOpen = indexedDB.open;
+    // A quota-exhausted or blocked store surfaces here as a failure to open.
+    (indexedDB as unknown as { open: unknown }).open = () => {
+      throw new DOMException("QuotaExceededError");
+    };
+    try {
+      await expect(saveFitDetails([detail("blocked")])).resolves.toBe(false);
+    } finally {
+      (indexedDB as unknown as { open: unknown }).open = realOpen;
+    }
   });
 });
 
