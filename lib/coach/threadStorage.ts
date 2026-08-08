@@ -21,8 +21,25 @@ function loadAll(): CoachThread[] {
   }
 }
 
+/**
+ * Persist the thread list, or give up quietly.
+ *
+ * The read path above guards `window` and wraps its parse; this did neither, so it
+ * threw a ReferenceError during SSR and a QuotaExceededError in Safari private
+ * browsing — from inside the Coach page's send handler, taking the conversation down
+ * with it. Losing thread history is an annoyance; losing the reply the athlete just
+ * waited (and paid) for is not.
+ *
+ * This is the fourth module with the same asymmetry, after lib/plan, lib/storage and
+ * lib/training-calendar.
+ */
 function saveAll(threads: CoachThread[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(threads.slice(0, 24)));
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(threads.slice(0, 24)));
+  } catch {
+    /* quota exhausted or storage blocked — history is lost, the conversation is not */
+  }
 }
 
 export function listThreads(): CoachThread[] {
@@ -31,11 +48,20 @@ export function listThreads(): CoachThread[] {
 
 export function getActiveThreadId(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(ACTIVE_KEY);
+  try {
+    return localStorage.getItem(ACTIVE_KEY);
+  } catch {
+    return null;
+  }
 }
 
 export function setActiveThreadId(id: string) {
-  localStorage.setItem(ACTIVE_KEY, id);
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(ACTIVE_KEY, id);
+  } catch {
+    /* the active thread simply will not be remembered across reloads */
+  }
 }
 
 export function getThread(id: string): CoachThread | null {
@@ -64,7 +90,11 @@ export function deleteThread(id: string) {
   const threads = loadAll().filter((t) => t.id !== id);
   saveAll(threads);
   if (getActiveThreadId() === id) {
-    localStorage.removeItem(ACTIVE_KEY);
+    try {
+      localStorage.removeItem(ACTIVE_KEY);
+    } catch {
+      /* already unreachable */
+    }
   }
 }
 
