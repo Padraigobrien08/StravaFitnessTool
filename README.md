@@ -37,9 +37,9 @@ Open **[http://localhost:3000](http://localhost:3000)** and click **“Try the d
 
 That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half marathon) so you can explore _every_ client-side surface instantly — **no Strava account, no database, no API key**. Hit **Exit demo** in the header to clear it. Prefer your own data? Use **Import** (100% in-browser) — see [Quick start](#quick-start).
 
-![StrideIQ Home — console briefing with today's focus, readiness and TSB, projected half-marathon finish, and the recent-change feed](docs/screenshots/home.png)
+![StrideIQ Home — console briefing on a live Strava account: today's focus, readiness and TSB, and the return-to-running ramp after fifteen days off](docs/screenshots/home.png)
 
-<sub>All screenshots are the built-in demo athlete — every number shown is computed from the sample data by the same deterministic engines that run on your own.</sub>
+<sub>Home and Coach are a live Strava-synced account, caught mid-comeback after a training gap. Intelligence and Goals are the built-in demo athlete. Every number in all four is computed by the deterministic engines, not written by a model.</sub>
 
 ---
 
@@ -115,11 +115,12 @@ actually ran: _"The models agree with each other, which is not the same as being
 #### Coach — threaded investigation over deterministic tools
 
 The Coach orchestrates; it does not compute. Numbers come from the same
-[44 deterministic tools](#reasoning-tools-deterministic) the HTTP API exposes. Chat needs an LLM
-key, so the demo shows the reasoning workspace with the chat path disabled — the banner is the
-app telling you exactly what is and isn't live.
+[44 deterministic tools](#reasoning-tools-deterministic) the HTTP API exposes, and every answer
+closes with what it was grounded in, how confident it is, and what it could not see. The reply
+below is real, against a live synced account: note the limitation line conceding that a week
+without runs limits what the answer can say.
 
-![StrideIQ Coach — three-pane investigation workspace with domain navigation, suggested investigations, and an answer-context rail showing readiness, race, risk and opportunity](docs/screenshots/coach.png)
+![StrideIQ Coach — a real threaded investigation: two tool-grounded answers, each with a confidence level, the tools they were grounded in, and an explicit limitation line, beside an answer-context rail showing readiness, race, risk and opportunity](docs/screenshots/coach.png)
 
 ### Engineering
 
