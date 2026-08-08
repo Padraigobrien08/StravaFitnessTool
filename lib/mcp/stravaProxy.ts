@@ -1,4 +1,5 @@
 import { getValidAccessToken, getStravaConnection } from "@/lib/db/strava-connection";
+import { StravaApiError } from "@/lib/strava/api/client";
 import { compactActivityStreams, downsampleCompactStreams } from "@/lib/strava/api/compactStreams";
 import { exportRouteGpx, exportRouteTcx } from "@/lib/strava/api/exportRoute";
 import { exploreSegments } from "@/lib/strava/api/exploreSegments";
@@ -91,6 +92,32 @@ function parseId(params: StravaMcpParams, label = "id"): number {
   const id = parseInt(params.id ?? "", 10);
   if (!Number.isFinite(id)) throw new Error(`${label} required`);
   return id;
+}
+
+/**
+ * A route id from either spelling, validated.
+ *
+ * `route_id` used to be read with a bare `parseInt` while the `id` fallback beside it
+ * went through `parseId`. The same malformed value was therefore a clean local error
+ * via one parameter and a request to `/routes/NaN` via the other.
+ */
+function parseRouteId(params: StravaMcpParams): number {
+  // `||`, not `??`: the previous code tested `params.route_id ?` truthily, so an empty
+  // string fell through to `id`. `??` would only skip null/undefined and would turn
+  // `{ route_id: "", id: "7" }` from a working call into an error.
+  const id = parseInt(params.route_id || params.id || "", 10);
+  if (!Number.isFinite(id)) throw new Error("route id required");
+  return id;
+}
+
+/**
+ * An optional numeric parameter. Unparseable reads as absent, so the caller's default
+ * applies — previously `NaN` was forwarded to the API as if it were a real value.
+ */
+function parseOptionalInt(raw: string | undefined): number | undefined {
+  if (!raw) return undefined;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) ? n : undefined;
 }
 
 function parseBounds(params: StravaMcpParams): [number, number, number, number] {
@@ -243,7 +270,7 @@ export async function handleStravaMcpAction(
         gender: params.gender as "M" | "F" | undefined,
         age_group: params.age_group,
         following: params.following === "true",
-        club_id: params.club_id ? parseInt(params.club_id, 10) : undefined,
+        club_id: parseOptionalInt(params.club_id),
       });
 
     case "segment_effort":
@@ -254,7 +281,7 @@ export async function handleStravaMcpAction(
         efforts: await fetchSegmentEfforts(accessToken, parseId(params, "segment id"), {
           start_date_local: params.start_date_local,
           end_date_local: params.end_date_local,
-          per_page: params.per_page ? parseInt(params.per_page, 10) : 30,
+          per_page: parseOptionalInt(params.per_page) ?? 30,
         }),
       };
 
@@ -264,8 +291,11 @@ export async function handleStravaMcpAction(
       try {
         return await starSegment(accessToken, segmentId, starred);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e);
-        if (msg.includes("403")) {
+        // Match on the typed status, not on the message text. The client formats its
+        // message as `${context}: ${status}` with `star segment ${id}` as the context,
+        // so a substring test for "403" hits the segment id — and the response body,
+        // which is interpolated too — as readily as the status it meant to catch.
+        if (e instanceof StravaApiError && e.status === 403) {
           throw new Error("Cannot star segment: check Strava app scopes include segment access.");
         }
         throw e;
@@ -287,17 +317,17 @@ export async function handleStravaMcpAction(
     }
 
     case "route": {
-      const routeId = params.route_id ? parseInt(params.route_id, 10) : parseId(params, "route id");
+      const routeId = parseRouteId(params);
       return fetchRoute(accessToken, routeId);
     }
 
     case "route_export_gpx": {
-      const routeId = params.route_id ? parseInt(params.route_id, 10) : parseId(params, "route id");
+      const routeId = parseRouteId(params);
       return exportRouteGpx(accessToken, routeId);
     }
 
     case "route_export_tcx": {
-      const routeId = params.route_id ? parseInt(params.route_id, 10) : parseId(params, "route id");
+      const routeId = parseRouteId(params);
       return exportRouteTcx(accessToken, routeId);
     }
 
