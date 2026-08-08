@@ -50,7 +50,16 @@ export interface ConsensusPrediction {
 export interface RegressionFit {
   exponent: number;
   coefficient: number;
+  /**
+   * Goodness of fit in log space. Kept for continuity, but near-useless as a quality
+   * signal here — the axes are collinear by construction, so this sits above 0.9 for
+   * almost any effort set. Judge the fit by `residualLogSd` and `exponentStdError`.
+   */
   rSquared: number;
+  /** SD of log-time residuals; null when n < 3. Roughly a proportion: 0.05 ≈ 5%. */
+  residualLogSd: number | null;
+  /** Standard error of the fitted exponent; null when n < 3 or distances don't vary. */
+  exponentStdError: number | null;
   pointCount: number;
   /** Sampled curve for charts: distanceKm → timeSec */
   curve: { distanceKm: number; timeSec: number }[];
@@ -243,6 +252,26 @@ export function fitPowerLawRegression(efforts: EffortPoint[]): RegressionFit | n
   }, 0);
   const rSquared = ssTot > 0 ? 1 - ssRes / ssTot : 0;
 
+  // Standard OLS inference. `dof` is n-2 because two parameters were estimated.
+  //
+  // These are what R² cannot tell you here. log(time) and log(distance) are nearly
+  // collinear by construction, so ssTot is enormous and R² lands above 0.9 for almost
+  // any effort set, including a badly polluted one — it measures "distance predicts
+  // time", which was never in doubt.
+  //
+  //   residualLogSd  — SD of the log-time residuals. Scale-free, and for small values
+  //                    reads directly as a percentage: 0.05 ≈ 5% typical scatter.
+  //   exponentStdError — how well-determined the fatigue-resistance exponent is. This
+  //                    is the one that governs extrapolation: predicting a marathon
+  //                    from a 10 km anchor multiplies exponent error by ln(42.195/10)
+  //                    ≈ 1.44, so ±0.08 on the exponent is ±11% on the predicted time.
+  const dof = n - 2;
+  const residualVariance = dof > 0 ? ssRes / dof : null;
+  const residualLogSd = residualVariance !== null ? Math.sqrt(residualVariance) : null;
+  const sxx = sumXX - (sumX * sumX) / n;
+  const exponentStdError =
+    residualVariance !== null && sxx > 0 ? Math.sqrt(residualVariance / sxx) : null;
+
   const curve: { distanceKm: number; timeSec: number }[] = [];
   for (let d = 3; d <= 44; d += 0.5) {
     curve.push({
@@ -255,9 +284,102 @@ export function fitPowerLawRegression(efforts: EffortPoint[]): RegressionFit | n
     exponent,
     coefficient,
     rSquared: Math.round(rSquared * 1000) / 1000,
+    residualLogSd,
+    exponentStdError,
     pointCount: n,
     curve,
   };
+}
+
+/** Half-width of the ~95% confidence interval on the fitted exponent. */
+export function exponentCi95(fit: RegressionFit): number | null {
+  return fit.exponentStdError === null ? null : 1.96 * fit.exponentStdError;
+}
+
+/** Typical scatter of the fit, as a percentage of predicted time. */
+export function typicalErrorPct(fit: RegressionFit): number | null {
+  // exp(σ) − 1 converts a log-space SD into a proportional one. Exact rather than
+  // the small-σ approximation σ ≈ pct, which drifts once scatter gets large.
+  return fit.residualLogSd === null ? null : (Math.exp(fit.residualLogSd) - 1) * 100;
+}
+
+/**
+ * ≈7.3% typical scatter.
+ *
+ * Anchored to the one real race this forecaster has been scored against, where it came
+ * in 7.5% out (see docs/LIMITATIONS.md). Claiming high confidence on a curve tighter
+ * than the only error ever actually measured would be inventing precision.
+ *
+ * Checked against data rather than picked: the demo athlete's properly classified
+ * effort set — 64 efforts, exponent 1.063, the best case a real runner is likely to
+ * present — sits at 5.1%, and a threshold of 5% rejected it. A top confidence level
+ * nothing can reach is not a strict scale, it is a broken one.
+ */
+const HIGH_MAX_RESIDUAL_LOG_SD = 0.07;
+
+/** ≈±11% when extrapolating a 10 km anchor to a marathon. */
+const HIGH_MAX_EXPONENT_CI95 = 0.08;
+
+/** ≈13% typical scatter — beyond this the efforts do not describe one curve. */
+const MEDIUM_MAX_RESIDUAL_LOG_SD = 0.12;
+
+/**
+ * How much to trust the race predictions.
+ *
+ * This used to be `efforts >= 5 && rSquared > 0.9`, which certified almost anything.
+ * R² is inflated here by the collinearity of the axes (see `fitPowerLawRegression`),
+ * so the gate fired on effort sets that were visibly poor — including ones polluted
+ * with easy running, which is the exact failure `collectEffortPoints` exists to stop.
+ *
+ * The replacement asks the two questions that actually bear on a prediction: how
+ * closely do the efforts sit on a single curve, and how well-pinned is the exponent
+ * being extrapolated. A set can satisfy R² > 0.99 and fail both.
+ *
+ * Thresholds are deliberately reachable — a well-trained runner with five genuine
+ * efforts across 5–21 km should qualify. They are a floor on evidence, not a bar
+ * calibrated against observed race error, which would need scored races to set.
+ */
+export function racePredictionConfidence(
+  effortCount: number,
+  regression: RegressionFit | null,
+): "low" | "medium" | "high" {
+  if (effortCount < 3) return "low";
+
+  const residual = regression?.residualLogSd ?? null;
+  const ci95 = regression ? exponentCi95(regression) : null;
+
+  if (
+    effortCount >= 5 &&
+    residual !== null &&
+    ci95 !== null &&
+    residual <= HIGH_MAX_RESIDUAL_LOG_SD &&
+    ci95 <= HIGH_MAX_EXPONENT_CI95
+  ) {
+    return "high";
+  }
+
+  // Scatter this wide means the efforts do not describe one curve, so the models are
+  // averaging noise. Report low even though there are enough points to fit.
+  if (residual !== null && residual > MEDIUM_MAX_RESIDUAL_LOG_SD) return "low";
+
+  return "medium";
+}
+
+/**
+ * The fit's quality in the athlete's terms.
+ *
+ * Reports typical scatter and the exponent's uncertainty rather than R², which read
+ * "R²=0.99" on curves that were plainly bad and so told the athlete the opposite of
+ * the truth.
+ */
+function describeFitQuality(fit: RegressionFit): string {
+  const pct = typicalErrorPct(fit);
+  const ci = exponentCi95(fit);
+  if (pct === null || ci === null) return "";
+  return (
+    `, with your efforts sitting about ${pct.toFixed(1)}% off it on average` +
+    ` and the exponent pinned to ±${ci.toFixed(2)}`
+  );
 }
 
 function pickAnchor(efforts: EffortPoint[]): EffortPoint | null {
@@ -404,12 +526,9 @@ export function buildRacePredictionAnalysis(
     };
   }).filter((c) => c.timeSec > 0);
 
-  let confidence: "low" | "medium" | "high" = "low";
-  if (efforts.length >= 5 && regression && regression.rSquared > 0.9) {
-    confidence = "high";
-  } else if (efforts.length >= 3) {
-    confidence = "medium";
-  }
+  const confidence = racePredictionConfidence(efforts.length, regression);
+
+  const fitQuality = regression ? describeFitQuality(regression) : null;
 
   const explanation: string[] = [
     opts.workoutLabels
@@ -418,8 +537,8 @@ export function buildRacePredictionAnalysis(
     anchor
       ? `Single-effort models anchor on your fastest effort in the 4–15 km range: "${anchor.runName}" (${formatShortTime(anchor.timeSec)} at ${anchor.distanceKm.toFixed(1)} km, ${anchor.source}).`
       : "No strong anchor effort found in the 4–15 km range.",
-    regression
-      ? `The regression line fits time vs distance in your data (exponent ${regression.exponent.toFixed(2)}, R²=${regression.rSquared.toFixed(2)}). Steeper exponent means pace fades faster with distance.`
+    regression && fitQuality
+      ? `Your personal curve has exponent ${regression.exponent.toFixed(2)}${fitQuality}. A steeper exponent means pace fades faster with distance.`
       : "Not enough efforts for a reliable personalized curve (need ≥3 between 3–30 km).",
     `Consensus times are the average across ${models.length} models; the spread shows model agreement (tighter = more confident).`,
     "Predictions are estimates: course, weather, training, and tactics on race day will shift real results.",

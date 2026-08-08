@@ -69,10 +69,21 @@ come off the same curve — roughly double the observed range, which is exactly 
 known to break down. `durabilityModel` exists to reason about long-run support, but it does
 not widen the headline consensus band.
 
-**The "high confidence" gate is weak.** It requires R² > 0.9 on a log–log fit of time against
-distance. Those axes are near-collinear by construction, so almost any non-degenerate effort
-set clears it. Read "high confidence" on a race prediction as "enough efforts to fit a curve",
-not as a claim about fit quality. Replacing this is a known task.
+**The confidence gate is evidence, not calibration.** It used to require R² > 0.9 on a log–log
+fit of time against distance — axes that are near-collinear by construction, so almost any
+effort set cleared it. Measured on the demo athlete, the old gate awarded **high** confidence
+to a set polluted with easy running whose fitted exponent was 0.991, i.e. "pace never fades
+with distance".
+
+It now asks the two questions that bear on a prediction: how tightly the efforts sit on one
+curve (residual SD in log space), and how well-pinned the extrapolated exponent is (its
+standard error). The same polluted set now reports medium; the properly classified set, at
+5.1% scatter with the exponent held to ±0.05, reports high.
+
+The thresholds are still a floor on **evidence**, not a calibration against observed race
+error — that would need scored races to set. The scatter bound is deliberately no tighter than
+7%, because the one race ever scored came in 7.5% out, and claiming a tighter curve than the
+only error ever measured would be inventing precision.
 
 ---
 

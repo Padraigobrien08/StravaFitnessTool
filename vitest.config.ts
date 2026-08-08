@@ -6,7 +6,11 @@ const alias = { "@": path.resolve(__dirname, ".") };
 // A git worktree checked out inside the repo (e.g. .claude/worktrees/*) carries a
 // full copy of the suite; without this the run collects every test twice and
 // reports doubled counts.
-const exclude = ["**/node_modules/**", "**/dist/**", "**/.next/**", "**/.claude/**"];
+//
+// `.eval/` is the same hazard from the other direction: it is a git-ignored scratch
+// area, so a throwaway probe written as a `.test.ts` joins `npm run check` locally
+// while being invisible in CI and to everyone else.
+const exclude = ["**/node_modules/**", "**/dist/**", "**/.next/**", "**/.claude/**", "**/.eval/**"];
 
 // Clock displacement is opt-in via PROBE_NOW and costs nothing when unset — see
 // test/time-travel.ts. Listed first so it runs before any other setup.
