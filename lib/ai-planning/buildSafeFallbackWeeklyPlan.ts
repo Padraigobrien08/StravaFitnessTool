@@ -51,6 +51,30 @@ function longSession(
   });
 }
 
+/**
+ * Scale planned run distances down to fit the weekly cap.
+ *
+ * A no-op whenever the plan already fits, which is the common case — the branches that
+ * derive their distances from `cap` are untouched. It only binds on the branches with
+ * fixed distances (recovery, taper) when the athlete's cap is lower than the template
+ * assumed. Proportional rather than truncating, so the shape of the week survives.
+ */
+function fitRunVolumeToCap(workouts: PlannedWorkout[], cap: number): PlannedWorkout[] {
+  if (!Number.isFinite(cap) || cap <= 0) return workouts;
+
+  const total = workouts
+    .filter((w) => w.modality === "run")
+    .reduce((sum, w) => sum + (w.distanceKm ?? 0), 0);
+  if (total <= cap) return workouts;
+
+  const factor = cap / total;
+  return workouts.map((w) =>
+    w.modality === "run" && w.distanceKm != null
+      ? { ...w, distanceKm: km(w.distanceKm * factor) }
+      : w,
+  );
+}
+
 export function buildSafeFallbackWeeklyPlan(
   context: CoachingContext,
   guardrails: WeeklyPlanGuardrails,
@@ -276,6 +300,19 @@ export function buildSafeFallbackWeeklyPlan(
     }
     summary = `Build week toward ${context.goal.raceType}: modest progression within ${cap} km cap.`;
     primaryGoal = `Progress toward ${context.goal.raceType} on ${context.goal.raceDate ?? "goal date"}`;
+  }
+
+  // The recovery and taper branches prescribe fixed distances (6 km, 7 km, and so
+  // on) that were chosen for a typical athlete and take no notice of `cap`. For a
+  // low-volume athlete — `lowData` and `taper` fixtures both sit near 12 km — that
+  // overshoots the weekly cap, and `validateWeeklyPlan` then rejects the result with
+  // severity "error". A fallback its own validator refuses is the one thing this
+  // generator must never produce: it is what an athlete gets when the LLM has already
+  // failed, so there is nothing further to fall back to.
+  //
+  // Race week is exempt. The race distance is not ours to shrink.
+  if (!(type === "race_week" || guardrails.raceWeek)) {
+    workouts = fitRunVolumeToCap(workouts, cap);
   }
 
   const totalRunDistanceKm =
