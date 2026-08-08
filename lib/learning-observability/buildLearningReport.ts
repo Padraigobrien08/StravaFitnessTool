@@ -2,14 +2,14 @@ import { allBeliefs } from "@/lib/athlete-memory";
 import type { AthleteMemoryProfile } from "@/lib/athlete-memory/types";
 import type { AdaptationSignal } from "@/lib/adaptation-engine";
 import type { TrackedRecommendationOutcome } from "@/lib/recommendation-learning";
-import type { CausalExplanation } from "@/lib/causal-reasoning";
+import type { DriverAttribution } from "@/lib/driver-attribution";
 import type { LearningObservabilityReport, LearningTimelineEntry } from "./types";
 
 export function buildLearningObservabilityReport(params: {
   memory: AthleteMemoryProfile;
   adaptationSignals: AdaptationSignal[];
   outcomes: TrackedRecommendationOutcome[];
-  causalSnapshots?: CausalExplanation[];
+  attributionSnapshots?: DriverAttribution[];
 }): LearningObservabilityReport {
   const beliefs = allBeliefs(params.memory);
   const contradictions: string[] = [];
@@ -55,6 +55,6 @@ export function buildLearningObservabilityReport(params: {
     contradictions: contradictions.slice(0, 8),
     uncertainties: uncertainties.slice(0, 8),
     timeline: timeline.slice(0, 12),
-    causalSnapshots: params.causalSnapshots ?? [],
+    attributionSnapshots: params.attributionSnapshots ?? [],
   };
 }

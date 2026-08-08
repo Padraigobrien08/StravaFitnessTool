@@ -9,7 +9,7 @@ import {
   applyOutcomesToMemory,
 } from "@/lib/recommendation-learning";
 import { buildAdaptationSignals } from "@/lib/adaptation-engine";
-import { inferLikelyCauses } from "@/lib/causal-reasoning";
+import { inferLikelyDrivers } from "@/lib/driver-attribution";
 import { buildLongitudinalComparisons } from "@/lib/longitudinal-analysis";
 import { evaluateRecentSessions, sessionEffectivenessSummary } from "@/lib/session-intelligence";
 import { buildReasoningContext } from "@/lib/reasoning/context";
@@ -69,8 +69,8 @@ export function buildAdaptiveIntelligence(
   const adaptationSignals = buildAdaptationSignals(analytics, outcomes);
   const comparisons = buildLongitudinalComparisons(bundle, raceGoal);
 
-  const causalReadiness = inferLikelyCauses(analytics, "readiness");
-  const causalFatigue = inferLikelyCauses(analytics, "fatigue");
+  const attributionReadiness = inferLikelyDrivers(analytics, "readiness");
+  const attributionFatigue = inferLikelyDrivers(analytics, "fatigue");
 
   const recentlyLearned = buildRecentlyLearned(memory, adaptationSignals, outcomes, sessionSummary);
 
@@ -78,7 +78,7 @@ export function buildAdaptiveIntelligence(
     memory,
     adaptationSignals,
     outcomes: getTrackedOutcomes(athleteKey),
-    causalSnapshots: [causalReadiness, causalFatigue],
+    attributionSnapshots: [attributionReadiness, attributionFatigue],
   });
 
   return {
@@ -89,9 +89,9 @@ export function buildAdaptiveIntelligence(
     recentSessions,
     sessionSummary,
     longitudinalComparisons: comparisons,
-    causal: {
-      readiness: causalReadiness,
-      fatigue: causalFatigue,
+    attribution: {
+      readiness: attributionReadiness,
+      fatigue: attributionFatigue,
     },
     recentlyLearned,
     observability,

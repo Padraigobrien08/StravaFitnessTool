@@ -1,6 +1,6 @@
-import type { CausalExplanation } from "./types";
+import type { DriverAttribution } from "./types";
 
-export function buildCausalNarrative(explanation: CausalExplanation): string {
+export function buildAttributionNarrative(explanation: DriverAttribution): string {
   const lines: string[] = [explanation.summary];
 
   for (const d of explanation.likelyDrivers.slice(0, 3)) {

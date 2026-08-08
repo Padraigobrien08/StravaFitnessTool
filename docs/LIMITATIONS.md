@@ -96,10 +96,14 @@ has not been observed completing over a real 24-hour production window. Until it
 "the system learns from your outcomes" as an implemented mechanism rather than a demonstrated
 behaviour.
 
-**"Causal reasoning" is attribution, not causal inference.** `lib/causal-reasoning/` maps
+**Driver attribution is association, not causal inference.** `lib/driver-attribution/` maps
 thresholds to named likely drivers with confidence levels and explicit uncertainties. There is
-no DAG, no counterfactual, and no adjustment for confounding. The outputs are hedged
-appropriately in the UI; the module name is more ambitious than the method.
+no DAG, no counterfactual, and no adjustment for confounding, so a driver it names moved
+alongside the outcome rather than being shown to have produced it. The outputs have always
+been hedged — "appears influenced primarily by …", per-driver confidence, stated uncertainties
+— and those survive into the Coach context. The module was called `causal-reasoning` until
+recently, which promised a method it does not implement; it was renamed rather than annotated,
+since a comment disclaiming causality inside a folder named for it loses.
 
 ---
 

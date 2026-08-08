@@ -1,5 +1,5 @@
 import type { AdaptiveIntelligenceSnapshot } from "./types";
-import { buildCausalNarrative } from "@/lib/causal-reasoning";
+import { buildAttributionNarrative } from "@/lib/driver-attribution";
 
 export function serializeAdaptiveIntelligenceForCoach(
   snap: AdaptiveIntelligenceSnapshot,
@@ -23,8 +23,8 @@ export function serializeAdaptiveIntelligenceForCoach(
   }
 
   if (!topic || topic === "all" || topic === "readiness" || topic === "fatigue") {
-    sections.push(buildCausalNarrative(snap.causal.readiness));
-    sections.push(buildCausalNarrative(snap.causal.fatigue));
+    sections.push(buildAttributionNarrative(snap.attribution.readiness));
+    sections.push(buildAttributionNarrative(snap.attribution.fatigue));
   }
 
   if (!topic || topic === "all" || topic === "outcomes") {
