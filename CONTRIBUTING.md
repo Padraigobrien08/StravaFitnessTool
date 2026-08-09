@@ -10,8 +10,8 @@ Thanks for your interest in improving StrideIQ! This guide covers local setup, t
 ## Local setup
 
 ```bash
-git clone https://github.com/Padraigobrien08/StravaFitnessTool.git
-cd StravaFitnessTool
+git clone https://github.com/Padraigobrien08/strideiq.git
+cd strideiq
 npm install
 npm run dev            # http://localhost:3000 — click "Try the demo" (zero setup)
 ```
@@ -113,4 +113,4 @@ fails when the component becomes unusable, not when it is restyled.
 
 ## Reporting bugs / requesting features
 
-Use the [issue templates](https://github.com/Padraigobrien08/StravaFitnessTool/issues/new/choose). For security issues, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
+Use the [issue templates](https://github.com/Padraigobrien08/strideiq/issues/new/choose). For security issues, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.

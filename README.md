@@ -6,10 +6,12 @@
 
 Import Strava data. Get evidence-backed insights. Plan your week. Investigate _why_ with a tool-grounded Coach.
 
-[Try the demo](#-try-the-demo-zero-setup) · [Quick start](#quick-start) · [Features](#features) · [Deploy](#deploy) · [Docs](#documentation)
+**[Open the live demo →](https://strideiq-lemon.vercel.app)**
 
-[![CI](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/ci.yml/badge.svg)](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/codeql.yml/badge.svg)](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/codeql.yml)
+[Quick start](#quick-start) · [Features](#features) · [Deploy](#deploy) · [Docs](#documentation)
+
+[![CI](https://github.com/Padraigobrien08/strideiq/actions/workflows/ci.yml/badge.svg)](https://github.com/Padraigobrien08/strideiq/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Padraigobrien08/strideiq/actions/workflows/codeql.yml/badge.svg)](https://github.com/Padraigobrien08/strideiq/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-14b8a6.svg)](LICENSE)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149eca?logo=react)
@@ -21,21 +23,30 @@ Import Strava data. Get evidence-backed insights. Plan your week. Investigate _w
 
 StrideIQ is a **local-first** Next.js app that turns Strava exports (or live API sync) into a coherent training operating system — not another chart dashboard. Deterministic engines compute metrics; the Coach and LLM layers **orchestrate tools** and must not invent numbers.
 
-> **Repository:** `StravaFitnessTool` on GitHub · **Product name:** StrideIQ  
-> **Status:** MVP (`v0.1.0-mvp`) — private beta
+**See it now: [strideiq-lemon.vercel.app](https://strideiq-lemon.vercel.app) → “Try the demo”.** That loads a 12-month sample athlete into your browser and every surface below becomes live — no account, no database, no API key, nothing to install. The deployment runs with zero environment variables set, so Coach chat is off there (the rest of the Coach workspace still computes); [run it locally](#quick-start) with your own key for that.
+
+> **Status:** MVP (`v0.1.0-mvp`) — private beta  
+> **Start here:** [**What is validated, and what is not**](docs/LIMITATIONS.md) — which claims in
+> this repository have been checked against reality, and which are only implemented and tested.
 
 ---
 
 ## ⚡ Try the demo (zero setup)
+
+**Hosted — nothing to install:** open **[strideiq-lemon.vercel.app](https://strideiq-lemon.vercel.app)** and click **“Try the demo.”**
+
+**Locally, from a clone:**
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open **[http://localhost:3000](http://localhost:3000)** and click **“Try the demo.”**
+…then open **[http://localhost:3000](http://localhost:3000)** and click the same button.
 
-That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half marathon) so you can explore _every_ client-side surface instantly — **no Strava account, no database, no API key**. Hit **Exit demo** in the header to clear it. Prefer your own data? Use **Import** (100% in-browser) — see [Quick start](#quick-start).
+Either way it loads a full **12-month sample athlete** (mid-build for a sub-1:45 half marathon) so you can explore _every_ client-side surface instantly — **no Strava account, no database, no API key**. Hit **Exit demo** in the header to clear it. Prefer your own data? Use **Import** (100% in-browser) — see [Quick start](#quick-start).
+
+The hosted deployment runs with **zero environment variables**, which is the same Path A configuration described in [Quick start](#quick-start). That is deliberate — it is the honest demonstration that the export-only path needs no backend. The consequences are visible and intended: `/api/health` reports `"status":"incomplete"`, Coach chat returns 503 (the deterministic half of the Coach workspace still computes), and Strava sync is absent.
 
 ![StrideIQ Home — console briefing on a live Strava account: today's focus, readiness and TSB, and the return-to-running ramp after fifteen days off](docs/screenshots/home.png)
 
@@ -90,7 +101,7 @@ That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half mar
 | -------------------------- | --------------------------------------------------------------------------------------- |
 | **Home**                   | Operating-system layout: focus, week board, change feed, decision support               |
 | **Plan**                   | Planning context, AI/rule-based week generation, drag-and-drop board, planned vs actual |
-| **Goals**                  | Race briefing, readiness, forecasts, mission control                                    |
+| **Goals**                  | Race briefing, readiness, forecasts, mission control (the **Race goal** tab of Plan)    |
 | **Training & Performance** | Volume, blocks, efficiency, projections, records                                        |
 | **Runs**                   | Activity explorer, session intelligence, route replay (MapLibre)                        |
 | **Intelligence**           | Persistent athlete belief model — signals, memory, ecosystem (not a chat UI)            |
@@ -182,8 +193,8 @@ flowchart LR
 ### Run locally
 
 ```bash
-git clone https://github.com/Padraigobrien08/StravaFitnessTool.git
-cd StravaFitnessTool
+git clone https://github.com/Padraigobrien08/strideiq.git
+cd strideiq
 npm install
 cp .env.example .env.local   # optional — see paths below
 npm run dev
@@ -306,7 +317,7 @@ Production values and callback URLs: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Deploy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Padraigobrien08/StravaFitnessTool)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Padraigobrien08/strideiq)
 
 The app builds and runs with **zero environment variables** — the demo and local-export modes work out of the box. Add the variables below only for the optional server features.
 
@@ -323,22 +334,22 @@ Hosted stack: **Vercel** (app) + **Neon** (database) + **Strava** (OAuth + optio
 
 ## Routes
 
-| Route              | Purpose                                           |
-| ------------------ | ------------------------------------------------- |
-| `/home`            | Training operating system — focus, week, insights |
-| `/plan`            | Adaptive week workspace                           |
-| `/goals`           | Race readiness and forecasts                      |
-| `/training`        | Volume, blocks, load intelligence                 |
-| `/performance`     | Trends, records, projections                      |
-| `/runs`            | Activity explorer                                 |
-| `/runs/[id]`       | Session execution analysis                        |
-| `/runs/[id]/route` | GPS replay (pace, HR, elevation)                  |
-| `/intelligence`    | Athlete Intelligence Model                        |
-| `/coach`           | Investigation chat                                |
-| `/context`         | Training mix and cross-training context           |
-| `/report`          | Printable summary                                 |
-| `/import`          | CSV, FIT, Strava OAuth                            |
-| `/settings`        | Units, privacy, webhooks, data quality            |
+| Route              | Purpose                                              |
+| ------------------ | ---------------------------------------------------- |
+| `/home`            | Training operating system — focus, week, insights    |
+| `/plan`            | Adaptive week workspace                              |
+| `/goals`           | Redirect → `/plan?tab=goal` (Goals merged into Plan) |
+| `/training`        | Volume, blocks, load intelligence                    |
+| `/performance`     | Trends, records, projections                         |
+| `/runs`            | Activity explorer                                    |
+| `/runs/[id]`       | Session execution analysis                           |
+| `/runs/[id]/route` | GPS replay (pace, HR, elevation)                     |
+| `/intelligence`    | Athlete Intelligence Model                           |
+| `/coach`           | Investigation chat                                   |
+| `/context`         | Training mix and cross-training context              |
+| `/report`          | Printable summary                                    |
+| `/import`          | CSV, FIT, Strava OAuth                               |
+| `/settings`        | Units, privacy, webhooks, data quality               |
 
 Coach deep links from Intelligence: `?domain=…`, `?q=…`, `?topic=…`, `&investigate=1`.
 
@@ -504,6 +515,6 @@ Next.js/Turbopack picks the workspace root by walking _up_ for a lockfile. If a 
 
 <div align="center">
 
-**[StrideIQ](https://github.com/Padraigobrien08/StravaFitnessTool)** · Built for runners who want answers, not just activity logs.
+**[StrideIQ](https://github.com/Padraigobrien08/strideiq)** · Built for runners who want answers, not just activity logs.
 
 </div>
