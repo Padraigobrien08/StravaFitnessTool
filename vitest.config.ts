@@ -63,6 +63,30 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text-summary", "text", "html"],
+      /**
+       * A ratchet, not a target.
+       *
+       * These sit a few points under what the suite actually reaches, so ordinary churn
+       * never trips them and a real regression does. Deleting a covered module or
+       * landing a large uncovered feature moves the number by more than the margin;
+       * refactoring inside tested code does not.
+       *
+       * Measured 2026-08-09 **without a database**, which is the lower of the two
+       * numbers: statements 63.0, branches 52.7, functions 56.7, lines 63.6. CI runs
+       * these suites against Postgres and reads higher. The floors are set against the
+       * no-database figure on purpose — a developer running `npm run test:coverage` on a
+       * laptop must not fail a check that CI would pass.
+       *
+       * Raise them when a deliberate push lifts real coverage. Do not raise them to
+       * whatever the number happens to be today; that turns every unrelated PR into a
+       * coverage negotiation.
+       */
+      thresholds: {
+        statements: 60,
+        branches: 50,
+        functions: 53,
+        lines: 60,
+      },
       // Report on shipped code; skip tests, fixtures, types, and generated files.
       include: [
         "app/**/*.{ts,tsx}",

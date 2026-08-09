@@ -5,6 +5,7 @@ import { resolveRedirectUri } from "@/lib/strava/api/config";
 import { upsertStravaConnection } from "@/lib/db/strava-connection";
 import { createUser, findUserByStravaAthleteId } from "@/lib/db/users";
 import { setSessionCookie } from "@/lib/auth/session";
+import { logger, serializeError } from "@/lib/observability/logger";
 
 const STATE_COOKIE = "strideiq_oauth_state";
 
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   // User declined on Strava's consent screen (error=access_denied).
   if (oauthError) {
-    console.warn(`[strava/callback] authorization declined: ${oauthError}`);
+    logger.warn({ event: "strava.oauth.declined", reason: oauthError });
     return NextResponse.redirect(new URL(`/import?strava=denied`, request.url));
   }
 
@@ -30,13 +31,15 @@ export async function GET(request: NextRequest) {
   jar.delete(STATE_COOKIE);
 
   if (!code) {
-    console.error("[strava/callback] no authorization code in callback");
+    logger.error({ event: "strava.oauth.failed", reason: "nocode" });
     return fail("nocode");
   }
   // A missing/mismatched state cookie usually means the link expired (>10 min)
   // or the browser dropped the cookie (blocked cookies / cross-site).
   if (!state || !expectedState || state !== expectedState) {
-    console.error("[strava/callback] state mismatch", {
+    logger.error({
+      event: "strava.oauth.failed",
+      reason: "state",
       hasState: Boolean(state),
       hasExpectedCookie: Boolean(expectedState),
     });
@@ -49,12 +52,12 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     // Almost always a Strava-side rejection: wrong client secret, or the app's
     // Authorization Callback Domain not matching this host (e.g. localhost).
-    console.error("[strava/callback] token exchange failed:", err);
+    logger.error({ event: "strava.oauth.failed", reason: "token", error: serializeError(err) });
     return fail("token");
   }
 
   if (!tokens.athlete?.id) {
-    console.error("[strava/callback] token response had no athlete id");
+    logger.error({ event: "strava.oauth.failed", reason: "noathlete" });
     return fail("noathlete");
   }
 
@@ -65,7 +68,7 @@ export async function GET(request: NextRequest) {
     await setSessionCookie(userId);
   } catch (err) {
     // Connection succeeded with Strava but we couldn't persist it / the session.
-    console.error("[strava/callback] failed to persist connection:", err);
+    logger.error({ event: "strava.oauth.failed", reason: "db", error: serializeError(err) });
     return fail("db");
   }
 

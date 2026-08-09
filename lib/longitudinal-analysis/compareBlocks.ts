@@ -15,6 +15,19 @@ export function compareCurrentToStrongestBlock(
 
   if (!current || !best || best.label === "N/A") return null;
 
+  // A block is not a comparison to itself.
+  //
+  // When the athlete has only one detected block, the phase finder returns it as both
+  // `current` and `best`, and the summary read "Current block aligns with your strongest
+  // aerobic phase (Dec 8 – Jan 5)" — the same dates on both sides, presented as a
+  // longitudinal finding. Measured on a single 10 km run it also cited "1 runs, hard
+  // 100%" as its evidence.
+  //
+  // The claim is vacuous rather than wrong, which is worse: it reads like the system has
+  // looked across the athlete's history and found agreement. Returning null lets the
+  // caller say nothing, which is what it has to say.
+  if (current.label === best.label) return null;
+
   const hardDelta = current.hardPct - best.hardPct;
   const volDelta = current.distanceKm - best.distanceKm;
 

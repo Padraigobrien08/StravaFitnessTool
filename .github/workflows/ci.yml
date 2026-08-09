@@ -87,7 +87,8 @@ jobs:
         run: node scripts/migrate.mjs
         env:
           DATABASE_URL: ${{ env.TEST_DB_URL }}
-      # Coverage summary for visibility (non-blocking — no enforced thresholds).
+      # Enforces the floors in vitest.config.ts, which are set a few points under the
+      # suite's real coverage. A failure here means coverage dropped, not that it is low.
       - run: npm run test:coverage
         env:
           TEST_DATABASE_URL: ${{ env.TEST_DB_URL }}
