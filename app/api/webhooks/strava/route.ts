@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { findUserIdByStravaAthleteId } from "@/lib/db/users";
 import { deleteActivityForUser, syncSingleActivityForUser } from "@/lib/sync/singleActivity";
 import { verifyWebhookSignatureDetailed } from "@/lib/strava/webhooks/verify";
+import { logger, serializeError } from "@/lib/observability/logger";
 
 export async function GET(request: NextRequest) {
   const verifyToken = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN;
@@ -32,11 +33,16 @@ export async function POST(request: NextRequest) {
     // Log the reason. A silent 403 is indistinguishable from Strava not calling at
     // all, and this endpoint has no other signal — the wrong header name sat here
     // undetected precisely because nothing on either side said anything.
-    console.error(
-      verification.reason === "no_signing_secret"
-        ? "[strava webhook] rejected: STRAVA_WEBHOOK_SIGNING_SECRET is not set"
-        : `[strava webhook] rejected: ${verification.reason}`,
-    );
+    logger.error({
+      event: "strava.webhook.rejected",
+      reason: verification.reason,
+      // Spelled out because this is the one a deploy gets wrong, and "no_signing_secret"
+      // alone reads like Strava's problem rather than a missing variable here.
+      detail:
+        verification.reason === "no_signing_secret"
+          ? "STRAVA_WEBHOOK_SIGNING_SECRET is not set"
+          : undefined,
+    });
     return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
   }
 
@@ -65,7 +71,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Sync failed";
-    console.error("[strava webhook]", message);
+    logger.error({
+      event: "strava.webhook.sync_failed",
+      aspectType: event.aspect_type,
+      activityId: event.object_id,
+      error: serializeError(e),
+    });
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }

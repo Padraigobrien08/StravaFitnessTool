@@ -9,6 +9,19 @@
  *
  * JSON rather than prose because the point is to be queryable: `level`, `event` and
  * `route` are the fields you filter on when something is wrong at 7am.
+ *
+ * **Server code only.** Client components keep plain `console.error`, deliberately.
+ * Nothing collects a browser's console, so the queryability this exists for does not
+ * apply there, and JSON is actively worse to read in devtools: passing an `Error`
+ * straight to `console.error` gets an expandable, source-mapped stack, while
+ * `JSON.stringify` of one yields `{}` — `message` and `stack` are non-enumerable. The
+ * `serializeError` below is what bridges that, and it is only worth the noise where a
+ * log aggregator is reading.
+ *
+ * So the split is by runtime, not by taste: API routes, `instrumentation.ts` and
+ * anything under `lib/` that runs server-side use `logger`; `"use client"` files, the
+ * error boundaries and the browser-side import parser use `console`. Converting the
+ * latter would trade a good debugging experience for a log line nobody receives.
  */
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
