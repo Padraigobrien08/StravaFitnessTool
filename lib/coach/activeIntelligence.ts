@@ -42,16 +42,33 @@ export function buildActiveObservations(
     out.push(o);
   };
 
+  // Lead with the gap when there is one. Everything below is measured from training
+  // that stopped, so the reader needs to know that before reading any of it.
+  if (!isTrainingCurrent(analytics.fatigue)) {
+    push({
+      id: "training-gap",
+      text: `No running for ${stalenessClause(analytics.fatigue)}: the numbers below describe the block before that, not current form.`,
+      tone: "warning",
+      domain: "Readiness",
+      confidence: "high",
+      isNew: true,
+    });
+  }
+
   if (analytics.efficiencySummary.trend === "improving") {
     const weeks = analytics.efficiencyTrend.slice(-3);
+    // "Recent" and "trending" are present-tense claims. After a gap the gain is
+    // something that happened, not something happening, and it is being lost.
+    const current = isTrainingCurrent(analytics.fatigue);
     push({
       id: "eff-trend",
-      text:
-        weeks.length >= 2
+      text: current
+        ? weeks.length >= 2
           ? "Aerobic efficiency has improved across recent HR-backed runs."
-          : "Early signal: pace at comparable heart rate is trending faster.",
-      tone: "positive",
-      domain: "Performance",
+          : "Early signal: pace at comparable heart rate is trending faster."
+        : `Aerobic efficiency had improved, measured before ${stalenessClause(analytics.fatigue)}: a starting point to re-establish, not current form.`,
+      tone: current ? "positive" : "neutral",
+      domain: current ? "Performance" : "Readiness",
       confidence: analytics.dataConfidence,
       isNew: true,
     });
@@ -81,6 +98,11 @@ export function buildActiveObservations(
     });
   }
 
+  // No currency guard needed here, unlike the claims above. `CURRENCY_CAP` in
+  // lib/analytics/fatigue.ts already clamps freshness to 50 when detrained and 65
+  // when rusty, so a stale athlete cannot reach 70 and be told their freshness
+  // "supports quality work" — the readiness model closed that off upstream. A guard
+  // here would never be false and would imply a live risk that is not.
   if (analytics.fatigue.freshness >= 70) {
     push({
       id: "fresh",
@@ -100,10 +122,18 @@ export function buildActiveObservations(
   }
 
   if (analytics.raceReadiness && analytics.raceReadiness.score >= 60) {
+    // "Stabilized" asserts the score is holding, which requires something to be
+    // holding it up. Observed on the live account at 15 days without a run: Home
+    // said DETRAINED while this card said "Race readiness stabilized at 67/100
+    // (Nearly there)" — two surfaces disagreeing about the same athlete on the same
+    // screen, which is worse than either being wrong on its own.
+    const current = isTrainingCurrent(analytics.fatigue);
     push({
       id: "race-ready",
-      text: `Race readiness stabilized at ${analytics.raceReadiness.score}/100 (${analytics.raceReadiness.label}).`,
-      tone: "positive",
+      text: current
+        ? `Race readiness stabilized at ${analytics.raceReadiness.score}/100 (${analytics.raceReadiness.label}).`
+        : `Race readiness was ${analytics.raceReadiness.score}/100 before ${stalenessClause(analytics.fatigue)}: where you left off, not where you are.`,
+      tone: current ? "positive" : "neutral",
       domain: "Race prep",
       confidence: analytics.dataConfidence,
     });
@@ -156,6 +186,17 @@ export function deriveCurrentFocus(
   analytics: DashboardInsights,
   observations: ActiveObservation[],
 ): { focus: string; rationale: string } {
+  // A gap outranks everything below it. Load-based advice reasons about training
+  // that is not happening, and "protect the block" is incoherent when there is no
+  // block: Home already leads with the comeback in this state, so Coach agreeing is
+  // the difference between one product and two.
+  if (!isTrainingCurrent(analytics.fatigue)) {
+    return {
+      focus: "Getting back to running",
+      rationale: `${stalenessClause(analytics.fatigue)}. Rebuild easy volume first; the block that produced these numbers has stopped.`,
+    };
+  }
+
   if (analytics.fatigue.tsb < -15) {
     return {
       focus: "Fatigue management",

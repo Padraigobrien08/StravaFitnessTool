@@ -6,9 +6,32 @@ on:
   pull_request:
     branches: [main]
 
+# Connection string for the throwaway Postgres the DB suites run against. It matches
+# docker-compose.yml so CI and a laptop exercise the same schema the same way, and the
+# host is `localhost`, which is what `lib/db/__tests__/testDatabase.ts` requires.
+env:
+  TEST_DB_URL: postgresql://strideiq:strideiq@localhost:5432/strideiq
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Ten suites under lib/db round-trip real SQL and were skipping in CI for want of
+    # a database, so migrations, upserts, forecast logs and athlete memory went
+    # unverified on every PR. postgres:17 matches docker-compose.yml.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: strideiq
+          POSTGRES_PASSWORD: strideiq
+          POSTGRES_DB: strideiq
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U strideiq -d strideiq"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -16,13 +39,43 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+
+      # Called directly rather than through `npm run db:migrate`, which loads
+      # `.env.local` — absent in CI today, but this way the migration target cannot
+      # be changed by a file appearing later. DATABASE_URL is scoped to this step
+      # alone: the suites reach their database only via the guarded TEST_DATABASE_URL,
+      # and leaving DATABASE_URL set job-wide would hand them a second, ungated route.
+      - name: Migrate the test database
+        run: node scripts/migrate.mjs
+        env:
+          DATABASE_URL: ${{ env.TEST_DB_URL }}
+
       # Typecheck + lint + unit tests. Tests that depend on the git-ignored
       # Strava export fixture self-skip when it's absent (i.e. in CI).
       - run: npm run check
+        env:
+          TEST_DATABASE_URL: ${{ env.TEST_DB_URL }}
+
       - run: npm run build
 
   coverage:
     runs-on: ubuntu-latest
+    # Same database as `build`. Without it the report showed lib/db as essentially
+    # uncovered, which understated a tested layer rather than merely omitting it.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: strideiq
+          POSTGRES_PASSWORD: strideiq
+          POSTGRES_DB: strideiq
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U strideiq -d strideiq"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -30,12 +83,22 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Migrate the test database
+        run: node scripts/migrate.mjs
+        env:
+          DATABASE_URL: ${{ env.TEST_DB_URL }}
       # Coverage summary for visibility (non-blocking — no enforced thresholds).
       - run: npm run test:coverage
+        env:
+          TEST_DATABASE_URL: ${{ env.TEST_DB_URL }}
 
   # Runs the suite as if it were a year from now. Three suites have turned `main` red
   # purely because time passed, each found only when it broke; this catches the next
   # one at authoring time instead. Cheap: same suite, one env var.
+  #
+  # Deliberately no database: this job exists to find date-rot in analytics, and the DB
+  # suites write rows stamped with the displaced clock, which would add failures that
+  # say nothing about the thing being probed.
   time-travel:
     runs-on: ubuntu-latest
     steps:

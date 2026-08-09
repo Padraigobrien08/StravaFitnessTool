@@ -1,20 +1,22 @@
 import type { DashboardInsights } from "@/lib/analytics";
-import type { CausalDriver, CausalExplanation, CausalPhenomenon } from "./types";
+import type { AttributedDriver, DriverAttribution, AttributionTarget } from "./types";
 
-function driver(partial: Omit<CausalDriver, "evidence"> & { evidence: string[] }): CausalDriver {
+function driver(
+  partial: Omit<AttributedDriver, "evidence"> & { evidence: string[] },
+): AttributedDriver {
   return partial;
 }
 
-export function inferLikelyCauses(
+export function inferLikelyDrivers(
   analytics: DashboardInsights,
-  phenomenon: CausalPhenomenon,
+  phenomenon: AttributionTarget,
   opts?: { priorReadiness?: number; priorFreshness?: number },
-): CausalExplanation {
-  const drivers: CausalDriver[] = [];
+): DriverAttribution {
+  const drivers: AttributedDriver[] = [];
   const uncertainties: string[] = [];
 
   if (analytics.dataConfidence === "low" || analytics.summary.runCount < 8) {
-    uncertainties.push("Limited training history: causal attribution is tentative");
+    uncertainties.push("Limited training history: driver attribution is tentative");
   }
   if (analytics.dataConfidence === "low") {
     uncertainties.push("Low data confidence may obscure load and efficiency drivers");
@@ -184,12 +186,12 @@ export function inferLikelyCauses(
         phenomenon: phenomenon,
         likelyDrivers: drivers,
         uncertainties,
-        summary: "Insufficient context for causal attribution.",
+        summary: "Insufficient context to attribute drivers.",
       };
   }
 }
 
-function buildSummary(label: string, drivers: CausalDriver[], statePhrase: string): string {
+function buildSummary(label: string, drivers: AttributedDriver[], statePhrase: string): string {
   if (drivers.length === 0) {
     return `${label} ${statePhrase}; no dominant driver identified from current evidence.`;
   }

@@ -11,6 +11,7 @@ import { validateWeeklyPlan } from "./validateWeeklyPlan";
 import { applyPlanPreferenceToGuardrails } from "./applyPlanPreference";
 import { computeWeeklyPlanGuardrails } from "./weeklyPlanGuardrails";
 import { inferPlanHintsFromContext } from "@/lib/plan/inferPlanHintsFromContext";
+import { logger } from "@/lib/observability/logger";
 import { PLAN_CONTEXT_MAX_CHARS } from "@/lib/plan/planContextConstants";
 import type {
   GenerateWeeklyPlanOptions,
@@ -137,11 +138,27 @@ export async function generateWeeklyPlanFromContext(
     const raw = await callOpenAIWeeklyPlan(messages, apiKey);
     const parsed = parseWeeklyTrainingPlan(raw);
     if (!parsed.success) {
+      // Say which fields, not just that it failed. A schema drift between the JSON
+      // schema sent and the Zod schema parsed is invisible from the outside: the
+      // athlete sees a working plan that happens to say "fallback".
+      logger.warn({
+        event: "plan.llm_parse_failed",
+        issues: parsed.error.issues.slice(0, 5).map((i) => `${i.path.join(".")}: ${i.message}`),
+      });
       const plan = buildSafeFallbackWeeklyPlan(context, guardrails);
       return finalizePlan(plan, context, guardrails, "fallback");
     }
     return finalizePlan(parsed.data, context, guardrails, "llm");
-  } catch {
+  } catch (e) {
+    // This was a bare `catch {}`, which is how a permanently broken schema went
+    // unnoticed: OpenAI rejected every request with a 400, the error was discarded,
+    // and the deterministic fallback was returned as if it had been a considered
+    // choice. A fallback nobody can distinguish from success is not a safety net,
+    // it is a silent downgrade.
+    logger.warn({
+      event: "plan.llm_call_failed",
+      error: e instanceof Error ? e.message.slice(0, 300) : String(e).slice(0, 300),
+    });
     const plan = buildSafeFallbackWeeklyPlan(context, guardrails);
     return finalizePlan(plan, context, guardrails, "fallback");
   }

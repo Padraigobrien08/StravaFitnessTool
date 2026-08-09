@@ -16,30 +16,58 @@ const TOOL_GROUNDING: Record<string, string> = {
   get_data_quality: "data quality",
 };
 
-export function confidenceLevel(raw: string | null): "low" | "medium" | "high" | null {
+export type CoachConfidence = "low" | "medium" | "medium-high" | "high";
+
+/**
+ * The prompt asks for one of four levels — low, medium, medium-high, high — and this
+ * read only three of them. `"medium-high".includes("high")` is true, so the hedged level
+ * was displayed as the confident one, rounding the model's own caveat upward. Order
+ * matters here for exactly that reason: the compound has to be tested before "high".
+ */
+export function confidenceLevel(raw: string | null): CoachConfidence | null {
   if (!raw) return null;
   const l = raw.toLowerCase();
+  if (/medium[\s_-]*high/.test(l)) return "medium-high";
   if (l.includes("high")) return "high";
   if (l.includes("medium") || l.includes("moderate")) return "medium";
   if (l.includes("low")) return "low";
   return null;
 }
 
-export function inferGroundedIn(parsed: ParsedCoachResponse, toolsUsed?: string[]): string[] {
-  const fromTools = (toolsUsed ?? [])
-    .map((t) => TOOL_GROUNDING[t] ?? labelForTool(t).toLowerCase())
-    .filter(Boolean);
+/**
+ * What the answer was actually grounded in.
+ *
+ * Three states, deliberately distinguished:
+ *
+ *  - `tools`   — these tools ran, so their results are in the reply's context.
+ *  - `none`    — the model answered without calling anything. Worth saying: it is the
+ *                one case where "grounded in" would be a lie, and the reader is the
+ *                only one who can judge whether that matters for their question.
+ *  - `unknown` — no record either way. Threads persisted before `toolsUsed` existed
+ *                deserialize with it absent, and absent is not the same as none.
+ */
+export type Grounding =
+  { kind: "tools"; labels: string[] } | { kind: "none" } | { kind: "unknown" };
 
-  const fromEvidence = parsed.evidence.join(" ").toLowerCase();
-  const hints: string[] = [];
-  if (/readiness|freshness|tsb/.test(fromEvidence)) hints.push("readiness");
-  if (/volume|km|week/.test(fromEvidence)) hints.push("volume");
-  if (/threshold|interval|tempo|pace/.test(fromEvidence)) hints.push("sessions");
-  if (/race|half|marathon/.test(fromEvidence)) hints.push("race prep");
-  if (/strength|gym|cross|modality|ecosystem/.test(fromEvidence)) hints.push("ecosystem");
+/**
+ * Derived from the tool calls alone.
+ *
+ * This used to merge the real `toolsUsed` list with regexes run over the model's own
+ * `## Evidence` prose — `/readiness|freshness|tsb/` and friends. So a reply that merely
+ * *mentioned* readiness earned a "readiness" grounding chip, and a reply that called no
+ * tools at all could still be labelled grounded in four things. The badge exists to
+ * certify that numbers came from the engines rather than the model; deriving it from
+ * what the model wrote is the one way of computing it that cannot do that.
+ */
+export function describeGrounding(toolsUsed: string[] | undefined): Grounding {
+  if (toolsUsed === undefined) return { kind: "unknown" };
+  if (toolsUsed.length === 0) return { kind: "none" };
 
-  const merged = [...fromTools, ...hints];
-  return [...new Set(merged)].slice(0, 4);
+  const labels = [
+    ...new Set(toolsUsed.map((t) => TOOL_GROUNDING[t] ?? labelForTool(t).toLowerCase())),
+  ].filter(Boolean);
+
+  return labels.length > 0 ? { kind: "tools", labels: labels.slice(0, 4) } : { kind: "none" };
 }
 
 export function primaryLimitation(parsed: ParsedCoachResponse): string | null {

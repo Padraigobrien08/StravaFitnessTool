@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   buildRacePredictionAnalysis,
   collectEffortPoints,
+  exponentCi95,
   fitPowerLawRegression,
   isRaceLikeEffort,
   predictCameron,
+  racePredictionConfidence,
+  typicalErrorPct,
   type EffortPoint,
 } from "../predictions";
 import { predictRaceTime } from "../records";
@@ -190,6 +193,122 @@ describe("collectEffortPoints effort quality", () => {
     expect(polluted.exponent).toBeLessThan(1.02); // flattened by easy running
     expect(filtered.exponent).toBeGreaterThan(1.02);
     expect(filtered.exponent).toBeLessThan(1.15);
+  });
+});
+
+describe("fit quality statistics", () => {
+  /** Efforts on an exact power law, optionally perturbed by ±`jitter` in log space. */
+  function curve(distances: number[], exponent = 1.06, jitter = 0): EffortPoint[] {
+    return distances.map((km, i) => ({
+      distanceKm: km,
+      timeSec: 300 * Math.pow(km, exponent) * (1 + (i % 2 === 0 ? jitter : -jitter)),
+      runId: String(i),
+      runName: `effort ${i}`,
+      date: "2026-01-01",
+      source: "Lap block",
+    }));
+  }
+
+  it("reports no residual scatter for a perfect fit", () => {
+    const fit = fitPowerLawRegression(curve([3, 5, 8, 10, 15, 21]))!;
+    expect(fit.residualLogSd).toBeCloseTo(0, 6);
+    expect(fit.exponentStdError).toBeCloseTo(0, 6);
+    expect(typicalErrorPct(fit)).toBeCloseTo(0, 4);
+  });
+
+  it("recovers the scatter it was given", () => {
+    // ±5% alternating perturbation. Residual SD in log space should land near ln(1.05).
+    const fit = fitPowerLawRegression(curve([3, 5, 8, 10, 15, 21], 1.06, 0.05))!;
+    expect(fit.residualLogSd).toBeGreaterThan(0.03);
+    expect(fit.residualLogSd).toBeLessThan(0.07);
+    expect(typicalErrorPct(fit)!).toBeGreaterThan(3);
+    expect(typicalErrorPct(fit)!).toBeLessThan(7);
+  });
+
+  it("returns nulls rather than a fabricated precision at n = 2 degrees of freedom", () => {
+    // Three points, two parameters: one degree of freedom left. Defined, but wide.
+    const fit = fitPowerLawRegression(curve([5, 10, 21], 1.06, 0.05))!;
+    expect(fit.residualLogSd).not.toBeNull();
+    expect(exponentCi95(fit)!).toBeGreaterThan(0);
+  });
+
+  it("widens the exponent interval when the distances barely vary", () => {
+    // Everything crammed into 9-11 km: little leverage, so the exponent is poorly pinned
+    // even though the points sit close to the line.
+    const narrow = fitPowerLawRegression(curve([9, 9.5, 10, 10.5, 11], 1.06, 0.02))!;
+    const wide = fitPowerLawRegression(curve([3, 5, 10, 15, 21], 1.06, 0.02))!;
+    expect(exponentCi95(narrow)!).toBeGreaterThan(exponentCi95(wide)!);
+  });
+});
+
+describe("racePredictionConfidence", () => {
+  function curve(distances: number[], jitter = 0): EffortPoint[] {
+    return distances.map((km, i) => ({
+      distanceKm: km,
+      timeSec: 300 * Math.pow(km, 1.06) * (1 + (i % 2 === 0 ? jitter : -jitter)),
+      runId: String(i),
+      runName: `effort ${i}`,
+      date: "2026-01-01",
+      source: "Lap block",
+    }));
+  }
+
+  it("is low without enough efforts to fit anything", () => {
+    expect(racePredictionConfidence(2, null)).toBe("low");
+    expect(racePredictionConfidence(0, null)).toBe("low");
+  });
+
+  it("is high for many tight efforts across a wide distance range", () => {
+    const fit = fitPowerLawRegression(curve([3, 5, 8, 10, 15, 21]))!;
+    expect(racePredictionConfidence(6, fit)).toBe("high");
+  });
+
+  // The point of the change: R² alone certified sets like this one.
+  it("refuses high when the efforts scatter badly, however good R² looks", () => {
+    const fit = fitPowerLawRegression(curve([3, 5, 8, 10, 15, 21], 0.18))!;
+    expect(fit.rSquared).toBeGreaterThan(0.9); // the old gate would have passed
+    expect(racePredictionConfidence(6, fit)).not.toBe("high");
+  });
+
+  it("refuses high when the exponent is not pinned down, however tight the fit", () => {
+    // Tight scatter but almost no distance leverage: extrapolating to a marathon from
+    // this is guesswork, and the old gate could not see the difference.
+    const fit = fitPowerLawRegression(curve([9, 9.5, 10, 10.5, 11], 0.03))!;
+    expect(fit.rSquared).toBeGreaterThan(0.5);
+    expect(exponentCi95(fit)!).toBeGreaterThan(0.08);
+    expect(racePredictionConfidence(5, fit)).not.toBe("high");
+  });
+
+  it("never exceeds medium below five efforts, however perfect the curve", () => {
+    const fit = fitPowerLawRegression(curve([5, 10, 21]))!;
+    expect(fit.residualLogSd).toBeCloseTo(0, 6);
+    expect(racePredictionConfidence(4, fit)).toBe("medium");
+  });
+});
+
+describe("prediction confidence end to end", () => {
+  // The regression test from `collectEffortPoints`, carried through to the headline:
+  // an effort set polluted with easy running must not be labelled high confidence.
+  it("does not report high confidence on a set polluted with easy running", () => {
+    const runs = [
+      mockRun("r1", 5, 4.0),
+      mockRun("r2", 8, 4.2),
+      mockRun("r3", 10, 4.35),
+      mockRun("r4", 15, 4.6),
+      ...Array.from({ length: 20 }, (_, i) => mockRun(`easy${i}`, 6 + (i % 4), 5.9)),
+    ];
+    const polluted = buildRacePredictionAnalysis(runs, []);
+    expect(polluted.efforts.length).toBeGreaterThan(5);
+    expect(polluted.confidence).not.toBe("high");
+  });
+
+  it("explains the fit in scatter and exponent precision, not R²", () => {
+    const runs = [mockRun("1", 5, 4.0), mockRun("2", 10, 4.3), mockRun("3", 15, 4.5)];
+    const analysis = buildRacePredictionAnalysis(runs, []);
+    const line = analysis.explanation.find((e) => e.includes("exponent"));
+    expect(line).toBeDefined();
+    expect(line).not.toContain("R²");
+    expect(line).toMatch(/off it on average/);
   });
 });
 

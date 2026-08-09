@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { buildActiveObservations, buildRisksAndOpportunities } from "../activeIntelligence";
+import {
+  buildActiveObservations,
+  buildRisksAndOpportunities,
+  deriveCurrentFocus,
+} from "../activeIntelligence";
+import { buildCoachContextSnapshot } from "../viewModel";
 import { insightsFrom, mkRun } from "@/lib/coaching-context/__tests__/fixtures";
 import type { RunActivity } from "@/lib/strava/types";
+import type { RaceGoal } from "@/lib/analytics/readiness";
 import { detectInterference } from "@/lib/ecosystem/interference";
 import type { NormalizedActivity } from "@/lib/ecosystem/types";
 
@@ -72,6 +78,115 @@ describe("claims are consistent with training currency", () => {
     const obs = buildActiveObservations(analytics, []);
     const all = textOf(buildRisksAndOpportunities(analytics, obs));
     expect(all).not.toMatch(/fatigue or heat may be compressing/i);
+  });
+});
+
+/**
+ * The second half of the same bug, found on the live account at 15 days without a run.
+ * Home led with DETRAINED and "freshness 50 reflects rest"; Coach, from the same
+ * analytics, showed "Race readiness stabilized at 67/100 (Nearly there)" and a focus of
+ * "protect the block with polarized easy days". Two surfaces describing one athlete
+ * incompatibly is worse for trust than either being wrong alone.
+ */
+describe("readiness claims respect training currency", () => {
+  /**
+   * A block substantial enough to leave race readiness above the 60 that the
+   * observation requires, then a gap of `gapDays`. Sized from measurement: 24 runs
+   * left readiness at 62, close enough to the threshold that ordinary drift in the
+   * readiness model would silently push these tests below it and hollow them out.
+   * 40 runs lands at 74.
+   */
+  function block(gapDays: number): RunActivity[] {
+    const runs: RunActivity[] = [];
+    for (let i = 0; i < 40; i++) {
+      const daysAgo = gapDays + (40 - i) * 2;
+      runs.push(
+        mkRun(daysAgo, {
+          distanceM: i % 4 === 0 ? 19200 : 12000,
+          movingSec: i % 4 === 0 ? 3600 : 3240,
+          avgHr: 150,
+        }),
+      );
+    }
+    return runs;
+  }
+
+  /**
+   * A race goal is required, not decoration: `raceReadiness` is null without one, so
+   * the observation under test never fires and the assertions below pass on an empty
+   * string. Every test here asserts its own precondition for the same reason.
+   */
+  function withGoal(gapDays: number) {
+    const raceDate = new Date(Date.now() + 60 * 86_400_000).toISOString().slice(0, 10);
+    const goal: RaceGoal = { distance: "hm", date: raceDate };
+    return insightsFrom(block(gapDays), goal).analytics;
+  }
+
+  it("does not say readiness has stabilized after a fortnight without running", () => {
+    const analytics = withGoal(15);
+    expect(analytics.fatigue.readiness.currency).not.toBe("current");
+    // Precondition: the branch that produced the bad copy is actually reachable.
+    expect(analytics.raceReadiness).not.toBeNull();
+    expect(analytics.raceReadiness!.score).toBeGreaterThanOrEqual(60);
+
+    const all = textOf(buildActiveObservations(analytics, []));
+    expect(all).toMatch(/race readiness/i);
+    expect(all).not.toMatch(/readiness stabilized/i);
+    expect(all).toMatch(/where you left off/i);
+  });
+
+  it("keeps the stabilized wording for an athlete who is actually training", () => {
+    const analytics = withGoal(0);
+    expect(analytics.fatigue.readiness.currency).toBe("current");
+    expect(analytics.raceReadiness!.score).toBeGreaterThanOrEqual(60);
+    const all = textOf(buildActiveObservations(analytics, []));
+    expect(all).toMatch(/stabilized at \d+\/100/i);
+  });
+
+  /**
+   * The green-light line is guarded upstream rather than here: `CURRENCY_CAP` clamps
+   * freshness to 50 when detrained, so it cannot reach the 70 that triggers
+   * "freshness supports quality work". That is the right place for it — but it means
+   * the safety of this observation rests on a constant in another module, so pin it.
+   * If that cap is ever raised, a detrained athlete starts being told to go hard.
+   */
+  it("cannot reach the freshness that green-lights quality work while detrained", () => {
+    const analytics = withGoal(15);
+    expect(analytics.fatigue.readiness.currency).toBe("detrained");
+    expect(analytics.fatigue.freshness).toBeLessThan(70);
+
+    const all = textOf(buildActiveObservations(analytics, []));
+    expect(all).not.toMatch(/freshness supports quality work/i);
+  });
+
+  it("still green-lights quality for a rested athlete who is training", () => {
+    const analytics = withGoal(0);
+    expect(analytics.fatigue.freshness).toBeGreaterThanOrEqual(70);
+    const all = textOf(buildActiveObservations(analytics, []));
+    expect(all).toMatch(/freshness supports quality work/i);
+  });
+
+  it("leads with the gap so the numbers below are read in context", () => {
+    const analytics = withGoal(15);
+    const obs = buildActiveObservations(analytics, []);
+    expect(obs[0]?.text).toMatch(/without a run/i);
+    expect(obs[0]?.tone).toBe("warning");
+  });
+
+  it("does not tell an athlete who has stopped training to protect the block", () => {
+    const analytics = withGoal(15);
+    const obs = buildActiveObservations(analytics, []);
+    const focus = deriveCurrentFocus(analytics, obs);
+    expect(focus.rationale).not.toMatch(/protect the block/i);
+    expect(focus.focus).toMatch(/back to running/i);
+  });
+
+  it("marks the answer-context snapshot as measured before the gap", () => {
+    const stale = buildCoachContextSnapshot(withGoal(15), null);
+    expect(stale.currencyNote).toMatch(/measured before .*without a run/i);
+
+    const current = buildCoachContextSnapshot(withGoal(0), null);
+    expect(current.currencyNote).toBeNull();
   });
 });
 

@@ -59,7 +59,7 @@ type Insight = {
 - [x] Phase 5c — Coach chat + MCP + reasoning tools (`lib/reasoning/`)
 - [x] Phase 5d — Intelligence page + Coach workspace split
 - [ ] Phase 6 — Auth, billing, Sentry, PostHog, E2E (V2 hosted)
-- [ ] Phase 7 — **Differentiation:** deeper athlete memory, causality, adaptive goals (see [docs/DIFFERENTIATION_NORTH_STAR.md](docs/DIFFERENTIATION_NORTH_STAR.md))
+- [ ] Phase 7 — **Differentiation:** deeper athlete memory, causality, adaptive goals (see [docs/internal/DIFFERENTIATION_NORTH_STAR.md](docs/internal/DIFFERENTIATION_NORTH_STAR.md))
 
 ## Differentiation (north star)
 
@@ -67,4 +67,4 @@ Not: dashboard + chat over metrics.
 **Is:** interactive endurance reasoning + personal adaptation intelligence.
 
 Priority moat features: conversational **why** (reasoning tools), **training memory**, **causality**, **adaptive goals**, memory-weighted **planning**, **comparative self** phases.  
-See `docs/DIFFERENTIATION_NORTH_STAR.md`.
+See `docs/internal/DIFFERENTIATION_NORTH_STAR.md`.

@@ -1,7 +1,7 @@
 import type { AthleteBelief } from "@/lib/athlete-memory/types";
 import type { AdaptationSignal } from "@/lib/adaptation-engine";
 import type { TrackedRecommendationOutcome } from "@/lib/recommendation-learning";
-import type { CausalExplanation } from "@/lib/causal-reasoning";
+import type { DriverAttribution } from "@/lib/driver-attribution";
 
 export interface BeliefConfidenceChange {
   beliefId: string;
@@ -28,5 +28,5 @@ export interface LearningObservabilityReport {
   contradictions: string[];
   uncertainties: string[];
   timeline: LearningTimelineEntry[];
-  causalSnapshots: CausalExplanation[];
+  attributionSnapshots: DriverAttribution[];
 }

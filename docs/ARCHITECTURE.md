@@ -25,7 +25,8 @@ lib/analytics (client) + lib/insights
 React context (StravaProvider) + optional localStorage snapshot
 ```
 
-- FIT streams: matched via `Filename` in CSV → parsed into **IndexedDB** (`lib/fit/`).
+- FIT streams: matched via `Filename` in CSV, parsed by `lib/strava/parseFit.ts`, stored in
+  **IndexedDB** by `lib/storage/fit-db.ts`.
 - Works without Neon or API keys; Coach chat requires server sync for tool-backed answers.
 
 ### Path B — Strava API + Neon (hosted sync)
@@ -47,7 +48,7 @@ Both paths converge on the same **in-memory analytics** shape (`DashboardInsight
 
 | Layer                | Location                                              | Responsibility                                                  |
 | -------------------- | ----------------------------------------------------- | --------------------------------------------------------------- |
-| Ingest               | `lib/strava/`, `lib/sync/`, `lib/fit/`                | CSV, API, FIT → raw then domain                                 |
+| Ingest               | `lib/strava/`, `lib/sync/`, `lib/storage/`            | CSV, API, FIT → raw then domain                                 |
 | Domain               | `lib/domain/`                                         | `RunActivity`, normalized fields                                |
 | Analytics            | `lib/analytics/`                                      | Volume, fatigue, readiness, predictions, efficiency             |
 | Insights             | `lib/insights/`                                       | Question-tagged narrative cards                                 |

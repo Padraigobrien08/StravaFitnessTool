@@ -1,6 +1,7 @@
 import type { DashboardInsights } from "@/lib/analytics";
 import type { PersonalRecord } from "@/lib/analytics/records";
 import type { RacePredictionAnalysis, ConsensusPrediction } from "@/lib/analytics/predictions";
+import { typicalErrorPct, type RegressionFit } from "@/lib/analytics/predictions";
 import type { PrTimelinePoint } from "@/lib/analytics/progression";
 import type { Insight } from "@/lib/insights/types";
 import type { ImportQualityReport } from "@/lib/quality/assessImport";
@@ -9,6 +10,13 @@ import { formatDuration, formatPace } from "@/lib/utils";
 import type { ForecastV2View } from "@/lib/goals/forecastV2ViewModel";
 import { isTrainingCurrent } from "@/lib/insights/consistency";
 import { parseISO } from "date-fns";
+
+/** How tightly the athlete's efforts sit on their fitted curve, stated as a limitation. */
+function curveScatterLimitation(regression: RegressionFit | null): string {
+  const pct = regression ? typicalErrorPct(regression) : null;
+  if (pct === null) return "Single-anchor models widen uncertainty at longer distances.";
+  return `Your efforts sit about ${pct.toFixed(1)}% off your fitted curve on average: wider spread when efforts disagree.`;
+}
 
 export type PerformanceSeverity = "positive" | "neutral" | "warning";
 
@@ -511,9 +519,10 @@ function buildIntegrity(
     limitations: [
       "Projections are evidence-based estimates, not guarantees.",
       "Course, weather, fueling, and taper execution materially affect race day.",
-      analytics.racePredictionAnalysis.regression
-        ? `Curve fit R² = ${analytics.racePredictionAnalysis.regression.rSquared.toFixed(2)}: wider spread when efforts disagree.`
-        : "Single-anchor models widen uncertainty at longer distances.",
+      // Was "Curve fit R² = 0.99", which reads as a quality score and is not one: the
+      // log axes are collinear, so R² clears 0.9 on effort sets that fit badly. Typical
+      // scatter says the thing the athlete was being told this number meant.
+      curveScatterLimitation(analytics.racePredictionAnalysis.regression),
     ],
     fieldCoverage: (quality?.fieldCoverage ?? []).slice(0, 4).map((f) => ({
       label: f.label,

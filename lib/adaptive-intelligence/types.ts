@@ -3,7 +3,7 @@ import type { AdaptationSignal } from "@/lib/adaptation-engine";
 import type { TrackedRecommendationOutcome } from "@/lib/recommendation-learning";
 import type { SessionIntelligence } from "@/lib/session-intelligence";
 import type { LongitudinalComparison } from "@/lib/longitudinal-analysis";
-import type { CausalExplanation } from "@/lib/causal-reasoning";
+import type { DriverAttribution } from "@/lib/driver-attribution";
 import type { LearningObservabilityReport } from "@/lib/learning-observability";
 
 export interface AdaptiveIntelligenceSnapshot {
@@ -14,9 +14,9 @@ export interface AdaptiveIntelligenceSnapshot {
   recentSessions: SessionIntelligence[];
   sessionSummary: string[];
   longitudinalComparisons: LongitudinalComparison[];
-  causal: {
-    readiness: CausalExplanation;
-    fatigue: CausalExplanation;
+  attribution: {
+    readiness: DriverAttribution;
+    fatigue: DriverAttribution;
   };
   recentlyLearned: string[];
   observability: LearningObservabilityReport;

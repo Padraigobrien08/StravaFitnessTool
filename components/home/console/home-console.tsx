@@ -101,20 +101,28 @@ export function HomeConsole({
       />
 
       {/* items-start: grid rows stretch by default, so the verdict panel grew to
-          match the taller Readiness + leg-feel column and left a large empty
-          block under its actions. */}
+          match the taller right column and left a large empty block under its
+          actions.
+
+          Leg-feel sits with the verdict, not with Readiness. Measured at 1440px the
+          three cards are 237 / 306 / 178, so stacking the two tallest on the right
+          left a 259px void beside a 237px verdict card — the single worst piece of
+          dead space on the page. Pairing the shortest with the shortest balances the
+          columns at 427 vs 306 and more than halves the gap. It also reads better:
+          the verdict and "how do the legs feel?" are both things you act on, while
+          Readiness is the number they are derived from. */}
       <div className="grid items-start gap-3 lg:grid-cols-[1.65fr_1fr]">
-        <TheCall
-          vm={vm}
-          today={today}
-          onGeneratePlan={onGeneratePlan}
-          planLoading={planLoading}
-          hasSavedPlan={vm.hero.hasSavedPlan}
-        />
         <div className="flex flex-col gap-3">
-          <Readiness analytics={analytics} hero={vm.hero} />
+          <TheCall
+            vm={vm}
+            today={today}
+            onGeneratePlan={onGeneratePlan}
+            planLoading={planLoading}
+            hasSavedPlan={vm.hero.hasSavedPlan}
+          />
           <LegFeelCard />
         </div>
+        <Readiness analytics={analytics} hero={vm.hero} />
       </div>
 
       {/* After a gap, load-based advice has nothing recent to reason about, so the
@@ -422,12 +430,23 @@ function Readiness({
 
   return (
     <Panel>
-      <div className="mb-3 flex items-center justify-between">
+      {/* The TSB readout keeps its place; the link is the drill-in to the load detail
+          behind these numbers. Without it /training had no inbound link anywhere in the
+          app, which made the command palette its only route in. */}
+      <div className="mb-3 flex items-center justify-between gap-2">
         <Eyebrow>Readiness</Eyebrow>
-        <span className="font-mono text-[11px] text-zinc-500">
-          <JargonTerm term="tsb">TSB</JargonTerm> {fatigue.tsb > 0 ? "+" : ""}
-          {fatigue.tsb}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[11px] text-zinc-500">
+            <JargonTerm term="tsb">TSB</JargonTerm> {fatigue.tsb > 0 ? "+" : ""}
+            {fatigue.tsb}
+          </span>
+          <Link
+            href="/training"
+            className="text-[11px] text-zinc-500 transition-colors hover:text-zinc-300"
+          >
+            Load detail →
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4">
@@ -682,7 +701,9 @@ function ChangeFeed({ items }: { items: HomeOperatingSystemView["changeFeed"] })
         : "var(--hz-easy)";
   return (
     <Panel>
-      <Eyebrow className="mb-3">What changed recently</Eyebrow>
+      {/* The printable change summary is the long form of this list, and had no inbound
+          link either. Pairing them puts /report where a reader already is. */}
+      <PanelHeader title="What changed recently" href="/report" action="Full report" />
       {items.length === 0 ? (
         <p className="text-[13px] text-zinc-500">No notable changes this block.</p>
       ) : (

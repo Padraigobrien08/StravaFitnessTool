@@ -27,7 +27,15 @@ const minimalPrediction: RacePredictionAnalysis = {
     },
   ],
   primaryAnchor: null,
-  regression: { exponent: 1.09, coefficient: 1, rSquared: 0.9, pointCount: 5, curve: [] },
+  regression: {
+    exponent: 1.09,
+    coefficient: 1,
+    rSquared: 0.9,
+    residualLogSd: 0.04,
+    exponentStdError: 0.02,
+    pointCount: 5,
+    curve: [],
+  },
   explanation: [],
   confidence: "medium",
 };

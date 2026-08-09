@@ -37,12 +37,9 @@ Open **[http://localhost:3000](http://localhost:3000)** and click **“Try the d
 
 That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half marathon) so you can explore _every_ client-side surface instantly — **no Strava account, no database, no API key**. Hit **Exit demo** in the header to clear it. Prefer your own data? Use **Import** (100% in-browser) — see [Quick start](#quick-start).
 
-<!--
-  📸 Screenshots: run the demo, then capture Home / Intelligence / Goals into
-  docs/screenshots/{home,intelligence,goals}.png — see docs/screenshots/README.md.
--->
+![StrideIQ Home — console briefing on a live Strava account: today's focus, readiness and TSB, and the return-to-running ramp after fifteen days off](docs/screenshots/home.png)
 
-![StrideIQ Home — command briefing, readiness ring, intelligence feed](docs/screenshots/home.png)
+<sub>Home and Coach are a live Strava-synced account, caught mid-comeback after a training gap. Intelligence and Goals are the built-in demo athlete. Every number in all four is computed by the deterministic engines, not written by a model.</sub>
 
 ---
 
@@ -100,9 +97,34 @@ That loads a full **12-month sample athlete** (mid-build for a sub-1:45 half mar
 | **Coach**                  | Investigation workspace — threaded reasoning with server-backed tools                   |
 | **Report**                 | Printable training change summary                                                       |
 
+#### Intelligence — the curated belief model
+
+A read-first surface, not a chat window: what the system currently believes, how each signal is
+moving, and what to do about it. Every claim carries its evidence and confidence.
+
+![StrideIQ Intelligence — current focus and belief, how each signal is moving, and decision support split into risks, opportunities, and a primary action](docs/screenshots/intelligence.png)
+
+#### Goals — forecasts that admit what they don't know
+
+The forecast reports a range and a confidence, then names its own weakest assumption. Here the
+engine holds the band open because its models have never been scored against a race this athlete
+actually ran: _"The models agree with each other, which is not the same as being right."_
+
+![StrideIQ Goals — half-marathon forecast of 1h 37m with a p25–p75 range, evidence list, explicit confidence reasoning, and a limitations panel](docs/screenshots/goals.png)
+
+#### Coach — threaded investigation over deterministic tools
+
+The Coach orchestrates; it does not compute. Numbers come from the same
+[44 deterministic tools](#reasoning-tools-deterministic) the HTTP API exposes, and every answer
+closes with what it was grounded in, how confident it is, and what it could not see. The reply
+below is real, against a live synced account: note the limitation line conceding that a week
+without runs limits what the answer can say.
+
+![StrideIQ Coach — a real threaded investigation: two tool-grounded answers, each with a confidence level, the tools they were grounded in, and an explicit limitation line, beside an answer-context rail showing readiness, race, risk and opportunity](docs/screenshots/coach.png)
+
 ### Engineering
 
-- **1,000+ Vitest tests** · production `next build`
+- **1,800+ Vitest tests** · production `next build` · DB suites run against Postgres in CI
 - **shadcn/ui** component layer · DM Sans + Syne typography
 - **MCP package** — same intelligence tools in Claude Desktop (`packages/strideiq-mcp`)
 
@@ -313,6 +335,7 @@ Hosted stack: **Vercel** (app) + **Neon** (database) + **Strava** (OAuth + optio
 | `/runs/[id]/route` | GPS replay (pace, HR, elevation)                  |
 | `/intelligence`    | Athlete Intelligence Model                        |
 | `/coach`           | Investigation chat                                |
+| `/context`         | Training mix and cross-training context           |
 | `/report`          | Printable summary                                 |
 | `/import`          | CSV, FIT, Strava OAuth                            |
 | `/settings`        | Units, privacy, webhooks, data quality            |
@@ -418,6 +441,7 @@ Enable from **Settings** after OAuth is connected. Refresh the app after webhook
 | [docs/README.md](docs/README.md)                                                           | Documentation index                     |
 | [PRODUCT.md](PRODUCT.md)                                                                   | Product contract and IA rules           |
 | [docs/FEATURES.md](docs/FEATURES.md)                                                       | Complete feature catalog                |
+| [docs/LIMITATIONS.md](docs/LIMITATIONS.md)                                                 | What is validated, and what is not      |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                               | Layers, data flow, API                  |
 | [docs/COACH_AND_INTELLIGENCE.md](docs/COACH_AND_INTELLIGENCE.md)                           | Intelligence vs Coach                   |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)                                                   | Vercel + Neon + Strava production setup |
@@ -447,6 +471,21 @@ Enable from **Settings** after OAuth is connected. Refresh the app after webhook
 - Saved training weeks live in browser `localStorage` (not synced per user to Neon).
 - Coach and full intelligence bundle require server env and LLM keys.
 - See [docs/RELEASE_MVP.md](docs/RELEASE_MVP.md) for the full list.
+
+### What is validated, and what is not
+
+Those are scope gaps. The more important question for a tool that predicts race times is which
+of its numbers have been **checked against reality** — and the honest answer is: one race, and
+the model was 7.5% out.
+
+**[docs/LIMITATIONS.md](docs/LIMITATIONS.md)** sets that out in full: what has been backtested
+and what hasn't, why the forecast intervals are honesty floors rather than calibrated bands,
+the known result-matching defect in accuracy scoring, why marathon predictions are
+extrapolation, and which integrations have never run against the live system they talk to.
+
+Read it before trusting a number here. The distinction it keeps is between _implemented_,
+_unit-tested_, _integration-tested_, _exercised against the real external system_, and _proven
+in sustained use_ — 1,822 passing tests establish the second of those five, and nothing more.
 
 ---
 

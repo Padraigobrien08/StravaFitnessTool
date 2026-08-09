@@ -21,6 +21,12 @@ export interface CoachMessage {
 export interface CoachContextSnapshot {
   readinessScore: number | null;
   readinessLabel: string | null;
+  /**
+   * Set when training is not current: names the gap the numbers were measured
+   * before. Without it the rail shows "Readiness 67 · Nearly there" to an athlete
+   * who has not run in a fortnight, while Home shows DETRAINED from the same data.
+   */
+  currencyNote: string | null;
   freshness: number | null;
   fatigueLabel: string | null;
   tsb: number | null;
