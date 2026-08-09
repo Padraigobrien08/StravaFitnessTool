@@ -10,14 +10,18 @@ import type { FitRunDetail } from "@/lib/strava/fitTypes";
 /**
  * Adaptive goal-scenario engine — "what would it take to hit my goal?"
  *
- * Deterministic. The probability is NOT invented: each scenario perturbs the
- * training levers the forecast engine actually reads (recent-block volume,
- * long-run distance, weekly quality sessions), re-runs `buildRaceForecastV2`,
- * and maps the target time onto the resulting prediction interval. Language
- * layers (Coach, Goals panel) surface these numbers; they must not fabricate them.
+ * Deterministic. The score is NOT invented: each scenario perturbs the training
+ * levers the forecast engine actually reads (recent-block volume, long-run distance,
+ * weekly quality sessions), re-runs `buildRaceForecastV2`, and maps the target time
+ * onto the resulting band. Language layers (Coach, Goals panel) surface these numbers;
+ * they must not fabricate them.
+ *
+ * `probabilityPct` is a 0-100 plausibility score, not a percentage chance — see
+ * `probabilityOfTarget`. The field name predates that distinction and is kept only
+ * because it is persisted in recommendation logs.
  */
 
-/** Probability at/above which a target is called "likely". */
+/** Score at/above which a target is called "likely". */
 const LIKELY_PCT = 70;
 
 export interface GoalLever {
@@ -36,7 +40,7 @@ export interface GoalScenario {
   leverSummary: string;
   projectedTimeSec: number;
   projectedTimeLabel: string;
-  /** P(finish ≤ target) from the perturbed prediction interval; null if no target. */
+  /** 0-100 plausibility score from the perturbed band; null if no target. Not a chance. */
   probabilityPct: number | null;
   meetsTarget: boolean;
   /** Sustained weekly volume this scenario implies (km). */
@@ -77,16 +81,35 @@ function clamp(n: number, lo: number, hi: number): number {
 }
 
 /**
- * P(finish ≤ target) as a percent. The interval is a percentile ladder over
- * race times (smaller time = faster), so probability rises as the target time
- * grows. Piecewise-linear across p10–p90 with linear extrapolation at the ends,
+ * A 0–100 plausibility score for hitting `targetSec`, rising as the target gets
+ * easier. Piecewise-linear across the band with linear extrapolation at the ends,
  * clamped to [2, 98].
+ *
+ * **Not a probability, despite the shape.** This treats the five band points as a
+ * percentile ladder and interpolates between them. That would give P(finish ≤ target)
+ * if they were percentiles — but they are a symmetric spread of a heuristic width (see
+ * `RaceForecastV2["predictionIntervalSec"]`), so what comes out is an ordering, not a
+ * frequency. A "72" means the target sits comfortably inside the band, not that seven
+ * in ten attempts would beat it.
+ *
+ * The clamp to [2, 98] is the one part that is honest by construction: it refuses to
+ * ever say "certain" or "impossible", which is the right instinct for a number this
+ * softly founded. Kept as-is.
+ *
+ * Fitting real quantiles from scored races would make this an actual probability; until
+ * then, callers should present it as a score and never as a percentage chance.
  */
 export function probabilityOfTarget(
   targetSec: number,
   interval: RaceForecastV2["predictionIntervalSec"],
 ): number {
-  const xs = [interval.p10, interval.p25, interval.p50, interval.p75, interval.p90];
+  const xs = [
+    interval.outerLowSec,
+    interval.innerLowSec,
+    interval.mostLikelySec,
+    interval.innerHighSec,
+    interval.outerHighSec,
+  ];
   const ys = [10, 25, 50, 75, 90];
 
   // Below the fastest anchor — extrapolate using the first segment's slope.
@@ -234,7 +257,7 @@ export function computeGoalScenarios(input: RaceForecastInput): GoalScenarioResu
   const evidence = [
     `Baseline projection ${formatDuration(baseline.mostLikelyTimeSec)} (${baseline.confidence.replace("_", " ")} confidence)`,
     `Current load ~${currentWeeklyKm} km/wk, ${currentQualityPerWeek} quality session${currentQualityPerWeek === 1 ? "" : "s"}/wk`,
-    `Prediction corridor ${formatDuration(baseline.predictionIntervalSec.p25)}–${formatDuration(baseline.predictionIntervalSec.p75)} (p25–p75)`,
+    `Prediction corridor ${formatDuration(baseline.predictionIntervalSec.innerLowSec)}–${formatDuration(baseline.predictionIntervalSec.innerHighSec)}`,
   ];
 
   const limitations: string[] = [];
@@ -280,17 +303,17 @@ function buildRecommendation(
   baseline: RaceForecastV2,
 ): string {
   if (!hasTarget) {
-    return "Set a target time on your goal to see the probability of hitting it and the training changes that would move the needle.";
+    return "Set a target time on your goal to see how it scores against the forecast band and the training changes that would move the needle.";
   }
   const target = formatDuration(targetTimeSec!);
   if (baselineProbabilityPct != null && baselineProbabilityPct >= LIKELY_PCT) {
-    return `You're on track for ${target}: current training projects a ${baselineProbabilityPct}% chance. Hold specificity and freshness through race day.`;
+    return `You're on track for ${target}: current training scores it ${baselineProbabilityPct}/100 against the forecast band. Hold specificity and freshness through race day.`;
   }
   // Least-effort scenario (ladder order) that reaches "likely".
   const lift = scenarios.find((s) => s.id !== "maintain" && s.meetsTarget);
   if (lift) {
-    return `${target} looks reachable with "${lift.label}" (${lift.leverSummary}), which raises the estimate from ${baselineProbabilityPct}% to ${lift.probabilityPct}%.`;
+    return `${target} looks reachable with "${lift.label}" (${lift.leverSummary}), which raises the score from ${baselineProbabilityPct} to ${lift.probabilityPct}.`;
   }
   const best = scenarios[scenarios.length - 1];
-  return `${target} is a stretch: even a full training block projects only ${best.probabilityPct}%. Consider a more conservative target near ${formatDuration(baseline.predictionIntervalSec.p50)} or a later race date.`;
+  return `${target} is a stretch: even a full training block reaches only ${best.probabilityPct}/100. Consider a more conservative target near ${formatDuration(baseline.predictionIntervalSec.mostLikelySec)} or a later race date.`;
 }

@@ -406,12 +406,12 @@ The former legacy chart routes (`/dashboard`, `/trends`, `/effort`, `/records`, 
 The forecaster grades itself: each forecast is logged when issued, then scored against a
 later real effort at that distance.
 
-| Stage     | Behaviour                                                                                                                                                                              | Location                                                     |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Log       | Recorded on issue; never breaks the forecast if logging fails                                                                                                                          | `lib/forecasting-v2/calibrationService.ts`                   |
-| Score     | Matched against the earliest **plausible race attempt** after the issue date — within ±7% of the distance and no slower than p90 × 1.15, so training runs are not read as race results | `calibration.ts`                                             |
-| Summarize | Interval hit rate, median signed error, mean absolute error                                                                                                                            | `summarizeCalibration`                                       |
-| Surface   | Shown in `/intelligence`                                                                                                                                                               | `components/intelligence/intelligence-forecast-accuracy.tsx` |
+| Stage     | Behaviour                                                                                                                                                                                                | Location                                                     |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Log       | Recorded on issue; never breaks the forecast if logging fails                                                                                                                                            | `lib/forecasting-v2/calibrationService.ts`                   |
+| Score     | Matched against the earliest **plausible race attempt** after the issue date — within ±7% of the distance and no slower than the pessimistic bound × 1.15, so training runs are not read as race results | `calibration.ts`                                             |
+| Summarize | Interval hit rate, median signed error, mean absolute error                                                                                                                                              | `summarizeCalibration`                                       |
+| Surface   | Shown in `/intelligence`                                                                                                                                                                                 | `components/intelligence/intelligence-forecast-accuracy.tsx` |
 
 Requires a database: in export-only mode nothing is logged and the panel stays empty.
 

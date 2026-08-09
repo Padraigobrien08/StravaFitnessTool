@@ -30,7 +30,7 @@ export function ForecastV2Panel({ forecast }: { forecast: ForecastV2View }) {
             </p>
           </div>
           <div>
-            <Eyebrow>Realistic range (p25–p75)</Eyebrow>
+            <Eyebrow>Realistic range</Eyebrow>
             <Readout value={forecast.rangeDisplay} className="mt-1 text-lg text-zinc-200" />
             <p className="mt-0.5 text-xs text-zinc-500">
               Conservative {forecast.conservative} · Optimistic {forecast.optimistic}

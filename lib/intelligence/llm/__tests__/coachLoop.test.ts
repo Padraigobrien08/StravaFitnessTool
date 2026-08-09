@@ -170,13 +170,52 @@ describe("Anthropic: a failing tool must not end the conversation", () => {
     expect(bodyOf(1).messages.at(-1).content[0].is_error).toBeUndefined();
   });
 
-  it("still counts a failed tool as used, since it was called", async () => {
+  /**
+   * This assertion used to read the other way — "still counts a failed tool as used,
+   * since it was called" — and it was wrong on the premise, not the mechanics.
+   *
+   * `toolsUsed` has exactly one consumer: `describeGrounding`, which turns it into the
+   * "Grounded in readiness, volume" chips under a Coach answer. Those chips exist to
+   * tell the reader the numbers came from the engines. A call that threw returned no
+   * numbers, so listing it certifies the opposite of what happened: the model is
+   * correctly told the call failed and answers around it, while the badge tells the
+   * reader that failure was the evidence.
+   *
+   * "It was called" is true and irrelevant. The badge is not an audit log of attempts.
+   */
+  it("does not count a failed tool as grounding", async () => {
     executeIntelligenceTool.mockRejectedValue(new Error("nope"));
     fetchMock
       .mockResolvedValueOnce(anthropicTurn([toolBlock(REAL_TOOL)], "tool_use"))
       .mockResolvedValueOnce(anthropicTurn([textBlock("ok")], "end_turn"));
 
-    expect((await runAnthropic()).toolsUsed).toEqual([REAL_TOOL]);
+    expect((await runAnthropic()).toolsUsed).toEqual([]);
+  });
+
+  it("does not count a hallucinated tool name as grounding", async () => {
+    fetchMock
+      .mockResolvedValueOnce(anthropicTurn([toolBlock("get_imaginary_metric")], "tool_use"))
+      .mockResolvedValueOnce(anthropicTurn([textBlock("ok")], "end_turn"));
+
+    expect((await runAnthropic()).toolsUsed).toEqual([]);
+  });
+
+  // The mixed turn is the one that matters: dropping the failure must not drop the
+  // success alongside it, or a partial outage silently un-grounds a good answer.
+  it("keeps the tools that succeeded when one of several fails", async () => {
+    executeIntelligenceTool
+      .mockRejectedValueOnce(new Error("nope"))
+      .mockResolvedValueOnce({ readiness: 81 });
+    fetchMock
+      .mockResolvedValueOnce(
+        anthropicTurn(
+          [toolBlock(REAL_TOOL, "tu_1"), toolBlock("get_readiness", "tu_2")],
+          "tool_use",
+        ),
+      )
+      .mockResolvedValueOnce(anthropicTurn([textBlock("ok")], "end_turn"));
+
+    expect((await runAnthropic()).toolsUsed).toEqual(["get_readiness"]);
   });
 });
 
@@ -279,6 +318,28 @@ describe("OpenAI: the same guarantees", () => {
 
     await expect(runOpenAI()).resolves.toMatchObject({ reply: "Could not check." });
     expect(JSON.parse(bodyOf(1).messages.at(-1).content).error).toMatch(/database unavailable/);
+  });
+
+  // Same guarantee as the Anthropic loop: the grounding badge must not certify a call
+  // that returned nothing. The two loops had the identical defect and identical fix.
+  it("does not count a failed tool as grounding", async () => {
+    executeIntelligenceTool.mockRejectedValue(new Error("nope"));
+    fetchMock
+      .mockResolvedValueOnce(
+        openaiTurn(
+          {
+            role: "assistant",
+            content: null,
+            tool_calls: [
+              { id: "c1", type: "function", function: { name: REAL_TOOL, arguments: "{}" } },
+            ],
+          },
+          "tool_calls",
+        ),
+      )
+      .mockResolvedValueOnce(openaiTurn({ role: "assistant", content: "ok" }, "stop"));
+
+    expect((await runOpenAI()).toolsUsed).toEqual([]);
   });
 
   /**

@@ -354,7 +354,7 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
       return wrapIntelligence(
         {
           mostLikely: formatDuration(f.mostLikelyTimeSec),
-          range: `${formatDuration(f.predictionIntervalSec.p25)}–${formatDuration(f.predictionIntervalSec.p75)}`,
+          range: `${formatDuration(f.predictionIntervalSec.innerLowSec)}–${formatDuration(f.predictionIntervalSec.innerHighSec)}`,
           confidence: f.confidence,
           capabilityBase: formatDuration(f.capabilityBaseTimeSec),
           derivation: f.derivation.map((s) => ({
@@ -712,8 +712,8 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
           summary: {
             logged: s.logged,
             evaluated: s.evaluated,
-            withinIntervalPct: s.withinIntervalPct,
-            withinP25P75Pct: s.withinP25P75Pct,
+            outerBandHitRatePct: s.outerBandHitRatePct,
+            innerBandHitRatePct: s.innerBandHitRatePct,
             bias:
               s.medianSignedErrorSec == null
                 ? null
@@ -729,13 +729,13 @@ export async function executeIntelligenceTool(ctx: IntelligenceContext, call: To
             issued: f.issuedAt.slice(0, 10),
             predicted: formatDuration(f.mostLikelyTimeSec),
             actual: f.actualTimeSec != null ? formatDuration(f.actualTimeSec) : null,
-            withinInterval: f.withinInterval ?? null,
+            withinBand: f.withinBand ?? null,
           })),
         },
         quality,
         s.evaluated > 0
           ? [
-              `${s.withinIntervalPct}% of forecasts landed in the p10–p90 range (well-calibrated ≈ 80%)`,
+              `${s.outerBandHitRatePct}% of scored forecasts landed inside the band that was shown. This is an observed hit rate, not a calibration score: the band is a heuristic, so there is no share it ought to be.`,
               `Mean absolute error ${s.meanAbsErrorSec}s across ${s.evaluated} scored forecasts`,
             ]
           : [],
@@ -1148,7 +1148,7 @@ export const INTELLIGENCE_TOOL_DEFINITIONS = [
   {
     name: "get_forecast_accuracy",
     description:
-      "How well-calibrated the race forecaster has been: of past predictions that a real effort later tested, what share landed in the predicted p10–p90 range, the model's bias (optimistic/conservative), and mean absolute error. Use for 'how accurate are your predictions?', 'can I trust your forecast?', or a calibration check.",
+      "How the race forecaster has actually performed: of past predictions that a real effort later tested, what share landed inside the band that was shown, the model's bias (optimistic/conservative), and mean absolute error. The hit rate is an observed frequency, not a calibration score, because the band is not a fitted interval. Use for 'how accurate are your predictions?' or 'can I trust your forecast?'.",
     input_schema: { type: "object", properties: {}, additionalProperties: false },
   },
   {

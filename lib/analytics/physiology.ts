@@ -52,7 +52,32 @@ export interface CriticalSpeedFit {
   csMetersPerSec: number;
   /** Anaerobic distance reserve in meters — intercept of the distance–time line. */
   dPrimeMeters: number;
+  /**
+   * Goodness of fit. Kept for continuity and display, but **not** a quality gate.
+   *
+   * R² answers "does time explain distance", which over a 2–30 min window is close to
+   * asking whether longer efforts cover more ground — never in doubt. What it cannot
+   * answer is whether the *slope* is pinned down, and the slope is critical speed
+   * itself. Two effort sets with the same R² can disagree by 10% on CS.
+   *
+   * Its behaviour here is arbitrary rather than simply lenient: measured on the demo
+   * athlete's 45 in-band efforts it returns 0.843, which the old gate scored `low`
+   * while the actual scatter was 4.0% of mean distance. It rejected a reasonable fit
+   * for the wrong reason, and had no way to reject the fits that deserve it.
+   *
+   * Judge the fit by `csStdErrorMps` and `residualMeters`. Same conclusion, by a
+   * different route, as the log–log R² note on `fitPowerLawRegression`.
+   */
   rSquared: number;
+  /**
+   * Standard error of the fitted slope, i.e. of critical speed itself, in m/s. Null
+   * when n < 3. This is the number that governs whether the aerobic ceiling is pinned
+   * down: CS converts straight to a pace, so a 1% error here is a 1% error in every
+   * pace derived from it.
+   */
+  csStdErrorMps: number | null;
+  /** SD of the distance residuals, in metres. Null when n < 3. */
+  residualMeters: number | null;
   /** Number of efforts used in the fit. */
   n: number;
 }
@@ -177,24 +202,47 @@ export const RIEGEL_REFERENCE_EXPONENT = 1.06;
 const CS_MIN_SEC = 120; // ~2 min — below this, non-CS energetics dominate
 const CS_MAX_SEC = 1800; // ~30 min — beyond this, glycogen/durability confound the line
 
+/** Upper sanity bound on the anaerobic reserve; see `fitCriticalSpeed`. */
+const MAX_PLAUSIBLE_D_PRIME_M = 1000;
+
 /**
  * Fit the two-parameter critical-speed model: distance = CS·t + D′.
  * Ordinary least squares of distance (m) on time (s); slope is CS, intercept D′.
  * Returns null when the efforts are too few, too clustered in duration, or the
  * fit is implausible (non-positive CS, or a large negative reserve).
  */
-export function fitCriticalSpeed(
+/**
+ * Why a critical-speed fit was declined.
+ *
+ * Reported rather than inferred. `assessCriticalSpeed` used to guess the reason from
+ * the in-band effort count alone, so every rejection that was not "too few efforts"
+ * was explained to the athlete as "efforts are too clustered in duration". Measured on
+ * the demo athlete that produced a flatly false limitation: 45 efforts spanning the
+ * whole 2–30 min window, declined for an implausible D′, and told they were clustered.
+ * A diagnostic that names the wrong cause sends someone off to fix the wrong thing.
+ */
+export type CriticalSpeedRejection =
+  | "too_few_efforts"
+  | "durations_too_clustered"
+  | "implausible_speed"
+  | "implausible_reserve"
+  | "degenerate_fit";
+
+export type CriticalSpeedFitResult =
+  { fit: CriticalSpeedFit; rejection: null } | { fit: null; rejection: CriticalSpeedRejection };
+
+export function fitCriticalSpeedDetailed(
   points: { distanceKm: number; timeSec: number }[],
-): CriticalSpeedFit | null {
+): CriticalSpeedFitResult {
   const usable = points.filter(
     (p) => p.timeSec >= CS_MIN_SEC && p.timeSec <= CS_MAX_SEC && p.distanceKm > 0,
   );
-  if (usable.length < 3) return null;
+  if (usable.length < 3) return { fit: null, rejection: "too_few_efforts" };
 
   const times = usable.map((p) => p.timeSec);
   const spread = Math.max(...times) / Math.min(...times);
   // Need a real lever arm in duration, or the line is under-determined.
-  if (spread < 1.5) return null;
+  if (spread < 1.5) return { fit: null, rejection: "durations_too_clustered" };
 
   const xs = times; // seconds
   const ys = usable.map((p) => p.distanceKm * 1000); // meters
@@ -204,27 +252,74 @@ export function fitCriticalSpeed(
   const sumXX = xs.reduce((a, b) => a + b * b, 0);
   const sumXY = xs.reduce((a, x, i) => a + x * ys[i], 0);
   const denom = n * sumXX - sumX * sumX;
-  if (Math.abs(denom) < 1e-9) return null;
+  if (Math.abs(denom) < 1e-9) return { fit: null, rejection: "degenerate_fit" };
 
   const cs = (n * sumXY - sumX * sumY) / denom; // slope = critical speed (m/s)
   const dPrime = (sumY - cs * sumX) / n; // intercept = anaerobic reserve (m)
 
   // Physiological sanity: CS positive and in a plausible running range; a small
   // negative reserve is rounding noise, a large one means the model doesn't fit.
-  if (!Number.isFinite(cs) || cs <= 1 || cs > 8) return null;
-  if (!Number.isFinite(dPrime) || dPrime < -100) return null;
+  if (!Number.isFinite(cs) || cs <= 1 || cs > 8)
+    return { fit: null, rejection: "implausible_speed" };
+  if (!Number.isFinite(dPrime) || dPrime < -100) {
+    return { fit: null, rejection: "implausible_reserve" };
+  }
+  // …and the same check in the other direction, which was missing.
+  //
+  // D′ is an anaerobic distance bank: the metres you can spend above critical speed
+  // before you have to slow to it. For runners it is typically 100–300 m, and values
+  // past ~600 m are the literature's sign of a misfit rather than a remarkable athlete.
+  // Measured on the demo athlete, the unbounded fit returned D′ = 1614 m alongside a
+  // critical speed of 6:29/km — the signature of an effort set holding sub-maximal long
+  // efforts, which flatten the line and push the intercept up. Both numbers were then
+  // displayed as physiology.
+  //
+  // 1000 m is deliberately generous: it is roughly double the highest value a real
+  // runner plausibly holds, so it rejects only genuine misfit and never a strong
+  // anaerobic athlete. Returning null here means the surface says "not enough evidence"
+  // instead of quoting a fitted number nobody should act on, which is the same choice
+  // the rest of this module already makes when data is thin.
+  if (dPrime > MAX_PLAUSIBLE_D_PRIME_M) return { fit: null, rejection: "implausible_reserve" };
 
   const meanY = sumY / n;
   const ssTot = ys.reduce((s, y) => s + (y - meanY) ** 2, 0);
   const ssRes = ys.reduce((s, _y, i) => s + (ys[i] - (cs * xs[i] + dPrime)) ** 2, 0);
   const rSquared = ssTot > 0 ? 1 - ssRes / ssTot : 0;
 
+  // Standard OLS inference, the same two numbers `fitPowerLawRegression` computes for
+  // the power law and for the same reason: R² cannot tell you whether the *slope* is
+  // pinned down, and here the slope is the entire physiological claim.
+  const dof = n - 2;
+  const residualVariance = dof > 0 ? ssRes / dof : null;
+  const residualMeters = residualVariance !== null ? Math.sqrt(residualVariance) : null;
+  const sxx = sumXX - (sumX * sumX) / n;
+  const csStdErrorMps =
+    residualVariance !== null && sxx > 0 ? Math.sqrt(residualVariance / sxx) : null;
+
   return {
-    csMetersPerSec: cs,
-    dPrimeMeters: Math.max(0, dPrime),
-    rSquared: Math.round(rSquared * 1000) / 1000,
-    n,
+    fit: {
+      csMetersPerSec: cs,
+      dPrimeMeters: Math.max(0, dPrime),
+      rSquared: Math.round(rSquared * 1000) / 1000,
+      csStdErrorMps,
+      residualMeters,
+      n,
+    },
+    rejection: null,
   };
+}
+
+/** Thin wrapper for callers that only care whether a fit exists. */
+export function fitCriticalSpeed(
+  points: { distanceKm: number; timeSec: number }[],
+): CriticalSpeedFit | null {
+  return fitCriticalSpeedDetailed(points).fit;
+}
+
+/** Standard error of critical speed as a share of critical speed. */
+export function csRelativeStdError(fit: CriticalSpeedFit): number | null {
+  if (fit.csStdErrorMps === null || fit.csMetersPerSec <= 0) return null;
+  return fit.csStdErrorMps / fit.csMetersPerSec;
 }
 
 /** Predicted time (s) to cover distanceM at critical-speed capability. */
@@ -234,9 +329,37 @@ export function criticalSpeedPredictSec(fit: CriticalSpeedFit, distanceM: number
   return net / fit.csMetersPerSec;
 }
 
-function csConfidence(n: number, rSquared: number): "low" | "medium" | "high" {
-  if (n >= 5 && rSquared >= 0.95) return "high";
-  if (n >= 4 && rSquared >= 0.85) return "medium";
+/**
+ * ±2.5% on critical speed for `high`, ±6% for `medium`.
+ *
+ * Anchored to what the number is used for rather than picked for feel. CS converts
+ * directly to a pace, so its relative standard error *is* the relative error on every
+ * pace derived from it. At a 6:00/km critical speed, 2.5% is ±9 s/km — inside the
+ * range a runner can actually hold to — and 6% is ±22 s/km, which is still directional
+ * but no longer a target you would pace off.
+ *
+ * This replaces a gate of `rSquared >= 0.95` for high and `>= 0.85` for medium. R² was
+ * the wrong instrument twice over. It cannot see whether the *slope* is pinned down,
+ * and the slope carries the entire physiological claim: two effort sets with identical
+ * R² can disagree by 10% on critical speed. And its behaviour here is arbitrary rather
+ * than merely lenient — measured on the demo athlete's 45 in-band efforts it returns
+ * 0.843, which the old gate scored `low` while the actual scatter (4.0% of mean
+ * distance) is respectable. It was rejecting a fit for the wrong reason, having no way
+ * to reject the fits that deserve it.
+ *
+ * These are floors on **evidence**, not a calibration against measured error in CS,
+ * which would need a lab test or a set of true maximal efforts to establish. Same
+ * standing as the thresholds in `racePredictionConfidence`, and the same caveat.
+ */
+const CS_HIGH_MAX_REL_STD_ERROR = 0.025;
+const CS_MEDIUM_MAX_REL_STD_ERROR = 0.06;
+
+function csConfidence(fit: CriticalSpeedFit): "low" | "medium" | "high" {
+  const relSe = csRelativeStdError(fit);
+  // Without inference there is nothing to judge; n < 3 cannot reach the fit anyway.
+  if (relSe === null) return "low";
+  if (fit.n >= 5 && relSe <= CS_HIGH_MAX_REL_STD_ERROR) return "high";
+  if (fit.n >= 4 && relSe <= CS_MEDIUM_MAX_REL_STD_ERROR) return "medium";
   return "low";
 }
 
@@ -247,8 +370,31 @@ function paceStr(secPerKm: number): string {
 }
 
 /** Assess Critical Speed + D′ from race-quality effort points, glass-box. */
+const CS_REJECTION_LIMITATION: Record<CriticalSpeedRejection, (inBand: number) => string> = {
+  too_few_efforts: (n) =>
+    `Only ${n} effort${n === 1 ? "" : "s"} in the 2–30 min window (need ≥3 spread across durations).`,
+  durations_too_clustered: () =>
+    "Efforts are too clustered in duration for a stable critical-speed line: they need to span short and long to separate the two parameters.",
+  implausible_speed: () =>
+    "The fitted critical speed fell outside a plausible running range, which means the line does not describe these efforts.",
+  implausible_reserve: () =>
+    "The fitted anaerobic reserve came out implausibly large, the signature of sub-maximal efforts in the set flattening the line. Critical speed is withheld rather than reported from a fit this shape.",
+  degenerate_fit: () => "The efforts do not vary enough in duration to fit a line at all.",
+};
+
+const CS_REJECTION_INTERPRETATION: Record<CriticalSpeedRejection, string> = {
+  too_few_efforts:
+    "Not enough efforts across the 2–30 min range to separate aerobic ceiling from anaerobic reserve.",
+  durations_too_clustered:
+    "Efforts do not span enough of the 2–30 min range to separate aerobic ceiling from anaerobic reserve.",
+  implausible_speed: "The critical-speed model does not fit these efforts.",
+  implausible_reserve:
+    "The critical-speed model does not fit these efforts well enough to report a number.",
+  degenerate_fit: "The critical-speed model does not fit these efforts.",
+};
+
 export function assessCriticalSpeed(efforts: EffortPoint[]): CriticalSpeedAssessment {
-  const fit = fitCriticalSpeed(efforts);
+  const { fit, rejection } = fitCriticalSpeedDetailed(efforts);
   if (!fit) {
     const inBand = efforts.filter((e) => e.timeSec >= CS_MIN_SEC && e.timeSec <= CS_MAX_SEC).length;
     return {
@@ -259,22 +405,22 @@ export function assessCriticalSpeed(efforts: EffortPoint[]): CriticalSpeedAssess
       rSquared: null,
       n: inBand,
       confidence: "low",
-      interpretation:
-        "Not enough efforts across the 2–30 min range to separate aerobic ceiling from anaerobic reserve.",
+      interpretation: CS_REJECTION_INTERPRETATION[rejection],
       evidence: [],
-      limitations: [
-        inBand < 3
-          ? `Only ${inBand} effort${inBand === 1 ? "" : "s"} in the 2–30 min window (need ≥3 spread across durations).`
-          : "Efforts are too clustered in duration for a stable critical-speed line.",
-      ],
+      limitations: [CS_REJECTION_LIMITATION[rejection](inBand)],
     };
   }
 
   const csPace = 1000 / fit.csMetersPerSec;
-  const confidence = csConfidence(fit.n, fit.rSquared);
+  const confidence = csConfidence(fit);
+  const relSe = csRelativeStdError(fit);
 
   const evidence = [
-    `Fitted ${fit.n} best efforts (2–30 min) to distance = CS·t + D′, R²=${fit.rSquared.toFixed(2)}.`,
+    // Report the standard error, not R². R² says "longer efforts cover more ground";
+    // the standard error says how much the pace below is allowed to move.
+    relSe !== null
+      ? `Fitted ${fit.n} best efforts (2–30 min) to distance = CS·t + D′; critical speed pinned to ±${(relSe * 100).toFixed(1)}%.`
+      : `Fitted ${fit.n} best efforts (2–30 min) to distance = CS·t + D′.`,
     `Critical speed ${paceStr(csPace)}, the pace your aerobic system can hold with fatigue held roughly steady.`,
     `Anaerobic reserve D′ ≈ ${Math.round(fit.dPrimeMeters)} m, the distance bank you can spend above critical speed.`,
   ];

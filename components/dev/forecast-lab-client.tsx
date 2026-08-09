@@ -113,8 +113,8 @@ export function ForecastLabClient() {
             <Row label="Distance" value={f.distanceLabel} />
             <Row label="Most likely" value={formatSec(f.mostLikelyTimeSec)} />
             <Row
-              label="Interval p10–p90"
-              value={`${formatSec(f.predictionIntervalSec.p10)} – ${formatSec(f.predictionIntervalSec.p90)}`}
+              label="Outer band"
+              value={`${formatSec(f.predictionIntervalSec.outerLowSec)} – ${formatSec(f.predictionIntervalSec.outerHighSec)}`}
             />
             <Row label="Conservative" value={formatSec(f.conservativeTimeSec)} />
             <Row label="Optimistic" value={formatSec(f.optimisticTimeSec)} />

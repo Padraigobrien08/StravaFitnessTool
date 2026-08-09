@@ -125,13 +125,27 @@ describe("fitCriticalSpeed", () => {
 
 describe("criticalSpeedPredictSec", () => {
   it("round-trips distance = CS·t + D′", () => {
-    const fit = { csMetersPerSec: 5, dPrimeMeters: 200, rSquared: 1, n: 5 };
+    const fit = {
+      csMetersPerSec: 5,
+      dPrimeMeters: 200,
+      rSquared: 1,
+      csStdErrorMps: 0,
+      residualMeters: 0,
+      n: 5,
+    };
     // 5000 m should take (5000 − 200) / 5 = 960 s
     expect(criticalSpeedPredictSec(fit, 5000)).toBeCloseTo(960, 5);
   });
 
   it("returns null when distance is inside the reserve", () => {
-    const fit = { csMetersPerSec: 5, dPrimeMeters: 200, rSquared: 1, n: 5 };
+    const fit = {
+      csMetersPerSec: 5,
+      dPrimeMeters: 200,
+      rSquared: 1,
+      csStdErrorMps: 0,
+      residualMeters: 0,
+      n: 5,
+    };
     expect(criticalSpeedPredictSec(fit, 100)).toBeNull();
   });
 });
@@ -422,5 +436,107 @@ describe("computePhysiology", () => {
     } else {
       expect(phys.criticalSpeed.limitations.length).toBeGreaterThan(0);
     }
+  });
+});
+
+/**
+ * The critical-speed quality gate.
+ *
+ * These pin the replacement of a gate that read `rSquared >= 0.95` for high and
+ * `>= 0.85` for medium. R² cannot see whether the *slope* is pinned down, and the
+ * slope is the whole physiological claim: critical speed converts directly to a pace,
+ * so its relative standard error is the relative error of every pace derived from it.
+ */
+describe("critical-speed fit quality", () => {
+  const durations = [180, 400, 700, 1100, 1500];
+
+  it("reports the standard error of critical speed, not just R²", () => {
+    const fit = fitCriticalSpeed(durations.map((t) => pointOnLine(t, 5, 200)))!;
+    // A perfectly collinear set: no scatter, so no uncertainty in the slope.
+    expect(fit.csStdErrorMps).toBeCloseTo(0, 6);
+    expect(fit.residualMeters).toBeCloseTo(0, 6);
+  });
+
+  it("gives high confidence to a tightly determined line", () => {
+    const a = assessCriticalSpeed(
+      durations.map((t) => {
+        const p = pointOnLine(t, 5, 200);
+        return effort(p.distanceKm, p.timeSec);
+      }),
+    );
+    expect(a.available).toBe(true);
+    expect(a.confidence).toBe("high");
+  });
+
+  /**
+   * The case R² could not catch. Scatter is added so the slope is poorly determined,
+   * while R² stays high because distance and time remain near-collinear over the
+   * window — which is exactly the failure the old gate was blind to.
+   */
+  it("withholds high confidence when the slope is loosely determined", () => {
+    const noisy = durations.map((t, i) => {
+      const p = pointOnLine(t, 5, 200);
+      const jitter = (i % 2 === 0 ? 1 : -1) * 0.12 * p.distanceKm;
+      return effort(p.distanceKm + jitter, p.timeSec);
+    });
+    const a = assessCriticalSpeed(noisy);
+    expect(a.rSquared).toBeGreaterThan(0.85); // the old gate would have said "medium"
+    expect(a.confidence).not.toBe("high");
+  });
+
+  it("quotes the standard error in its evidence rather than R²", () => {
+    const a = assessCriticalSpeed(
+      durations.map((t) => {
+        const p = pointOnLine(t, 5, 200);
+        return effort(p.distanceKm, p.timeSec);
+      }),
+    );
+    expect(a.evidence[0]).toMatch(/pinned to ±/);
+    expect(a.evidence[0]).not.toMatch(/R²/);
+  });
+});
+
+/**
+ * D′ is an anaerobic distance bank, typically 100–300 m for a runner. The fit had a
+ * lower sanity bound (`dPrime < -100`) and no upper one, so a set holding sub-maximal
+ * long efforts flattened the line and pushed the intercept up without anything
+ * objecting. Measured on the demo athlete that produced D′ = 1614 m beside a critical
+ * speed of 6:29/km, both displayed as physiology.
+ */
+describe("critical-speed sanity bounds", () => {
+  it("rejects an implausibly large anaerobic reserve", () => {
+    const points = [180, 400, 700, 1100, 1500].map((t) => pointOnLine(t, 5, 1600));
+    expect(fitCriticalSpeed(points)).toBeNull();
+  });
+
+  it("still accepts a large but plausible reserve", () => {
+    const points = [180, 400, 700, 1100, 1500].map((t) => pointOnLine(t, 5, 400));
+    expect(fitCriticalSpeed(points)).not.toBeNull();
+  });
+
+  // The limitation used to be picked from the in-band count alone, so any rejection
+  // that was not "too few efforts" was explained as clustering — including this one,
+  // on 45 well-spread efforts.
+  it("names the real reason instead of blaming duration clustering", () => {
+    const a = assessCriticalSpeed(
+      [180, 400, 700, 1100, 1500].map((t) => {
+        const p = pointOnLine(t, 5, 1600);
+        return effort(p.distanceKm, p.timeSec);
+      }),
+    );
+    expect(a.available).toBe(false);
+    expect(a.limitations[0]).toMatch(/anaerobic reserve/);
+    expect(a.limitations[0]).not.toMatch(/clustered/);
+  });
+
+  it("still blames clustering when that is genuinely the problem", () => {
+    const a = assessCriticalSpeed(
+      [500, 560, 620].map((t) => {
+        const p = pointOnLine(t, 5, 200);
+        return effort(p.distanceKm, p.timeSec);
+      }),
+    );
+    expect(a.available).toBe(false);
+    expect(a.limitations[0]).toMatch(/clustered/);
   });
 });

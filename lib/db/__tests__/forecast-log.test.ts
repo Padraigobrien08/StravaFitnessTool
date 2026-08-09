@@ -16,10 +16,10 @@ function makeForecast(overrides: Partial<LoggedForecast> = {}): LoggedForecast {
     distanceMeters: 21097,
     issuedAt: "2026-05-01T08:00:00.000Z",
     mostLikelyTimeSec: 5400,
-    p10Sec: 5250,
-    p25Sec: 5330,
-    p75Sec: 5470,
-    p90Sec: 5550,
+    outerLowSec: 5250,
+    innerLowSec: 5330,
+    innerHighSec: 5470,
+    outerHighSec: 5550,
     ...overrides,
   };
 }
@@ -58,12 +58,12 @@ describe.skipIf(!hasDb)("forecast-log DB persistence", () => {
       ...makeForecast(),
       actualTimeSec: 5420,
       actualDate: "2026-06-10",
-      withinInterval: true,
+      withinBand: true,
       signedErrorSec: 20,
       evaluatedAt: "2026-06-11T00:00:00.000Z",
     });
     const found = (await getForecasts(TEST_USER)).find((f) => f.forecastId === FC_ID)!;
     expect(found.actualTimeSec).toBe(5420);
-    expect(found.withinInterval).toBe(true);
+    expect(found.withinBand).toBe(true);
   });
 });

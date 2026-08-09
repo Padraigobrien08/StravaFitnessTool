@@ -161,22 +161,38 @@ export function buildUncertaintyAssessment(
   };
 }
 
+/**
+ * Spread `widthSec` symmetrically around the point estimate to give an inner and an
+ * outer band.
+ *
+ * The two multipliers are shape, not statistics. `OUTER_HALF_WIDTH_FACTOR` is wider
+ * than half the nominal width so the outer band is visibly the pessimistic case, and
+ * `INNER_HALF_WIDTH_FACTOR` is narrower so there is a tighter corridor to talk about.
+ * They were chosen to look right on a chart and have never been fitted to anything.
+ *
+ * This function used to return `p10/p25/p50/p75/p90`. It computes exactly what it
+ * computed then; only the names changed, because the old ones claimed a distribution
+ * this construction does not have. See `RaceForecastV2["predictionIntervalSec"]`.
+ */
+const OUTER_HALF_WIDTH_FACTOR = 1.35;
+const INNER_HALF_WIDTH_FACTOR = 0.75;
+
 export function buildPredictionInterval(
   centerSec: number,
   widthSec: number,
 ): {
-  p10: number;
-  p25: number;
-  p50: number;
-  p75: number;
-  p90: number;
+  outerLowSec: number;
+  innerLowSec: number;
+  mostLikelySec: number;
+  innerHighSec: number;
+  outerHighSec: number;
 } {
   const half = widthSec / 2;
   return {
-    p10: Math.round(centerSec - half * 1.35),
-    p25: Math.round(centerSec - half * 0.75),
-    p50: Math.round(centerSec),
-    p75: Math.round(centerSec + half * 0.75),
-    p90: Math.round(centerSec + half * 1.35),
+    outerLowSec: Math.round(centerSec - half * OUTER_HALF_WIDTH_FACTOR),
+    innerLowSec: Math.round(centerSec - half * INNER_HALF_WIDTH_FACTOR),
+    mostLikelySec: Math.round(centerSec),
+    innerHighSec: Math.round(centerSec + half * INNER_HALF_WIDTH_FACTOR),
+    outerHighSec: Math.round(centerSec + half * OUTER_HALF_WIDTH_FACTOR),
   };
 }

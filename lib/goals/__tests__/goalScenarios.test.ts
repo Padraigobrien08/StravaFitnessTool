@@ -7,7 +7,13 @@ import {
 } from "@/lib/forecasting-v2/evaluation/fixtures";
 import type { RaceForecastInput } from "@/lib/forecasting-v2/forecastTypes";
 
-const interval = { p10: 6000, p25: 6200, p50: 6400, p75: 6600, p90: 6800 };
+const interval = {
+  outerLowSec: 6000,
+  innerLowSec: 6200,
+  mostLikelySec: 6400,
+  innerHighSec: 6600,
+  outerHighSec: 6800,
+};
 
 describe("probabilityOfTarget", () => {
   it("returns ~the anchor percentile when the target sits on an anchor", () => {
@@ -17,7 +23,7 @@ describe("probabilityOfTarget", () => {
   });
 
   it("interpolates between anchors", () => {
-    // Midway between p50 (6400→50) and p75 (6600→75) → ~62.5
+    // Midway between mostLikelySec (6400→50) and innerHighSec (6600→75) → ~62.5
     expect(probabilityOfTarget(6500, interval)).toBeCloseTo(62.5, 0);
   });
 

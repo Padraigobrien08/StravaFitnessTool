@@ -49,15 +49,39 @@ around a wrong number. A minimum width is now applied as a share of predicted ti
 confidence. That is a floor asserted to prevent false precision; it is not a distribution
 fitted to observed error, and it should not be read as "80% of races land in here."
 
+**The band used to be labelled with quantile names, and that was the sharpest piece of
+false precision in the repository.** The five points were called `p10/p25/p50/p75/p90`
+everywhere — in the type, in the API, on the Goals screen ("Realistic range (p25–p75)"),
+and in the tool description Coach reads. Nothing about their construction earns those
+names: the width is a sum of hand-chosen per-driver seconds with a floor applied, spread
+symmetrically by two fixed multipliers. Naming something p10 asserts that a tenth of
+outcomes fall below it, and no such claim had ever been checked.
+
+It was not only cosmetic. `calibration.ts` scored those bounds as though they were
+quantiles, reporting coverage against "an ideal of ~80%", and the Coach-facing tool
+description repeated the 80% target — so the unearned claim was propagating into
+generated answers. Three consequences, all now fixed: the fields are named
+`outerLowSec`/`innerLowSec`/`mostLikelySec`/`innerHighSec`/`outerHighSec`; the summary
+reports an observed **hit rate** with no target attached, because a heuristic band has no
+share it ought to hit; and the same correction was applied to `probabilityOfTarget`,
+which interpolates the band into what it called `P(finish ≤ target)` and presented to
+the athlete as "a 68% chance". It is now described and displayed as a 0–100 score.
+
+The symmetry is still wrong on its own terms — race times are right-skewed, because a
+blow-up costs far more than a good day gains — and is left alone deliberately. A
+symmetric heuristic is honest; a symmetric _quantile_ is not. Only the claim was
+withdrawn.
+
 **The production calibration loop has no data.** `lib/forecasting-v2/calibration.ts` logs each
-forecast and scores it when a real effort at that distance lands, reporting p10–p90 coverage
-against an ideal of ~80%. The mechanism is implemented and unit-tested. It has not accumulated
-enough scored forecasts to report a coverage number, and none is published here. **Do not read
-the existence of a calibration module as evidence the forecaster is calibrated.**
+forecast and scores it when a real effort at that distance lands, reporting the observed hit
+rate against the band. The mechanism is implemented and unit-tested. It has not accumulated
+enough scored forecasts to report a number, and none is published here. **Do not read
+the existence of a calibration module as evidence the forecaster is calibrated** — it is
+named for what it is meant to become, not for what it currently does.
 
 **Known defect — result matching (DD-3).** Scoring picks the _earliest_ qualifying effort
-after the issue date, guarded by rejecting anything slower than 15% below p90
-(`RACE_ATTEMPT_MAX_SLOWDOWN_VS_P90`). That guard was added after the accuracy panel reported
+after the issue date, guarded by rejecting anything slower than 15% below the pessimistic
+bound (`RACE_ATTEMPT_MAX_SLOWDOWN_VS_OUTER_HIGH`). That guard was added after the accuracy panel reported
 the model 40 minutes optimistic because an easy 21 km three days after a forecast had been
 scored as the race (`6d448fd`). The residual risk is real: a hard tempo at the target distance
 can land inside the same 15% band and be recorded as the race. For an athlete who races rarely
@@ -150,6 +174,29 @@ displayed beside Critical Speed.
 own efforts. The model is well established; the fit quality depends entirely on how many
 genuine maximal efforts of differing duration exist in the data, which for most recreational
 runners is few.
+
+**Its confidence gate used to be R², which is the same mistake this page criticises the
+race forecaster for.** `csConfidence` required `R² ≥ 0.95` for high and `≥ 0.85` for
+medium. R² asks whether time explains distance, which over a 2–30 min window is close to
+asking whether longer efforts cover more ground. It cannot see whether the _slope_ is
+determined, and the slope is critical speed itself. The gate now uses the standard error
+of the fitted slope: ±2.5% for high, ±6% for medium. Those are floors on evidence, not a
+calibration against measured error in CS — the same standing, and the same caveat, as the
+race-prediction thresholds above.
+
+**A missing sanity bound was reporting a misfit as physiology.** D′ is an anaerobic
+distance bank, typically 100–300 m for a runner. The fit rejected implausibly _negative_
+reserves and had no upper bound at all. Measured on the demo athlete it returned
+**D′ = 1614 m beside a critical speed of 6:29/km** — the signature of sub-maximal long
+efforts flattening the line — and both numbers were displayed as measurements. Fits above
+1000 m are now declined outright, so the surface says it cannot answer instead of quoting
+a number nobody should act on. On the demo athlete it now declines.
+
+Fixing that surfaced a third problem: the "unavailable" message was chosen from the
+in-band effort count alone, so every rejection that was not "too few efforts" was
+explained as _"efforts are too clustered in duration"_ — including this one, on 45
+efforts spanning the whole window. The reason is now reported by the fit rather than
+guessed by the caller.
 
 ---
 

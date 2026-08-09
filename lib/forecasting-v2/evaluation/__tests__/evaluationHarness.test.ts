@@ -124,7 +124,8 @@ describe("fixture athletes", () => {
       fixtureId: "inconsistent_models",
     });
     const width =
-      report.forecast.predictionIntervalSec.p90 - report.forecast.predictionIntervalSec.p10;
+      report.forecast.predictionIntervalSec.outerHighSec -
+      report.forecast.predictionIntervalSec.outerLowSec;
     expect(width).toBeGreaterThanOrEqual(180);
     expect(report.fixtureExpectation?.met).toBe(true);
   });

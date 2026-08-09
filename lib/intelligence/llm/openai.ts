@@ -101,7 +101,6 @@ export async function runOpenAICoachChat(
     }
 
     for (const tc of msg.tool_calls) {
-      toolsUsed.push(tc.function.name);
       let args: Record<string, unknown> = {};
       try {
         args = JSON.parse(tc.function.arguments || "{}") as Record<string, unknown>;
@@ -109,6 +108,8 @@ export async function runOpenAICoachChat(
         args = {};
       }
       const outcome = await executeToolForModel(ctx, tc.function.name, args);
+      // Only a call that returned data counts as grounding. See `describeGrounding`.
+      if (!outcome.isError) toolsUsed.push(tc.function.name);
       openaiMessages.push({
         role: "tool",
         tool_call_id: tc.id,

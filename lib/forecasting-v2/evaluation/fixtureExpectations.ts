@@ -23,7 +23,8 @@ export function evaluateFixtureExpectations(
   const failures: string[] = [];
   const exp = profile.expectations;
   const rank = CONFIDENCE_RANK[forecast.confidence];
-  const intervalWidth = forecast.predictionIntervalSec.p90 - forecast.predictionIntervalSec.p10;
+  const intervalWidth =
+    forecast.predictionIntervalSec.outerHighSec - forecast.predictionIntervalSec.outerLowSec;
   const rec = forecast.recommendation.toLowerCase();
 
   if (exp.maxConfidence != null && rank > CONFIDENCE_RANK[exp.maxConfidence]) {

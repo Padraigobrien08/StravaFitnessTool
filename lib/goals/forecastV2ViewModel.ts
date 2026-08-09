@@ -72,8 +72,8 @@ export interface ForecastV2View {
 }
 
 function intervalRange(f: RaceForecastV2): string {
-  const { p25, p75 } = f.predictionIntervalSec;
-  return `${formatDuration(p25)}–${formatDuration(p75)}`;
+  const { innerLowSec, innerHighSec } = f.predictionIntervalSec;
+  return `${formatDuration(innerLowSec)}–${formatDuration(innerHighSec)}`;
 }
 
 function confidenceLabel(c: RaceForecastV2["confidence"]): string {
@@ -140,9 +140,9 @@ export function buildForecastV2View(opts: {
       gapSec <= 0
         ? `${formatDuration(Math.abs(gapSec))} ahead of target`
         : `${formatDuration(gapSec)} behind target`;
-    const beatsTarget = targetTimeSec >= raw.predictionIntervalSec.p25;
+    const beatsTarget = targetTimeSec >= raw.predictionIntervalSec.innerLowSec;
     targetChance = beatsTarget
-      ? "Current evidence suggests target is within realistic range (p25–p75 corridor)."
+      ? "Current evidence suggests target is within the realistic range."
       : "Target is more ambitious than the current prediction interval suggests.";
     targetPath = realistic
       ? "Maintain specificity and freshness; execution discipline on race day."
