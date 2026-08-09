@@ -4,7 +4,7 @@ StrideIQ is a **Next.js 16** application that ingests Strava activities, normali
 
 ## Design principles
 
-1. **UI never reads raw Strava CSV shapes** — parsing stays in `lib/strava`; features consume `lib/domain` and view models.
+1. **UI never reads raw Strava CSV shapes** — parsing stays in `lib/strava`, which emits zod-validated normalized types; features consume those and view models.
 2. **Insights before charts** — narrative cards include evidence, severity, and confidence.
 3. **LLMs orchestrate; engines decide** — Coach and MCP call tools backed by `lib/analytics`, `lib/reasoning`, and `lib/ecosystem`; the model must not invent metrics.
 4. **Running vs ecosystem** — race performance and readiness are run-centric; bike/strength/yoga inform fatigue and interference context only unless explicitly scoped.
@@ -18,7 +18,7 @@ Strava export folder (activities.csv + optional activities/*.fit.gz)
         ↓
 lib/strava/* parsers
         ↓
-lib/domain/mapFromStrava → RunActivity[]
+lib/strava/parse* → RunActivity[] (zod-validated)
         ↓
 lib/analytics (client) + lib/insights
         ↓
@@ -46,20 +46,20 @@ Both paths converge on the same **in-memory analytics** shape (`DashboardInsight
 
 ## Layer map
 
-| Layer                | Location                                              | Responsibility                                                  |
-| -------------------- | ----------------------------------------------------- | --------------------------------------------------------------- |
-| Ingest               | `lib/strava/`, `lib/sync/`, `lib/storage/`            | CSV, API, FIT → raw then domain                                 |
-| Domain               | `lib/domain/`                                         | `RunActivity`, normalized fields                                |
-| Analytics            | `lib/analytics/`                                      | Volume, fatigue, readiness, predictions, efficiency             |
-| Insights             | `lib/insights/`                                       | Question-tagged narrative cards                                 |
-| Reasoning            | `lib/reasoning/`                                      | compare_sessions, readiness delta, best phase, fade, PR context |
-| Ecosystem            | `lib/ecosystem/`                                      | Multi-sport load, interference, archetype                       |
-| Intelligence service | `lib/intelligence/`                                   | Server bundle, tools, chat loop, API auth                       |
-| Coach UI state       | `lib/coach/`, `hooks/use-coach-thread.ts`             | Workspace state, threads, response parsing                      |
-| Athlete model UI     | `lib/intelligence/athleteState.ts`, `presentation.ts` | Shared selectors for `/intelligence` and Coach context          |
-| View models          | `lib/training/`, `lib/goals/`, `lib/report/`          | Page-specific DTOs                                              |
-| Route intelligence   | `lib/route-intelligence/`                             | GPS replay timeline, overlays                                   |
-| DB                   | `lib/db/`, `db/migrations/`                           | Neon schema, connections, preferences                           |
+| Layer                | Location                                              | Responsibility                                                   |
+| -------------------- | ----------------------------------------------------- | ---------------------------------------------------------------- |
+| Ingest               | `lib/strava/`, `lib/sync/`, `lib/storage/`            | CSV, API, FIT → raw then domain                                  |
+| Domain               | `lib/strava/types.ts`                                 | `RunActivity`, `ActivitySummary`, `AthleteProfile` (zod schemas) |
+| Analytics            | `lib/analytics/`                                      | Volume, fatigue, readiness, predictions, efficiency              |
+| Insights             | `lib/insights/`                                       | Question-tagged narrative cards                                  |
+| Reasoning            | `lib/reasoning/`                                      | compare_sessions, readiness delta, best phase, fade, PR context  |
+| Ecosystem            | `lib/ecosystem/`                                      | Multi-sport load, interference, archetype                        |
+| Intelligence service | `lib/intelligence/`                                   | Server bundle, tools, chat loop, API auth                        |
+| Coach UI state       | `lib/coach/`, `hooks/use-coach-thread.ts`             | Workspace state, threads, response parsing                       |
+| Athlete model UI     | `lib/intelligence/athleteState.ts`, `presentation.ts` | Shared selectors for `/intelligence` and Coach context           |
+| View models          | `lib/training/`, `lib/goals/`, `lib/report/`          | Page-specific DTOs                                               |
+| Route intelligence   | `lib/route-intelligence/`                             | GPS replay timeline, overlays                                    |
+| DB                   | `lib/db/`, `db/migrations/`                           | Neon schema, connections, preferences                            |
 
 ## Application surfaces
 

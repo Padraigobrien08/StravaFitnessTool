@@ -1,5 +1,4 @@
 import type { StravaImport } from "@/lib/strava/types";
-import { mapStravaImport } from "@/lib/domain/mapFromStrava";
 
 export type ConfidenceLevel = "low" | "medium" | "high";
 
@@ -31,11 +30,14 @@ function coverageLevel(ratio: number): ConfidenceLevel {
 }
 
 export function assessImportQuality(data: StravaImport): ImportQualityReport {
-  const dataset = mapStravaImport(data);
-  const runs = dataset.runs;
+  // Counted straight off the parsed runs. This used to call `mapStravaImport` first,
+  // re-shaping every run in the dataset so that five `!= null` checks could read
+  // `avgHeartRate` instead of `avgHr` — a full O(n) copy per call, on a function the
+  // dashboard hook runs on every render, to rename one field.
+  const runs = data.runs;
   const total = runs.length;
 
-  const withHr = runs.filter((r) => r.avgHeartRate != null).length;
+  const withHr = runs.filter((r) => r.avgHr != null).length;
   const withElev = runs.filter((r) => r.elevationGainM != null).length;
   const withLoad = runs.filter((r) => r.trainingLoad != null).length;
   const withCadence = runs.filter((r) => r.avgCadence != null).length;
