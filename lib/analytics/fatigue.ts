@@ -1,12 +1,17 @@
 import type { RunActivity } from "@/lib/strava/types";
 import type { LegFeel } from "@/lib/wellness/types";
 import { DEFAULT_FEEL_CALIBRATION, type FeelCalibration } from "@/lib/wellness/calibration";
-import { parseISO, format, startOfWeek, addWeeks } from "date-fns";
+import { parseISO, format, startOfWeek, addWeeks, differenceInCalendarDays } from "date-fns";
 
 export interface WeeklyLoadPoint {
   weekStart: string;
   label: string;
   load: number;
+  /**
+   * True for the final point, which covers the trailing seven days rather than a
+   * calendar week. See `weeklyLoadSeries`.
+   */
+  trailing?: boolean;
 }
 
 export interface AcuteChronicLoad {
@@ -45,6 +50,12 @@ export function weeklyLoadSeries(runs: RunActivity[]): WeeklyLoadPoint[] {
   const withLoad = runs.filter((r) => r.trainingLoad !== null);
   const useProxy = withLoad.length < runs.length * 0.5;
 
+  // One rule for what a run costs, shared by the weekly buckets and the trailing
+  // window below. Two copies would drift, and the drift would look like a real
+  // change in fitness.
+  const loadOf = (run: RunActivity): number =>
+    useProxy ? (run.distanceM / 1000) * 10 : (run.trainingLoad ?? (run.distanceM / 1000) * 10);
+
   const map = new Map<string, WeeklyLoadPoint>();
 
   for (const run of runs) {
@@ -55,10 +66,7 @@ export function weeklyLoadSeries(runs: RunActivity[]): WeeklyLoadPoint[] {
       label: format(parseISO(key), "MMM d"),
       load: 0,
     };
-    const load = useProxy
-      ? (run.distanceM / 1000) * 10
-      : (run.trainingLoad ?? (run.distanceM / 1000) * 10);
-    existing.load += load;
+    existing.load += loadOf(run);
     map.set(key, existing);
   }
 
@@ -70,11 +78,31 @@ export function weeklyLoadSeries(runs: RunActivity[]): WeeklyLoadPoint[] {
   // through the current week so a gap that runs up to today still decays.
   const keys = [...map.keys()].sort();
   const out: WeeklyLoadPoint[] = [];
-  const lastWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const now = new Date();
+  const lastWeek = startOfWeek(now, { weekStartsOn: 1 });
+  const lastWeekKey = format(lastWeek, "yyyy-MM-dd");
   let cursor = parseISO(keys[0]);
   while (cursor <= lastWeek) {
     const key = format(cursor, "yyyy-MM-dd");
-    out.push(map.get(key) ?? { weekStart: key, label: format(cursor, "MMM d"), load: 0 });
+    const point = map.get(key) ?? { weekStart: key, label: format(cursor, "MMM d"), load: 0 };
+    // The current calendar week is only partly over, but the exponential average
+    // treats every point as a whole week. On a Monday that fed in a single day as
+    // though it were seven, and acute load collapsed: measured on the demo athlete,
+    // ATL 66 → 40 and freshness 49 → 86 overnight on identical training. That decided
+    // whether the planner prescribed recovery, and tripped the Coach's "freshness
+    // supports quality work" line for anyone who happened to look on a Monday.
+    //
+    // So the final point covers the trailing seven days instead of the calendar week.
+    // It is always a whole week of load, needs no extrapolation from a partial one —
+    // which overshoots badly when the few elapsed days happen to hold a hard session —
+    // and is the same unit as every other point, so nothing downstream rescales.
+    // It overlaps the previous point by design; for an average that is mild smoothing,
+    // and far cheaper than a weekday artifact.
+    out.push(
+      key === lastWeekKey
+        ? { ...point, load: trailingSevenDayLoad(runs, now, loadOf), trailing: true }
+        : point,
+    );
     cursor = addWeeks(cursor, 1);
   }
   // Any run dated beyond the current week (clock skew, a future-dated activity)
@@ -83,6 +111,20 @@ export function weeklyLoadSeries(runs: RunActivity[]): WeeklyLoadPoint[] {
     if (key > format(lastWeek, "yyyy-MM-dd")) out.push(map.get(key)!);
   }
   return out;
+}
+
+/** Total load in the seven days ending today, inclusive. */
+function trailingSevenDayLoad(
+  runs: RunActivity[],
+  now: Date,
+  loadOf: (run: RunActivity) => number,
+): number {
+  let total = 0;
+  for (const run of runs) {
+    const days = differenceInCalendarDays(now, parseISO(run.date));
+    if (days >= 0 && days < 7) total += loadOf(run);
+  }
+  return total;
 }
 
 export function acuteChronicLoad(
