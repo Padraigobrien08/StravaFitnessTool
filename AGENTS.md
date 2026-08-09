@@ -14,7 +14,11 @@ Do **not** merge Intelligence into Coach or duplicate full dashboards in either 
 
 ## Code rules
 
-1. **No raw Strava CSV in UI** — `lib/strava` → `lib/domain` → features.
+1. **No raw Strava CSV in UI** — `lib/strava` parses CSV/API/FIT into zod-validated
+   normalized types (`RunActivity`, `ActivitySummary`, `AthleteProfile`) and those _are_
+   the domain model. Features consume them and view models, never CSV rows. There is no
+   second mapping layer: `lib/domain/` used to hold a parallel set of the same types and
+   was deleted, since nothing but a self-cancelling round trip ever used it.
 2. **LLMs call tools** — numbers come from `lib/analytics`, `lib/reasoning`, `lib/intelligence/tools.ts`.
 3. **Running vs ecosystem** — race predictions from runs; gym/bike/swim affect fatigue/interference context.
 4. **Coach layout** — viewport-locked; only `.coach-reasoning-scroll` scrolls; composer is `shrink-0`.

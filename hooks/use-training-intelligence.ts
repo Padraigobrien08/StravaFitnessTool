@@ -4,8 +4,13 @@ import { useMemo } from "react";
 import { useStrava } from "@/lib/context/strava-context";
 import { assessImportQuality } from "@/lib/quality/assessImport";
 import { generateInsights } from "@/lib/insights/generate";
-import { mapStravaImport } from "@/lib/domain/mapFromStrava";
 
+/**
+ * `runs` replaces what used to be `dataset`, a second copy of every run in a parallel
+ * shape produced by `mapStravaImport`. One consumer read it (`/report`), and it
+ * converted the fields straight back: `distanceM: r.distanceKm * 1000`. The round trip
+ * cancelled itself, so the runs are handed over as parsed.
+ */
 export function useTrainingIntelligence() {
   const { importData, insights, loading, fitStatus } = useStrava();
 
@@ -13,7 +18,7 @@ export function useTrainingIntelligence() {
     if (!importData || !insights) {
       return {
         loading,
-        dataset: null,
+        runs: [],
         quality: null,
         insights: [],
         analytics: null,
@@ -23,7 +28,7 @@ export function useTrainingIntelligence() {
     const generated = generateInsights(insights, quality);
     return {
       loading,
-      dataset: mapStravaImport(importData),
+      runs: importData.runs,
       quality,
       insights: generated,
       analytics: insights,

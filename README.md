@@ -141,7 +141,7 @@ flowchart LR
   end
 
   subgraph core [Core]
-    Parsers[lib/strava + domain]
+    Parsers[lib/strava parse + normalize]
     Analytics[Analytics engines]
     Insights[Insight engine]
   end
@@ -393,7 +393,7 @@ app/                      # Next.js App Router (pages + API)
 components/               # Feature UI (coach, plan, home, goals, …)
 components/ui/            # shadcn/ui primitives
 lib/
-  strava/ domain/         # Ingest + normalized activities
+  strava/                 # Ingest + zod-validated normalized activities
   analytics/ insights/  # Metrics + narratives
   intelligence/         # Server bundle, tools, chat
   reasoning/            # Deterministic reasoning primitives
@@ -404,7 +404,7 @@ packages/strideiq-mcp/    # MCP server
 docs/                     # Architecture, deploy, smoke tests
 ```
 
-**Rule:** UI consumes domain models and view models — never raw Strava CSV rows.
+**Rule:** UI consumes the normalized types from `lib/strava/types.ts` and view models — never raw Strava CSV rows.
 
 ### Scripts
 

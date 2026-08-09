@@ -5,26 +5,27 @@ import { RequireData } from "@/components/require-data";
 import { useTrainingIntelligence } from "@/hooks/use-training-intelligence";
 import { useGoalStore } from "@/stores/goal-store";
 import { buildReportPageView } from "@/lib/report/viewModels";
+import { paceSecPerKm } from "@/lib/analytics/pace";
 import { IntelligenceReport } from "@/components/report/intelligence-report";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 
 export default function ReportPage() {
-  const { analytics, insights, quality, dataset, loading } = useTrainingIntelligence();
+  const { analytics, insights, quality, runs, loading } = useTrainingIntelligence();
   const raceGoal = useGoalStore((s) => s.raceGoal);
 
   const recentRuns = useMemo(() => {
-    if (!dataset?.runs.length) return [];
-    return [...dataset.runs]
+    if (!runs.length) return [];
+    return [...runs]
       .reverse()
       .slice(0, 10)
       .map((r) => ({
         date: r.date,
         name: r.name,
-        distanceM: r.distanceKm * 1000,
-        paceSecPerKm: r.paceSecPerKm,
+        distanceM: r.distanceM,
+        paceSecPerKm: paceSecPerKm(r),
       }));
-  }, [dataset?.runs]);
+  }, [runs]);
 
   const view = useMemo(() => {
     if (!analytics) return null;

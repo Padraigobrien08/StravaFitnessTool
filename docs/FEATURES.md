@@ -139,11 +139,11 @@ tracks applied files in a `_migrations` table and is safe to re-run.
 
 ### 2.7 Domain model
 
-| Feature                | Description                           | Location                             |
-| ---------------------- | ------------------------------------- | ------------------------------------ |
-| **RunActivity**        | Normalized run shape for all features | `lib/strava/types.ts`, `lib/domain/` |
-| **NormalizedActivity** | Cross-sport shape for ecosystem       | `lib/ecosystem/types.ts`             |
-| **No raw CSV in UI**   | Parsers isolated in `lib/strava`      | Enforced by architecture             |
+| Feature                | Description                           | Location                 |
+| ---------------------- | ------------------------------------- | ------------------------ |
+| **RunActivity**        | Normalized run shape for all features | `lib/strava/types.ts`    |
+| **NormalizedActivity** | Cross-sport shape for ecosystem       | `lib/ecosystem/types.ts` |
+| **No raw CSV in UI**   | Parsers isolated in `lib/strava`      | Enforced by architecture |
 
 ---
 
