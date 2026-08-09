@@ -136,18 +136,28 @@ subscription has been registered and no real webhook delivery has been received.
 every generated plan silently becomes the deterministic fallback. `lib/env/index.ts` warns about
 this at startup. Coach chat itself supports both providers.
 
-**AI weekly planning reached the model for the first time recently, and has one verified
-run.** The strict JSON schema sent to OpenAI omitted five properties from its `required`
+**AI weekly planning reached the model for the first time recently, and works on a real
+account.** The strict JSON schema sent to OpenAI omitted five properties from its `required`
 lists, which strict structured outputs rejects outright. Every request returned 400, the error
 was discarded by a bare `catch`, and the deterministic fallback was served in its place — so
 every AI plan ever generated was rule-based, while the only symptom was a plan describing
-itself as a fallback. Fixed, and confirmed by a live call returning a real plan.
+itself as a fallback.
 
-What that establishes is narrow: one successful generation against the demo athlete. The
-schema contract is now unit-tested in both directions, but a test cannot prove the API
-_accepts_ the schema — only a live request does, and CI makes none. If the structured-output
-rules change, CI stays green and planning silently reverts to fallback. The failure is now at
-least logged (`plan.llm_call_failed`) rather than swallowed.
+Verified twice since the fix: once against the demo athlete, and once against a live synced
+account (809 activities, 73 runs) through `POST /api/me/weekly-plan`. That second run returned
+`source: "repaired"` with validation and integrity both passing, no `plan.llm_call_failed` in
+the logs, and a plan visibly shaped by the athlete's actual state — a return-to-running week
+naming the fifteen-day gap as its first limitation, where the fallback would have said "This
+is a rule-based fallback plan". `"repaired"` rather than `"llm"` means the safety ladder
+adjusted the model's output and said so, which is the ladder doing its job rather than
+standing in for a broken integration.
+
+That is two successful generations, not a track record. Nothing here has been observed over
+repeated weeks, plan quality has not been assessed beyond "the ladder accepted it", and the
+schema contract — while now unit-tested in both directions — cannot be proven by a test: only
+a live request shows the API still _accepts_ it, and CI makes none. If the structured-output
+rules change, CI stays green and planning silently reverts to fallback, now at least with
+`plan.llm_call_failed` in the logs rather than nothing at all.
 
 **`STRIDEIQ_API_KEY_USER_ID` is set by hand and can go stale.** A fresh Strava OAuth creates a
 new user row, leaving the variable pointing at a user with no data. The web UI is unaffected,
