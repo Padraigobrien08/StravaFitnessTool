@@ -6,11 +6,25 @@ import { useStrava } from "@/lib/context/strava-context";
 import { useSyncPreferences } from "@/hooks/use-sync-preferences";
 import { CoachWorkspace } from "@/components/coach/coach-workspace";
 import { CoachReasoningWorkspace } from "@/components/coach/coach-reasoning-workspace";
+import {
+  chatDisabledReason,
+  coachHostFromHostname,
+  type CoachHost,
+} from "@/lib/coach/chatDisabledReason";
 
 function CoachPageInner() {
   const { apiConnected, importData, dataSources } = useStrava();
   const [serverReady, setServerReady] = useState(false);
   const isDemo = Boolean(dataSources.demo);
+
+  // Resolved after mount rather than during render: `window` does not exist on the
+  // server, and rendering one wording then swapping to the other is a hydration
+  // mismatch. "hosted" is the safer initial value — it never tells a reader to edit a
+  // file that is not there.
+  const [host, setHost] = useState<CoachHost>("hosted");
+  useEffect(() => {
+    setHost(coachHostFromHostname(window.location.hostname));
+  }, []);
 
   useSyncPreferences(apiConnected);
 
@@ -34,13 +48,7 @@ function CoachPageInner() {
       <CoachWorkspace>
         <CoachReasoningWorkspace
           disabled={chatDisabled}
-          disabledReason={
-            isDemo
-              ? "Demo mode: the reasoning workspace below is live on the sample athlete, but the chat needs an LLM key. Add OPENAI_API_KEY (or ANTHROPIC_API_KEY) + DATABASE_URL to .env.local and connect Strava to enable tool-backed chat. See the README “Coach chat” section."
-              : !apiConnected
-                ? "Connect Strava on Import. Coach needs server-synced activities for tool-backed reasoning."
-                : "Sync activities from Import so investigations can use your full history."
-          }
+          disabledReason={chatDisabledReason({ isDemo, apiConnected, host })}
         />
       </CoachWorkspace>
     </RequireData>
