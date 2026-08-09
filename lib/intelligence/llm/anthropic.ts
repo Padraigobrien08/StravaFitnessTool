@@ -73,8 +73,9 @@ export async function runAnthropicCoachChat(
 
       for (const block of data.content) {
         if (block.type !== "tool_use") continue;
-        toolsUsed.push(block.name);
         const outcome = await executeToolForModel(ctx, block.name, block.input ?? {});
+        // Only a call that returned data counts as grounding. See `describeGrounding`.
+        if (!outcome.isError) toolsUsed.push(block.name);
         toolResults.push({
           type: "tool_result",
           tool_use_id: block.id,

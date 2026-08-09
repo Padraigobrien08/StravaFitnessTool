@@ -110,7 +110,7 @@ The forecast reports a range and a confidence, then names its own weakest assump
 engine holds the band open because its models have never been scored against a race this athlete
 actually ran: _"The models agree with each other, which is not the same as being right."_
 
-![StrideIQ Goals — half-marathon forecast of 1h 37m with a p25–p75 range, evidence list, explicit confidence reasoning, and a limitations panel](docs/screenshots/goals.png)
+![StrideIQ Goals — half-marathon forecast of 1h 37m with a realistic range, evidence list, explicit confidence reasoning, and a limitations panel](docs/screenshots/goals.png)
 
 #### Coach — threaded investigation over deterministic tools
 

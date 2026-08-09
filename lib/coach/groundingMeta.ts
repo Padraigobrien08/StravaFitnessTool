@@ -58,6 +58,13 @@ export type Grounding =
  * tools at all could still be labelled grounded in four things. The badge exists to
  * certify that numbers came from the engines rather than the model; deriving it from
  * what the model wrote is the one way of computing it that cannot do that.
+ *
+ * The second half of that fix is in the provider loops: `toolsUsed` was appended to
+ * *before* the tool ran, so a call that threw — a database blip, a bad argument — still
+ * produced its grounding chip. The model was correctly told the call failed and would
+ * answer around it, while the badge told the reader that failure was the evidence. Both
+ * loops now push only after a non-error outcome, so what arrives here is the set of
+ * calls that actually returned data.
  */
 export function describeGrounding(toolsUsed: string[] | undefined): Grounding {
   if (toolsUsed === undefined) return { kind: "unknown" };

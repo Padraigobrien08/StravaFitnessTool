@@ -87,7 +87,7 @@ export function GoalsRaceBrief({ brief }: { brief: GoalsRaceBriefView }) {
               <p className="mt-1 font-mono text-[11px] text-zinc-500">{brief.distanceLabel}</p>
             ) : null}
           </div>
-          <BriefMetric label="Range" value={brief.rangeDisplay} sub="p25–p75" />
+          <BriefMetric label="Range" value={brief.rangeDisplay} sub="likely range" />
           {brief.readinessScore != null ? (
             <BriefMetric
               label="Readiness"

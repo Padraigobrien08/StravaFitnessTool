@@ -111,15 +111,15 @@ describe("uncertainty", () => {
   it("widens interval for low data", () => {
     const forecast = buildRaceForecastV2(lowDataRunner);
     expect(forecast.confidence).toMatch(/low|medium/);
-    expect(forecast.predictionIntervalSec.p90 - forecast.predictionIntervalSec.p10).toBeGreaterThan(
-      120,
-    );
+    expect(
+      forecast.predictionIntervalSec.outerHighSec - forecast.predictionIntervalSec.outerLowSec,
+    ).toBeGreaterThan(120);
   });
 
   it("builds percentile interval", () => {
     const interval = buildPredictionInterval(3600, 240);
-    expect(interval.p50).toBe(3600);
-    expect(interval.p10).toBeLessThan(interval.p90);
+    expect(interval.mostLikelySec).toBe(3600);
+    expect(interval.outerLowSec).toBeLessThan(interval.outerHighSec);
   });
 });
 
@@ -168,7 +168,7 @@ describe("buildRaceForecastV2", () => {
   it("returns full V2 shape with uncertainty and agreement", () => {
     const f = buildRaceForecastV2(hmReadyRunner);
     expect(f.mostLikelyTimeSec).toBeGreaterThan(0);
-    expect(f.predictionIntervalSec.p50).toBe(f.mostLikelyTimeSec);
+    expect(f.predictionIntervalSec.mostLikelySec).toBe(f.mostLikelyTimeSec);
     expect(f.modelEstimates.length).toBeGreaterThan(0);
     expect(f.modelAgreement.spreadSec).toBeGreaterThanOrEqual(0);
     expect(f.limitations.length).toBeGreaterThan(0);

@@ -37,7 +37,7 @@ export function runSanityRules(
 ): ValidationRuleResult[] {
   const rules: ValidationRuleResult[] = [];
   const { predictionIntervalSec: iv } = forecast;
-  const intervalWidth = iv.p90 - iv.p10;
+  const intervalWidth = iv.outerHighSec - iv.outerLowSec;
 
   // --- Prediction range ---
   if (forecast.conservativeTimeSec >= forecast.mostLikelyTimeSec) {
@@ -79,10 +79,22 @@ export function runSanityRules(
     );
   }
 
-  const percentiles = [iv.p10, iv.p25, iv.p50, iv.p75, iv.p90];
+  const percentiles = [
+    iv.outerLowSec,
+    iv.innerLowSec,
+    iv.mostLikelySec,
+    iv.innerHighSec,
+    iv.outerHighSec,
+  ];
   const ordered = percentiles.every((v, i) => i === 0 || v >= percentiles[i - 1]!);
   if (ordered) {
-    rules.push(pass("percentile_ordering", "interval", "p10 ≤ p25 ≤ p50 ≤ p75 ≤ p90."));
+    rules.push(
+      pass(
+        "percentile_ordering",
+        "interval",
+        "outerLowSec ≤ innerLowSec ≤ mostLikelySec ≤ innerHighSec ≤ outerHighSec.",
+      ),
+    );
   } else {
     rules.push(
       fail(
@@ -95,15 +107,17 @@ export function runSanityRules(
     );
   }
 
-  if (iv.p50 === forecast.mostLikelyTimeSec) {
-    rules.push(pass("p50_equals_most_likely", "interval", "p50 matches most-likely time."));
+  if (iv.mostLikelySec === forecast.mostLikelyTimeSec) {
+    rules.push(
+      pass("p50_equals_most_likely", "interval", "mostLikelySec matches most-likely time."),
+    );
   } else {
     rules.push(
       fail(
         "p50_equals_most_likely",
         "interval",
         "warning",
-        `p50 (${iv.p50}s) differs from most likely (${forecast.mostLikelyTimeSec}s).`,
+        `mostLikelySec (${iv.mostLikelySec}s) differs from most likely (${forecast.mostLikelyTimeSec}s).`,
       ),
     );
   }

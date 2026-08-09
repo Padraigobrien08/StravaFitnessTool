@@ -570,7 +570,7 @@ function applyCanonicalForecast(
     distanceKm: goalDistanceKm ?? projection.primary?.distanceKm ?? 0,
     timeDisplay: forecast.mostLikely,
     rangeDisplay: forecast.rangeDisplay,
-    // forecastV2 communicates uncertainty via the p25–p75 band (rangeDisplay),
+    // forecastV2 communicates uncertainty via the innerLowSec–innerHighSec band (rangeDisplay),
     // not a symmetric ± spread — so no separate spread token.
     spreadDisplay: "",
     confidence: forecastConfidenceLevel(forecast.confidence),

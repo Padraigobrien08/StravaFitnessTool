@@ -195,12 +195,31 @@ export type RaceForecastV2 = {
   mostLikelyTimeSec: number;
   conservativeTimeSec: number;
   optimisticTimeSec: number;
+  /**
+   * The band shown to the athlete, in seconds, widest first.
+   *
+   * **These are not quantiles, and the names deliberately no longer pretend to be.**
+   * They were `p10/p25/p50/p75/p90` until this commit, which asserted a distribution
+   * that has never been fitted: the width comes from `uncertaintyModel`, which sums
+   * hand-chosen seconds per risk driver and then applies a minimum-width floor as a
+   * share of predicted time. The five points are a symmetric spread of that width via
+   * fixed multipliers. Nothing about the construction makes 10% of outcomes fall below
+   * `outerLowSec`.
+   *
+   * Symmetry is also wrong on its own terms — race times are right-skewed, because a
+   * blow-up costs far more than a good day gains — but a symmetric heuristic is honest
+   * where a symmetric *quantile* is not, so the shape is left alone and only the claim
+   * is withdrawn.
+   *
+   * Replace with fitted quantiles when enough races have been scored to fit one; the
+   * observed hit rate in `summarizeCalibration` is exactly that input.
+   */
   predictionIntervalSec: {
-    p10: number;
-    p25: number;
-    p50: number;
-    p75: number;
-    p90: number;
+    outerLowSec: number;
+    innerLowSec: number;
+    mostLikelySec: number;
+    innerHighSec: number;
+    outerHighSec: number;
   };
 
   confidence: "low" | "medium" | "medium_high" | "high";

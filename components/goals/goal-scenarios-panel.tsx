@@ -68,7 +68,7 @@ export function GoalScenariosPanel({ scenarios }: { scenarios: GoalScenarioResul
                   <span className="text-sm text-zinc-400">{s.projectedTimeLabel}</span>
                   {s.probabilityPct != null ? (
                     <span className={cn("text-sm font-semibold", probColor(s.probabilityPct))}>
-                      {s.probabilityPct}%
+                      {s.probabilityPct}/100
                     </span>
                   ) : null}
                 </div>

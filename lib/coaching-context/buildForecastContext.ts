@@ -17,8 +17,8 @@ export function buildForecastContext(
   const raw = view.raw;
   const mostLikelyTimeSec = raw.mostLikelyTimeSec;
   const realisticRangeSec = {
-    low: raw.predictionIntervalSec.p25,
-    high: raw.predictionIntervalSec.p75,
+    low: raw.predictionIntervalSec.innerLowSec,
+    high: raw.predictionIntervalSec.innerHighSec,
   };
 
   return {

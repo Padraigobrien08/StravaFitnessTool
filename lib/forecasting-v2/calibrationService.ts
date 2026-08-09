@@ -22,10 +22,10 @@ export async function logForecastForCalibration(
     distanceMeters: forecast.distanceMeters,
     issuedAt: now.toISOString(),
     mostLikelyTimeSec: forecast.mostLikelyTimeSec,
-    p10Sec: forecast.predictionIntervalSec.p10,
-    p25Sec: forecast.predictionIntervalSec.p25,
-    p75Sec: forecast.predictionIntervalSec.p75,
-    p90Sec: forecast.predictionIntervalSec.p90,
+    outerLowSec: forecast.predictionIntervalSec.outerLowSec,
+    innerLowSec: forecast.predictionIntervalSec.innerLowSec,
+    innerHighSec: forecast.predictionIntervalSec.innerHighSec,
+    outerHighSec: forecast.predictionIntervalSec.outerHighSec,
   };
   try {
     await logForecast(userId, logged);

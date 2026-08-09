@@ -29,7 +29,7 @@ export function IntelligenceForecastAccuracy({ data }: { data: ForecastCalibrati
       ) : (
         <>
           <p className="mt-1 text-[12px] text-zinc-400">
-            <span className="font-medium text-zinc-200">{summary.withinIntervalPct}%</span> landed
+            <span className="font-medium text-zinc-200">{summary.outerBandHitRatePct}%</span> landed
             in the predicted range <span className="text-zinc-600">(well-calibrated ≈ 80%)</span> ·
             mean error {summary.meanAbsErrorSec}s
             {bias ? (
@@ -54,10 +54,10 @@ export function IntelligenceForecastAccuracy({ data }: { data: ForecastCalibrati
                 <span
                   className={cn(
                     "text-[11px]",
-                    f.withinInterval ? "text-[var(--home-good)]" : "text-amber-400/85",
+                    f.withinBand ? "text-[var(--home-good)]" : "text-amber-400/85",
                   )}
                 >
-                  {f.withinInterval ? "in range" : "off"}
+                  {f.withinBand ? "in range" : "off"}
                 </span>
               </li>
             ))}
