@@ -107,6 +107,34 @@ since a comment disclaiming causality inside a folder named for it loses.
 
 ---
 
+## Load and freshness
+
+**Acute load is an average over weekly buckets, and the last bucket dominates it.** `ATL`
+uses a two-week time constant over weekly totals, so roughly two thirds of the reading comes
+from the most recent point. That makes freshness responsive, which is the intent, but it also
+means a single unusual week moves it a long way.
+
+**A weekly schedule that does not divide into seven aliases against the window.** An athlete
+running every third day produces alternating 200/300 weeks, because seven days holds two runs
+some weeks and three in others. Their freshness genuinely oscillates with that pattern rather
+than with their training. Measured: a 29% heavier trailing week takes freshness from mid-range
+to near zero.
+
+**Freshness thresholds are absolute, not relative to the athlete.** `freshnessFromTsb` reads
+TSB in raw load units — `39 + tsb` below −10, and fixed cut-points at ±10 — while TSB itself
+scales with training volume. A high-volume athlete therefore reaches the extremes on ordinary
+variation, where a low-volume one never would. The function is also discontinuous at those
+cut-points: crossing −10 moves freshness eleven points for an arbitrarily small change in
+balance.
+
+These were surfaced while fixing a worse one: the current calendar week was fed into the
+average as though it were complete, so acute load collapsed part-way through every week. For a
+steady daily runner that produced a freshness reading of 100 on six days out of seven, correct
+only on Sundays. The final point now covers the trailing seven days, which removes the
+weekday artifact; the three limitations above are what remains, and are unfixed.
+
+---
+
 ## Physiology
 
 Estimates are gated on sample size and return _nothing_ rather than a confident number when

@@ -131,12 +131,27 @@ describe("the guarantee, end to end", () => {
     expect(snap.freshness).toBe(freshnessFromTsb(snap.tsb, snap.restDaysSinceLastRun).freshness);
   });
 
-  it("scores a stale high balance below a current moderate one", () => {
-    // Invariant 5: freshness is no longer monotonic in TSB.
+  it("scores a stale high balance below a current one with less balance", () => {
+    // Invariant 5: freshness is no longer monotonic in TSB. The stale athlete has the
+    // higher balance and must still score lower, because the balance is stale.
+    //
+    // The comparator used to be "a run every three days", which passed only because
+    // acute load was computed from a partial calendar week and came out deflated. With
+    // the week boundary fixed that athlete reads genuinely fatigued — they are mid-block
+    // with a trailing week above their chronic load — so they no longer demonstrate
+    // anything about staleness. Three days also aliases against a seven-day window,
+    // giving them 200/300/200 weeks and an unstable reading.
+    //
+    // A consistent block that eased off over the last week is the honest comparator:
+    // unambiguously current, and fresher than the athlete who simply stopped.
     const stale = buildFatigueSnapshot(blockThenGap());
+
     const current: RunActivity[] = [];
-    for (let d = 60; d >= 0; d -= 3) current.push(daysAgo(d, 10, 100));
+    for (let d = 60; d >= 7; d -= 2) current.push(daysAgo(d, 12, 120));
+    for (let d = 5; d >= 1; d -= 2) current.push(daysAgo(d, 6, 45));
     const fresh = buildFatigueSnapshot(current);
+
+    expect(fresh.readiness.currency).toBe("current");
     expect(stale.tsb).toBeGreaterThan(fresh.tsb);
     expect(stale.freshness).toBeLessThan(fresh.freshness);
   });
