@@ -4,7 +4,7 @@
 
 Please **do not** open a public issue for security vulnerabilities.
 
-Instead, report privately via GitHub's [**Report a vulnerability**](https://github.com/Padraigobrien08/StravaFitnessTool/security/advisories/new) (Security → Advisories), which keeps the report confidential until a fix is ready.
+Instead, report privately via GitHub's [**Report a vulnerability**](https://github.com/Padraigobrien08/strideiq/security/advisories/new) (Security → Advisories), which keeps the report confidential until a fix is ready.
 
 Include, where possible:
 

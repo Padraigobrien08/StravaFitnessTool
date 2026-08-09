@@ -7,11 +7,11 @@
   "author": "Padraig O'Brien (https://github.com/Padraigobrien08)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Padraigobrien08/StravaFitnessTool.git"
+    "url": "git+https://github.com/Padraigobrien08/strideiq.git"
   },
-  "homepage": "https://github.com/Padraigobrien08/StravaFitnessTool#readme",
+  "homepage": "https://github.com/Padraigobrien08/strideiq#readme",
   "bugs": {
-    "url": "https://github.com/Padraigobrien08/StravaFitnessTool/issues"
+    "url": "https://github.com/Padraigobrien08/strideiq/issues"
   },
   "engines": {
     "node": ">=22"

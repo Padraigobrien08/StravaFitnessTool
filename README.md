@@ -8,8 +8,8 @@ Import Strava data. Get evidence-backed insights. Plan your week. Investigate _w
 
 [Try the demo](#-try-the-demo-zero-setup) · [Quick start](#quick-start) · [Features](#features) · [Deploy](#deploy) · [Docs](#documentation)
 
-[![CI](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/ci.yml/badge.svg)](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/codeql.yml/badge.svg)](https://github.com/Padraigobrien08/StravaFitnessTool/actions/workflows/codeql.yml)
+[![CI](https://github.com/Padraigobrien08/strideiq/actions/workflows/ci.yml/badge.svg)](https://github.com/Padraigobrien08/strideiq/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Padraigobrien08/strideiq/actions/workflows/codeql.yml/badge.svg)](https://github.com/Padraigobrien08/strideiq/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-14b8a6.svg)](LICENSE)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149eca?logo=react)
@@ -21,8 +21,9 @@ Import Strava data. Get evidence-backed insights. Plan your week. Investigate _w
 
 StrideIQ is a **local-first** Next.js app that turns Strava exports (or live API sync) into a coherent training operating system — not another chart dashboard. Deterministic engines compute metrics; the Coach and LLM layers **orchestrate tools** and must not invent numbers.
 
-> **Repository:** `StravaFitnessTool` on GitHub · **Product name:** StrideIQ  
-> **Status:** MVP (`v0.1.0-mvp`) — private beta
+> **Status:** MVP (`v0.1.0-mvp`) — private beta  
+> **Start here:** [**What is validated, and what is not**](docs/LIMITATIONS.md) — which claims in
+> this repository have been checked against reality, and which are only implemented and tested.
 
 ---
 
@@ -182,8 +183,8 @@ flowchart LR
 ### Run locally
 
 ```bash
-git clone https://github.com/Padraigobrien08/StravaFitnessTool.git
-cd StravaFitnessTool
+git clone https://github.com/Padraigobrien08/strideiq.git
+cd strideiq
 npm install
 cp .env.example .env.local   # optional — see paths below
 npm run dev
@@ -306,7 +307,7 @@ Production values and callback URLs: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Deploy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Padraigobrien08/StravaFitnessTool)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Padraigobrien08/strideiq)
 
 The app builds and runs with **zero environment variables** — the demo and local-export modes work out of the box. Add the variables below only for the optional server features.
 
@@ -504,6 +505,6 @@ Next.js/Turbopack picks the workspace root by walking _up_ for a lockfile. If a 
 
 <div align="center">
 
-**[StrideIQ](https://github.com/Padraigobrien08/StravaFitnessTool)** · Built for runners who want answers, not just activity logs.
+**[StrideIQ](https://github.com/Padraigobrien08/strideiq)** · Built for runners who want answers, not just activity logs.
 
 </div>

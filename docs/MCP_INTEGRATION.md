@@ -32,7 +32,7 @@ Example: [config/mcp/claude-desktop.example.json](../config/mcp/claude-desktop.e
   "mcpServers": {
     "strideiq": {
       "command": "node",
-      "args": ["/absolute/path/to/StravaFitnessTool/packages/strideiq-mcp/dist/index.js"],
+      "args": ["/absolute/path/to/strideiq/packages/strideiq-mcp/dist/index.js"],
       "env": {
         "STRIDEIQ_BASE_URL": "http://localhost:3000",
         "STRIDEIQ_API_KEY": "your-secret-key"
